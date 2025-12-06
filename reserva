@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encanto Festas | Reserva de Brinquedos</title>
+    <!-- Carregamento do Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Configuração da fonte Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7; /* Fundo levemente off-white */
+        }
+        /* Definição das cores da marca */
+        .color-brand-blue { background-color: #3B82F6; }
+        .text-brand-blue { color: #3B82F6; }
+        .border-brand-blue { border-color: #3B82F6; }
+        .color-brand-yellow { background-color: #F59E0B; }
+        .text-brand-yellow { color: #F59E0B; }
+        
+        /* Estilos específicos para o calendário */
+        .day-cell {
+            transition: all 0.2s;
+            cursor: pointer;
+            @apply p-2 rounded-lg text-center font-medium;
+        }
+        .day-cell:not(.disabled-day):hover {
+            @apply ring-2 ring-offset-2 ring-brand-blue;
+        }
+        .selected-day {
+            @apply ring-4 ring-brand-blue bg-blue-50 text-brand-blue font-bold;
+        }
+
+        /* Estilo para a caixa de orçamento flutuante */
+        #quote-popup {
+            transition: transform 0.3s ease-out;
+            transform: translateY(100%);
+        }
+        #quote-popup.active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Cabeçalho (Header) -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- Espaço para Logo Redonda -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full color-brand-blue flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                    EF
+                </div>
+                <h1 class="text-xl font-extrabold text-gray-800">Encanto Festas</h1>
+            </div>
+            <!-- Título da Página -->
+            <h2 class="text-lg font-semibold text-brand-blue hidden sm:block">Reserve Seus Brinquedos</h2>
+            <nav class="hidden sm:block">
+                <a href="#" class="text-gray-600 hover:text-brand-yellow font-medium transition">Voltar para o Início</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="bg-white rounded-xl shadow-2xl p-6 md:p-10 mb-20">
+
+            <!-- Mensagem de Marketing -->
+            <h3 class="text-3xl sm:text-4xl font-black text-gray-800 mb-4 text-center">
+                Garanta a <span class="text-brand-yellow">Diversão Máxima</span>!
+            </h3>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+                Selecione a data da sua festa no calendário abaixo e veja a mágica acontecer! Datas com mais brinquedos disponíveis estão em <span class="font-bold text-green-600">Verde</span>.
+            </p>
+
+            <!-- Container Principal (Calendar/Availability View) -->
+            <div id="reservation-container">
+                
+                <!-- 1. Visão do Calendário -->
+                <div id="calendar-view">
+                    <div class="flex justify-between items-center mb-6 p-4 rounded-lg bg-blue-50 border-l-4 border-brand-blue">
+                        <button id="prev-month" class="p-2 rounded-full hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <h4 id="current-month-year" class="text-xl font-bold text-gray-800"></h4>
+                        <button id="next-month" class="p-2 rounded-full hover:bg-blue-100 transition">
+                            <svg class="w-6 h-6 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Legenda de Cores -->
+                    <div class="flex justify-center space-x-4 mb-8 text-sm font-medium text-gray-600">
+                        <div class="flex items-center"><span class="w-4 h-4 rounded-full bg-green-500 mr-2"></span>Alta Disponibilidade</div>
+                        <div class="flex items-center"><span class="w-4 h-4 rounded-full bg-yellow-500 mr-2"></span>Média Disponibilidade</div>
+                        <div class="flex items-center"><span class="w-4 h-4 rounded-full bg-red-500 mr-2"></span>Baixa Disponibilidade / Desconto!</div>
+                    </div>
+                    
+                    <!-- Grid do Calendário -->
+                    <div class="grid grid-cols-7 gap-1 text-sm md:text-base">
+                        <div class="text-center font-bold text-brand-blue p-2">Dom</div>
+                        <div class="text-center font-bold text-brand-blue p-2">Seg</div>
+                        <div class="text-center font-bold text-brand-blue p-2">Ter</div>
+                        <div class="text-center font-bold text-brand-blue p-2">Qua</div>
+                        <div class="text-center font-bold text-brand-blue p-2">Qui</div>
+                        <div class="text-center font-bold text-brand-blue p-2">Sex</div>
+                        <div class="text-center font-bold text-brand-blue p-2">Sáb</div>
+                        <div id="calendar-grid" class="contents">
+                            <!-- Células do Calendário serão injetadas aqui -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Visão de Brinquedos Disponíveis (Inicialmente Oculta) -->
+                <div id="availability-view" class="hidden">
+                    <h4 class="text-2xl font-extrabold text-gray-800 mb-6">Brinquedos Disponíveis para <span id="selected-date-display" class="text-brand-blue"></span></h4>
+                    
+                    <button id="back-to-calendar" class="text-sm font-medium text-gray-600 mb-4 flex items-center hover:text-brand-yellow transition">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Mudar Data
+                    </button>
+
+                    <div id="toys-list" class="space-y-6">
+                        <!-- Lista de Brinquedos será injetada aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder para Modal de Mensagem (em substituição ao alert/confirm) -->
+            <div id="message-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl">
+                    <h5 class="text-xl font-bold mb-3 text-brand-blue" id="modal-title">Atenção</h5>
+                    <p class="text-gray-700 mb-4" id="modal-content">Selecione uma data para visualizar os brinquedos disponíveis.</p>
+                    <button id="modal-close-btn" class="w-full color-brand-blue text-white py-2 rounded-lg font-semibold hover:bg-blue-600 transition">Entendi</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Orçamento em Tempo Real (Sticky Footer) -->
+    <div id="quote-popup" class="fixed bottom-0 left-0 right-0 color-brand-blue text-white shadow-2xl z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <div id="quote-summary">
+                <span class="font-semibold text-lg">Orçamento Atual:</span>
+                <span id="quote-total" class="ml-2 text-2xl font-extrabold text-brand-yellow">R$ 0,00</span>
+                <span id="quote-count" class="text-sm ml-2"> (0 itens)</span>
+            </div>
+            <button id="open-quote-details" class="bg-brand-yellow text-gray-900 py-1.5 px-4 rounded-lg font-bold hover:bg-yellow-400 transition">
+                Ver Detalhes
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal de Detalhes do Orçamento (Agora com botão para Finalizar) -->
+    <div id="quote-details-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h5 class="text-2xl font-bold text-brand-blue">Detalhes da Reserva</h5>
+                <button id="close-quote-details" class="text-gray-500 hover:text-gray-900">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">Data selecionada: <span id="modal-quote-date" class="font-semibold">N/A</span></p>
+            <div id="modal-quote-items" class="space-y-3 max-h-80 overflow-y-auto">
+                <!-- Itens do orçamento serão injetados aqui -->
+                <p class="text-gray-500 italic">Nenhum item adicionado.</p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-200">
+                <div class="flex justify-between items-center font-bold text-xl">
+                    <span>Total Estimado:</span>
+                    <span id="modal-quote-total" class="text-brand-blue">R$ 0,00</span>
+                </div>
+            </div>
+            <button id="open-checkout-modal" class="mt-6 w-full color-brand-blue text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-600 transition">
+                Finalizar Reserva (Ir para Formulário)
+            </button>
+        </div>
+    </div>
+    
+    <!-- NOVO: Modal de Checkout/Formulário de Reserva -->
+    <div id="checkout-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                <h5 class="text-2xl font-bold text-brand-blue">Confirme Seus Dados</h5>
+                <button id="close-checkout-modal" class="text-gray-500 hover:text-gray-900">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <p class="text-sm text-gray-600 mb-4 flex-shrink-0">Data da Reserva: <span id="checkout-date-display" class="font-semibold">N/A</span></p>
+
+            <!-- Resumo do Pedido -->
+            <div class="mb-4 bg-blue-50 p-3 rounded-lg border border-brand-blue flex flex-col sm:flex-row justify-between items-center flex-shrink-0">
+                <span class="font-semibold text-lg text-gray-800">Seu Pedido:</span>
+                <div class="flex items-center mt-2 sm:mt-0">
+                    <span class="text-sm text-gray-600 mr-2" id="checkout-item-count">0 itens</span>
+                    <span class="text-3xl font-extrabold text-brand-yellow" id="checkout-total-display">R$ 0,00</span>
+                </div>
+            </div>
+
+            <!-- Formulário de Contato -->
+            <form id="reservation-form" class="space-y-4 overflow-y-auto pr-2">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                    <input type="text" id="name" name="name" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:border-brand-blue focus:ring-brand-blue">
+                </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Telefone (WhatsApp)</label>
+                    <input type="tel" id="phone" name="phone" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:border-brand-blue focus:ring-brand-blue">
+                </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700">Endereço da Festa</label>
+                    <textarea id="address" name="address" rows="2" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:border-brand-blue focus:ring-brand-blue"></textarea>
+                </div>
+                <div>
+                    <label for="event-time" class="block text-sm font-medium text-gray-700">Horário Previsto do Evento</label>
+                    <input type="text" id="event-time" name="event-time" placeholder="Ex: 14h às 18h" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:border-brand-blue focus:ring-brand-blue">
+                </div>
+                
+                <div class="pt-4 sticky bottom-0 bg-white border-t border-gray-200 -mx-6 px-6 pb-2 flex-shrink-0">
+                    <p class="text-xs text-gray-500 mb-2">Ao enviar, você confirma a intenção de reserva e será contatado para confirmação e pagamento.</p>
+                    <button type="submit" class="w-full color-brand-yellow text-gray-900 py-3 rounded-lg font-bold text-lg hover:bg-yellow-400 transition shadow-lg">
+                        Confirmar e Enviar Pedido
+                    </button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+
+
+    <script>
+        // ============== CONSTANTES E DADOS DO ESTOQUE ==============
+        
+        // Dados fixos dos brinquedos e estoque MÁXIMO (UN)
+        const TOYS = [
+            { id: 'P1', name: 'Cama Elástica Pequena', max_stock: 1, base_price: 170.00, size: '2.0m x 2.0m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P1' },
+            { id: 'P2', name: 'Cama Elástica Média', max_stock: 3, base_price: 190.00, size: '2.8m x 2.8m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P2' },
+            { id: 'P3', name: 'Castelinho Pula Pula', max_stock: 1, base_price: 210.00, size: '3.0m x 3.0m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P3' },
+            { id: 'P4', name: 'Piscina de Bolinhas', max_stock: 2, base_price: 160.00, size: '1.5m x 1.5m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P4' },
+            { id: 'P5', name: 'Área Baby', max_stock: 1, base_price: 110.00, size: '3.5m x 2.5m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P5' },
+            { id: 'P6', name: 'Mini Baby Inflável', max_stock: 1, base_price: 220.00, size: '4.0m x 3.0m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P6' },
+            // Brinquedos infláveis grandes e mutuamente exclusivos
+            { id: 'P7', name: 'Escorrega com Bolinhas', max_stock: 1, base_price: 400.00, size: '5.0m x 4.0m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P7', large_inflatable: true },
+            { id: 'P8', name: 'Tobogã Médio', max_stock: 1, base_price: 400.00, size: '6.0m x 3.5m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P8', large_inflatable: true },
+            { id: 'P9', name: 'Futebol de Sabão', max_stock: 1, base_price: 600.00, size: '8.0m x 5.0m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P9', large_inflatable: true },
+            // Jogos de Mesa
+            { id: 'P10', name: 'Pebolim', max_stock: 1, base_price: 200.00, size: '1.5m x 1.0m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P10' },
+            { id: 'P11', name: 'Air Hockey', max_stock: 1, base_price: 200.00, size: '2.0m x 1.2m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P11' },
+            { id: 'P12', name: 'Ping-Pong', max_stock: 1, base_price: 200.00, size: '2.74m x 1.52m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P12' },
+            { id: 'P13', name: 'Jogos de Mesa (x4)', max_stock: 4, base_price: 15.00, size: '0.5m x 0.5m (cada)', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P13', per_unit: true }, // Valor por jogo
+        ];
+
+        // Mapa de estoque MÁXIMO por ID
+        const MAX_STOCK_MAP = TOYS.reduce((acc, toy) => {
+            acc[toy.id] = toy.max_stock;
+            return acc;
+        }, {});
+
+        // Total máximo de estoque (excluindo P13 que tem preço por jogo)
+        const TOTAL_MAX_STOCK = TOYS
+            .filter(t => t.id !== 'P13')
+            .reduce((sum, toy) => sum + toy.max_stock, 0);
+
+        // Dados de disponibilidade simulada para coloração do calendário
+        // Estrutura: 'YYYY-MM-DD': { Px: unidades_restantes }
+        const mockAvailability = {
+            '2025-12-08': { P2: 1, P4: 1, P9: 1, P13: 2 }, 
+            '2025-12-15': { P1: 1, P2: 3, P3: 1, P4: 2, P5: 1, P6: 1, P7: 1, P10: 1, P11: 1, P12: 1, P13: 4 }, // Alta
+            '2025-12-24': { P2: 2, P4: 1, P5: 1, P13: 1 }, // Baixa
+            '2025-12-31': { P1: 1, P2: 3, P3: 1, P4: 2, P5: 1, P6: 1, P8: 1, P10: 1, P11: 1, P12: 1, P13: 4 }, // Alta
+            '2026-01-05': { P3: 0, P6: 0, P7: 1, P13: 0 }, // Muito Baixa, mas P7 disponível
+            '2026-01-12': { P2: 1, P8: 1, P10: 1, P11: 1, P12: 1, P13: 4 }, // Média
+        };
+        
+        // Fator de desconto baseado na baixa disponibilidade de um item (preço inverso)
+        const DISCOUNT_FACTOR = 0.85; // 15% de desconto
+
+        // ============== ESTADO DA APLICAÇÃO ==============
+
+        let currentDisplayDate = new Date();
+        let selectedDate = null;
+        let reservationCart = {}; // { Px: { quantity: N, price: X, name: Y } }
+
+        // ============== UTILITÁRIOS E FUNÇÕES DE ESTOQUE ==============
+
+        /**
+         * Formata uma data para o padrão 'YYYY-MM-DD'.
+         * @param {Date} date 
+         * @returns {string}
+         */
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        /**
+         * Retorna o estoque restante para uma data, ou estoque máximo se não houver registro.
+         * @param {string} dateString 'YYYY-MM-DD'
+         * @returns {object} { Px: unidades_restantes }
+         */
+        function getDailyStock(dateString) {
+            const defaultStock = {};
+            TOYS.forEach(toy => {
+                defaultStock[toy.id] = toy.max_stock;
+            });
+            // Sobrescreve com a disponibilidade mockada se existir
+            return { ...defaultStock, ...mockAvailability[dateString] };
+        }
+
+        /**
+         * Calcula o total de unidades disponíveis para colorir o calendário.
+         * @param {string} dateString 
+         * @returns {number} Percentual de estoque total (0 a 1)
+         */
+        function calculateStockPercentage(dateString) {
+            const stock = getDailyStock(dateString);
+            let availableStock = 0;
+            // Soma o estoque disponível de todos os itens (exceto P13 que tem preço por jogo)
+            TOYS.filter(t => t.id !== 'P13').forEach(toy => {
+                availableStock += stock[toy.id] !== undefined ? stock[toy.id] : toy.max_stock;
+            });
+            
+            // O estoque máximo não inclui P13, então o TOTAL_MAX_STOCK é a base correta
+            return availableStock / TOTAL_MAX_STOCK;
+        }
+
+        /**
+         * Retorna a classe de cor (verde, amarelo, vermelho) com base no percentual de estoque.
+         * @param {number} percentage 
+         * @returns {string} Tailwind CSS classes
+         */
+        function getStockColor(percentage) {
+            if (percentage >= 0.7) {
+                return 'bg-green-500 hover:bg-green-600 text-white'; // Alta
+            } else if (percentage >= 0.4) {
+                return 'bg-yellow-500 hover:bg-yellow-600 text-white'; // Média
+            } else {
+                return 'bg-red-500 hover:bg-red-600 text-white'; // Baixa (Desconto)
+            }
+        }
+
+        /**
+         * Determina se um dos grandes infláveis está reservado para a data.
+         * @param {object} stock - Estoque diário
+         * @returns {boolean} True se um grande inflável estiver reservado (estoque 0)
+         */
+        function isLargeInflatableBooked(stock) {
+            // P7, P8, P9 são os grandes infláveis
+            return stock['P7'] < MAX_STOCK_MAP['P7'] || stock['P8'] < MAX_STOCK_MAP['P8'] || stock['P9'] < MAX_STOCK_MAP['P9'];
+        }
+
+        // ============== FUNÇÕES DE RENDERIZAÇÃO E EVENTOS ==============
+
+        /**
+         * Renderiza o calendário do mês atual
+         */
+        function renderCalendar() {
+            const calendarGrid = document.getElementById('calendar-grid');
+            const monthYearDisplay = document.getElementById('current-month-year');
+            calendarGrid.innerHTML = '';
+
+            const year = currentDisplayDate.getFullYear();
+            const month = currentDisplayDate.getMonth();
+            const today = new Date();
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            const startDay = firstDayOfMonth.getDay(); // 0 (Dom) a 6 (Sáb)
+
+            monthYearDisplay.textContent = firstDayOfMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+            // 1. Preenche dias vazios (padding)
+            for (let i = 0; i < startDay; i++) {
+                calendarGrid.innerHTML += `<div class="day-cell text-gray-300 disabled-day"></div>`;
+            }
+
+            // 2. Preenche os dias do mês
+            for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const dateString = formatDate(date);
+                const isPast = date.setHours(0,0,0,0) < today.setHours(0,0,0,0);
+                const isSelected = selectedDate === dateString;
+                
+                let cellClass = 'bg-gray-100 text-gray-700';
+                let clickHandler = isPast ? '' : `onclick="selectDate('${dateString}')"`;
+                
+                if (isPast) {
+                    cellClass = 'bg-gray-50 text-gray-400 disabled-day cursor-not-allowed';
+                    clickHandler = '';
+                } else {
+                    const stockPercentage = calculateStockPercentage(dateString);
+                    const colorClass = getStockColor(stockPercentage);
+                    cellClass = colorClass;
+                }
+                
+                if (isSelected) {
+                    cellClass += ' selected-day ring-brand-yellow !text-gray-900 shadow-md';
+                }
+
+                calendarGrid.innerHTML += `
+                    <div 
+                        class="day-cell ${cellClass} ${isSelected ? 'selected-day' : ''}"
+                        ${clickHandler}
+                    >
+                        ${day}
+                    </div>
+                `;
+            }
+        }
+
+        /**
+         * Mostra o modal de mensagem customizado.
+         * @param {string} title 
+         * @param {string} content 
+         */
+        function showMessageModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-content').textContent = content;
+            document.getElementById('message-modal').classList.remove('hidden');
+        }
+
+        /**
+         * Esconde o modal de mensagem.
+         */
+        function hideMessageModal() {
+            document.getElementById('message-modal').classList.add('hidden');
+        }
+
+        /**
+         * Lida com a seleção de uma data no calendário.
+         * @param {string} dateString 'YYYY-MM-DD'
+         */
+        function selectDate(dateString) {
+            selectedDate = dateString;
+            renderCalendar(); // Atualiza a seleção visual
+            showAvailabilityView(dateString); // Muda para a visão de brinquedos
+        }
+
+        /**
+         * Alterna para a visão de disponibilidade e renderiza a lista de brinquedos.
+         * @param {string} dateString 
+         */
+        function showAvailabilityView(dateString) {
+            const stock = getDailyStock(dateString);
+            const largeInflatableBooked = isLargeInflatableBooked(stock);
+            
+            const [year, month, day] = dateString.split('-').map(Number);
+            const displayDate = new Date(year, month - 1, day).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+            document.getElementById('selected-date-display').textContent = displayDate;
+            document.getElementById('calendar-view').classList.add('hidden');
+            document.getElementById('availability-view').classList.remove('hidden');
+            
+            renderToysList(stock, largeInflatableBooked);
+        }
+        
+        /**
+         * Renderiza a lista de brinquedos disponíveis para a data selecionada.
+         * @param {object} stock - Estoque diário
+         * @param {boolean} largeInflatableBooked - Se um grande inflável já está reservado
+         */
+        function renderToysList(stock, largeInflatableBooked) {
+            const toysListDiv = document.getElementById('toys-list');
+            toysListDiv.innerHTML = '';
+            
+            TOYS.forEach(toy => {
+                const currentStock = stock[toy.id] !== undefined ? stock[toy.id] : toy.max_stock;
+                const available = currentStock > 0;
+                
+                let finalPrice = toy.base_price;
+                let priceLabel = `R$ ${toy.base_price.toFixed(2).replace('.', ',')}`;
+                let discountText = '';
+
+                // Lógica de Preço Inverso: Se o estoque for menor que o máximo, aplica desconto
+                if (currentStock < toy.max_stock) {
+                    finalPrice = toy.base_price * DISCOUNT_FACTOR;
+                    priceLabel = `<span class="text-sm line-through text-red-500 mr-2">R$ ${toy.base_price.toFixed(2).replace('.', ',')}</span> R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
+                    discountText = `<span class="text-sm font-semibold text-red-600 ml-2">(Desconto de 15% por Baixa Disponibilidade!)</span>`;
+                }
+
+                // Lógica da Unidade Grande (Escorrega, Tobogã, Futebol de Sabão)
+                let specialConstraint = false;
+                if (toy.large_inflatable) {
+                    // Se algum grande inflável JÁ estiver reservado (stock < max), este item (e os outros) ficam indisponíveis.
+                    // A única exceção é o item que tem estoque > 0 (o que foi reservado)
+                    if (largeInflatableBooked && currentStock === 0) {
+                        specialConstraint = true; // Indisponível por conflito
+                    }
+                }
+
+                const isDisabled = !available || specialConstraint;
+                const quantityInCart = reservationCart[toy.id] ? reservationCart[toy.id].quantity : 0;
+                
+                // Armazena o preço final para uso no carrinho
+                toy.final_price = finalPrice;
+
+                toysListDiv.innerHTML += `
+                    <div id="toy-${toy.id}" class="flex flex-col sm:flex-row items-center p-4 bg-gray-50 rounded-xl shadow-lg border-l-4 ${isDisabled ? 'border-gray-300 opacity-60' : 'border-brand-yellow'}">
+                        
+                        <!-- Coluna da Foto/Tamanho (1:1) -->
+                        <div class="w-full sm:w-1/4 flex-shrink-0 mb-4 sm:mb-0">
+                            <img src="${toy.photo}" alt="Foto ${toy.name}" class="w-full h-auto max-w-[100px] sm:max-w-[120px] rounded-lg mx-auto object-cover">
+                            <p class="text-xs text-gray-500 text-center mt-1">Medida Aprox.: ${toy.size}</p>
+                        </div>
+                        
+                        <!-- Coluna do Detalhe/Ação -->
+                        <div class="w-full sm:w-3/4 sm:ml-6">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                                <h5 class="text-lg font-bold text-gray-800">${toy.name}</h5>
+                                <p class="text-xl font-extrabold text-brand-blue mt-1 md:mt-0">${priceLabel}${discountText}</p>
+                            </div>
+                            
+                            <p class="text-sm text-gray-600 mb-3">
+                                <span class="${available ? 'text-green-600' : 'text-red-600'} font-bold">
+                                    ${currentStock} UN. Restantes
+                                </span>
+                                ${specialConstraint ? '<span class="text-red-600 ml-2 font-semibold">(Indisponível: Grande Inflável já reservado.)</span>' : ''}
+                            </p>
+
+                            <div class="flex items-center space-x-4">
+                                <!-- Botão de Diminuir -->
+                                <button onclick="updateCart('${toy.id}', -1)" ${quantityInCart === 0 || isDisabled ? 'disabled' : ''} class="p-2 w-10 h-10 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                </button>
+
+                                <span class="text-2xl font-bold text-gray-800 w-8 text-center" id="quantity-${toy.id}">${quantityInCart}</span>
+                                
+                                <!-- Botão de Aumentar -->
+                                <button onclick="updateCart('${toy.id}', 1)" ${!available || isDisabled || quantityInCart >= currentStock ? 'disabled' : ''} class="p-2 w-10 h-10 rounded-full color-brand-blue text-white hover:bg-blue-600 disabled:opacity-50 transition">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        /**
+         * Atualiza o carrinho de reserva.
+         * @param {string} toyId 
+         * @param {number} change +1 ou -1
+         */
+        function updateCart(toyId, change) {
+            const toy = TOYS.find(t => t.id === toyId);
+            if (!toy) return;
+
+            // Pega o estoque atual para a data selecionada
+            const stock = getDailyStock(selectedDate);
+            const currentStock = stock[toyId] !== undefined ? stock[toyId] : toy.max_stock;
+            const quantityInCart = reservationCart[toyId] ? reservationCart[toyId].quantity : 0;
+            const newQuantity = quantityInCart + change;
+
+            // 1. Validação de Limites
+            if (newQuantity < 0 || newQuantity > currentStock) {
+                showMessageModal("Atenção ao Estoque", `Não podemos adicionar mais unidades. O estoque disponível para ${toy.name} é de ${currentStock} unidade(s).`);
+                return;
+            }
+
+            // 2. Validação de Insuflável Grande (apenas um por dia)
+            if (toy.large_inflatable) {
+                const otherLargeInflatables = ['P7', 'P8', 'P9'].filter(id => id !== toyId);
+                // Verifica se já existe um grande inflável no carrinho
+                const alreadyBooked = otherLargeInflatables.some(id => reservationCart[id] && reservationCart[id].quantity > 0);
+                
+                if (newQuantity > 0 && alreadyBooked) {
+                    showMessageModal("Conflito de Reserva", `Você já reservou outro Inflável Grande para esta data. Apenas UM Tobogã, Escorrega ou Futebol de Sabão pode ser alugado por festa.`);
+                    return;
+                }
+            }
+            
+            // 3. Atualiza o Carrinho/Cálculo
+            if (newQuantity > 0) {
+                reservationCart[toyId] = {
+                    quantity: newQuantity,
+                    price: toy.final_price || toy.base_price, // Usa o preço final calculado na renderização
+                    name: toy.name,
+                    isPerUnit: toy.per_unit
+                };
+            } else {
+                delete reservationCart[toyId];
+            }
+
+            // 4. Atualiza a UI
+            document.getElementById(`quantity-${toyId}`).textContent = newQuantity;
+            updateQuotePopup();
+            renderToysList(stock, isLargeInflatableBooked(stock)); // Re-renderiza para atualizar botões (útil para large inflatables)
+        }
+
+        /**
+         * Calcula o total do carrinho.
+         * @returns {{total: number, items: number}}
+         */
+        function calculateTotal() {
+            let total = 0;
+            let totalItems = 0;
+
+            for (const id in reservationCart) {
+                const item = reservationCart[id];
+                total += item.quantity * item.price;
+                totalItems += item.quantity;
+            }
+            return { total, items: totalItems };
+        }
+
+        /**
+         * Atualiza o pop-up de orçamento inferior.
+         */
+        function updateQuotePopup() {
+            const { total, items } = calculateTotal();
+
+            document.getElementById('quote-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            document.getElementById('quote-count').textContent = ` (${items} item${items !== 1 ? 's' : ''})`;
+
+            // Mostra/Esconde o pop-up
+            const popup = document.getElementById('quote-popup');
+            if (items > 0) {
+                popup.classList.add('active');
+            } else {
+                popup.classList.remove('active');
+            }
+        }
+        
+        /**
+         * Renderiza os detalhes do orçamento no modal de detalhes.
+         */
+        function renderQuoteDetails() {
+            const itemsDiv = document.getElementById('modal-quote-items');
+            itemsDiv.innerHTML = '';
+            
+            const { total } = calculateTotal();
+            const cartItems = Object.values(reservationCart);
+
+            if (cartItems.length === 0) {
+                itemsDiv.innerHTML = '<p class="text-gray-500 italic">Nenhum item adicionado à sua reserva.</p>';
+                document.getElementById('open-checkout-modal').disabled = true;
+                document.getElementById('open-checkout-modal').classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                document.getElementById('open-checkout-modal').disabled = false;
+                document.getElementById('open-checkout-modal').classList.remove('opacity-50', 'cursor-not-allowed');
+
+                cartItems.forEach(item => {
+                    const subtotal = item.quantity * item.price;
+                    itemsDiv.innerHTML += `
+                        <div class="flex justify-between items-center text-gray-700">
+                            <span class="font-medium">${item.quantity}x ${item.name}</span>
+                            <span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            // Atualiza o display da data e o total
+            const [year, month, day] = selectedDate.split('-').map(Number);
+            const displayDate = new Date(year, month - 1, day).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            document.getElementById('modal-quote-date').textContent = displayDate;
+            document.getElementById('modal-quote-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+        
+        /**
+         * Abre e popula o modal de formulário de checkout.
+         */
+        function openCheckoutModal() {
+            const { total, items } = calculateTotal();
+            
+            // Popula os dados do pedido
+            document.getElementById('checkout-date-display').textContent = new Date(selectedDate).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('checkout-item-count').textContent = `${items} item${items !== 1 ? 's' : ''}`;
+            document.getElementById('checkout-total-display').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            
+            // Esconde o modal de detalhes e mostra o de checkout
+            document.getElementById('quote-details-modal').classList.add('hidden');
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+
+        // ============== INICIALIZAÇÃO E LISTENERS ==============
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCalendar();
+            
+            // Listener de navegação do calendário
+            document.getElementById('prev-month').addEventListener('click', () => {
+                currentDisplayDate.setMonth(currentDisplayDate.getMonth() - 1);
+                renderCalendar();
+            });
+            document.getElementById('next-month').addEventListener('click', () => {
+                currentDisplayDate.setMonth(currentDisplayDate.getMonth() + 1);
+                renderCalendar();
+            });
+
+            // Listener para voltar ao calendário
+            document.getElementById('back-to-calendar').addEventListener('click', () => {
+                document.getElementById('availability-view').classList.add('hidden');
+                document.getElementById('calendar-view').classList.remove('hidden');
+                // Limpa o carrinho ao voltar, forçando nova seleção e evitando erros de contexto
+                reservationCart = {};
+                selectedDate = null;
+                updateQuotePopup();
+                renderCalendar();
+            });
+
+            // Listeners do Modal de Mensagem
+            document.getElementById('modal-close-btn').addEventListener('click', hideMessageModal);
+            
+            // Listeners do Modal de Detalhes do Orçamento
+            document.getElementById('open-quote-details').addEventListener('click', () => {
+                if (!selectedDate) {
+                    showMessageModal("Selecione uma Data", "Por favor, selecione uma data no calendário antes de visualizar o orçamento.");
+                    return;
+                }
+                if (Object.keys(reservationCart).length === 0) {
+                    showMessageModal("Adicione Brinquedos", "Seu carrinho está vazio. Adicione pelo menos um brinquedo para prosseguir.");
+                    return;
+                }
+
+                renderQuoteDetails();
+                document.getElementById('quote-details-modal').classList.remove('hidden');
+            });
+            
+            document.getElementById('close-quote-details').addEventListener('click', () => {
+                document.getElementById('quote-details-modal').classList.add('hidden');
+            });
+
+            // Listener para abrir o Modal de Checkout (Formulário)
+            document.getElementById('open-checkout-modal').addEventListener('click', openCheckoutModal);
+
+            // Listeners do Modal de Checkout/Formulário
+            document.getElementById('close-checkout-modal').addEventListener('click', () => {
+                document.getElementById('checkout-modal').classList.add('hidden');
+            });
+            
+            // Listener de Submissão do Formulário (Apenas simulação)
+            document.getElementById('reservation-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Coleta dados do formulário
+                const formData = new FormData(e.target);
+                const reservationData = Object.fromEntries(formData.entries());
+                
+                // Adiciona dados da reserva
+                reservationData.date = new Date(selectedDate).toLocaleDateString('pt-BR');
+                reservationData.cart = reservationCart;
+                reservationData.total = calculateTotal().total;
+                
+                console.log("DADOS DA RESERVA ENVIADOS:", reservationData);
+
+                // Mensagem de sucesso (simulação)
+                showMessageModal("Reserva Solicitada!", 
+                    `Obrigado, ${reservationData.name}! Seu pedido de reserva para a data ${reservationData.date} no valor de R$ ${reservationData.total.toFixed(2).replace('.', ',')} foi enviado. Entraremos em contato no número ${reservationData.phone} para finalizar a reserva.`);
+                
+                // Reseta a UI após a simulação de envio
+                document.getElementById('checkout-modal').classList.add('hidden');
+                reservationCart = {};
+                selectedDate = null;
+                updateQuotePopup();
+                renderCalendar();
+                document.getElementById('availability-view').classList.add('hidden');
+                document.getElementById('calendar-view').classList.remove('hidden');
+            });
+
+
+            // Inicializa o pop-up (garante que está escondido no início)
+            updateQuotePopup();
+        });
+    </script>
+</body>
+</html>
