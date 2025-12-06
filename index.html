@@ -3,772 +3,560 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encanto Festas | Reserva de Brinquedos</title>
-    <!-- Carregamento do Tailwind CSS para estilização -->
+    <title>Reserva de Locação - Encanto Festas</title>
+    <!-- Carrega o Tailwind CSS CDN para estilização -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuração do Tailwind para usar a fonte Inter e cores personalizadas (Azul e Amarelo) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'encanto-blue': '#3B82F6', // Azul principal
+                        'encanto-yellow': '#FACC15', // Amarelo de destaque
+                        'high-availability': '#10B981', // Verde
+                        'low-availability': '#F59E0B', // Amarelo/Laranja
+                        'full-availability': '#EF4444', // Vermelho (simulando a regra de preço, onde menos = mais barato)
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        /* Configuração da fonte Inter */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        /* Estilos personalizados para o calendário e responsividade */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f7f7f7; /* Fundo levemente off-white */
+            background-color: #F8FAFC; /* Fundo levemente cinza */
         }
-        /* Definição das cores da marca */
-        .color-brand-blue { background-color: #3B82F6; }
-        .text-brand-blue { color: #3B82F6; }
-        .border-brand-blue { border-color: #3B82F6; }
-        .color-brand-yellow { background-color: #F59E0B; }
-        .text-brand-yellow { color: #F59E0B; }
-        
-        /* Estilos específicos para o calendário */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
         .day-cell {
-            transition: all 0.2s;
+            padding: 8px;
             cursor: pointer;
-            @apply p-2 rounded-lg text-center font-medium;
+            border-radius: 8px;
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-align: center;
+            font-weight: 500;
         }
-        .day-cell:not(.disabled-day):hover {
-            @apply ring-2 ring-offset-2 ring-brand-blue;
+        .day-cell:hover:not(.disabled):not(.selected) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         }
-        .selected-day {
-            @apply ring-4 ring-brand-blue bg-blue-50 text-brand-blue font-bold;
+        .day-cell.disabled {
+            background-color: #E5E7EB;
+            color: #9CA3AF;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
-
-        /* Estilo para a caixa de orçamento flutuante */
-        #quote-popup {
-            transition: transform 0.3s ease-out;
-            transform: translateY(100%);
-        }
-        #quote-popup.active {
+        .day-cell.selected {
+            border: 3px solid #1D4ED8; /* Azul escuro */
             transform: translateY(0);
+        }
+        /* Classe para o orçamento flutuante */
+        .budget-popup {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen pb-24"> <!-- Padding bottom para o orçamento fixo -->
 
-    <!-- Cabeçalho (Header) -->
-    <header class="bg-white shadow-md sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    <div class="max-w-4xl mx-auto p-4 md:p-8">
+
+        <!-- HEADER E LOGO -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b pb-4">
             <!-- Espaço para Logo Redonda -->
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full color-brand-blue flex items-center justify-center text-white text-sm font-bold shadow-lg">
-                    EF
+            <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                <div class="w-16 h-16 bg-encanto-yellow rounded-full flex items-center justify-center shadow-lg border-4 border-encanto-blue">
+                    <span class="text-white text-xl font-black">EF</span>
                 </div>
-                <h1 class="text-xl font-extrabold text-gray-800">Encanto Festas</h1>
+                <h1 class="text-3xl font-extrabold text-gray-800">Encanto Festas</h1>
             </div>
-            <!-- Título da Página -->
-            <h2 class="text-lg font-semibold text-brand-blue hidden sm:block">Reserve Seus Brinquedos</h2>
-            <nav class="hidden sm:block">
-                <a href="#" class="text-gray-600 hover:text-brand-yellow font-medium transition">Voltar para o Início</a>
-            </nav>
-        </div>
-    </header>
+            <div class="text-right">
+                <h2 class="text-2xl font-semibold text-encanto-blue">Reserva de Locação</h2>
+                <p class="text-sm text-gray-500 italic">Sua festa começa aqui!</p>
+            </div>
+        </header>
 
-    <!-- Conteúdo Principal -->
-    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <div class="bg-white rounded-xl shadow-2xl p-6 md:p-10 mb-20">
+        <!-- SEÇÃO PRINCIPAL (CALENDÁRIO / PRODUTOS) -->
+        <main>
+            <!-- Passo 1: Seleção de Data -->
+            <section id="date-selection-section" class="bg-white p-6 rounded-xl shadow-2xl border-t-8 border-encanto-blue">
+                <h3 class="text-xl font-bold mb-4 text-gray-700">1. Selecione a Data do seu Evento</h3>
 
-            <!-- Mensagem de Marketing -->
-            <h3 class="text-3xl sm:text-4xl font-black text-gray-800 mb-4 text-center">
-                Garanta a <span class="text-brand-yellow">Diversão Máxima</span>!
-            </h3>
-            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
-                Selecione a data da sua festa no calendário abaixo e veja a mágica acontecer! Datas com mais brinquedos disponíveis estão em <span class="font-bold text-green-600">Verde</span>.
-            </p>
-
-            <!-- Container Principal (Calendar/Availability View) -->
-            <div id="reservation-container">
-                
-                <!-- 1. Visão do Calendário -->
-                <div id="calendar-view">
-                    <div class="flex justify-between items-center mb-6 p-4 rounded-lg bg-blue-50 border-l-4 border-brand-blue">
-                        <button id="prev-month" class="p-2 rounded-full hover:bg-blue-100 transition">
-                            <svg class="w-6 h-6 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                        </button>
-                        <h4 id="current-month-year" class="text-xl font-bold text-gray-800"></h4>
-                        <button id="next-month" class="p-2 rounded-full hover:bg-blue-100 transition">
-                            <svg class="w-6 h-6 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
-                    </div>
-
-                    <!-- Legenda de Cores -->
-                    <div class="flex justify-center space-x-4 mb-8 text-sm font-medium text-gray-600">
-                        <div class="flex items-center"><span class="w-4 h-4 rounded-full bg-green-500 mr-2"></span>Alta Disponibilidade</div>
-                        <div class="flex items-center"><span class="w-4 h-4 rounded-full bg-yellow-500 mr-2"></span>Média Disponibilidade</div>
-                        <div class="flex items-center"><span class="w-4 h-4 rounded-full bg-red-500 mr-2"></span>Baixa Disponibilidade / Desconto!</div>
-                    </div>
-                    
-                    <!-- Grid do Calendário -->
-                    <div class="grid grid-cols-7 gap-1 text-sm md:text-base">
-                        <div class="text-center font-bold text-brand-blue p-2">Dom</div>
-                        <div class="text-center font-bold text-brand-blue p-2">Seg</div>
-                        <div class="text-center font-bold text-brand-blue p-2">Ter</div>
-                        <div class="text-center font-bold text-brand-blue p-2">Qua</div>
-                        <div class="text-center font-bold text-brand-blue p-2">Qui</div>
-                        <div class="text-center font-bold text-brand-blue p-2">Sex</div>
-                        <div class="text-center font-bold text-brand-blue p-2">Sáb</div>
-                        <div id="calendar-grid" class="contents">
-                            <!-- Células do Calendário serão injetadas aqui -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Visão de Brinquedos Disponíveis (Inicialmente Oculta) -->
-                <div id="availability-view" class="hidden">
-                    <h4 class="text-2xl font-extrabold text-gray-800 mb-6">Brinquedos Disponíveis para <span id="selected-date-display" class="text-brand-blue"></span></h4>
-                    
-                    <button id="back-to-calendar" class="text-sm font-medium text-gray-600 mb-4 flex items-center hover:text-brand-yellow transition">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        Mudar Data
+                <!-- Controles e Título do Mês -->
+                <div class="flex justify-between items-center mb-6">
+                    <button id="prev-month" class="p-2 rounded-full bg-encanto-yellow hover:bg-yellow-600 text-white transition duration-150">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                     </button>
-
-                    <div id="toys-list" class="space-y-6">
-                        <!-- Lista de Brinquedos será injetada aqui -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Placeholder para Modal de Mensagem (em substituição ao alert/confirm) -->
-            <div id="message-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
-                <div class="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl">
-                    <h5 class="text-xl font-bold mb-3 text-brand-blue" id="modal-title">Atenção</h5>
-                    <p class="text-gray-700 mb-4" id="modal-content">Selecione uma data para visualizar os brinquedos disponíveis.</p>
-                    <button id="modal-close-btn" class="w-full color-brand-blue text-white py-2 rounded-lg font-semibold hover:bg-blue-600 transition">Entendi</button>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Orçamento em Tempo Real (Sticky Footer) -->
-    <div id="quote-popup" class="fixed bottom-0 left-0 right-0 color-brand-blue text-white shadow-2xl z-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-            <div id="quote-summary">
-                <span class="font-semibold text-lg">Orçamento Atual:</span>
-                <span id="quote-total" class="ml-2 text-2xl font-extrabold text-brand-yellow">R$ 0,00</span>
-                <span id="quote-count" class="text-sm ml-2"> (0 itens)</span>
-            </div>
-            <button id="open-quote-details" class="bg-brand-yellow text-gray-900 py-1.5 px-4 rounded-lg font-bold hover:bg-yellow-400 transition">
-                Ver Detalhes
-            </button>
-        </div>
-    </div>
-    
-    <!-- Modal de Detalhes do Orçamento (Agora com botão para Finalizar) -->
-    <div id="quote-details-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <h5 class="text-2xl font-bold text-brand-blue">Detalhes da Reserva</h5>
-                <button id="close-quote-details" class="text-gray-500 hover:text-gray-900">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <p class="text-sm text-gray-600 mb-4">Data selecionada: <span id="modal-quote-date" class="font-semibold">N/A</span></p>
-            <div id="modal-quote-items" class="space-y-3 max-h-80 overflow-y-auto">
-                <!-- Itens do orçamento serão injetados aqui -->
-                <p class="text-gray-500 italic">Nenhum item adicionado.</p>
-            </div>
-            <div class="mt-6 pt-4 border-t border-gray-200">
-                <div class="flex justify-between items-center font-bold text-xl">
-                    <span>Total Estimado:</span>
-                    <span id="modal-quote-total" class="text-brand-blue">R$ 0,00</span>
-                </div>
-            </div>
-            <button id="open-checkout-modal" class="mt-6 w-full color-brand-blue text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-600 transition">
-                Finalizar Reserva (Ir para Formulário)
-            </button>
-        </div>
-    </div>
-    
-    <!-- NOVO: Modal de Checkout/Formulário de Reserva -->
-    <div id="checkout-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center mb-4 flex-shrink-0">
-                <h5 class="text-2xl font-bold text-brand-blue">Confirme Seus Dados</h5>
-                <button id="close-checkout-modal" class="text-gray-500 hover:text-gray-900">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            
-            <p class="text-sm text-gray-600 mb-4 flex-shrink-0">Data da Reserva: <span id="checkout-date-display" class="font-semibold">N/A</span></p>
-
-            <!-- Resumo do Pedido -->
-            <div class="mb-4 bg-blue-50 p-3 rounded-lg border border-brand-blue flex flex-col sm:flex-row justify-between items-center flex-shrink-0">
-                <span class="font-semibold text-lg text-gray-800">Seu Pedido:</span>
-                <div class="flex items-center mt-2 sm:mt-0">
-                    <span class="text-sm text-gray-600 mr-2" id="checkout-item-count">0 itens</span>
-                    <span class="text-3xl font-extrabold text-brand-yellow" id="checkout-total-display">R$ 0,00</span>
-                </div>
-            </div>
-
-            <!-- Formulário de Contato -->
-            <form id="reservation-form" class="space-y-4 overflow-y-auto pr-2">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Nome Completo</label>
-                    <input type="text" id="name" name="name" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:border-brand-blue focus:ring-brand-blue">
-                </div>
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700">Telefone (WhatsApp)</label>
-                    <input type="tel" id="phone" name="phone" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:border-brand-blue focus:ring-brand-blue">
-                </div>
-                <div>
-                    <label for="address" class="block text-sm font-medium text-gray-700">Endereço da Festa</label>
-                    <textarea id="address" name="address" rows="2" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:border-brand-blue focus:ring-brand-blue"></textarea>
-                </div>
-                <div>
-                    <label for="event-time" class="block text-sm font-medium text-gray-700">Horário Previsto do Evento</label>
-                    <input type="text" id="event-time" name="event-time" placeholder="Ex: 14h às 18h" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:border-brand-blue focus:ring-brand-blue">
-                </div>
-                
-                <div class="pt-4 sticky bottom-0 bg-white border-t border-gray-200 -mx-6 px-6 pb-2 flex-shrink-0">
-                    <p class="text-xs text-gray-500 mb-2">Ao enviar, você confirma a intenção de reserva e será contatado para confirmação e pagamento.</p>
-                    <button type="submit" class="w-full color-brand-yellow text-gray-900 py-3 rounded-lg font-bold text-lg hover:bg-yellow-400 transition shadow-lg">
-                        Confirmar e Enviar Pedido
+                    <span id="month-year" class="text-2xl font-bold text-encanto-blue"></span>
+                    <button id="next-month" class="p-2 rounded-full bg-encanto-yellow hover:bg-yellow-600 text-white transition duration-150">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </button>
                 </div>
-            </form>
-            
-        </div>
+
+                <!-- Legenda de Cores -->
+                <div class="flex justify-center space-x-4 mb-6 text-sm">
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-high-availability mr-2"></span>
+                        <span class="text-gray-600">Alta Disponibilidade (Preço Normal)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-low-availability mr-2"></span>
+                        <span class="text-gray-600">Média Disponibilidade</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-full-availability mr-2"></span>
+                        <span class="text-gray-600">Baixa Disponibilidade (Preço Mais Barato!)</span>
+                    </div>
+                </div>
+
+                <!-- Cabeçalho da Semana -->
+                <div class="calendar-grid font-semibold text-center text-gray-500 mb-2">
+                    <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+                </div>
+
+                <!-- Grid do Calendário -->
+                <div id="calendar-body" class="calendar-grid text-gray-800">
+                    <!-- Dias serão injetados aqui pelo JavaScript -->
+                </div>
+            </section>
+
+            <!-- Passo 2: Seleção de Brinquedos (Invisível até uma data ser selecionada) -->
+            <section id="item-selection-section" class="mt-10 pt-8 border-t-4 border-encanto-yellow" style="display: none;">
+                <h3 class="text-2xl font-bold mb-6 text-encanto-blue">2. Brinquedos Disponíveis em <span id="selected-date-display" class="text-encanto-yellow"></span></h3>
+
+                <p id="discount-message" class="bg-encanto-blue/10 text-encanto-blue p-3 rounded-lg mb-6 font-semibold hidden">
+                    🎉 Parabéns! Nesta data, a disponibilidade está baixa e, por isso, estamos aplicando um **desconto** nos preços base dos brinquedos! Aproveite!
+                </p>
+
+                <div id="toy-list" class="space-y-6">
+                    <!-- Brinquedos serão injetados aqui -->
+                </div>
+
+                <div class="mt-10 text-center">
+                    <button id="finalize-reservation" class="px-8 py-4 bg-encanto-blue text-white font-bold text-lg rounded-full shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 disabled:bg-gray-400" disabled>
+                        Finalizar Reserva (Preencher Formulário)
+                    </button>
+                </div>
+            </section>
+        </main>
+
     </div>
 
+    <!-- POPUP DE ORÇAMENTO (Sempre visível na parte inferior) -->
+    <div class="budget-popup bg-white shadow-2xl border-t-4 border-encanto-yellow p-4">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h4 class="text-lg font-bold text-gray-700">Seu Orçamento em Tempo Real:</h4>
+            <div class="text-2xl font-extrabold text-encanto-blue">
+                Total: <span id="budget-total">R$ 0,00</span>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // ============== CONSTANTES E DADOS DO ESTOQUE ==============
-        
-        // Dados fixos dos brinquedos e estoque MÁXIMO (UN)
+        // Variáveis globais para o calendário
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let selectedDate = null;
+        const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        // Armazenamento do carrinho (código: quantidade)
+        let cart = {};
+
+        // === DADOS MOCK DOS BRINQUEDOS E ESTOQUE ===
         const TOYS = [
-            { id: 'P1', name: 'Cama Elástica Pequena', max_stock: 1, base_price: 170.00, size: '2.0m x 2.0m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P1' },
-            { id: 'P2', name: 'Cama Elástica Média', max_stock: 3, base_price: 190.00, size: '2.8m x 2.8m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P2' },
-            { id: 'P3', name: 'Castelinho Pula Pula', max_stock: 1, base_price: 210.00, size: '3.0m x 3.0m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P3' },
-            { id: 'P4', name: 'Piscina de Bolinhas', max_stock: 2, base_price: 160.00, size: '1.5m x 1.5m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P4' },
-            { id: 'P5', name: 'Área Baby', max_stock: 1, base_price: 110.00, size: '3.5m x 2.5m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P5' },
-            { id: 'P6', name: 'Mini Baby Inflável', max_stock: 1, base_price: 220.00, size: '4.0m x 3.0m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P6' },
-            // Brinquedos infláveis grandes e mutuamente exclusivos
-            { id: 'P7', name: 'Escorrega com Bolinhas', max_stock: 1, base_price: 400.00, size: '5.0m x 4.0m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P7', large_inflatable: true },
-            { id: 'P8', name: 'Tobogã Médio', max_stock: 1, base_price: 400.00, size: '6.0m x 3.5m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P8', large_inflatable: true },
-            { id: 'P9', name: 'Futebol de Sabão', max_stock: 1, base_price: 600.00, size: '8.0m x 5.0m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P9', large_inflatable: true },
-            // Jogos de Mesa
-            { id: 'P10', name: 'Pebolim', max_stock: 1, base_price: 200.00, size: '1.5m x 1.0m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P10' },
-            { id: 'P11', name: 'Air Hockey', max_stock: 1, base_price: 200.00, size: '2.0m x 1.2m', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P11' },
-            { id: 'P12', name: 'Ping-Pong', max_stock: 1, base_price: 200.00, size: '2.74m x 1.52m', photo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=P12' },
-            { id: 'P13', name: 'Jogos de Mesa (x4)', max_stock: 4, base_price: 15.00, size: '0.5m x 0.5m (cada)', photo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=P13', per_unit: true }, // Valor por jogo
+            { id: 'p_trampoline', name: 'Cama Elástica Pequena', price: 170.00, stock: 1, size: '2.0m x 2.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Pequena' },
+            { id: 'm_trampoline', name: 'Cama Elástica Média', price: 190.00, stock: 3, size: '3.5m x 3.5m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Média' },
+            { id: 'bouncer', name: 'Castelinho Pula Pula', price: 210.00, stock: 1, size: '4.0m x 4.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Castelinho' },
+            { id: 'ball_pit', name: 'Piscina de Bolinhas', price: 160.00, stock: 2, size: '2.5m x 2.5m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Bolinhas' },
+            { id: 'baby_area', name: 'Área Baby', price: 110.00, stock: 1, size: '3.0m x 3.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Baby+Area' },
+            { id: 'mini_inflable', name: 'Mini Baby Inflável', price: 220.00, stock: 1, size: '2.5m x 2.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Mini+Inflável' },
+            // Itens com restrição: APENAS UM PODE SER ALUGADO POR DIA
+            { id: 'slide_ball', name: 'Escorrega com Bolinha', price: 400.00, stock: 1, size: '5.0m x 3.0m', specialGroup: 'slide_group', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Escorrega' },
+            { id: 'medium_toboggan', name: 'Tobogã Médio', price: 400.00, stock: 1, size: '6.0m x 4.0m', specialGroup: 'slide_group', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Tobogã' },
+            { id: 'soap_soccer', name: 'Futebol de Sabão', price: 600.00, stock: 1, size: '10.0m x 5.0m', specialGroup: 'slide_group', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Futebol+Sabão' },
+            { id: 'foosball', name: 'Pebolim', price: 200.00, stock: 1, size: '1.5m x 1.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Pebolim' },
+            { id: 'air_hockey', name: 'Air Hockey', price: 200.00, stock: 1, size: '2.0m x 1.2m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Air+Hockey' },
+            { id: 'ping_pong', name: 'Ping Pong', price: 200.00, stock: 1, size: '2.74m x 1.52m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Ping+Pong' },
+            // JOGOS DE MESA: Valor por UNIDADE de jogo (total de 4 jogos)
+            { id: 'table_games', name: 'Jogos de Mesa', price: 15.00, stock: 4, size: '0.8m x 0.8m (cada)', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Jogos+Mesa' },
         ];
 
-        // Mapa de estoque MÁXIMO por ID
-        const MAX_STOCK_MAP = TOYS.reduce((acc, toy) => {
-            acc[toy.id] = toy.max_stock;
-            return acc;
-        }, {});
+        // Mapeamento de disponibilidade mock para demonstração do calendário/preço
+        // Simula quantos itens (excluindo o grupo 'slide_group', que é 1 max) estão disponíveis em um dia.
+        // Total máximo de estoque (sem contar grupo de slides): 19 - 3 + 1 = 17 unidades
+        const MOCK_AVAILABILITY = {
+            // Dias com alta disponibilidade (Preço Normal - Verde)
+            '2025-12-19': { availableCount: 15, slideBooked: null, discount: 0.0 },
+            '2025-12-20': { availableCount: 17, slideBooked: null, discount: 0.0 },
+            '2025-01-10': { availableCount: 16, slideBooked: null, discount: 0.0 },
 
-        // Total máximo de estoque (excluindo P13 que tem preço por jogo)
-        const TOTAL_MAX_STOCK = TOYS
-            .filter(t => t.id !== 'P13')
-            .reduce((sum, toy) => sum + toy.max_stock, 0);
+            // Dias com média disponibilidade (Amarelo/Laranja)
+            '2025-12-15': { availableCount: 10, slideBooked: 'slide_ball', discount: 0.0 }, // Slide já alugado
+            '2025-01-05': { availableCount: 9, slideBooked: null, discount: 0.0 },
 
-        // Dados de disponibilidade simulada para coloração do calendário
-        // Estrutura: 'YYYY-MM-DD': { Px: unidades_restantes }
-        const mockAvailability = {
-            '2025-12-08': { P2: 1, P4: 1, P9: 1, P13: 2 }, 
-            '2025-12-15': { P1: 1, P2: 3, P3: 1, P4: 2, P5: 1, P6: 1, P7: 1, P10: 1, P11: 1, P12: 1, P13: 4 }, // Alta
-            '2025-12-24': { P2: 2, P4: 1, P5: 1, P13: 1 }, // Baixa
-            '2025-12-31': { P1: 1, P2: 3, P3: 1, P4: 2, P5: 1, P6: 1, P8: 1, P10: 1, P11: 1, P12: 1, P13: 4 }, // Alta
-            '2026-01-05': { P3: 0, P6: 0, P7: 1, P13: 0 }, // Muito Baixa, mas P7 disponível
-            '2026-01-12': { P2: 1, P8: 1, P10: 1, P11: 1, P12: 1, P13: 4 }, // Média
+            // Dias com baixa disponibilidade (Preço Mais Barato! - Vermelho)
+            '2025-12-10': { availableCount: 5, slideBooked: null, discount: 0.15 }, // 15% de desconto
+            '2025-12-25': { availableCount: 3, slideBooked: 'medium_toboggan', discount: 0.25 }, // 25% de desconto, slide alugado
+            '2025-01-20': { availableCount: 6, slideBooked: null, discount: 0.10 }, // 10% de desconto
         };
-        
-        // Fator de desconto baseado na baixa disponibilidade de um item (preço inverso)
-        const DISCOUNT_FACTOR = 0.85; // 15% de desconto
 
-        // ============== ESTADO DA APLICAÇÃO ==============
-
-        let currentDisplayDate = new Date();
-        let selectedDate = null;
-        let reservationCart = {}; // { Px: { quantity: N, price: X, name: Y } }
-
-        // ============== UTILITÁRIOS E FUNÇÕES DE ESTOQUE ==============
+        // Elementos DOM
+        const calendarBody = document.getElementById('calendar-body');
+        const monthYearDisplay = document.getElementById('month-year');
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const dateSelectionSection = document.getElementById('date-selection-section');
+        const itemSelectionSection = document.getElementById('item-selection-section');
+        const selectedDateDisplay = document.getElementById('selected-date-display');
+        const toyListContainer = document.getElementById('toy-list');
+        const budgetTotalDisplay = document.getElementById('budget-total');
+        const finalizeButton = document.getElementById('finalize-reservation');
+        const discountMessage = document.getElementById('discount-message');
 
         /**
-         * Formata uma data para o padrão 'YYYY-MM-DD'.
-         * @param {Date} date 
-         * @returns {string}
+         * Retorna os dados de disponibilidade (simulados) para uma data específica.
+         * @param {Date} date O objeto Date para buscar.
+         * @returns {object} { availableCount, slideBooked, discount }
          */
-        function formatDate(date) {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const d = String(date.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
+        function getDailyAvailability(date) {
+            const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            // Retorna o mock data ou um objeto padrão (simulando estoque máximo e sem desconto)
+            return MOCK_AVAILABILITY[dateKey] || { availableCount: 17, slideBooked: null, discount: 0.0 };
         }
 
         /**
-         * Retorna o estoque restante para uma data, ou estoque máximo se não houver registro.
-         * @param {string} dateString 'YYYY-MM-DD'
-         * @returns {object} { Px: unidades_restantes }
+         * Determina a classe de cor do calendário com base na contagem de itens disponíveis.
+         * @param {number} availableCount Número de itens disponíveis.
+         * @returns {string} Classe Tailwind para cor de fundo.
          */
-        function getDailyStock(dateString) {
-            const defaultStock = {};
-            TOYS.forEach(toy => {
-                defaultStock[toy.id] = toy.max_stock;
-            });
-            // Sobrescreve com a disponibilidade mockada se existir
-            return { ...defaultStock, ...mockAvailability[dateString] };
-        }
-
-        /**
-         * Calcula o total de unidades disponíveis para colorir o calendário.
-         * @param {string} dateString 
-         * @returns {number} Percentual de estoque total (0 a 1)
-         */
-        function calculateStockPercentage(dateString) {
-            const stock = getDailyStock(dateString);
-            let availableStock = 0;
-            // Soma o estoque disponível de todos os itens (exceto P13 que tem preço por jogo)
-            TOYS.filter(t => t.id !== 'P13').forEach(toy => {
-                availableStock += stock[toy.id] !== undefined ? stock[toy.id] : toy.max_stock;
-            });
-            
-            // O estoque máximo não inclui P13, então o TOTAL_MAX_STOCK é a base correta
-            return availableStock / TOTAL_MAX_STOCK;
-        }
-
-        /**
-         * Retorna a classe de cor (verde, amarelo, vermelho) com base no percentual de estoque.
-         * @param {number} percentage 
-         * @returns {string} Tailwind CSS classes
-         */
-        function getStockColor(percentage) {
-            if (percentage >= 0.7) {
-                return 'bg-green-500 hover:bg-green-600 text-white'; // Alta
-            } else if (percentage >= 0.4) {
-                return 'bg-yellow-500 hover:bg-yellow-600 text-white'; // Média
+        function getAvailabilityColorClass(availableCount) {
+            // Lógica de cores baseada no total de itens disponíveis
+            if (availableCount < 7) {
+                return 'bg-full-availability text-white font-bold'; // Baixa Disponibilidade (Vermelho/Desconto)
+            } else if (availableCount <= 12) {
+                return 'bg-low-availability text-gray-900'; // Média Disponibilidade (Amarelo/Laranja)
             } else {
-                return 'bg-red-500 hover:bg-red-600 text-white'; // Baixa (Desconto)
+                return 'bg-high-availability text-white'; // Alta Disponibilidade (Verde)
             }
         }
 
         /**
-         * Determina se um dos grandes infláveis está reservado para a data.
-         * @param {object} stock - Estoque diário
-         * @returns {boolean} True se um grande inflável estiver reservado (estoque 0)
-         */
-        function isLargeInflatableBooked(stock) {
-            // P7, P8, P9 são os grandes infláveis
-            return stock['P7'] < MAX_STOCK_MAP['P7'] || stock['P8'] < MAX_STOCK_MAP['P8'] || stock['P9'] < MAX_STOCK_MAP['P9'];
-        }
-
-        // ============== FUNÇÕES DE RENDERIZAÇÃO E EVENTOS ==============
-
-        /**
-         * Renderiza o calendário do mês atual
+         * Desenha o calendário para o mês e ano atuais.
          */
         function renderCalendar() {
-            const calendarGrid = document.getElementById('calendar-grid');
-            const monthYearDisplay = document.getElementById('current-month-year');
-            calendarGrid.innerHTML = '';
-
-            const year = currentDisplayDate.getFullYear();
-            const month = currentDisplayDate.getMonth();
+            const date = new Date(currentYear, currentMonth, 1);
+            const firstDay = date.getDay(); // 0 = Domingo, 6 = Sábado
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const today = new Date();
-            const firstDayOfMonth = new Date(year, month, 1);
-            const lastDayOfMonth = new Date(year, month + 1, 0);
-            const startDay = firstDayOfMonth.getDay(); // 0 (Dom) a 6 (Sáb)
 
-            monthYearDisplay.textContent = firstDayOfMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            monthYearDisplay.textContent = `${MONTH_NAMES[currentMonth]} ${currentYear}`;
+            calendarBody.innerHTML = ''; // Limpa o calendário anterior
 
-            // 1. Preenche dias vazios (padding)
-            for (let i = 0; i < startDay; i++) {
-                calendarGrid.innerHTML += `<div class="day-cell text-gray-300 disabled-day"></div>`;
+            // Preenche os dias vazios no início do mês
+            for (let i = 0; i < firstDay; i++) {
+                calendarBody.innerHTML += '<div></div>';
             }
 
-            // 2. Preenche os dias do mês
-            for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
-                const date = new Date(year, month, day);
-                const dateString = formatDate(date);
-                const isPast = date.setHours(0,0,0,0) < today.setHours(0,0,0,0);
-                const isSelected = selectedDate === dateString;
-                
-                let cellClass = 'bg-gray-100 text-gray-700';
-                let clickHandler = isPast ? '' : `onclick="selectDate('${dateString}')"`;
-                
+            // Preenche os dias do mês
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDate = new Date(currentYear, currentMonth, day);
+                const isPast = dayDate < today && dayDate.toDateString() !== today.toDateString();
+                const availability = getDailyAvailability(dayDate);
+                const colorClass = getAvailabilityColorClass(availability.availableCount);
+
+                const cell = document.createElement('div');
+                cell.className = `day-cell ${colorClass}`;
+                cell.textContent = day;
+                cell.setAttribute('data-date', dayDate.toISOString().split('T')[0]);
+
                 if (isPast) {
-                    cellClass = 'bg-gray-50 text-gray-400 disabled-day cursor-not-allowed';
-                    clickHandler = '';
+                    cell.classList.add('disabled');
                 } else {
-                    const stockPercentage = calculateStockPercentage(dateString);
-                    const colorClass = getStockColor(stockPercentage);
-                    cellClass = colorClass;
-                }
-                
-                if (isSelected) {
-                    cellClass += ' selected-day ring-brand-yellow !text-gray-900 shadow-md';
+                    cell.addEventListener('click', () => handleDateSelection(dayDate, cell));
                 }
 
-                calendarGrid.innerHTML += `
-                    <div 
-                        class="day-cell ${cellClass} ${isSelected ? 'selected-day' : ''}"
-                        ${clickHandler}
-                    >
-                        ${day}
-                    </div>
-                `;
+                // Marca o dia selecionado (se houver)
+                if (selectedDate && selectedDate.toDateString() === dayDate.toDateString()) {
+                    cell.classList.add('selected');
+                }
+
+                calendarBody.appendChild(cell);
             }
         }
 
         /**
-         * Mostra o modal de mensagem customizado.
-         * @param {string} title 
-         * @param {string} content 
+         * Manipula a seleção de uma data no calendário.
+         * @param {Date} date Objeto Date selecionado.
+         * @param {HTMLElement} cell Célula do calendário clicada.
          */
-        function showMessageModal(title, content) {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-content').textContent = content;
-            document.getElementById('message-modal').classList.remove('hidden');
+        function handleDateSelection(date, cell) {
+            // Remove a seleção de todas as células
+            document.querySelectorAll('.day-cell.selected').forEach(c => c.classList.remove('selected'));
+            cell.classList.add('selected');
+
+            selectedDate = date;
+            cart = {}; // Limpa o carrinho ao mudar a data
+            updateBudget();
+
+            // Formata a data para exibição
+            const formattedDate = date.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            selectedDateDisplay.textContent = formattedDate;
+
+            // Pula automaticamente para a seção de itens
+            setTimeout(() => {
+                itemSelectionSection.style.display = 'block';
+                itemSelectionSection.scrollIntoView({ behavior: 'smooth' });
+                renderToyList();
+            }, 100);
         }
 
-        /**
-         * Esconde o modal de mensagem.
-         */
-        function hideMessageModal() {
-            document.getElementById('message-modal').classList.add('hidden');
-        }
-
-        /**
-         * Lida com a seleção de uma data no calendário.
-         * @param {string} dateString 'YYYY-MM-DD'
-         */
-        function selectDate(dateString) {
-            selectedDate = dateString;
-            renderCalendar(); // Atualiza a seleção visual
-            showAvailabilityView(dateString); // Muda para a visão de brinquedos
-        }
-
-        /**
-         * Alterna para a visão de disponibilidade e renderiza a lista de brinquedos.
-         * @param {string} dateString 
-         */
-        function showAvailabilityView(dateString) {
-            const stock = getDailyStock(dateString);
-            const largeInflatableBooked = isLargeInflatableBooked(stock);
-            
-            const [year, month, day] = dateString.split('-').map(Number);
-            const displayDate = new Date(year, month - 1, day).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
-            document.getElementById('selected-date-display').textContent = displayDate;
-            document.getElementById('calendar-view').classList.add('hidden');
-            document.getElementById('availability-view').classList.remove('hidden');
-            
-            renderToysList(stock, largeInflatableBooked);
-        }
-        
         /**
          * Renderiza a lista de brinquedos disponíveis para a data selecionada.
-         * @param {object} stock - Estoque diário
-         * @param {boolean} largeInflatableBooked - Se um grande inflável já está reservado
          */
-        function renderToysList(stock, largeInflatableBooked) {
-            const toysListDiv = document.getElementById('toys-list');
-            toysListDiv.innerHTML = '';
-            
+        function renderToyList() {
+            if (!selectedDate) return;
+
+            const availability = getDailyAvailability(selectedDate);
+            toyListContainer.innerHTML = '';
+            finalizeButton.disabled = true; // Desabilita o botão até que algo seja selecionado
+
+            // Exibe ou esconde a mensagem de desconto
+            if (availability.discount > 0) {
+                discountMessage.classList.remove('hidden');
+            } else {
+                discountMessage.classList.add('hidden');
+            }
+
             TOYS.forEach(toy => {
-                const currentStock = stock[toy.id] !== undefined ? stock[toy.id] : toy.max_stock;
-                const available = currentStock > 0;
-                
-                let finalPrice = toy.base_price;
-                let priceLabel = `R$ ${toy.base_price.toFixed(2).replace('.', ',')}`;
-                let discountText = '';
+                const toyId = toy.id;
+                const basePrice = toy.price;
+                // Aplica o desconto se o dia tiver baixa disponibilidade
+                const finalPrice = basePrice * (1 - availability.discount);
 
-                // Lógica de Preço Inverso: Se o estoque for menor que o máximo, aplica desconto
-                if (currentStock < toy.max_stock) {
-                    finalPrice = toy.base_price * DISCOUNT_FACTOR;
-                    priceLabel = `<span class="text-sm line-through text-red-500 mr-2">R$ ${toy.base_price.toFixed(2).replace('.', ',')}</span> R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
-                    discountText = `<span class="text-sm font-semibold text-red-600 ml-2">(Desconto de 15% por Baixa Disponibilidade!)</span>`;
-                }
+                let currentStock = toy.stock;
+                let isAvailable = true;
+                let reason = '';
 
-                // Lógica da Unidade Grande (Escorrega, Tobogã, Futebol de Sabão)
-                let specialConstraint = false;
-                if (toy.large_inflatable) {
-                    // Se algum grande inflável JÁ estiver reservado (stock < max), este item (e os outros) ficam indisponíveis.
-                    // A única exceção é o item que tem estoque > 0 (o que foi reservado)
-                    if (largeInflatableBooked && currentStock === 0) {
-                        specialConstraint = true; // Indisponível por conflito
+                // Verifica a restrição do grupo especial
+                if (toy.specialGroup === 'slide_group') {
+                    if (availability.slideBooked && availability.slideBooked !== toyId) {
+                        isAvailable = false;
+                        reason = `(Já alugado: ${TOYS.find(t => t.id === availability.slideBooked).name} reservado)`;
+                    } else if (availability.slideBooked === toyId) {
+                        // Se for o brinquedo alugado, o estoque é 0
+                        currentStock = 0;
+                        isAvailable = false;
+                        reason = `(Alugado para esta data)`;
                     }
+                    // Se o slideBooked for null, o estoque é 1 (padrão) e está disponível para ser escolhido.
                 }
 
-                const isDisabled = !available || specialConstraint;
-                const quantityInCart = reservationCart[toy.id] ? reservationCart[toy.id].quantity : 0;
-                
-                // Armazena o preço final para uso no carrinho
-                toy.final_price = finalPrice;
+                // Renderiza o card do brinquedo
+                const card = document.createElement('div');
+                card.className = `flex flex-col md:flex-row bg-white rounded-lg shadow-xl p-4 md:p-6 transition duration-300 ${!isAvailable ? 'opacity-50 grayscale' : 'hover:shadow-encanto-yellow/50'}`;
+                card.innerHTML = `
+                    <div class="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
+                        <img src="${toy.mockImage}" alt="Foto de ${toy.name}" class="w-28 h-28 object-cover rounded-xl border-4 border-encanto-yellow">
+                        <p class="text-xs text-gray-500 mt-1 italic">Medida: ${toy.size}</p>
+                    </div>
 
-                toysListDiv.innerHTML += `
-                    <div id="toy-${toy.id}" class="flex flex-col sm:flex-row items-center p-4 bg-gray-50 rounded-xl shadow-lg border-l-4 ${isDisabled ? 'border-gray-300 opacity-60' : 'border-brand-yellow'}">
+                    <div class="flex-grow">
+                        <h4 class="text-xl font-bold text-gray-800">${toy.name} <span class="text-sm font-normal text-gray-500">${reason}</span></h4>
+                        <p class="text-3xl font-extrabold text-encanto-blue my-2">
+                            ${finalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </p>
+                        ${availability.discount > 0 ? `<p class="text-sm text-green-600 font-semibold mb-2">Preço com ${Math.round(availability.discount * 100)}% OFF!</p>` : ''}
                         
-                        <!-- Coluna da Foto/Tamanho (1:1) -->
-                        <div class="w-full sm:w-1/4 flex-shrink-0 mb-4 sm:mb-0">
-                            <img src="${toy.photo}" alt="Foto ${toy.name}" class="w-full h-auto max-w-[100px] sm:max-w-[120px] rounded-lg mx-auto object-cover">
-                            <p class="text-xs text-gray-500 text-center mt-1">Medida Aprox.: ${toy.size}</p>
-                        </div>
-                        
-                        <!-- Coluna do Detalhe/Ação -->
-                        <div class="w-full sm:w-3/4 sm:ml-6">
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                                <h5 class="text-lg font-bold text-gray-800">${toy.name}</h5>
-                                <p class="text-xl font-extrabold text-brand-blue mt-1 md:mt-0">${priceLabel}${discountText}</p>
-                            </div>
+                        <div class="flex items-center space-x-4 mt-3">
+                            <span class="text-sm font-medium text-gray-600">Disponível: ${currentStock} UN</span>
                             
-                            <p class="text-sm text-gray-600 mb-3">
-                                <span class="${available ? 'text-green-600' : 'text-red-600'} font-bold">
-                                    ${currentStock} UN. Restantes
-                                </span>
-                                ${specialConstraint ? '<span class="text-red-600 ml-2 font-semibold">(Indisponível: Grande Inflável já reservado.)</span>' : ''}
-                            </p>
-
-                            <div class="flex items-center space-x-4">
-                                <!-- Botão de Diminuir -->
-                                <button onclick="updateCart('${toy.id}', -1)" ${quantityInCart === 0 || isDisabled ? 'disabled' : ''} class="p-2 w-10 h-10 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                            <div class="flex items-center border border-gray-300 rounded-lg p-1 ${!isAvailable || currentStock === 0 ? 'pointer-events-none bg-gray-100' : ''}">
+                                <button data-id="${toyId}" data-action="decrement" class="p-1 text-encanto-blue hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" ${!isAvailable || currentStock === 0 ? 'disabled' : ''}>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
                                 </button>
-
-                                <span class="text-2xl font-bold text-gray-800 w-8 text-center" id="quantity-${toy.id}">${quantityInCart}</span>
-                                
-                                <!-- Botão de Aumentar -->
-                                <button onclick="updateCart('${toy.id}', 1)" ${!available || isDisabled || quantityInCart >= currentStock ? 'disabled' : ''} class="p-2 w-10 h-10 rounded-full color-brand-blue text-white hover:bg-blue-600 disabled:opacity-50 transition">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                <span id="qty-${toyId}" class="w-8 text-center font-bold text-gray-800">${cart[toyId] || 0}</span>
+                                <button data-id="${toyId}" data-action="increment" data-max="${currentStock}" data-group="${toy.specialGroup}" class="p-1 text-encanto-blue hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" ${!isAvailable || currentStock === 0 ? 'disabled' : ''}>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 </button>
-
                             </div>
                         </div>
                     </div>
                 `;
+
+                toyListContainer.appendChild(card);
+            });
+
+            // Adiciona listeners para os botões de quantidade
+            toyListContainer.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', handleQuantityChange);
             });
         }
 
         /**
-         * Atualiza o carrinho de reserva.
-         * @param {string} toyId 
-         * @param {number} change +1 ou -1
+         * Manipula o aumento/diminuição da quantidade de um brinquedo no carrinho.
+         * @param {Event} event Evento de clique.
          */
-        function updateCart(toyId, change) {
-            const toy = TOYS.find(t => t.id === toyId);
-            if (!toy) return;
+        function handleQuantityChange(event) {
+            const button = event.currentTarget;
+            const toyId = button.getAttribute('data-id');
+            const action = button.getAttribute('data-action');
+            const maxStock = parseInt(button.getAttribute('data-max'));
+            const specialGroup = button.getAttribute('data-group');
 
-            // Pega o estoque atual para a data selecionada
-            const stock = getDailyStock(selectedDate);
-            const currentStock = stock[toyId] !== undefined ? stock[toyId] : toy.max_stock;
-            const quantityInCart = reservationCart[toyId] ? reservationCart[toyId].quantity : 0;
-            const newQuantity = quantityInCart + change;
+            let currentQty = cart[toyId] || 0;
 
-            // 1. Validação de Limites
-            if (newQuantity < 0 || newQuantity > currentStock) {
-                showMessageModal("Atenção ao Estoque", `Não podemos adicionar mais unidades. O estoque disponível para ${toy.name} é de ${currentStock} unidade(s).`);
-                return;
-            }
+            if (action === 'increment') {
+                if (currentQty < maxStock) {
+                    // Lógica para o grupo especial (tobogã, escorrega, futebol de sabão)
+                    if (specialGroup === 'slide_group') {
+                        // Verifica se outro item do grupo já está no carrinho
+                        const isOtherSlideInCart = TOYS
+                            .filter(t => t.specialGroup === 'slide_group' && t.id !== toyId)
+                            .some(t => cart[t.id] > 0);
 
-            // 2. Validação de Insuflável Grande (apenas um por dia)
-            if (toy.large_inflatable) {
-                const otherLargeInflatables = ['P7', 'P8', 'P9'].filter(id => id !== toyId);
-                // Verifica se já existe um grande inflável no carrinho
-                const alreadyBooked = otherLargeInflatables.some(id => reservationCart[id] && reservationCart[id].quantity > 0);
-                
-                if (newQuantity > 0 && alreadyBooked) {
-                    showMessageModal("Conflito de Reserva", `Você já reservou outro Inflável Grande para esta data. Apenas UM Tobogã, Escorrega ou Futebol de Sabão pode ser alugado por festa.`);
-                    return;
+                        if (isOtherSlideInCart) {
+                            // Se sim, não permite a adição e notifica o usuário
+                            showMessageBox("Restrição de Locação", "Você só pode alugar um item do grupo 'Escorrega, Tobogã ou Futebol de Sabão' por data.", 'error');
+                            return;
+                        }
+                    }
+                    currentQty++;
+                }
+            } else if (action === 'decrement') {
+                if (currentQty > 0) {
+                    currentQty--;
                 }
             }
-            
-            // 3. Atualiza o Carrinho/Cálculo
-            if (newQuantity > 0) {
-                reservationCart[toyId] = {
-                    quantity: newQuantity,
-                    price: toy.final_price || toy.base_price, // Usa o preço final calculado na renderização
-                    name: toy.name,
-                    isPerUnit: toy.per_unit
-                };
-            } else {
-                delete reservationCart[toyId];
-            }
 
-            // 4. Atualiza a UI
-            document.getElementById(`quantity-${toyId}`).textContent = newQuantity;
-            updateQuotePopup();
-            renderToysList(stock, isLargeInflatableBooked(stock)); // Re-renderiza para atualizar botões (útil para large inflatables)
+            cart[toyId] = currentQty;
+            document.getElementById(`qty-${toyId}`).textContent = currentQty;
+            updateBudget();
+            updateFinalizeButton();
         }
 
         /**
-         * Calcula o total do carrinho.
-         * @returns {{total: number, items: number}}
+         * Calcula e atualiza o orçamento total e o status do botão de finalização.
          */
-        function calculateTotal() {
+        function updateBudget() {
             let total = 0;
-            let totalItems = 0;
+            const availability = getDailyAvailability(selectedDate || new Date()); // Usa data atual se nenhuma for selecionada
 
-            for (const id in reservationCart) {
-                const item = reservationCart[id];
-                total += item.quantity * item.price;
-                totalItems += item.quantity;
+            for (const id in cart) {
+                const quantity = cart[id];
+                const toy = TOYS.find(t => t.id === id);
+                if (toy && quantity > 0) {
+                    // Aplica o desconto do dia
+                    const finalPrice = toy.price * (1 - availability.discount);
+                    total += finalPrice * quantity;
+                }
             }
-            return { total, items: totalItems };
+
+            budgetTotalDisplay.textContent = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            updateFinalizeButton(total);
         }
 
         /**
-         * Atualiza o pop-up de orçamento inferior.
+         * Habilita/desabilita o botão de finalização.
+         * @param {number} total O valor total do carrinho.
          */
-        function updateQuotePopup() {
-            const { total, items } = calculateTotal();
-
-            document.getElementById('quote-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-            document.getElementById('quote-count').textContent = ` (${items} item${items !== 1 ? 's' : ''})`;
-
-            // Mostra/Esconde o pop-up
-            const popup = document.getElementById('quote-popup');
-            if (items > 0) {
-                popup.classList.add('active');
+        function updateFinalizeButton(total) {
+            const hasItems = total > 0;
+            finalizeButton.disabled = !hasItems;
+            if (hasItems) {
+                finalizeButton.textContent = `Finalizar Reserva (${budgetTotalDisplay.textContent})`;
+                finalizeButton.classList.remove('disabled:bg-gray-400');
             } else {
-                popup.classList.remove('active');
+                finalizeButton.textContent = 'Finalizar Reserva (Preencher Formulário)';
+                finalizeButton.classList.add('disabled:bg-gray-400');
             }
         }
-        
+
         /**
-         * Renderiza os detalhes do orçamento no modal de detalhes.
+         * Exibe uma caixa de mensagem customizada (em vez de alert()).
+         * @param {string} title Título da mensagem.
+         * @param {string} message Conteúdo da mensagem.
+         * @param {string} type 'info' ou 'error'.
          */
-        function renderQuoteDetails() {
-            const itemsDiv = document.getElementById('modal-quote-items');
-            itemsDiv.innerHTML = '';
-            
-            const { total } = calculateTotal();
-            const cartItems = Object.values(reservationCart);
+        function showMessageBox(title, message, type = 'info') {
+            const existingModal = document.getElementById('custom-modal');
+            if (existingModal) existingModal.remove();
 
-            if (cartItems.length === 0) {
-                itemsDiv.innerHTML = '<p class="text-gray-500 italic">Nenhum item adicionado à sua reserva.</p>';
-                document.getElementById('open-checkout-modal').disabled = true;
-                document.getElementById('open-checkout-modal').classList.add('opacity-50', 'cursor-not-allowed');
-            } else {
-                document.getElementById('open-checkout-modal').disabled = false;
-                document.getElementById('open-checkout-modal').classList.remove('opacity-50', 'cursor-not-allowed');
+            const bgColor = type === 'error' ? 'bg-red-500' : 'bg-encanto-blue';
 
-                cartItems.forEach(item => {
-                    const subtotal = item.quantity * item.price;
-                    itemsDiv.innerHTML += `
-                        <div class="flex justify-between items-center text-gray-700">
-                            <span class="font-medium">${item.quantity}x ${item.name}</span>
-                            <span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
+            const modalHtml = `
+                <div id="custom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div class="bg-white rounded-xl shadow-2xl max-w-sm mx-4 p-6 transform transition-all duration-300 scale-100">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-8 h-8 rounded-full ${bgColor} flex items-center justify-center text-white font-bold">
+                                ${type === 'error' ? '!' : 'i'}
+                            </div>
+                            <h5 class="text-xl font-bold text-gray-800">${title}</h5>
                         </div>
-                    `;
-                });
+                        <p class="text-gray-600 mb-6">${message}</p>
+                        <button onclick="document.getElementById('custom-modal').remove()" class="w-full py-2 ${bgColor} text-white font-semibold rounded-lg hover:opacity-90 transition duration-150">
+                            Entendi
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        // === EVENT LISTENERS E INICIALIZAÇÃO ===
+
+        prevMonthBtn.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
             }
-
-            // Atualiza o display da data e o total
-            const [year, month, day] = selectedDate.split('-').map(Number);
-            const displayDate = new Date(year, month - 1, day).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
-            
-            document.getElementById('modal-quote-date').textContent = displayDate;
-            document.getElementById('modal-quote-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-        }
-        
-        /**
-         * Abre e popula o modal de formulário de checkout.
-         */
-        function openCheckoutModal() {
-            const { total, items } = calculateTotal();
-            
-            // Popula os dados do pedido
-            document.getElementById('checkout-date-display').textContent = new Date(selectedDate).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
-            document.getElementById('checkout-item-count').textContent = `${items} item${items !== 1 ? 's' : ''}`;
-            document.getElementById('checkout-total-display').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-            
-            // Esconde o modal de detalhes e mostra o de checkout
-            document.getElementById('quote-details-modal').classList.add('hidden');
-            document.getElementById('checkout-modal').classList.remove('hidden');
-        }
-
-
-        // ============== INICIALIZAÇÃO E LISTENERS ==============
-        
-        document.addEventListener('DOMContentLoaded', () => {
             renderCalendar();
-            
-            // Listener de navegação do calendário
-            document.getElementById('prev-month').addEventListener('click', () => {
-                currentDisplayDate.setMonth(currentDisplayDate.getMonth() - 1);
-                renderCalendar();
-            });
-            document.getElementById('next-month').addEventListener('click', () => {
-                currentDisplayDate.setMonth(currentDisplayDate.getMonth() + 1);
-                renderCalendar();
-            });
-
-            // Listener para voltar ao calendário
-            document.getElementById('back-to-calendar').addEventListener('click', () => {
-                document.getElementById('availability-view').classList.add('hidden');
-                document.getElementById('calendar-view').classList.remove('hidden');
-                // Limpa o carrinho ao voltar, forçando nova seleção e evitando erros de contexto
-                reservationCart = {};
-                selectedDate = null;
-                updateQuotePopup();
-                renderCalendar();
-            });
-
-            // Listeners do Modal de Mensagem
-            document.getElementById('modal-close-btn').addEventListener('click', hideMessageModal);
-            
-            // Listeners do Modal de Detalhes do Orçamento
-            document.getElementById('open-quote-details').addEventListener('click', () => {
-                if (!selectedDate) {
-                    showMessageModal("Selecione uma Data", "Por favor, selecione uma data no calendário antes de visualizar o orçamento.");
-                    return;
-                }
-                if (Object.keys(reservationCart).length === 0) {
-                    showMessageModal("Adicione Brinquedos", "Seu carrinho está vazio. Adicione pelo menos um brinquedo para prosseguir.");
-                    return;
-                }
-
-                renderQuoteDetails();
-                document.getElementById('quote-details-modal').classList.remove('hidden');
-            });
-            
-            document.getElementById('close-quote-details').addEventListener('click', () => {
-                document.getElementById('quote-details-modal').classList.add('hidden');
-            });
-
-            // Listener para abrir o Modal de Checkout (Formulário)
-            document.getElementById('open-checkout-modal').addEventListener('click', openCheckoutModal);
-
-            // Listeners do Modal de Checkout/Formulário
-            document.getElementById('close-checkout-modal').addEventListener('click', () => {
-                document.getElementById('checkout-modal').classList.add('hidden');
-            });
-            
-            // Listener de Submissão do Formulário (Apenas simulação)
-            document.getElementById('reservation-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                // Coleta dados do formulário
-                const formData = new FormData(e.target);
-                const reservationData = Object.fromEntries(formData.entries());
-                
-                // Adiciona dados da reserva
-                reservationData.date = new Date(selectedDate).toLocaleDateString('pt-BR');
-                reservationData.cart = reservationCart;
-                reservationData.total = calculateTotal().total;
-                
-                console.log("DADOS DA RESERVA ENVIADOS:", reservationData);
-
-                // Mensagem de sucesso (simulação)
-                showMessageModal("Reserva Solicitada!", 
-                    `Obrigado, ${reservationData.name}! Seu pedido de reserva para a data ${reservationData.date} no valor de R$ ${reservationData.total.toFixed(2).replace('.', ',')} foi enviado. Entraremos em contato no número ${reservationData.phone} para finalizar a reserva.`);
-                
-                // Reseta a UI após a simulação de envio
-                document.getElementById('checkout-modal').classList.add('hidden');
-                reservationCart = {};
-                selectedDate = null;
-                updateQuotePopup();
-                renderCalendar();
-                document.getElementById('availability-view').classList.add('hidden');
-                document.getElementById('calendar-view').classList.remove('hidden');
-            });
-
-
-            // Inicializa o pop-up (garante que está escondido no início)
-            updateQuotePopup();
         });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+
+        // Simula o redirecionamento para o formulário (passo final)
+        finalizeButton.addEventListener('click', () => {
+            if (!finalizeButton.disabled) {
+                const itemsList = Object.keys(cart).filter(id => cart[id] > 0).map(id => {
+                    const toy = TOYS.find(t => t.id === id);
+                    return `${toy.name} (x${cart[id]})`;
+                }).join(', ');
+
+                showMessageBox(
+                    "Próxima Etapa: Formulário",
+                    `Você selecionou a data ${selectedDate.toLocaleDateString('pt-BR')} e os seguintes itens: ${itemsList}. Por favor, preencha o formulário a seguir para confirmar a locação.`,
+                    'info'
+                );
+
+                // Em um ambiente real, você faria um POST ou redirecionaria para a página de checkout.
+                // window.location.href = '/checkout-form.html';
+            }
+        });
+
+        // Inicializa o calendário ao carregar a página
+        window.onload = function() {
+            renderCalendar();
+            updateBudget(); // Inicializa o orçamento em R$ 0,00
+        }
     </script>
 </body>
 </html>
