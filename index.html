@@ -6,7 +6,7 @@
     <title>Reserva de Locação - Encanto Festas</title>
     <!-- Carrega o Tailwind CSS CDN para estilização -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuração do Tailwind para usar a fonte Inter e cores personalizadas (Azul e Amarelo) -->
+    <!-- Configuração do Tailwind para usar a fonte Inter e cores personalizadas -->
     <script>
         tailwind.config = {
             theme: {
@@ -14,6 +14,7 @@
                     colors: {
                         'encanto-blue': '#3B82F6', // Azul principal
                         'encanto-yellow': '#FACC15', // Amarelo de destaque
+                        'encanto-green': '#10B981', // Verde para destaque/confirmação
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -42,7 +43,7 @@
             font-weight: 500;
         }
         .day-cell.available:hover:not(.selected) {
-            background-color: #E5E7EB; /* Cinza claro no hover */
+            background-color: #E5E7EB; 
             transform: translateY(-2px);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         }
@@ -53,11 +54,11 @@
             opacity: 0.7;
         }
         .day-cell.selected {
-            border: 3px solid #1D4ED8; /* Azul escuro */
-            background-color: #BFDBFE; /* Azul muito claro para contraste com a borda */
+            border: 3px solid #1D4ED8; 
+            background-color: #BFDBFE; 
             transform: translateY(0);
         }
-        /* Classe para o orçamento flutuante */
+        /* Classe para o orçamento flutuante (Full-width no bottom) */
         .budget-popup {
             position: fixed;
             bottom: 0;
@@ -66,9 +67,41 @@
             z-index: 50;
         }
 
-        /* Estilo para o botão de navegação de mês */
-        .nav-button {
-            @apply p-3 md:p-4 rounded-full bg-encanto-blue text-white shadow-xl hover:bg-blue-700 transition duration-150 transform active:scale-95 disabled:bg-gray-400;
+        /* Estilo para o Modal de Formulário (Tela Cheia) */
+        .fullscreen-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+            background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro com mais opacidade */
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0; /* Remove padding geral para ocupar 100% da tela em mobile */
+        }
+        .fullscreen-modal-content {
+            background-color: white;
+            border-radius: 0; /* Remove border-radius em mobile */
+            width: 100%;
+            height: 100%; /* Ocupa a altura total */
+            max-width: none; /* Ignora max-width em mobile */
+            max-height: none; /* Ignora max-height em mobile */
+            overflow-y: auto;
+            box-shadow: none; /* Remove box-shadow em mobile */
+        }
+
+        /* Ajustes para desktop (tela maior que 768px) */
+        @media (min-width: 768px) {
+            .fullscreen-modal-content {
+                border-radius: 16px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                max-width: 900px;
+                max-height: 90vh;
+                height: auto; /* Permite que o conteúdo defina a altura */
+            }
         }
     </style>
 </head>
@@ -78,7 +111,6 @@
 
         <!-- HEADER E LOGO -->
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b pb-4">
-            <!-- Espaço para Logo Redonda -->
             <div class="flex items-center space-x-4 mb-4 md:mb-0">
                 <div class="w-16 h-16 bg-encanto-yellow rounded-full flex items-center justify-center shadow-lg border-4 border-encanto-blue">
                     <span class="text-white text-xl font-black">EF</span>
@@ -99,12 +131,12 @@
 
                 <!-- Controles e Título do Mês -->
                 <div class="flex justify-between items-center mb-6">
-                    <!-- Botão de mês anterior (desabilitado se for o mês atual) -->
-                    <button id="prev-month" class="nav-button">
+                    <!-- Botão de mês anterior -->
+                    <button id="prev-month" class="p-3 md:p-4 rounded-full bg-encanto-blue text-white shadow-xl hover:bg-blue-700 transition duration-150 transform active:scale-95 disabled:bg-gray-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
                     </button>
                     <span id="month-year" class="text-2xl font-bold text-gray-800"></span>
-                    <button id="next-month" class="nav-button">
+                    <button id="next-month" class="p-3 md:p-4 rounded-full bg-encanto-blue text-white shadow-xl hover:bg-blue-700 transition duration-150 transform active:scale-95 disabled:bg-gray-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
                     </button>
                 </div>
@@ -124,32 +156,22 @@
             <section id="item-selection-section" class="mt-10 pt-8 border-t-4 border-encanto-yellow" style="display: none;">
                 <h3 class="text-2xl font-bold mb-6 text-encanto-blue">2. Brinquedos Disponíveis em <span id="selected-date-display" class="text-encanto-yellow"></span></h3>
 
-                <!-- Mensagem de desconto removida -->
-                <p id="discount-message" class="bg-encanto-blue/10 text-encanto-blue p-3 rounded-lg mb-6 font-semibold hidden">
-                    <!-- Esta mensagem agora permanece oculta, pois a lógica de desconto foi removida. -->
-                </p>
-
-                <div id="toy-list" class="space-y-4"> <!-- Diminuído o espaçamento entre itens -->
+                <div id="toy-list" class="space-y-4"> 
                     <!-- Brinquedos serão injetados aqui -->
-                </div>
-
-                <div class="mt-10 text-center">
-                    <button id="finalize-reservation" class="px-8 py-4 bg-encanto-blue text-white font-bold text-lg rounded-full shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 disabled:bg-gray-400" disabled>
-                        Finalizar Reserva (Preencher Formulário)
-                    </button>
                 </div>
             </section>
         </main>
 
     </div>
 
-    <!-- POPUP DE ORÇAMENTO (Sempre visível na parte inferior) -->
+    <!-- POPUP DE ORÇAMENTO (100% Mobile - Fixo na Barra Inferior) -->
     <div class="budget-popup bg-white shadow-2xl border-t-4 border-encanto-yellow p-4">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h4 class="text-lg font-bold text-gray-700">Seu Orçamento em Tempo Real:</h4>
-            <div class="text-2xl font-extrabold text-encanto-blue">
-                Total: <span id="budget-total">R$ 0,00</span>
-            </div>
+        <div class="max-w-4xl mx-auto flex justify-between items-center w-full"> <!-- w-full garante 100% de largura dentro do max-w -->
+            <h4 class="text-lg font-bold text-gray-700">Valor Total:</h4>
+            <!-- O botão agora exibe o valor total e abre o modal de detalhes/finalização -->
+            <button id="show-budget-details-btn" class="px-6 py-2 bg-encanto-blue text-white font-bold text-lg rounded-full shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 disabled:bg-gray-400" disabled>
+                Detalhes (R$ 0,00)
+            </button>
         </div>
     </div>
 
@@ -164,7 +186,6 @@
         let cart = {};
 
         // === DADOS MOCK DOS BRINQUEDOS E ESTOQUE ===
-        // Preços e Estoques mantidos.
         const TOYS = [
             { id: 'p_trampoline', name: 'Cama Elástica Pequena', price: 170.00, stock: 1, size: '2.0m x 2.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Pequena' },
             { id: 'm_trampoline', name: 'Cama Elástica Média', price: 190.00, stock: 3, size: '3.5m x 3.5m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Média' },
@@ -172,35 +193,50 @@
             { id: 'ball_pit', name: 'Piscina de Bolinhas', price: 160.00, stock: 2, size: '2.5m x 2.5m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Bolinhas' },
             { id: 'baby_area', name: 'Área Baby', price: 110.00, stock: 1, size: '3.0m x 3.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Baby+Area' },
             { id: 'mini_inflable', name: 'Mini Baby Inflável', price: 220.00, stock: 1, size: '2.5m x 2.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Mini+Inflável' },
-            // Itens com restrição: APENAS UM PODE SER ALUGADO POR DIA
             { id: 'slide_ball', name: 'Escorrega com Bolinha', price: 400.00, stock: 1, specialGroup: 'slide_group', size: '5.0m x 3.0m', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Escorrega' },
             { id: 'medium_toboggan', name: 'Tobogã Médio', price: 400.00, stock: 1, specialGroup: 'slide_group', size: '6.0m x 4.0m', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Tobogã' },
             { id: 'soap_soccer', name: 'Futebol de Sabão', price: 600.00, stock: 1, specialGroup: 'slide_group', size: '10.0m x 5.0m', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Futebol+Sabão' },
             { id: 'foosball', name: 'Pebolim', price: 200.00, stock: 1, size: '1.5m x 1.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Pebolim' },
             { id: 'air_hockey', name: 'Air Hockey', price: 200.00, stock: 1, size: '2.0m x 1.2m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Air+Hockey' },
             { id: 'ping_pong', name: 'Ping Pong', price: 200.00, stock: 1, size: '2.74m x 1.52m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Ping+Pong' },
-            // JOGOS DE MESA: Valor por UNIDADE de jogo (total de 4 jogos)
             { id: 'table_games', name: 'Jogos de Mesa', price: 15.00, stock: 4, size: '0.8m x 0.8m (cada)', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Jogos+Mesa' },
         ];
+        
+        // Dados de Bairros
+        const NEIGHBORHOODS = [
+            "Selecione o Bairro...",
+            "Acaraí", "Água Branca", "Capri", "Centro - Sfs", "Centro Histórico", 
+            "Enseada", "Ervino", "Iperoba", "Itaguaçu", "Laranjeiras", 
+            "Majorca", "Miranda", "Morro Grande", "Paulas", "Praia Grande", 
+            "Reta", "Ribeira", "Rocio Grande", "Rocio Pequeno", "Sandra Regina", 
+            "Tapera Ubatuba", "Vila da Glória"
+        ];
+        
+        // Armazenamento do orçamento detalhado
+        let budgetDetails = {
+            subtotal: 0,
+            discount: 0,
+            currentDeliveryFee: 0.00, // Inicializado em 0.00 (NOVA REGRA)
+            finalTotal: 0,
+            uniqueItems: 0
+        };
 
         // Elementos DOM
         const calendarBody = document.getElementById('calendar-body');
         const monthYearDisplay = document.getElementById('month-year');
         const prevMonthBtn = document.getElementById('prev-month');
-        const nextMonthBtn = document.getElementById('next-month');
         const itemSelectionSection = document.getElementById('item-selection-section');
         const selectedDateDisplay = document.getElementById('selected-date-display');
         const toyListContainer = document.getElementById('toy-list');
-        const budgetTotalDisplay = document.getElementById('budget-total');
-        const finalizeButton = document.getElementById('finalize-reservation');
-        const discountMessage = document.getElementById('discount-message');
+        const showDetailsBtn = document.getElementById('show-budget-details-btn');
+
+        showDetailsBtn.addEventListener('click', showBudgetDetailsModal);
 
         /**
          * Retorna os dados de disponibilidade (agora simplificados) para uma data específica.
          * @returns {object} { slideBooked, discount }
          */
         function getDailyAvailability(date) {
-            // Retorna o estado padrão: slide não reservado (null) e 0% de desconto.
             return { slideBooked: null, discount: 0.0 };
         }
 
@@ -209,19 +245,17 @@
          */
         function renderCalendar() {
             const date = new Date(currentYear, currentMonth, 1);
-            const firstDay = date.getDay(); // 0 = Domingo, 6 = Sábado
+            const firstDay = date.getDay(); 
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const today = new Date();
 
             monthYearDisplay.textContent = `${MONTH_NAMES[currentMonth]} ${currentYear}`;
-            calendarBody.innerHTML = ''; // Limpa o calendário anterior
+            calendarBody.innerHTML = ''; 
 
-            // === Lógica para desabilitar o botão de Mês Anterior ===
+            // Lógica para desabilitar o botão de Mês Anterior
             const todayMonth = today.getMonth();
             const todayYear = today.getFullYear();
-            // Desabilita se o mês atual for exibido ou se estivermos em um ano anterior
             prevMonthBtn.disabled = currentYear < todayYear || (currentYear === todayYear && currentMonth <= todayMonth);
-            // =================================================================
 
             // Preenche os dias vazios no início do mês
             for (let i = 0; i < firstDay; i++) {
@@ -231,13 +265,11 @@
             // Preenche os dias do mês
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayDate = new Date(currentYear, currentMonth, day);
-                // Verifica se é uma data passada (dia anterior ao dia de hoje)
                 const isPast = dayDate < today && dayDate.toDateString() !== today.toDateString();
 
                 const cell = document.createElement('div');
-                let cellClass = 'bg-white text-gray-800 available'; // Classe base para dias disponíveis
+                let cellClass = 'bg-white text-gray-800 available'; 
 
-                // Destaca o dia de hoje
                 const isToday = dayDate.toDateString() === today.toDateString();
                 if (isToday) {
                     cellClass = 'bg-encanto-blue text-white font-bold shadow-md available';
@@ -254,7 +286,6 @@
                     cell.addEventListener('click', () => handleDateSelection(dayDate, cell));
                 }
 
-                // Marca o dia selecionado (se houver)
                 if (selectedDate && selectedDate.toDateString() === dayDate.toDateString()) {
                     cell.classList.add('selected');
                 }
@@ -265,11 +296,8 @@
 
         /**
          * Manipula a seleção de uma data no calendário.
-         * @param {Date} date Objeto Date selecionado.
-         * @param {HTMLElement} cell Célula do calendário clicada.
          */
         function handleDateSelection(date, cell) {
-            // Remove a seleção de todas as células
             document.querySelectorAll('.day-cell.selected').forEach(c => c.classList.remove('selected'));
             cell.classList.add('selected');
 
@@ -277,14 +305,11 @@
             cart = {}; // Limpa o carrinho ao mudar a data
             updateBudget();
 
-            // Formata a data para exibição
             const formattedDate = date.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             selectedDateDisplay.textContent = formattedDate;
 
-            // Pula automaticamente para a seção de itens
             setTimeout(() => {
                 itemSelectionSection.style.display = 'block';
-                // Adiciona um pequeno atraso para garantir que a rolagem funcione bem após o display:block
                 requestAnimationFrame(() => {
                     itemSelectionSection.scrollIntoView({ behavior: 'smooth' });
                 });
@@ -293,28 +318,24 @@
         }
 
         /**
-         * Renderiza a lista de brinquedos disponíveis para a data selecionada (Design Atualizado).
+         * Renderiza a lista de brinquedos disponíveis.
          */
         function renderToyList() {
             if (!selectedDate) return;
 
             const availability = getDailyAvailability(selectedDate);
             toyListContainer.innerHTML = '';
-            finalizeButton.disabled = true; // Desabilita o botão até que algo seja selecionado
-
-            // Esconde a mensagem de desconto, pois a lógica foi removida.
-            discountMessage.classList.add('hidden');
-
+            
             TOYS.forEach(toy => {
                 const toyId = toy.id;
                 const basePrice = toy.price;
-                const finalPrice = basePrice; // Preço é sempre o base
+                const finalPrice = basePrice; 
 
                 let currentStock = toy.stock;
                 let isAvailable = true;
                 let reason = '';
 
-                // Verifica a restrição do grupo especial (Tobogã/Escorrega)
+                // Verifica a restrição do grupo especial
                 if (toy.specialGroup === 'slide_group') {
                     if (availability.slideBooked && availability.slideBooked !== toyId) {
                         isAvailable = false;
@@ -326,38 +347,31 @@
                     }
                 }
                 
-                // Classe de estilo mais compacta e atraente
                 const cardClass = `flex bg-white rounded-xl shadow-lg p-4 transition duration-300 transform hover:scale-[1.01] ring-1 ring-gray-100 ${!isAvailable ? 'opacity-50 grayscale' : 'hover:ring-encanto-blue hover:shadow-xl'}`;
 
-                // Renderiza o card do brinquedo com o novo layout (Controles de Unidade abaixo da foto)
                 const card = document.createElement('div');
                 card.className = cardClass;
                 card.innerHTML = `
                     <!-- LEFT SECTION: Image, Quantity Control, and Stock Info -->
                     <div class="flex flex-col items-center flex-shrink-0 mr-4">
-                        <!-- Image (menor: w-20 h-20) -->
                         <img src="${toy.mockImage}" alt="Foto de ${toy.name}" onerror="this.onerror=null;this.src='https://placehold.co/80x80/9CA3AF/FFFFFF?text=Item';" class="w-20 h-20 object-cover rounded-lg border-2 border-encanto-yellow mb-2 flex-shrink-0">
                         
-                        <!-- Quantity Control (Abaixo da Imagem) -->
+                        <!-- Quantity Control -->
                         <div class="flex items-center rounded-lg overflow-hidden border-2 border-encanto-blue/50 shadow-md transition ${!isAvailable || currentStock === 0 ? 'pointer-events-none opacity-50' : ''}">
-                            <!-- Botão Diminuir -->
                             <button data-id="${toyId}" data-action="decrement" class="w-7 h-7 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
                                 <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
                             </button>
-                            <!-- Display de Quantidade -->
                             <span id="qty-${toyId}" class="w-8 h-7 flex items-center justify-center bg-blue-50 text-encanto-blue font-bold text-sm">${cart[toyId] || 0}</span>
-                            <!-- Botão Aumentar -->
                             <button data-id="${toyId}" data-action="increment" data-max="${currentStock}" data-group="${toy.specialGroup}" class="w-7 h-7 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
                                 <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                             </button>
                         </div>
                         
-                        <!-- Stock Info (Abaixo dos Botões) -->
                         <span class="text-xs text-gray-500 mt-1 italic">Disp: ${currentStock} UN</span>
                     </div>
 
-                    <!-- RIGHT SECTION: Product Details and Price (Alinhado ao Topo - justify-start) -->
-                    <div class="flex flex-col justify-start flex-grow min-w-0 py-1"> <!-- Alterado para justify-start e adicionado py-1 para ajuste fino -->
+                    <!-- RIGHT SECTION: Product Details and Price -->
+                    <div class="flex flex-col justify-start flex-grow min-w-0 py-1">
                         <h4 class="text-lg font-bold text-gray-900 leading-tight">${toy.name}</h4>
                         <p class="text-sm font-medium text-gray-500 italic mt-0.5">Tamanho: ${toy.size}</p>
                         <p class="text-2xl font-extrabold text-encanto-blue mt-1">
@@ -378,7 +392,6 @@
 
         /**
          * Manipula o aumento/diminuição da quantidade de um brinquedo no carrinho.
-         * @param {Event} event Evento de clique.
          */
         function handleQuantityChange(event) {
             const button = event.currentTarget;
@@ -391,15 +404,12 @@
 
             if (action === 'increment') {
                 if (currentQty < maxStock) {
-                    // Lógica para o grupo especial (tobogã, escorrega, futebol de sabão)
                     if (specialGroup === 'slide_group') {
-                        // Verifica se outro item do grupo já está no carrinho
                         const isOtherSlideInCart = TOYS
                             .filter(t => t.specialGroup === 'slide_group' && t.id !== toyId)
                             .some(t => cart[t.id] > 0);
 
                         if (isOtherSlideInCart) {
-                            // Se sim, não permite a adição e notifica o usuário
                             showMessageBox("Restrição de Locação", "Você só pode alugar um item do grupo 'Escorrega, Tobogã ou Futebol de Sabão' por data.", 'error');
                             return;
                         }
@@ -415,69 +425,428 @@
             cart[toyId] = currentQty;
             document.getElementById(`qty-${toyId}`).textContent = currentQty;
             updateBudget();
-            updateFinalizeButton();
         }
 
         /**
-         * Calcula e atualiza o orçamento total e o status do botão de finalização.
+         * Calcula e armazena o orçamento detalhado (subtotal, desconto, taxa, total).
+         * @param {number} [customFee=0.00] - Taxa de entrega personalizada (opcional, default 0.00).
          */
-        function updateBudget() {
-            let total = 0;
+        function updateBudget(customFee = 0.00) {
+            let subtotal = 0;
+            let uniqueItems = 0;
             
             for (const id in cart) {
                 const quantity = cart[id];
                 const toy = TOYS.find(t => t.id === id);
                 if (toy && quantity > 0) {
-                    // Usa o preço base do brinquedo
-                    total += toy.price * quantity;
+                    subtotal += toy.price * quantity;
+                    uniqueItems++;
                 }
             }
 
-            budgetTotalDisplay.textContent = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            updateFinalizeButton(total);
+            // 1. Aplica Desconto: 10% se houver 2 ou mais itens únicos no carrinho
+            const discountRate = uniqueItems >= 2 ? 0.10 : 0.0;
+            const discountAmount = subtotal * discountRate;
+            
+            // 2. Define a Taxa de Entrega (Usa o customFee, que é 0.00 por padrão)
+            const deliveryFee = customFee; 
+
+            // 3. Calcula Total
+            const finalTotal = subtotal - discountAmount + deliveryFee;
+
+            // Armazena os detalhes no objeto global
+            budgetDetails.subtotal = subtotal;
+            budgetDetails.discount = discountAmount;
+            budgetDetails.currentDeliveryFee = deliveryFee; // Atualiza a taxa atual
+            budgetDetails.finalTotal = finalTotal;
+            budgetDetails.uniqueItems = uniqueItems;
+
+            updateDetailsButton(finalTotal);
+            return budgetDetails;
         }
 
         /**
-         * Habilita/desabilita o botão de finalização.
-         * @param {number} total O valor total do carrinho.
+         * Atualiza o texto e o estado do botão de Detalhes no rodapé.
+         * @param {number} total O valor total final.
          */
-        function updateFinalizeButton(total) {
-            const hasItems = total > 0;
-            finalizeButton.disabled = !hasItems;
+        function updateDetailsButton(total) {
+            // O botão deve ser habilitado se houver qualquer item no carrinho
+            const hasItems = budgetDetails.subtotal > 0; 
+            
+            showDetailsBtn.disabled = !hasItems;
+
+            const formattedTotal = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            
             if (hasItems) {
-                finalizeButton.textContent = `Finalizar Reserva (${budgetTotalDisplay.textContent})`;
-                finalizeButton.classList.remove('disabled:bg-gray-400');
+                showDetailsBtn.textContent = `Detalhes / Finalizar (${formattedTotal})`;
+                showDetailsBtn.classList.remove('disabled:bg-gray-400');
             } else {
-                finalizeButton.textContent = 'Finalizar Reserva (Preencher Formulário)';
-                finalizeButton.classList.add('disabled:bg-gray-400');
+                showDetailsBtn.textContent = 'Detalhes (R$ 0,00)';
+                showDetailsBtn.classList.add('disabled:bg-gray-400');
             }
         }
+        
+        /**
+         * Exibe o modal com o detalhamento do orçamento (pré-confirmação).
+         */
+        function showBudgetDetailsModal() {
+            if (showDetailsBtn.disabled) return;
+            
+            const details = updateBudget(budgetDetails.currentDeliveryFee); // Garante que os detalhes estejam atualizados
+            const itemsInCart = TOYS.filter(toy => cart[toy.id] > 0).map(toy => {
+                const quantity = cart[toy.id];
+                return `<li class="flex justify-between text-sm text-gray-600 border-b border-gray-100 py-1">
+                            <span>${quantity}x ${toy.name}</span>
+                            <span>${(toy.price * quantity).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                        </li>`;
+            }).join('');
+
+            const discountClass = details.discount > 0 ? 'text-encanto-green font-bold' : 'text-gray-500';
+            const discountText = details.discount > 0 ? `- ${details.discount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} (10% OFF)` : 'R$ 0,00';
+            const feeText = details.currentDeliveryFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            
+            // Texto da taxa de entrega conforme a nova regra
+            let feeDescription = 'Taxa de Entrega: R$ 0,00 (Gratuita para a maioria dos bairros)';
+            if (details.currentDeliveryFee > 0) {
+                 feeDescription = 'Taxa de Entrega: R$ 25,00 (Bairro Ervino)';
+            }
+            
+            const modalContent = `
+                <h5 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Detalhes da Reserva</h5>
+                
+                <h6 class="font-semibold text-gray-700 mb-2">Itens Selecionados:</h6>
+                <ul class="list-none p-0 mb-4 max-h-36 overflow-y-auto bg-gray-50 p-3 rounded-lg">
+                    ${itemsInCart}
+                </ul>
+
+                <div class="space-y-2 text-gray-700">
+                    <div class="flex justify-between">
+                        <span>Subtotal (Itens)</span>
+                        <span class="font-medium">${details.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <span>Desconto (2+ itens)</span>
+                        <span class="${discountClass}">${discountText}</span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span>Taxa de Entrega</span>
+                        <span class="font-medium">${feeText}</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-4 pt-4 border-t-2 border-encanto-blue">
+                    <span class="text-xl font-bold text-gray-800">TOTAL ESTIMADO:</span>
+                    <span class="text-3xl font-extrabold text-encanto-blue">${details.finalTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">O valor total será ajustado ao selecionar o bairro no próximo passo.</p>
+            `;
+
+            showMessageBox(
+                "Confirmar Locação",
+                modalContent,
+                'finalize' 
+            );
+        }
 
         /**
-         * Exibe uma caixa de mensagem customizada (em vez de alert()).
-         * @param {string} title Título da mensagem.
-         * @param {string} message Conteúdo da mensagem.
-         * @param {string} type 'info' ou 'error'.
+         * Exibe o modal full-screen com o formulário de finalização da reserva.
          */
-        function showMessageBox(title, message, type = 'info') {
+        function showReservationFormModal() {
+            // Estado inicial da taxa: 0.00
+            let currentFee = 0.00;
+            // Recalcula o total inicial com 0.00 de taxa
+            let currentTotal = updateBudget(currentFee).finalTotal;
+
+            const total = currentTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            const date = selectedDate.toLocaleDateString('pt-BR');
+
+            // Função para atualizar o total no modal dinamicamente
+            const updateFormTotalDisplay = () => {
+                const bairroSelect = document.getElementById('client-neighborhood');
+                const totalDisplay = document.getElementById('form-total-display');
+                const feeDisplay = document.getElementById('form-fee-display');
+                const feeAlert = document.getElementById('fee-alert');
+                
+                let newFee = 0.00;
+                let alertMessage = '';
+                
+                // === NOVA LÓGICA DE FRETE ===
+                if (bairroSelect.value === 'Ervino') {
+                    newFee = 25.00;
+                    alertMessage = 'Atenção! O bairro **Ervino** possui uma taxa de entrega de **R$ 25,00**. Este valor foi adicionado ao total.';
+                } else if (bairroSelect.value !== NEIGHBORHOODS[0]) {
+                    // Selecionou qualquer outro bairro válido
+                    newFee = 0.00; 
+                } else {
+                    // Bairro não selecionado (placeholder)
+                    newFee = 0.00;
+                }
+                // ============================
+
+                currentFee = newFee;
+                
+                // Recalcula o orçamento com a nova taxa
+                const newDetails = updateBudget(currentFee);
+                currentTotal = newDetails.finalTotal;
+
+                // Atualiza a exibição no formulário
+                totalDisplay.textContent = currentTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                feeDisplay.textContent = currentFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                
+                // Atualiza o alerta de taxa
+                if (alertMessage) {
+                    feeAlert.innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
+                                            <p class="font-bold">Taxa de Entrega!</p>
+                                            <p>${alertMessage.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
+                                          </div>`;
+                    feeAlert.classList.remove('hidden');
+                } else {
+                    feeAlert.classList.add('hidden');
+                }
+            };
+            
+            // Cria as opções do dropdown de bairros
+            const neighborhoodOptions = NEIGHBORHOODS.map((bairro, index) => 
+                `<option value="${bairro}" ${index === 0 ? 'disabled selected' : ''}>${bairro}</option>`
+            ).join('');
+
+            const formContent = `
+                <div class="p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Coluna 2 e 3: Formulário de Dados (Maior em desktop) -->
+                    <div class="md:col-span-2 order-1 md:order-1">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Dados de Contato e Entrega</h4>
+                        
+                        <form id="reservation-form" onsubmit="event.preventDefault(); submitReservationForm();">
+                            <div class="space-y-4">
+                                <!-- Nome -->
+                                <div>
+                                    <label for="client-name" class="block text-sm font-medium text-gray-700">Nome Completo *</label>
+                                    <input type="text" id="client-name" required class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue">
+                                </div>
+                                <!-- Telefone -->
+                                <div>
+                                    <label for="client-phone" class="block text-sm font-medium text-gray-700">Telefone (WhatsApp) *</label>
+                                    <input type="tel" id="client-phone" required class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue" placeholder="(XX) XXXXX-XXXX">
+                                </div>
+                                <!-- Bairro (SELECT NOVO) -->
+                                <div>
+                                    <label for="client-neighborhood" class="block text-sm font-medium text-gray-700">Bairro de Entrega *</label>
+                                    <select id="client-neighborhood" required class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue bg-white">
+                                        ${neighborhoodOptions}
+                                    </select>
+                                </div>
+                                <!-- Endereço detalhado (Rua, Número, Complemento) -->
+                                <div>
+                                    <label for="client-street-address" class="block text-sm font-medium text-gray-700">Rua, Número e Complemento *</label>
+                                    <textarea id="client-street-address" rows="2" required class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue"></textarea>
+                                </div>
+                                <!-- CPF/CNPJ -->
+                                <div>
+                                    <label for="client-cpf" class="block text-sm font-medium text-gray-700">CPF/CNPJ (Para Contrato)</label>
+                                    <input type="text" id="client-cpf" class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue" placeholder="Obrigatório para emissão de contrato">
+                                </div>
+                            </div>
+                            
+                            <!-- ORÇAMENTO DINÂMICO DENTRO DO FORMULÁRIO (visível em mobile, acima do botão) -->
+                            <div class="mt-8 md:hidden bg-gray-50 p-4 rounded-lg border-l-4 border-encanto-blue">
+                                <p class="text-sm text-gray-600 mb-3">Data do Evento: <strong>${date}</strong></p>
+                                <div class="flex justify-between border-b pb-1">
+                                    <span class="text-sm">Subtotal (Itens)</span>
+                                    <span class="font-semibold text-sm">${budgetDetails.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                </div>
+                                <div class="flex justify-between mt-2">
+                                    <span class="text-lg font-bold">Taxa de Entrega</span>
+                                    <span id="form-fee-display-mobile" class="text-lg font-bold text-red-600">${currentFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                </div>
+                                <div id="fee-alert-mobile" class="hidden mt-4"></div>
+                                <div class="flex justify-between items-center pt-4 border-t mt-4 border-gray-200">
+                                    <span class="text-2xl font-extrabold text-gray-800">TOTAL</span>
+                                    <span id="form-total-display-mobile" class="text-3xl font-extrabold text-encanto-blue">${total}</span>
+                                </div>
+                            </div>
+                            <!-- FIM ORÇAMENTO MOBILE -->
+
+                            <button type="submit" class="mt-8 w-full py-4 bg-encanto-green text-white font-bold text-xl rounded-lg shadow-xl hover:bg-green-600 transition duration-150 transform hover:scale-[1.01]">
+                                Enviar e Bloquear Data (<span id="final-submit-total">${total}</span>)
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Coluna 1: Orçamento Dinâmico (APENAS DESKTOP) -->
+                    <div class="hidden md:block md:col-span-1 bg-gray-50 p-6 rounded-xl border-l-4 border-encanto-blue flex flex-col justify-between order-2">
+                        <div>
+                            <h5 class="text-xl font-bold text-gray-800 mb-4">Seu Orçamento Atual</h5>
+                            <p class="text-sm text-gray-600 mb-6">Data do Evento: <strong>${date}</strong></p>
+
+                            <div class="space-y-3 mb-6">
+                                <div class="flex justify-between border-b pb-1">
+                                    <span class="text-sm">Subtotal (Itens)</span>
+                                    <span class="font-semibold text-sm">${budgetDetails.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                </div>
+                                <div class="flex justify-between border-b pb-1">
+                                    <span class="text-sm">Desconto (10%)</span>
+                                    <span class="font-semibold text-encanto-green text-sm">${budgetDetails.discount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', signDisplay: 'exceptZero' })}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-lg font-bold">Taxa de Entrega</span>
+                                    <span id="form-fee-display-desktop" class="text-lg font-bold text-red-600">${currentFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                </div>
+                                
+                                <div id="fee-alert-desktop" class="hidden mt-4"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-extrabold text-gray-800">TOTAL</span>
+                                <span id="form-total-display-desktop" class="text-4xl font-extrabold text-encanto-blue">${total}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const existingModal = document.getElementById('custom-modal-form');
+            if (existingModal) existingModal.remove();
+
+            // Renderiza o novo modal full-screen
+            const modalHtml = `
+                <div id="custom-modal-form" class="fullscreen-modal">
+                    <div class="fullscreen-modal-content">
+                        <div class="p-4 md:p-8 flex justify-between items-center border-b md:border-b-0 sticky top-0 bg-white z-10">
+                            <h4 class="text-xl font-bold text-gray-800">Finalizar Reserva</h4>
+                            <button onclick="document.getElementById('custom-modal-form').remove()" class="text-gray-400 hover:text-gray-600 transition p-2 rounded-full hover:bg-gray-100">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        ${formContent}
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // Adiciona o listener de mudança ao select de bairro
+            document.getElementById('client-neighborhood').addEventListener('change', updateFormTotalDisplay);
+
+            // Garante que o total inicial seja exibido corretamente (inicia com 0.00 de frete)
+            updateFormTotalDisplay(); 
+            
+            // Corrige o bug de atualização dupla para desktop e mobile
+            const updateDisplays = (newFee, newTotal, alertHtml) => {
+                // Desktop
+                document.getElementById('form-fee-display-desktop').textContent = newFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('form-total-display-desktop').textContent = newTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('fee-alert-desktop').innerHTML = alertHtml;
+                document.getElementById('fee-alert-desktop').classList.toggle('hidden', !alertHtml);
+
+                // Mobile
+                document.getElementById('form-fee-display-mobile').textContent = newFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('form-total-display-mobile').textContent = newTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('fee-alert-mobile').innerHTML = alertHtml;
+                document.getElementById('fee-alert-mobile').classList.toggle('hidden', !alertHtml);
+                
+                // Botão principal
+                document.getElementById('final-submit-total').textContent = newTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            };
+
+            const originalUpdateFormTotalDisplay = updateFormTotalDisplay;
+
+            // Sobrescreve a função temporariamente para garantir a atualização de todos os campos
+            window.updateFormTotalDisplay = () => {
+                const bairroSelect = document.getElementById('client-neighborhood');
+                
+                let newFee = 0.00;
+                let alertMessage = '';
+                
+                if (bairroSelect.value === 'Ervino') {
+                    newFee = 25.00;
+                    alertMessage = 'Atenção! O bairro **Ervino** possui uma taxa de entrega de **R$ 25,00**. Este valor foi adicionado ao total.';
+                } else if (bairroSelect.value !== NEIGHBORHOODS[0]) {
+                    newFee = 0.00; 
+                } else {
+                    newFee = 0.00;
+                }
+
+                currentFee = newFee;
+                const newDetails = updateBudget(currentFee);
+                currentTotal = newDetails.finalTotal;
+
+                const alertHtml = alertMessage ? `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert"><p class="font-bold">Taxa de Entrega!</p><p>${alertMessage.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p></div>` : '';
+
+                updateDisplays(currentFee, currentTotal, alertHtml);
+            };
+            // Chama a função atualizada
+            window.updateFormTotalDisplay();
+            document.getElementById('client-neighborhood').addEventListener('change', window.updateFormTotalDisplay);
+        }
+
+        /**
+         * Simula o envio do formulário de reserva.
+         */
+        function submitReservationForm() {
+            const name = document.getElementById('client-name').value;
+            const neighborhood = document.getElementById('client-neighborhood').value;
+            const phone = document.getElementById('client-phone').value;
+            
+            // Lógica final de frete
+            const fee = neighborhood === 'Ervino' ? 25.00 : 0.00;
+            const finalDetails = updateBudget(fee);
+            const total = finalDetails.finalTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            document.getElementById('custom-modal-form').remove();
+            
+            showMessageBox(
+                "Reserva Enviada com Sucesso!",
+                `Obrigado, ${name}! Sua solicitação de reserva para o bairro **${neighborhood}** (Taxa: R$ ${fee.toFixed(2).replace('.', ',')}) no valor total de **${total}** foi registrada. Entraremos em contato no número ${phone} para finalizar o contrato.`,
+                'info'
+            );
+        }
+
+        /**
+         * Exibe uma caixa de mensagem customizada ou modal de finalização.
+         */
+        function showMessageBox(title, content, type = 'info') {
             const existingModal = document.getElementById('custom-modal');
             if (existingModal) existingModal.remove();
 
-            const bgColor = type === 'error' ? 'bg-red-500' : 'bg-encanto-blue';
+            let bgColor = 'bg-encanto-blue';
+            let buttonText = 'Entendi';
+            let mainAction = '';
+            
+            if (type === 'error') {
+                bgColor = 'bg-red-500';
+            } else if (type === 'finalize') {
+                bgColor = 'bg-encanto-green'; 
+                buttonText = 'Fazer a Reserva (Preencher Formulário)';
+                mainAction = `
+                    document.getElementById('custom-modal').remove(); 
+                    showReservationFormModal(); 
+                `;
+            }
+
+            const messageHtml = type === 'finalize' ? content : `<p class="text-gray-600 mb-6">${content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`;
+            
+            const buttonHtml = `
+                <button onclick="${type === 'finalize' ? mainAction : "document.getElementById('custom-modal').remove()"}" class="w-full py-3 ${bgColor} text-white font-bold text-lg rounded-lg shadow-xl hover:opacity-90 transition duration-150 transform hover:scale-[1.01]">
+                    ${buttonText}
+                </button>
+            `;
 
             const modalHtml = `
-                <div id="custom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div class="bg-white rounded-xl shadow-2xl max-w-sm mx-4 p-6 transform transition-all duration-300 scale-100">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="w-8 h-8 rounded-full ${bgColor} flex items-center justify-center text-white font-bold">
-                                ${type === 'error' ? '!' : 'i'}
-                            </div>
-                            <h5 class="text-xl font-bold text-gray-800">${title}</h5>
+                <div id="custom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+                    <div class="bg-white rounded-xl shadow-2xl max-w-lg mx-4 p-6 md:p-8 transform transition-all duration-300 scale-100">
+                        <div class="flex justify-between items-start mb-4">
+                            <h5 class="text-2xl font-bold text-gray-800">${title}</h5>
+                            <button onclick="document.getElementById('custom-modal').remove()" class="text-gray-400 hover:text-gray-600 transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
                         </div>
-                        <p class="text-gray-600 mb-6">${message}</p>
-                        <button onclick="document.getElementById('custom-modal').remove()" class="w-full py-2 ${bgColor} text-white font-semibold rounded-lg hover:opacity-90 transition duration-150">
-                            Entendi
-                        </button>
+                        ${messageHtml}
+                        <div class="mt-6">
+                            ${buttonHtml}
+                        </div>
                     </div>
                 </div>
             `;
@@ -495,7 +864,7 @@
             renderCalendar();
         });
 
-        nextMonthBtn.addEventListener('click', () => {
+        document.getElementById('next-month').addEventListener('click', () => {
             currentMonth++;
             if (currentMonth > 11) {
                 currentMonth = 0;
@@ -504,29 +873,10 @@
             renderCalendar();
         });
 
-        // Simula o redirecionamento para o formulário (passo final)
-        finalizeButton.addEventListener('click', () => {
-            if (!finalizeButton.disabled) {
-                const itemsList = Object.keys(cart).filter(id => cart[id] > 0).map(id => {
-                    const toy = TOYS.find(t => t.id === id);
-                    return `${toy.name} (x${cart[id]})`;
-                }).join(', ');
-
-                showMessageBox(
-                    "Próxima Etapa: Formulário",
-                    `Você selecionou a data ${selectedDate.toLocaleDateString('pt-BR')} e os seguintes itens: ${itemsList}. Por favor, preencha o formulário a seguir para confirmar a locação.`,
-                    'info'
-                );
-
-                // Em um ambiente real, você faria um POST ou redirecionaria para a página de checkout.
-                // window.location.href = '/checkout-form.html';
-            }
-        });
-
         // Inicializa o calendário ao carregar a página
         window.onload = function() {
             renderCalendar();
-            updateBudget(); // Inicializa o orçamento em R$ 0,00
+            updateBudget(); // Inicializa o orçamento em R$ 0,00 e o botão de detalhes
         }
     </script>
 </body>
