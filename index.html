@@ -3,881 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva de Locação - Encanto Festas</title>
-    <!-- Carrega o Tailwind CSS CDN para estilização -->
+    <title>Locação de Brinquedos - Brinque Mais</title>
+    <!-- Carrega o Tailwind CSS para o estilo -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuração do Tailwind para usar a fonte Inter e cores personalizadas -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'encanto-blue': '#3B82F6', // Azul principal
-                        'encanto-yellow': '#FACC15', // Amarelo de destaque
-                        'encanto-green': '#10B981', // Verde para destaque/confirmação
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
     <style>
-        /* Estilos personalizados para o calendário e responsividade */
+        /* Define a fonte Inter como padrão */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #F8FAFC; /* Fundo levemente cinza */
-        }
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-        }
-        .day-cell {
-            padding: 8px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: transform 0.1s, box-shadow 0.1s, background-color 0.15s;
-            text-align: center;
-            font-weight: 500;
-        }
-        .day-cell.available:hover:not(.selected) {
-            background-color: #E5E7EB; 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-        }
-        .day-cell.disabled {
-            background-color: #E5E7EB;
-            color: #9CA3AF;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        .day-cell.selected {
-            border: 3px solid #1D4ED8; 
-            background-color: #BFDBFE; 
-            transform: translateY(0);
-        }
-        /* Classe para o orçamento flutuante (Full-width no bottom) */
-        .budget-popup {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-        }
-
-        /* Estilo para o Modal de Formulário (Tela Cheia) */
-        .fullscreen-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 50;
-            background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro com mais opacidade */
-            backdrop-filter: blur(5px);
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0; /* Remove padding geral para ocupar 100% da tela em mobile */
+            flex-direction: column;
+            background-color: #f7f9fc; /* Fundo levemente acinzentado */
         }
-        .fullscreen-modal-content {
-            background-color: white;
-            border-radius: 0; /* Remove border-radius em mobile */
-            width: 100%;
-            height: 100%; /* Ocupa a altura total */
-            max-width: none; /* Ignora max-width em mobile */
-            max-height: none; /* Ignora max-height em mobile */
-            overflow-y: auto;
-            box-shadow: none; /* Remove box-shadow em mobile */
+        /* Define o layout principal para empurrar o footer para baixo e dar espaço à bottom bar */
+        #main-content {
+            flex-grow: 1;
+            padding-bottom: 5rem; /* Espaço para a bottom bar fixa */
+        }
+        /* Cor primária (Azul) */
+        .color-primary {
+            background-color: #3b82f6; /* Blue 500 */
+        }
+        /* Cor secundária (Amarelo) */
+        .color-secondary {
+            background-color: #facc15; /* Yellow 400 */
+        }
+        
+        /* Estilo para o menu hambúrguer - Cor da barra ajustada para o header BRANCO */
+        .burger-icon span {
+            display: block;
+            height: 3px;
+            width: 25px;
+            background: #3b82f6; /* Azul primário para contraste */
+            margin: 4px 0;
+            transition: all 0.3s ease-in-out;
+        }
+        /* Esconde o menu de navegação grande por padrão */
+        .nav-menu {
+            display: none;
         }
 
-        /* Ajustes para desktop (tela maior que 768px) */
-        @media (min-width: 768px) {
-            .fullscreen-modal-content {
-                border-radius: 16px;
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                max-width: 900px;
-                max-height: 90vh;
-                height: auto; /* Permite que o conteúdo defina a altura */
-            }
+        /* Estilos específicos para a barra inferior (mobile) */
+        #bottom-nav {
+            z-index: 50; /* Garante que fique acima de outros conteúdos */
         }
+
+        /* Classes Tailwind customizadas para cores */
+        .bg-primary { background-color: #3b82f6; }
+        .text-primary { color: #3b82f6; }
+        .bg-secondary { background-color: #facc15; }
+        .text-secondary { color: #facc15; }
+
     </style>
-</head>
-<body class="min-h-screen pb-24"> <!-- Padding bottom para o orçamento fixo -->
-
-    <div class="max-w-4xl mx-auto p-4 md:p-8">
-
-        <!-- HEADER E LOGO -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b pb-4">
-            <div class="flex items-center space-x-4 mb-4 md:mb-0">
-                <div class="w-16 h-16 bg-encanto-yellow rounded-full flex items-center justify-center shadow-lg border-4 border-encanto-blue">
-                    <span class="text-white text-xl font-black">EF</span>
-                </div>
-                <h1 class="text-3xl font-extrabold text-gray-800">Encanto Festas</h1>
-            </div>
-            <div class="text-right">
-                <h2 class="text-2xl font-semibold text-encanto-blue">Reserva de Locação</h2>
-                <p class="text-sm text-gray-500 italic">Sua festa começa aqui!</p>
-            </div>
-        </header>
-
-        <!-- SEÇÃO PRINCIPAL (CALENDÁRIO / PRODUTOS) -->
-        <main>
-            <!-- Passo 1: Seleção de Data -->
-            <section id="date-selection-section" class="bg-white p-6 rounded-xl shadow-2xl border-t-8 border-encanto-blue">
-                <h3 class="text-xl font-bold mb-4 text-gray-700">1. Selecione a Data do seu Evento</h3>
-
-                <!-- Controles e Título do Mês -->
-                <div class="flex justify-between items-center mb-6">
-                    <!-- Botão de mês anterior -->
-                    <button id="prev-month" class="p-3 md:p-4 rounded-full bg-encanto-blue text-white shadow-xl hover:bg-blue-700 transition duration-150 transform active:scale-95 disabled:bg-gray-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
-                    </button>
-                    <span id="month-year" class="text-2xl font-bold text-gray-800"></span>
-                    <button id="next-month" class="p-3 md:p-4 rounded-full bg-encanto-blue text-white shadow-xl hover:bg-blue-700 transition duration-150 transform active:scale-95 disabled:bg-gray-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-                    </button>
-                </div>
-
-                <!-- Cabeçalho da Semana -->
-                <div class="calendar-grid font-semibold text-center text-gray-500 mb-2">
-                    <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
-                </div>
-
-                <!-- Grid do Calendário -->
-                <div id="calendar-body" class="calendar-grid text-gray-800">
-                    <!-- Dias serão injetados aqui pelo JavaScript -->
-                </div>
-            </section>
-
-            <!-- Passo 2: Seleção de Brinquedos (Invisível até uma data ser selecionada) -->
-            <section id="item-selection-section" class="mt-10 pt-8 border-t-4 border-encanto-yellow" style="display: none;">
-                <h3 class="text-2xl font-bold mb-6 text-encanto-blue">2. Brinquedos Disponíveis em <span id="selected-date-display" class="text-encanto-yellow"></span></h3>
-
-                <div id="toy-list" class="space-y-4"> 
-                    <!-- Brinquedos serão injetados aqui -->
-                </div>
-            </section>
-        </main>
-
-    </div>
-
-    <!-- POPUP DE ORÇAMENTO (100% Mobile - Fixo na Barra Inferior) -->
-    <div class="budget-popup bg-white shadow-2xl border-t-4 border-encanto-yellow p-4">
-        <div class="max-w-4xl mx-auto flex justify-between items-center w-full"> <!-- w-full garante 100% de largura dentro do max-w -->
-            <h4 class="text-lg font-bold text-gray-700">Valor Total:</h4>
-            <!-- O botão agora exibe o valor total e abre o modal de detalhes/finalização -->
-            <button id="show-budget-details-btn" class="px-6 py-2 bg-encanto-blue text-white font-bold text-lg rounded-full shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 disabled:bg-gray-400" disabled>
-                Detalhes (R$ 0,00)
-            </button>
-        </div>
-    </div>
-
     <script>
-        // Variáveis globais para o calendário
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        let selectedDate = null;
-        const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-        // Armazenamento do carrinho (código: quantidade)
-        let cart = {};
-
-        // === DADOS MOCK DOS BRINQUEDOS E ESTOQUE ===
-        const TOYS = [
-            { id: 'p_trampoline', name: 'Cama Elástica Pequena', price: 170.00, stock: 1, size: '2.0m x 2.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Pequena' },
-            { id: 'm_trampoline', name: 'Cama Elástica Média', price: 190.00, stock: 3, size: '3.5m x 3.5m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Média' },
-            { id: 'bouncer', name: 'Castelinho Pula Pula', price: 210.00, stock: 1, size: '4.0m x 4.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Castelinho' },
-            { id: 'ball_pit', name: 'Piscina de Bolinhas', price: 160.00, stock: 2, size: '2.5m x 2.5m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Bolinhas' },
-            { id: 'baby_area', name: 'Área Baby', price: 110.00, stock: 1, size: '3.0m x 3.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Baby+Area' },
-            { id: 'mini_inflable', name: 'Mini Baby Inflável', price: 220.00, stock: 1, size: '2.5m x 2.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Mini+Inflável' },
-            { id: 'slide_ball', name: 'Escorrega com Bolinha', price: 400.00, stock: 1, specialGroup: 'slide_group', size: '5.0m x 3.0m', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Escorrega' },
-            { id: 'medium_toboggan', name: 'Tobogã Médio', price: 400.00, stock: 1, specialGroup: 'slide_group', size: '6.0m x 4.0m', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Tobogã' },
-            { id: 'soap_soccer', name: 'Futebol de Sabão', price: 600.00, stock: 1, specialGroup: 'slide_group', size: '10.0m x 5.0m', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Futebol+Sabão' },
-            { id: 'foosball', name: 'Pebolim', price: 200.00, stock: 1, size: '1.5m x 1.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Pebolim' },
-            { id: 'air_hockey', name: 'Air Hockey', price: 200.00, stock: 1, size: '2.0m x 1.2m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Air+Hockey' },
-            { id: 'ping_pong', name: 'Ping Pong', price: 200.00, stock: 1, size: '2.74m x 1.52m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Ping+Pong' },
-            { id: 'table_games', name: 'Jogos de Mesa', price: 15.00, stock: 4, size: '0.8m x 0.8m (cada)', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Jogos+Mesa' },
-        ];
-        
-        // Dados de Bairros
-        const NEIGHBORHOODS = [
-            "Selecione o Bairro...",
-            "Acaraí", "Água Branca", "Capri", "Centro - Sfs", "Centro Histórico", 
-            "Enseada", "Ervino", "Iperoba", "Itaguaçu", "Laranjeiras", 
-            "Majorca", "Miranda", "Morro Grande", "Paulas", "Praia Grande", 
-            "Reta", "Ribeira", "Rocio Grande", "Rocio Pequeno", "Sandra Regina", 
-            "Tapera Ubatuba", "Vila da Glória"
-        ];
-        
-        // Armazenamento do orçamento detalhado
-        let budgetDetails = {
-            subtotal: 0,
-            discount: 0,
-            currentDeliveryFee: 0.00, // Inicializado em 0.00 (NOVA REGRA)
-            finalTotal: 0,
-            uniqueItems: 0
-        };
-
-        // Elementos DOM
-        const calendarBody = document.getElementById('calendar-body');
-        const monthYearDisplay = document.getElementById('month-year');
-        const prevMonthBtn = document.getElementById('prev-month');
-        const itemSelectionSection = document.getElementById('item-selection-section');
-        const selectedDateDisplay = document.getElementById('selected-date-display');
-        const toyListContainer = document.getElementById('toy-list');
-        const showDetailsBtn = document.getElementById('show-budget-details-btn');
-
-        showDetailsBtn.addEventListener('click', showBudgetDetailsModal);
-
-        /**
-         * Retorna os dados de disponibilidade (agora simplificados) para uma data específica.
-         * @returns {object} { slideBooked, discount }
-         */
-        function getDailyAvailability(date) {
-            return { slideBooked: null, discount: 0.0 };
+        // Função para alternar a visibilidade do menu
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
         }
 
-        /**
-         * Desenha o calendário para o mês e ano atuais.
-         */
-        function renderCalendar() {
-            const date = new Date(currentYear, currentMonth, 1);
-            const firstDay = date.getDay(); 
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const today = new Date();
+        // Simula o clique dos botões da barra inferior
+        function handleBottomButtonClick(pageName) {
+            // Esta função apenas simula a navegação
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
 
-            monthYearDisplay.textContent = `${MONTH_NAMES[currentMonth]} ${currentYear}`;
-            calendarBody.innerHTML = ''; 
-
-            // Lógica para desabilitar o botão de Mês Anterior
-            const todayMonth = today.getMonth();
-            const todayYear = today.getFullYear();
-            prevMonthBtn.disabled = currentYear < todayYear || (currentYear === todayYear && currentMonth <= todayMonth);
-
-            // Preenche os dias vazios no início do mês
-            for (let i = 0; i < firstDay; i++) {
-                calendarBody.innerHTML += '<div></div>';
-            }
-
-            // Preenche os dias do mês
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayDate = new Date(currentYear, currentMonth, day);
-                const isPast = dayDate < today && dayDate.toDateString() !== today.toDateString();
-
-                const cell = document.createElement('div');
-                let cellClass = 'bg-white text-gray-800 available'; 
-
-                const isToday = dayDate.toDateString() === today.toDateString();
-                if (isToday) {
-                    cellClass = 'bg-encanto-blue text-white font-bold shadow-md available';
-                }
-
-                cell.className = `day-cell ${cellClass}`;
-                cell.textContent = day;
-                cell.setAttribute('data-date', dayDate.toISOString().split('T')[0]);
-
-                if (isPast) {
-                    cell.classList.add('disabled');
-                    cell.classList.remove('available');
-                } else {
-                    cell.addEventListener('click', () => handleDateSelection(dayDate, cell));
-                }
-
-                if (selectedDate && selectedDate.toDateString() === dayDate.toDateString()) {
-                    cell.classList.add('selected');
-                }
-
-                calendarBody.appendChild(cell);
-            }
-        }
-
-        /**
-         * Manipula a seleção de uma data no calendário.
-         */
-        function handleDateSelection(date, cell) {
-            document.querySelectorAll('.day-cell.selected').forEach(c => c.classList.remove('selected'));
-            cell.classList.add('selected');
-
-            selectedDate = date;
-            cart = {}; // Limpa o carrinho ao mudar a data
-            updateBudget();
-
-            const formattedDate = date.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            selectedDateDisplay.textContent = formattedDate;
-
+            messageText.textContent = `Ação: Ir para a página de '${pageName}' (A navegação será implementada em outra etapa).`;
+            messageBox.classList.remove('hidden');
             setTimeout(() => {
-                itemSelectionSection.style.display = 'block';
-                requestAnimationFrame(() => {
-                    itemSelectionSection.scrollIntoView({ behavior: 'smooth' });
-                });
-                renderToyList();
-            }, 100);
+                messageBox.classList.add('hidden');
+            }, 3000); // Esconde a mensagem após 3 segundos
         }
 
-        /**
-         * Renderiza a lista de brinquedos disponíveis.
-         */
-        function renderToyList() {
-            if (!selectedDate) return;
-
-            const availability = getDailyAvailability(selectedDate);
-            toyListContainer.innerHTML = '';
-            
-            TOYS.forEach(toy => {
-                const toyId = toy.id;
-                const basePrice = toy.price;
-                const finalPrice = basePrice; 
-
-                let currentStock = toy.stock;
-                let isAvailable = true;
-                let reason = '';
-
-                // Verifica a restrição do grupo especial
-                if (toy.specialGroup === 'slide_group') {
-                    if (availability.slideBooked && availability.slideBooked !== toyId) {
-                        isAvailable = false;
-                        reason = `(Já alugado: ${TOYS.find(t => t.id === availability.slideBooked).name} reservado)`;
-                    } else if (availability.slideBooked === toyId) {
-                        currentStock = 0;
-                        isAvailable = false;
-                        reason = `(Alugado para esta data)`;
-                    }
-                }
-                
-                const cardClass = `flex bg-white rounded-xl shadow-lg p-4 transition duration-300 transform hover:scale-[1.01] ring-1 ring-gray-100 ${!isAvailable ? 'opacity-50 grayscale' : 'hover:ring-encanto-blue hover:shadow-xl'}`;
-
-                const card = document.createElement('div');
-                card.className = cardClass;
-                card.innerHTML = `
-                    <!-- LEFT SECTION: Image, Quantity Control, and Stock Info -->
-                    <div class="flex flex-col items-center flex-shrink-0 mr-4">
-                        <img src="${toy.mockImage}" alt="Foto de ${toy.name}" onerror="this.onerror=null;this.src='https://placehold.co/80x80/9CA3AF/FFFFFF?text=Item';" class="w-20 h-20 object-cover rounded-lg border-2 border-encanto-yellow mb-2 flex-shrink-0">
-                        
-                        <!-- Quantity Control -->
-                        <div class="flex items-center rounded-lg overflow-hidden border-2 border-encanto-blue/50 shadow-md transition ${!isAvailable || currentStock === 0 ? 'pointer-events-none opacity-50' : ''}">
-                            <button data-id="${toyId}" data-action="decrement" class="w-7 h-7 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
-                                <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                            </button>
-                            <span id="qty-${toyId}" class="w-8 h-7 flex items-center justify-center bg-blue-50 text-encanto-blue font-bold text-sm">${cart[toyId] || 0}</span>
-                            <button data-id="${toyId}" data-action="increment" data-max="${currentStock}" data-group="${toy.specialGroup}" class="w-7 h-7 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
-                                <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            </button>
-                        </div>
-                        
-                        <span class="text-xs text-gray-500 mt-1 italic">Disp: ${currentStock} UN</span>
-                    </div>
-
-                    <!-- RIGHT SECTION: Product Details and Price -->
-                    <div class="flex flex-col justify-start flex-grow min-w-0 py-1">
-                        <h4 class="text-lg font-bold text-gray-900 leading-tight">${toy.name}</h4>
-                        <p class="text-sm font-medium text-gray-500 italic mt-0.5">Tamanho: ${toy.size}</p>
-                        <p class="text-2xl font-extrabold text-encanto-blue mt-1">
-                            ${finalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        </p>
-                        <span class="text-xs text-red-500">${reason}</span>
-                    </div>
-                `;
-
-                toyListContainer.appendChild(card);
-            });
-
-            // Adiciona listeners para os botões de quantidade
-            toyListContainer.querySelectorAll('button').forEach(button => {
-                button.addEventListener('click', handleQuantityChange);
-            });
-        }
-
-        /**
-         * Manipula o aumento/diminuição da quantidade de um brinquedo no carrinho.
-         */
-        function handleQuantityChange(event) {
-            const button = event.currentTarget;
-            const toyId = button.getAttribute('data-id');
-            const action = button.getAttribute('data-action');
-            const maxStock = parseInt(button.getAttribute('data-max'));
-            const specialGroup = button.getAttribute('data-group');
-
-            let currentQty = cart[toyId] || 0;
-
-            if (action === 'increment') {
-                if (currentQty < maxStock) {
-                    if (specialGroup === 'slide_group') {
-                        const isOtherSlideInCart = TOYS
-                            .filter(t => t.specialGroup === 'slide_group' && t.id !== toyId)
-                            .some(t => cart[t.id] > 0);
-
-                        if (isOtherSlideInCart) {
-                            showMessageBox("Restrição de Locação", "Você só pode alugar um item do grupo 'Escorrega, Tobogã ou Futebol de Sabão' por data.", 'error');
-                            return;
-                        }
-                    }
-                    currentQty++;
-                }
-            } else if (action === 'decrement') {
-                if (currentQty > 0) {
-                    currentQty--;
-                }
-            }
-
-            cart[toyId] = currentQty;
-            document.getElementById(`qty-${toyId}`).textContent = currentQty;
-            updateBudget();
-        }
-
-        /**
-         * Calcula e armazena o orçamento detalhado (subtotal, desconto, taxa, total).
-         * @param {number} [customFee=0.00] - Taxa de entrega personalizada (opcional, default 0.00).
-         */
-        function updateBudget(customFee = 0.00) {
-            let subtotal = 0;
-            let uniqueItems = 0;
-            
-            for (const id in cart) {
-                const quantity = cart[id];
-                const toy = TOYS.find(t => t.id === id);
-                if (toy && quantity > 0) {
-                    subtotal += toy.price * quantity;
-                    uniqueItems++;
-                }
-            }
-
-            // 1. Aplica Desconto: 10% se houver 2 ou mais itens únicos no carrinho
-            const discountRate = uniqueItems >= 2 ? 0.10 : 0.0;
-            const discountAmount = subtotal * discountRate;
-            
-            // 2. Define a Taxa de Entrega (Usa o customFee, que é 0.00 por padrão)
-            const deliveryFee = customFee; 
-
-            // 3. Calcula Total
-            const finalTotal = subtotal - discountAmount + deliveryFee;
-
-            // Armazena os detalhes no objeto global
-            budgetDetails.subtotal = subtotal;
-            budgetDetails.discount = discountAmount;
-            budgetDetails.currentDeliveryFee = deliveryFee; // Atualiza a taxa atual
-            budgetDetails.finalTotal = finalTotal;
-            budgetDetails.uniqueItems = uniqueItems;
-
-            updateDetailsButton(finalTotal);
-            return budgetDetails;
-        }
-
-        /**
-         * Atualiza o texto e o estado do botão de Detalhes no rodapé.
-         * @param {number} total O valor total final.
-         */
-        function updateDetailsButton(total) {
-            // O botão deve ser habilitado se houver qualquer item no carrinho
-            const hasItems = budgetDetails.subtotal > 0; 
-            
-            showDetailsBtn.disabled = !hasItems;
-
-            const formattedTotal = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            
-            if (hasItems) {
-                showDetailsBtn.textContent = `Detalhes / Finalizar (${formattedTotal})`;
-                showDetailsBtn.classList.remove('disabled:bg-gray-400');
-            } else {
-                showDetailsBtn.textContent = 'Detalhes (R$ 0,00)';
-                showDetailsBtn.classList.add('disabled:bg-gray-400');
-            }
-        }
-        
-        /**
-         * Exibe o modal com o detalhamento do orçamento (pré-confirmação).
-         */
-        function showBudgetDetailsModal() {
-            if (showDetailsBtn.disabled) return;
-            
-            const details = updateBudget(budgetDetails.currentDeliveryFee); // Garante que os detalhes estejam atualizados
-            const itemsInCart = TOYS.filter(toy => cart[toy.id] > 0).map(toy => {
-                const quantity = cart[toy.id];
-                return `<li class="flex justify-between text-sm text-gray-600 border-b border-gray-100 py-1">
-                            <span>${quantity}x ${toy.name}</span>
-                            <span>${(toy.price * quantity).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                        </li>`;
-            }).join('');
-
-            const discountClass = details.discount > 0 ? 'text-encanto-green font-bold' : 'text-gray-500';
-            const discountText = details.discount > 0 ? `- ${details.discount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} (10% OFF)` : 'R$ 0,00';
-            const feeText = details.currentDeliveryFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            
-            // Texto da taxa de entrega conforme a nova regra
-            let feeDescription = 'Taxa de Entrega: R$ 0,00 (Gratuita para a maioria dos bairros)';
-            if (details.currentDeliveryFee > 0) {
-                 feeDescription = 'Taxa de Entrega: R$ 25,00 (Bairro Ervino)';
-            }
-            
-            const modalContent = `
-                <h5 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Detalhes da Reserva</h5>
-                
-                <h6 class="font-semibold text-gray-700 mb-2">Itens Selecionados:</h6>
-                <ul class="list-none p-0 mb-4 max-h-36 overflow-y-auto bg-gray-50 p-3 rounded-lg">
-                    ${itemsInCart}
-                </ul>
-
-                <div class="space-y-2 text-gray-700">
-                    <div class="flex justify-between">
-                        <span>Subtotal (Itens)</span>
-                        <span class="font-medium">${details.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                    </div>
-                    
-                    <div class="flex justify-between">
-                        <span>Desconto (2+ itens)</span>
-                        <span class="${discountClass}">${discountText}</span>
-                    </div>
-
-                    <div class="flex justify-between">
-                        <span>Taxa de Entrega</span>
-                        <span class="font-medium">${feeText}</span>
-                    </div>
-                </div>
-
-                <div class="flex justify-between items-center mt-4 pt-4 border-t-2 border-encanto-blue">
-                    <span class="text-xl font-bold text-gray-800">TOTAL ESTIMADO:</span>
-                    <span class="text-3xl font-extrabold text-encanto-blue">${details.finalTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                </div>
-                <p class="text-xs text-gray-500 mt-2">O valor total será ajustado ao selecionar o bairro no próximo passo.</p>
-            `;
-
-            showMessageBox(
-                "Confirmar Locação",
-                modalContent,
-                'finalize' 
-            );
-        }
-
-        /**
-         * Exibe o modal full-screen com o formulário de finalização da reserva.
-         */
-        function showReservationFormModal() {
-            // Estado inicial da taxa: 0.00
-            let currentFee = 0.00;
-            // Recalcula o total inicial com 0.00 de taxa
-            let currentTotal = updateBudget(currentFee).finalTotal;
-
-            const total = currentTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            const date = selectedDate.toLocaleDateString('pt-BR');
-
-            // Função para atualizar o total no modal dinamicamente
-            const updateFormTotalDisplay = () => {
-                const bairroSelect = document.getElementById('client-neighborhood');
-                const totalDisplay = document.getElementById('form-total-display');
-                const feeDisplay = document.getElementById('form-fee-display');
-                const feeAlert = document.getElementById('fee-alert');
-                
-                let newFee = 0.00;
-                let alertMessage = '';
-                
-                // === NOVA LÓGICA DE FRETE ===
-                if (bairroSelect.value === 'Ervino') {
-                    newFee = 25.00;
-                    alertMessage = 'Atenção! O bairro **Ervino** possui uma taxa de entrega de **R$ 25,00**. Este valor foi adicionado ao total.';
-                } else if (bairroSelect.value !== NEIGHBORHOODS[0]) {
-                    // Selecionou qualquer outro bairro válido
-                    newFee = 0.00; 
-                } else {
-                    // Bairro não selecionado (placeholder)
-                    newFee = 0.00;
-                }
-                // ============================
-
-                currentFee = newFee;
-                
-                // Recalcula o orçamento com a nova taxa
-                const newDetails = updateBudget(currentFee);
-                currentTotal = newDetails.finalTotal;
-
-                // Atualiza a exibição no formulário
-                totalDisplay.textContent = currentTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                feeDisplay.textContent = currentFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                
-                // Atualiza o alerta de taxa
-                if (alertMessage) {
-                    feeAlert.innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
-                                            <p class="font-bold">Taxa de Entrega!</p>
-                                            <p>${alertMessage.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
-                                          </div>`;
-                    feeAlert.classList.remove('hidden');
-                } else {
-                    feeAlert.classList.add('hidden');
-                }
-            };
-            
-            // Cria as opções do dropdown de bairros
-            const neighborhoodOptions = NEIGHBORHOODS.map((bairro, index) => 
-                `<option value="${bairro}" ${index === 0 ? 'disabled selected' : ''}>${bairro}</option>`
-            ).join('');
-
-            const formContent = `
-                <div class="p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Coluna 2 e 3: Formulário de Dados (Maior em desktop) -->
-                    <div class="md:col-span-2 order-1 md:order-1">
-                        <h4 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Dados de Contato e Entrega</h4>
-                        
-                        <form id="reservation-form" onsubmit="event.preventDefault(); submitReservationForm();">
-                            <div class="space-y-4">
-                                <!-- Nome -->
-                                <div>
-                                    <label for="client-name" class="block text-sm font-medium text-gray-700">Nome Completo *</label>
-                                    <input type="text" id="client-name" required class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue">
-                                </div>
-                                <!-- Telefone -->
-                                <div>
-                                    <label for="client-phone" class="block text-sm font-medium text-gray-700">Telefone (WhatsApp) *</label>
-                                    <input type="tel" id="client-phone" required class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue" placeholder="(XX) XXXXX-XXXX">
-                                </div>
-                                <!-- Bairro (SELECT NOVO) -->
-                                <div>
-                                    <label for="client-neighborhood" class="block text-sm font-medium text-gray-700">Bairro de Entrega *</label>
-                                    <select id="client-neighborhood" required class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue bg-white">
-                                        ${neighborhoodOptions}
-                                    </select>
-                                </div>
-                                <!-- Endereço detalhado (Rua, Número, Complemento) -->
-                                <div>
-                                    <label for="client-street-address" class="block text-sm font-medium text-gray-700">Rua, Número e Complemento *</label>
-                                    <textarea id="client-street-address" rows="2" required class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue"></textarea>
-                                </div>
-                                <!-- CPF/CNPJ -->
-                                <div>
-                                    <label for="client-cpf" class="block text-sm font-medium text-gray-700">CPF/CNPJ (Para Contrato)</label>
-                                    <input type="text" id="client-cpf" class="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-encanto-blue focus:ring-encanto-blue" placeholder="Obrigatório para emissão de contrato">
-                                </div>
-                            </div>
-                            
-                            <!-- ORÇAMENTO DINÂMICO DENTRO DO FORMULÁRIO (visível em mobile, acima do botão) -->
-                            <div class="mt-8 md:hidden bg-gray-50 p-4 rounded-lg border-l-4 border-encanto-blue">
-                                <p class="text-sm text-gray-600 mb-3">Data do Evento: <strong>${date}</strong></p>
-                                <div class="flex justify-between border-b pb-1">
-                                    <span class="text-sm">Subtotal (Itens)</span>
-                                    <span class="font-semibold text-sm">${budgetDetails.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                                </div>
-                                <div class="flex justify-between mt-2">
-                                    <span class="text-lg font-bold">Taxa de Entrega</span>
-                                    <span id="form-fee-display-mobile" class="text-lg font-bold text-red-600">${currentFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                                </div>
-                                <div id="fee-alert-mobile" class="hidden mt-4"></div>
-                                <div class="flex justify-between items-center pt-4 border-t mt-4 border-gray-200">
-                                    <span class="text-2xl font-extrabold text-gray-800">TOTAL</span>
-                                    <span id="form-total-display-mobile" class="text-3xl font-extrabold text-encanto-blue">${total}</span>
-                                </div>
-                            </div>
-                            <!-- FIM ORÇAMENTO MOBILE -->
-
-                            <button type="submit" class="mt-8 w-full py-4 bg-encanto-green text-white font-bold text-xl rounded-lg shadow-xl hover:bg-green-600 transition duration-150 transform hover:scale-[1.01]">
-                                Enviar e Bloquear Data (<span id="final-submit-total">${total}</span>)
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Coluna 1: Orçamento Dinâmico (APENAS DESKTOP) -->
-                    <div class="hidden md:block md:col-span-1 bg-gray-50 p-6 rounded-xl border-l-4 border-encanto-blue flex flex-col justify-between order-2">
-                        <div>
-                            <h5 class="text-xl font-bold text-gray-800 mb-4">Seu Orçamento Atual</h5>
-                            <p class="text-sm text-gray-600 mb-6">Data do Evento: <strong>${date}</strong></p>
-
-                            <div class="space-y-3 mb-6">
-                                <div class="flex justify-between border-b pb-1">
-                                    <span class="text-sm">Subtotal (Itens)</span>
-                                    <span class="font-semibold text-sm">${budgetDetails.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                                </div>
-                                <div class="flex justify-between border-b pb-1">
-                                    <span class="text-sm">Desconto (10%)</span>
-                                    <span class="font-semibold text-encanto-green text-sm">${budgetDetails.discount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', signDisplay: 'exceptZero' })}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-lg font-bold">Taxa de Entrega</span>
-                                    <span id="form-fee-display-desktop" class="text-lg font-bold text-red-600">${currentFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                                </div>
-                                
-                                <div id="fee-alert-desktop" class="hidden mt-4"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="pt-4 border-t border-gray-200">
-                            <div class="flex justify-between items-center">
-                                <span class="text-2xl font-extrabold text-gray-800">TOTAL</span>
-                                <span id="form-total-display-desktop" class="text-4xl font-extrabold text-encanto-blue">${total}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            const existingModal = document.getElementById('custom-modal-form');
-            if (existingModal) existingModal.remove();
-
-            // Renderiza o novo modal full-screen
-            const modalHtml = `
-                <div id="custom-modal-form" class="fullscreen-modal">
-                    <div class="fullscreen-modal-content">
-                        <div class="p-4 md:p-8 flex justify-between items-center border-b md:border-b-0 sticky top-0 bg-white z-10">
-                            <h4 class="text-xl font-bold text-gray-800">Finalizar Reserva</h4>
-                            <button onclick="document.getElementById('custom-modal-form').remove()" class="text-gray-400 hover:text-gray-600 transition p-2 rounded-full hover:bg-gray-100">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
-                        </div>
-                        ${formContent}
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-            // Adiciona o listener de mudança ao select de bairro
-            document.getElementById('client-neighborhood').addEventListener('change', updateFormTotalDisplay);
-
-            // Garante que o total inicial seja exibido corretamente (inicia com 0.00 de frete)
-            updateFormTotalDisplay(); 
-            
-            // Corrige o bug de atualização dupla para desktop e mobile
-            const updateDisplays = (newFee, newTotal, alertHtml) => {
-                // Desktop
-                document.getElementById('form-fee-display-desktop').textContent = newFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                document.getElementById('form-total-display-desktop').textContent = newTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                document.getElementById('fee-alert-desktop').innerHTML = alertHtml;
-                document.getElementById('fee-alert-desktop').classList.toggle('hidden', !alertHtml);
-
-                // Mobile
-                document.getElementById('form-fee-display-mobile').textContent = newFee.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                document.getElementById('form-total-display-mobile').textContent = newTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                document.getElementById('fee-alert-mobile').innerHTML = alertHtml;
-                document.getElementById('fee-alert-mobile').classList.toggle('hidden', !alertHtml);
-                
-                // Botão principal
-                document.getElementById('final-submit-total').textContent = newTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            };
-
-            const originalUpdateFormTotalDisplay = updateFormTotalDisplay;
-
-            // Sobrescreve a função temporariamente para garantir a atualização de todos os campos
-            window.updateFormTotalDisplay = () => {
-                const bairroSelect = document.getElementById('client-neighborhood');
-                
-                let newFee = 0.00;
-                let alertMessage = '';
-                
-                if (bairroSelect.value === 'Ervino') {
-                    newFee = 25.00;
-                    alertMessage = 'Atenção! O bairro **Ervino** possui uma taxa de entrega de **R$ 25,00**. Este valor foi adicionado ao total.';
-                } else if (bairroSelect.value !== NEIGHBORHOODS[0]) {
-                    newFee = 0.00; 
-                } else {
-                    newFee = 0.00;
-                }
-
-                currentFee = newFee;
-                const newDetails = updateBudget(currentFee);
-                currentTotal = newDetails.finalTotal;
-
-                const alertHtml = alertMessage ? `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert"><p class="font-bold">Taxa de Entrega!</p><p>${alertMessage.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p></div>` : '';
-
-                updateDisplays(currentFee, currentTotal, alertHtml);
-            };
-            // Chama a função atualizada
-            window.updateFormTotalDisplay();
-            document.getElementById('client-neighborhood').addEventListener('change', window.updateFormTotalDisplay);
-        }
-
-        /**
-         * Simula o envio do formulário de reserva.
-         */
-        function submitReservationForm() {
-            const name = document.getElementById('client-name').value;
-            const neighborhood = document.getElementById('client-neighborhood').value;
-            const phone = document.getElementById('client-phone').value;
-            
-            // Lógica final de frete
-            const fee = neighborhood === 'Ervino' ? 25.00 : 0.00;
-            const finalDetails = updateBudget(fee);
-            const total = finalDetails.finalTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-            document.getElementById('custom-modal-form').remove();
-            
-            showMessageBox(
-                "Reserva Enviada com Sucesso!",
-                `Obrigado, ${name}! Sua solicitação de reserva para o bairro **${neighborhood}** (Taxa: R$ ${fee.toFixed(2).replace('.', ',')}) no valor total de **${total}** foi registrada. Entraremos em contato no número ${phone} para finalizar o contrato.`,
-                'info'
-            );
-        }
-
-        /**
-         * Exibe uma caixa de mensagem customizada ou modal de finalização.
-         */
-        function showMessageBox(title, content, type = 'info') {
-            const existingModal = document.getElementById('custom-modal');
-            if (existingModal) existingModal.remove();
-
-            let bgColor = 'bg-encanto-blue';
-            let buttonText = 'Entendi';
-            let mainAction = '';
-            
-            if (type === 'error') {
-                bgColor = 'bg-red-500';
-            } else if (type === 'finalize') {
-                bgColor = 'bg-encanto-green'; 
-                buttonText = 'Fazer a Reserva (Preencher Formulário)';
-                mainAction = `
-                    document.getElementById('custom-modal').remove(); 
-                    showReservationFormModal(); 
-                `;
-            }
-
-            const messageHtml = type === 'finalize' ? content : `<p class="text-gray-600 mb-6">${content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`;
-            
-            const buttonHtml = `
-                <button onclick="${type === 'finalize' ? mainAction : "document.getElementById('custom-modal').remove()"}" class="w-full py-3 ${bgColor} text-white font-bold text-lg rounded-lg shadow-xl hover:opacity-90 transition duration-150 transform hover:scale-[1.01]">
-                    ${buttonText}
-                </button>
-            `;
-
-            const modalHtml = `
-                <div id="custom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-                    <div class="bg-white rounded-xl shadow-2xl max-w-lg mx-4 p-6 md:p-8 transform transition-all duration-300 scale-100">
-                        <div class="flex justify-between items-start mb-4">
-                            <h5 class="text-2xl font-bold text-gray-800">${title}</h5>
-                            <button onclick="document.getElementById('custom-modal').remove()" class="text-gray-400 hover:text-gray-600 transition">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
-                        </div>
-                        ${messageHtml}
-                        <div class="mt-6">
-                            ${buttonHtml}
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-        }
-
-        // === EVENT LISTENERS E INICIALIZAÇÃO ===
-
-        prevMonthBtn.addEventListener('click', () => {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            renderCalendar();
-        });
-
-        document.getElementById('next-month').addEventListener('click', () => {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            renderCalendar();
-        });
-
-        // Inicializa o calendário ao carregar a página
-        window.onload = function() {
-            renderCalendar();
-            updateBudget(); // Inicializa o orçamento em R$ 0,00 e o botão de detalhes
+        // Função para fechar a caixa de mensagem
+        function closeMessage() {
+            document.getElementById('message-box').classList.add('hidden');
         }
     </script>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Caixa de Mensagem (Substitui o alert()) -->
+    <div id="message-box" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white p-4 rounded-lg shadow-xl z-50 transition duration-300 ease-in-out">
+        <p id="message-text" class="font-semibold"></p>
+        <button onclick="closeMessage()" class="absolute top-1 right-2 text-xl font-bold">&times;</button>
+    </div>
+
+    <!-- 1. CABEÇALHO (Header) - Fixo no topo - Agora BRANCO -->
+    <header class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Container principal do cabeçalho - RELATIVE para centrar o logo ABSOLUTAMENTE -->
+            <div class="flex justify-between items-center h-16 relative">
+
+                <!-- 1. LADO ESQUERDO: Botão Menu Hambúrguer (Mobile) / Links (Desktop) -->
+                
+                <!-- Botão Menu Hambúrguer (Apenas Mobile/Tablet) -->
+                <button type="button" class="lg:hidden text-primary hover:text-secondary p-2 rounded-md z-10" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMenu()">
+                    <div class="burger-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+
+                <!-- Menu de Navegação (Desktop - Escondido no Mobile) -->
+                <nav class="hidden lg:flex lg:space-x-8 nav-menu">
+                    <a href="#" class="text-primary hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition duration-150">Início</a>
+                    <a href="#" class="text-primary hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition duration-150">Brinquedos</a>
+                </nav>
+
+                <!-- 2. CENTRO: Logo Centralizada (Imagem) -->
+                <!-- Posição ABSOLUTA para garantir que o logo fique exatamente no centro horizontal, independentemente dos elementos laterais -->
+                <div class="absolute left-1/2 transform -translate-x-1/2 z-0">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
+                         alt="Logo Brinque Mais" 
+                         class="w-12 h-12 rounded-full border-2 border-secondary object-cover shadow-lg"
+                         onerror="this.onerror=null;this.src='https://placehold.co/48x48/3b82f6/facc15?text=Logo'"> <!-- Fallback caso a URL falhe -->
+                </div>
+
+                <!-- 3. LADO DIREITO: Ícone de Notificações (Mobile) / Mais Links (Desktop) -->
+
+                <!-- Links de Exemplo Desktop (Continuação da nav) -->
+                <nav class="hidden lg:flex lg:space-x-8 nav-menu ml-auto">
+                    <a href="#" class="text-primary hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition duration-150">Como Funciona</a>
+                    <a href="#" class="text-primary hover:text-secondary px-3 py-2 rounded-md text-sm font-medium transition duration-150">Contato</a>
+                </nav>
+                
+                <!-- Ícone de Notificações (Apenas Mobile/Tablet) -->
+                <button onclick="handleBottomButtonClick('Notificações')" class="text-primary hover:text-secondary p-2 rounded-full z-10 lg:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu Mobile (Abre e fecha com o botão hambúrguer) -->
+        <div class="lg:hidden hidden bg-primary" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#" class="bg-blue-600 text-white block px-3 py-2 rounded-md text-base font-medium">Início</a>
+                <a href="#" class="text-white hover:bg-blue-500 block px-3 py-2 rounded-md text-base font-medium">Brinquedos</a>
+                <a href="#" class="text-white hover:bg-blue-500 block px-3 py-2 rounded-md text-base font-medium">Como Funciona</a>
+                <a href="#" class="text-white hover:bg-blue-500 block px-3 py-2 rounded-md text-base font-medium">Contato</a>
+                <a href="#" onclick="handleBottomButtonClick('Notificações')" class="text-white hover:bg-blue-500 block px-3 py-2 rounded-md text-base font-medium">Notificações</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. CONTEÚDO PRINCIPAL -->
+    <main id="main-content" class="container mx-auto px-4 py-8">
+        <section class="text-center mb-12">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-primary mb-4">A Locadora de Brinquedos Mais Divertida!</h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Alugue os brinquedos perfeitos para todas as idades e ocasiões. Mais diversão, menos bagunça!</p>
+        </section>
+
+        <!-- Destaques (Grid Responsivo) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cartão de Destaque 1 -->
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-secondary mb-3 text-4xl">🧸</div>
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Variedade Imensa</h2>
+                <p class="text-gray-500">De brinquedos educativos a infláveis gigantes, temos o que você procura.</p>
+            </div>
+            <!-- Cartão de Destaque 2 -->
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-secondary mb-3 text-4xl">💰</div>
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Economize Dinheiro</h2>
+                <p class="text-gray-500">Aluguel é mais inteligente e econômico do que comprar.</p>
+            </div>
+            <!-- Cartão de Destaque 3 -->
+            <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-secondary mb-3 text-4xl">🧼</div>
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Limpeza Garantida</h2>
+                <p class="text-gray-500">Todos os itens são higienizados e inspecionados após cada locação.</p>
+            </div>
+        </div>
+
+        <!-- Seção de Chamada para Ação -->
+        <section class="mt-12 p-8 bg-secondary rounded-xl text-center shadow-inner">
+            <h3 class="text-3xl font-bold text-primary mb-4">Pronto para a Diversão?</h3>
+            <button onclick="handleBottomButtonClick('Alugar Agora')" class="bg-primary text-white font-bold py-3 px-8 rounded-full shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105">
+                Ver Catálogo Agora
+            </button>
+        </section>
+
+    </main>
+
+    <!-- 3. FOOTER (Rodapé) - Fixo na parte inferior da página, acima da bottom bar -->
+    <footer class="bg-primary pt-8 pb-4 text-white mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-6">
+                <!-- Coluna 1: Links Rápidos -->
+                <div>
+                    <h4 class="font-bold text-secondary mb-3">Links Rápidos</h4>
+                    <ul>
+                        <li class="mb-2"><a href="#" class="hover:text-secondary text-sm">Nossos Produtos</a></li>
+                        <li class="mb-2"><a href="#" class="hover:text-secondary text-sm">Novidades</a></li>
+                        <li class="mb-2"><a href="#" class="hover:text-secondary text-sm">Perguntas Frequentes</a></li>
+                    </ul>
+                </div>
+                <!-- Coluna 2: Contato -->
+                <div>
+                    <h4 class="font-bold text-secondary mb-3">Fale Conosco</h4>
+                    <ul>
+                        <li class="mb-2 text-sm">Email: contato@brinquemais.com.br</li>
+                        <li class="mb-2 text-sm">Telefone: (11) 98765-4321</li>
+                        <li class="mb-2 text-sm">Endereço: Rua da Alegria, 123</li>
+                    </ul>
+                </div>
+                <!-- Coluna 3: Redes Sociais -->
+                <div class="col-span-2 md:col-span-2">
+                    <h4 class="font-bold text-secondary mb-3">Siga-nos</h4>
+                    <div class="flex space-x-4">
+                        <!-- Ícones de redes sociais (Usando Placeholders de Texto) -->
+                        <a href="#" class="text-2xl hover:text-secondary transition duration-150">F</a> <!-- Facebook -->
+                        <a href="#" class="text-2xl hover:text-secondary transition duration-150">I</a> <!-- Instagram -->
+                        <a href="#" class="text-2xl hover:text-secondary transition duration-150">T</a> <!-- Twitter -->
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-blue-600 pt-4 text-center">
+                <p class="text-sm text-blue-200">&copy; 2024 Brinque Mais. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 4. BOTTOM BAR (Barra Inferior Fixa) - Apenas para Mobile/Tablet (max-lg) -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 w-full bg-white shadow-2xl lg:hidden border-t border-gray-200">
+        <div class="flex justify-around items-center h-16">
+            
+            <!-- Botão 1: Home -->
+            <button onclick="handleBottomButtonClick('Início')" class="flex flex-col items-center text-primary hover:text-secondary transition duration-150 p-2 rounded-lg w-1/4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="text-xs mt-1">Início</span>
+            </button>
+            
+            <!-- Botão 2: Brinquedos/Catálogo -->
+            <button onclick="handleBottomButtonClick('Catálogo')" class="flex flex-col items-center text-gray-500 hover:text-secondary transition duration-150 p-2 rounded-lg w-1/4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                <span class="text-xs mt-1">Catálogo</span>
+            </button>
+            
+            <!-- Botão 3: Carrinho (Central) -->
+            <button onclick="handleBottomButtonClick('Carrinho')" class="flex flex-col items-center bg-secondary text-primary rounded-full p-3 -mt-6 shadow-xl hover:scale-105 transition duration-200 transform w-1/4 max-w-[80px]">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </button>
+
+            <!-- Botão 4: Minha Conta -->
+            <button onclick="handleBottomButtonClick('Minha Conta')" class="flex flex-col items-center text-gray-500 hover:text-secondary transition duration-150 p-2 rounded-lg w-1/4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <span class="text-xs mt-1">Conta</span>
+            </button>
+            
+            <!-- Botão 5: Suporte/Ajuda -->
+            <button onclick="handleBottomButtonClick('Ajuda')" class="flex flex-col items-center text-gray-500 hover:text-secondary transition duration-150 p-2 rounded-lg w-1/4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9.228a4.5 4.5 0 110 5.544M15.772 9.228a4.5 4.5 0 100 5.544M18.89 13.5l-1.685.843A7.5 7.5 0 0112 20.25a7.5 7.5 0 01-5.205-1.907L5.11 15.75m3.784-6.321a9 9 0 010-5.544M15.084 9.228a9 9 0 000 5.544"></path></svg>
+                <span class="text-xs mt-1">Ajuda</span>
+            </button>
+
+        </div>
+    </nav>
 </body>
 </html>
