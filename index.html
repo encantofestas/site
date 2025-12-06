@@ -329,45 +329,41 @@
                 // Classe de estilo mais compacta e atraente
                 const cardClass = `flex bg-white rounded-xl shadow-lg p-4 transition duration-300 transform hover:scale-[1.01] ring-1 ring-gray-100 ${!isAvailable ? 'opacity-50 grayscale' : 'hover:ring-encanto-blue hover:shadow-xl'}`;
 
-                // Renderiza o card do brinquedo com o novo layout
+                // Renderiza o card do brinquedo com o novo layout (Controles de Unidade abaixo da foto)
                 const card = document.createElement('div');
                 card.className = cardClass;
                 card.innerHTML = `
-                    <div class="flex items-center justify-between w-full">
-                        <!-- LEFT SIDE: Image and Main Info (Compact) -->
-                        <div class="flex items-center space-x-4 flex-grow">
-                            <!-- Image (menor: w-20 h-20) -->
-                            <img src="${toy.mockImage}" alt="Foto de ${toy.name}" onerror="this.onerror=null;this.src='https://placehold.co/80x80/9CA3AF/FFFFFF?text=Item';" class="w-20 h-20 object-cover rounded-lg border-2 border-encanto-yellow flex-shrink-0">
-
-                            <!-- Main Details (Ao lado da foto) -->
-                            <div class="flex flex-col min-w-0">
-                                <h4 class="text-lg font-bold text-gray-900 truncate">${toy.name}</h4>
-                                <p class="text-sm font-medium text-gray-500 italic">Tamanho: ${toy.size}</p>
-                                <p class="text-2xl font-extrabold text-encanto-blue mt-1">
-                                    ${finalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                </p>
-                                <span class="text-xs text-red-500">${reason}</span>
-                            </div>
+                    <!-- LEFT SECTION: Image, Quantity Control, and Stock Info -->
+                    <div class="flex flex-col items-center flex-shrink-0 mr-4">
+                        <!-- Image (menor: w-20 h-20) -->
+                        <img src="${toy.mockImage}" alt="Foto de ${toy.name}" onerror="this.onerror=null;this.src='https://placehold.co/80x80/9CA3AF/FFFFFF?text=Item';" class="w-20 h-20 object-cover rounded-lg border-2 border-encanto-yellow mb-2 flex-shrink-0">
+                        
+                        <!-- Quantity Control (Abaixo da Imagem) -->
+                        <div class="flex items-center rounded-lg overflow-hidden border-2 border-encanto-blue/50 shadow-md transition ${!isAvailable || currentStock === 0 ? 'pointer-events-none opacity-50' : ''}">
+                            <!-- Botão Diminuir -->
+                            <button data-id="${toyId}" data-action="decrement" class="w-7 h-7 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
+                                <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                            </button>
+                            <!-- Display de Quantidade -->
+                            <span id="qty-${toyId}" class="w-8 h-7 flex items-center justify-center bg-blue-50 text-encanto-blue font-bold text-sm">${cart[toyId] || 0}</span>
+                            <!-- Botão Aumentar -->
+                            <button data-id="${toyId}" data-action="increment" data-max="${currentStock}" data-group="${toy.specialGroup}" class="w-7 h-7 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
+                                <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            </button>
                         </div>
+                        
+                        <!-- Stock Info (Abaixo dos Botões) -->
+                        <span class="text-xs text-gray-500 mt-1 italic">Disp: ${currentStock} UN</span>
+                    </div>
 
-                        <!-- RIGHT SIDE: Quantity Control (Redesenhado) -->
-                        <div class="flex flex-col items-end ml-4 flex-shrink-0">
-                            <span class="text-xs text-gray-600 mb-2">Disponível: ${currentStock} UN</span>
-                            
-                            <!-- Botão de Unidades Redesenhado -->
-                            <div class="flex items-center rounded-lg overflow-hidden border-2 border-encanto-blue/50 shadow-md transition ${!isAvailable || currentStock === 0 ? 'pointer-events-none opacity-50' : ''}">
-                                <!-- Botão Diminuir -->
-                                <button data-id="${toyId}" data-action="decrement" class="w-8 h-8 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
-                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                                </button>
-                                <!-- Display de Quantidade -->
-                                <span id="qty-${toyId}" class="w-10 h-8 flex items-center justify-center bg-blue-50 text-encanto-blue font-bold text-lg">${cart[toyId] || 0}</span>
-                                <!-- Botão Aumentar -->
-                                <button data-id="${toyId}" data-action="increment" data-max="${currentStock}" data-group="${toy.specialGroup}" class="w-8 h-8 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
-                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                </button>
-                            </div>
-                        </div>
+                    <!-- RIGHT SECTION: Product Details and Price (Compact) -->
+                    <div class="flex flex-col justify-center flex-grow min-w-0">
+                        <h4 class="text-lg font-bold text-gray-900 leading-tight">${toy.name}</h4>
+                        <p class="text-sm font-medium text-gray-500 italic mt-0.5">Tamanho: ${toy.size}</p>
+                        <p class="text-2xl font-extrabold text-encanto-blue mt-1">
+                            ${finalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </p>
+                        <span class="text-xs text-red-500">${reason}</span>
                     </div>
                 `;
 
