@@ -83,7 +83,35 @@
     <script>
         // Variáveis de estado
         let isPanelOpen = false;
-        let unreadCount = 3; // Simula 3 notificações não lidas no início (baseado no JSON de exemplo)
+
+        // --- DADOS MOCKADOS (SIMULAÇÃO DO JSON) ---
+        // Isso resolve o erro de fetch em ambientes de preview onde arquivos locais não são servidos
+        const mockNotificacoes = [
+          {
+            "id": 1,
+            "titulo": "Promoção Relâmpago!",
+            "mensagem": "Castelo Pula-Pula com 20% de desconto por tempo limitado! Agende agora.",
+            "tipo": "promocao",
+            "lida": false,
+            "data": "2024-12-05T14:30:00Z"
+          },
+          {
+            "id": 2,
+            "titulo": "Seu Carrinho Expirou",
+            "mensagem": "Os itens no seu carrinho foram liberados. Por favor, agende novamente.",
+            "tipo": "alerta",
+            "lida": true,
+            "data": "2024-12-04T10:00:00Z"
+          },
+          {
+            "id": 3,
+            "titulo": "Novo Brinquedo na Área!",
+            "mensagem": "Adicionamos a 'Piscina de Bolinhas Gigante' ao nosso catálogo. Confira!",
+            "tipo": "novo_produto",
+            "lida": false,
+            "data": "2024-12-03T09:15:00Z"
+          }
+        ];
 
         // Função simples de feedback visual (Toast)
         function showToast(message) {
@@ -97,9 +125,34 @@
             }, 3000);
         }
 
+        // --- SISTEMA DE ARMAZENAMENTO LOCAL (PERSISTÊNCIA) ---
+        function getReadNotifications() {
+            const stored = localStorage.getItem('encanto_notificacoes_lidas');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveReadNotification(id) {
+            const readIds = getReadNotifications();
+            if (!readIds.includes(id)) {
+                readIds.push(id);
+                localStorage.setItem('encanto_notificacoes_lidas', JSON.stringify(readIds));
+            }
+        }
+
+        function saveAllAsRead(notificacoes) {
+            const readIds = getReadNotifications();
+            notificacoes.forEach(n => {
+                if (!readIds.includes(n.id)) {
+                    readIds.push(n.id);
+                }
+            });
+            localStorage.setItem('encanto_notificacoes_lidas', JSON.stringify(readIds));
+        }
+
+        // --- ATUALIZAÇÃO DA UI ---
+
         // Função para atualizar o contador em todas as UI (desktop e mobile)
         function updateNotificationCount(count) {
-            unreadCount = count;
             const elements = document.querySelectorAll('.notification-counter');
             elements.forEach(el => {
                 if (count > 0) {
@@ -109,6 +162,7 @@
                     el.classList.add('hidden');
                 }
             });
+            
             // Oculta/Mostra o botão "Marcar todas como lidas"
             const markAllButton = document.getElementById('mark-all-button');
             if (markAllButton) {
@@ -120,96 +174,65 @@
             }
         }
 
-        // Função para mostrar o modal ao carregar
-        function showStatusModal() {
-            document.getElementById('site-status-modal').classList.remove('hidden');
-            // Inicializa o contador ao carregar
-            updateNotificationCount(unreadCount);
-        }
-
-        // Função para fechar o modal
-        function closeModal() {
-            document.getElementById('site-status-modal').classList.add('hidden');
-        }
-
-        // Abre o WhatsApp
-        function openWhatsApp() {
-            // Número de telefone de exemplo: +55 47 99227-7324
-            window.open('https://wa.me/5547992277324', '_blank');
-        }
-
         /**
-         * Marca todas as notificações como lidas, zerando o contador.
+         * Carrega as notificações (do MOCK), compara com LocalStorage e renderiza.
+         * Esta função é chamada ao abrir o site E ao abrir o painel.
          */
-        function markAllAsRead() {
-            const listItems = document.querySelectorAll('#notification-list li');
-            let markedCount = 0;
-            
-            listItems.forEach(li => {
-                // Remove o estilo de não lida (azul/borda)
-                if (li.classList.contains('bg-blue-50')) {
-                    li.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500', 'hover:bg-blue-100');
-                    li.classList.add('bg-white', 'hover:bg-gray-50');
-                    markedCount++;
-                }
-            });
+        let currentNotificationsData = []; // Armazena os dados atuais para uso no "Marcar todas"
 
-            if (markedCount > 0) {
-                showToast(`Sucesso! ${markedCount} notificações marcadas como lidas.`);
-            } else {
-                showToast(`Todas as notificações já estavam lidas.`);
-            }
-            
-            // Zera o contador visual
-            updateNotificationCount(0);
-        }
-        
-        /**
-         * Carrega as notificações do arquivo JSON e renderiza na UI.
-         */
-        async function fetchNotificacoes() {
+        async function fetchNotificacoesAndRender(onlyUpdateCount = false) {
             const panelList = document.getElementById('notification-list');
             const loadingIndicator = document.getElementById('loading-notifications');
-            panelList.innerHTML = ''; // Limpa a lista anterior
-            loadingIndicator.classList.remove('hidden'); // Mostra o loader
+            
+            if (!onlyUpdateCount) {
+                panelList.innerHTML = ''; 
+                loadingIndicator.classList.remove('hidden'); 
+            }
 
             try {
-                // URL relativa ao arquivo no Canvas/GitHub
-                const response = await fetch('notificacoes.json'); 
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP! Status: ${response.status}`);
-                }
-                let notificacoes = await response.json();
+                // Fetch do JSON SUBSTITUÍDO POR DADOS MOCKADOS
+                // Isso evita o erro de URL parsing no preview
                 
-                // Simulação: se o contador global for zero, todas as notificacoes são lidas
-                if (unreadCount === 0) {
-                     notificacoes = notificacoes.map(n => ({...n, lida: true}));
-                }
+                // Simula um pequeno delay de rede para parecer real (300ms)
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Usa a variável local em vez de fetch
+                const notificacoes = mockNotificacoes; 
+                currentNotificationsData = notificacoes; // Guarda para usar depois
 
+                // Pega IDs lidos do navegador
+                const readIds = getReadNotifications();
 
-                loadingIndicator.classList.add('hidden'); // Esconde o loader
+                // Calcula quantas NÃO estão na lista de lidos
+                const unreadItems = notificacoes.filter(n => !readIds.includes(n.id));
+                const unreadCount = unreadItems.length;
+
+                // Atualiza as bolinhas vermelhas
+                updateNotificationCount(unreadCount);
+
+                // Se for só para atualizar o contador (ex: ao carregar a página), para por aqui
+                if (onlyUpdateCount) return;
+
+                loadingIndicator.classList.add('hidden');
                 
                 if (notificacoes.length === 0) {
                     panelList.innerHTML = '<li class="p-4 text-center text-gray-500 text-sm">Nenhuma notificação para mostrar.</li>';
                     return;
                 }
 
+                // Renderiza a lista
                 notificacoes.forEach(notificacao => {
                     const li = document.createElement('li');
                     
-                    // Usa a variável global `unreadCount` para estilizar a simulação inicial
-                    // Nota: Em um app real, o estado de "lida" viria do backend/Firestore
-                    const isRead = notificacao.lida || unreadCount === 0;
+                    // Verifica se ESTE item específico já foi lido
+                    const isRead = readIds.includes(notificacao.id);
 
-                    // Define classes baseadas no status de lida
                     const bgClass = isRead ? 'bg-white hover:bg-gray-50' : 'bg-blue-50 hover:bg-blue-100 border-l-4 border-blue-500';
                     const icon = notificacao.tipo === 'promocao' ? '🎁' : 
                                  notificacao.tipo === 'alerta' ? '🚨' : '✨';
                     
                     li.className = `p-4 border-b border-gray-100 cursor-pointer transition ${bgClass} rounded-lg mb-2 notification-item`;
-                    li.dataset.read = isRead; // Define o estado de leitura
-
-                    // Formata a data
+                    
                     const dateObj = new Date(notificacao.data);
                     const dataFormatada = isNaN(dateObj) ? notificacao.data : dateObj.toLocaleDateString('pt-BR', {
                         day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
@@ -226,18 +249,19 @@
                         </div>
                     `;
                     
-                    // Adiciona um listener para simular a leitura de item individual
+                    // Ao clicar em UMA notificação
                     li.onclick = () => {
-                        if (li.dataset.read === 'false') {
-                            showToast(`Notificação "${notificacao.titulo}" marcada como lida.`);
-                            li.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500', 'hover:bg-blue-100');
-                            li.classList.add('bg-white', 'hover:bg-gray-50');
-                            li.dataset.read = 'true';
+                        if (!isRead) {
+                            // Salva no navegador que esta ID foi lida
+                            saveReadNotification(notificacao.id);
                             
-                            // Diminui o contador
-                            updateNotificationCount(unreadCount - 1);
-                        } else {
-                            showToast(`Esta notificação já foi lida.`);
+                            // Atualiza visualmente APENAS este item
+                            li.className = 'p-4 border-b border-gray-100 cursor-pointer transition bg-white hover:bg-gray-50 rounded-lg mb-2 notification-item';
+                            
+                            // Recalcula o contador total
+                            const newReadIds = getReadNotifications();
+                            const newUnreadCount = currentNotificationsData.filter(n => !newReadIds.includes(n.id)).length;
+                            updateNotificationCount(newUnreadCount);
                         }
                     };
 
@@ -246,8 +270,25 @@
 
             } catch (error) {
                 console.error("Erro ao carregar notificações:", error);
-                loadingIndicator.classList.add('hidden');
-                panelList.innerHTML = `<li class="p-4 text-center text-red-500 text-sm">Erro ao carregar. Tente novamente.</li>`;
+                if (!onlyUpdateCount) {
+                    loadingIndicator.classList.add('hidden');
+                    panelList.innerHTML = `<li class="p-4 text-center text-red-500 text-sm">Erro ao carregar. Tente novamente.</li>`;
+                }
+            }
+        }
+
+        /**
+         * Marca todas como lidas e salva no navegador
+         */
+        function markAllAsRead() {
+            if (currentNotificationsData.length > 0) {
+                // Salva TODOS os IDs atuais no LocalStorage
+                saveAllAsRead(currentNotificationsData);
+                
+                // Atualiza a lista visualmente (recarrega para aplicar estilos de lido)
+                fetchNotificacoesAndRender(false);
+                
+                showToast(`Todas as notificações marcadas como lidas.`);
             }
         }
         
@@ -262,8 +303,9 @@
                 // Abre
                 panel.classList.remove('translate-x-full');
                 overlay.classList.remove('hidden');
-                document.body.classList.add('overflow-hidden'); // Bloqueia scroll do body
-                fetchNotificacoes(); // Carrega os dados ao abrir
+                document.body.classList.add('overflow-hidden'); 
+                // Carrega a lista completa e renderiza
+                fetchNotificacoesAndRender(false); 
             } else {
                 // Fecha
                 panel.classList.add('translate-x-full');
@@ -273,8 +315,25 @@
             isPanelOpen = !isPanelOpen;
         }
 
-        // Chama o modal na abertura do site
-        document.addEventListener('DOMContentLoaded', showStatusModal);
+        // --- INICIALIZAÇÃO ---
+        function showStatusModal() {
+            document.getElementById('site-status-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('site-status-modal').classList.add('hidden');
+        }
+
+        function openWhatsApp() {
+            window.open('https://wa.me/5547992277324', '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showStatusModal();
+            // Ao carregar a página, busca o JSON apenas para atualizar o NÚMERO (contador)
+            // Não renderiza a lista pesada ainda (performance)
+            fetchNotificacoesAndRender(true);
+        });
     </script>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -334,14 +393,14 @@
             <!-- Ações Direita (Desktop) -->
             <div class="hidden md:flex items-center space-x-4">
                 
-                <!-- ÍCONE DE NOTIFICAÇÕES (NOVO) -->
+                <!-- ÍCONE DE NOTIFICAÇÕES (AGORA COM SINO) -->
                 <button onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
-                    <!-- Ícone de Linhas (Menu) -->
+                    <!-- Ícone de Sino (Outline) -->
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.472 6.136 6.5 7.558 6.5 9.158V14.16a2.032 2.032 0 01-.595 1.405L4 17h5m6 0a2 2 0 100 4 2 2 0 000-4z"/>
                     </svg>
                     <!-- Contador de Notificação Nova -->
-                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none">
+                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
                         <!-- Número preenchido por JS -->
                     </div>
                 </button>
@@ -354,12 +413,12 @@
 
             <!-- Botão Menu Mobile (Notificações) -->
             <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
-                <!-- Ícone de Linhas (Menu) -->
+                <!-- Ícone de Sino (Outline) -->
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.472 6.136 6.5 7.558 6.5 9.158V14.16a2.032 2.032 0 01-.595 1.405L4 17h5m6 0a2 2 0 100 4 2 2 0 000-4z"/>
                 </svg>
                 <!-- Contador de Notificação Nova -->
-                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none">
+                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
                     <!-- Número preenchido por JS -->
                 </div>
             </button>
