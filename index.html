@@ -14,9 +14,6 @@
                     colors: {
                         'encanto-blue': '#3B82F6', // Azul principal
                         'encanto-yellow': '#FACC15', // Amarelo de destaque
-                        'high-availability': '#10B981', // Verde
-                        'low-availability': '#F59E0B', // Amarelo/Laranja
-                        'full-availability': '#EF4444', // Vermelho (simulando a regra de preço, onde menos = mais barato)
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -40,11 +37,12 @@
             padding: 8px;
             cursor: pointer;
             border-radius: 8px;
-            transition: transform 0.1s, box-shadow 0.1s;
+            transition: transform 0.1s, box-shadow 0.1s, background-color 0.15s;
             text-align: center;
             font-weight: 500;
         }
-        .day-cell:hover:not(.disabled):not(.selected) {
+        .day-cell.available:hover:not(.selected) {
+            background-color: #E5E7EB; /* Cinza claro no hover */
             transform: translateY(-2px);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         }
@@ -56,6 +54,7 @@
         }
         .day-cell.selected {
             border: 3px solid #1D4ED8; /* Azul escuro */
+            background-color: #BFDBFE; /* Azul muito claro para contraste com a borda */
             transform: translateY(0);
         }
         /* Classe para o orçamento flutuante */
@@ -65,6 +64,11 @@
             left: 0;
             right: 0;
             z-index: 50;
+        }
+
+        /* Estilo para o botão de navegação de mês */
+        .nav-button {
+            @apply p-3 md:p-4 rounded-full bg-encanto-blue text-white shadow-xl hover:bg-blue-700 transition duration-150 transform active:scale-95 disabled:bg-gray-400;
         }
     </style>
 </head>
@@ -95,29 +99,14 @@
 
                 <!-- Controles e Título do Mês -->
                 <div class="flex justify-between items-center mb-6">
-                    <button id="prev-month" class="p-2 rounded-full bg-encanto-yellow hover:bg-yellow-600 text-white transition duration-150">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    <!-- Botão de mês anterior (desabilitado se for o mês atual) -->
+                    <button id="prev-month" class="nav-button">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
                     </button>
-                    <span id="month-year" class="text-2xl font-bold text-encanto-blue"></span>
-                    <button id="next-month" class="p-2 rounded-full bg-encanto-yellow hover:bg-yellow-600 text-white transition duration-150">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <span id="month-year" class="text-2xl font-bold text-gray-800"></span>
+                    <button id="next-month" class="nav-button">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
                     </button>
-                </div>
-
-                <!-- Legenda de Cores -->
-                <div class="flex justify-center space-x-4 mb-6 text-sm">
-                    <div class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-high-availability mr-2"></span>
-                        <span class="text-gray-600">Alta Disponibilidade (Preço Normal)</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-low-availability mr-2"></span>
-                        <span class="text-gray-600">Média Disponibilidade</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-full-availability mr-2"></span>
-                        <span class="text-gray-600">Baixa Disponibilidade (Preço Mais Barato!)</span>
-                    </div>
                 </div>
 
                 <!-- Cabeçalho da Semana -->
@@ -135,11 +124,12 @@
             <section id="item-selection-section" class="mt-10 pt-8 border-t-4 border-encanto-yellow" style="display: none;">
                 <h3 class="text-2xl font-bold mb-6 text-encanto-blue">2. Brinquedos Disponíveis em <span id="selected-date-display" class="text-encanto-yellow"></span></h3>
 
+                <!-- Mensagem de desconto removida -->
                 <p id="discount-message" class="bg-encanto-blue/10 text-encanto-blue p-3 rounded-lg mb-6 font-semibold hidden">
-                    🎉 Parabéns! Nesta data, a disponibilidade está baixa e, por isso, estamos aplicando um **desconto** nos preços base dos brinquedos! Aproveite!
+                    <!-- Esta mensagem agora permanece oculta, pois a lógica de desconto foi removida. -->
                 </p>
 
-                <div id="toy-list" class="space-y-6">
+                <div id="toy-list" class="space-y-4"> <!-- Diminuído o espaçamento entre itens -->
                     <!-- Brinquedos serão injetados aqui -->
                 </div>
 
@@ -174,6 +164,7 @@
         let cart = {};
 
         // === DADOS MOCK DOS BRINQUEDOS E ESTOQUE ===
+        // Preços e Estoques mantidos.
         const TOYS = [
             { id: 'p_trampoline', name: 'Cama Elástica Pequena', price: 170.00, stock: 1, size: '2.0m x 2.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Pequena' },
             { id: 'm_trampoline', name: 'Cama Elástica Média', price: 190.00, stock: 3, size: '3.5m x 3.5m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Média' },
@@ -182,9 +173,9 @@
             { id: 'baby_area', name: 'Área Baby', price: 110.00, stock: 1, size: '3.0m x 3.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Baby+Area' },
             { id: 'mini_inflable', name: 'Mini Baby Inflável', price: 220.00, stock: 1, size: '2.5m x 2.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Mini+Inflável' },
             // Itens com restrição: APENAS UM PODE SER ALUGADO POR DIA
-            { id: 'slide_ball', name: 'Escorrega com Bolinha', price: 400.00, stock: 1, size: '5.0m x 3.0m', specialGroup: 'slide_group', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Escorrega' },
-            { id: 'medium_toboggan', name: 'Tobogã Médio', price: 400.00, stock: 1, size: '6.0m x 4.0m', specialGroup: 'slide_group', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Tobogã' },
-            { id: 'soap_soccer', name: 'Futebol de Sabão', price: 600.00, stock: 1, size: '10.0m x 5.0m', specialGroup: 'slide_group', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Futebol+Sabão' },
+            { id: 'slide_ball', name: 'Escorrega com Bolinha', price: 400.00, stock: 1, specialGroup: 'slide_group', size: '5.0m x 3.0m', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Escorrega' },
+            { id: 'medium_toboggan', name: 'Tobogã Médio', price: 400.00, stock: 1, specialGroup: 'slide_group', size: '6.0m x 4.0m', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Tobogã' },
+            { id: 'soap_soccer', name: 'Futebol de Sabão', price: 600.00, stock: 1, specialGroup: 'slide_group', size: '10.0m x 5.0m', mockImage: 'https://placehold.co/150x150/EF4444/FFFFFF?text=Futebol+Sabão' },
             { id: 'foosball', name: 'Pebolim', price: 200.00, stock: 1, size: '1.5m x 1.0m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Pebolim' },
             { id: 'air_hockey', name: 'Air Hockey', price: 200.00, stock: 1, size: '2.0m x 1.2m', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Air+Hockey' },
             { id: 'ping_pong', name: 'Ping Pong', price: 200.00, stock: 1, size: '2.74m x 1.52m', specialGroup: null, mockImage: 'https://placehold.co/150x150/3B82F6/FFFFFF?text=Ping+Pong' },
@@ -192,31 +183,11 @@
             { id: 'table_games', name: 'Jogos de Mesa', price: 15.00, stock: 4, size: '0.8m x 0.8m (cada)', specialGroup: null, mockImage: 'https://placehold.co/150x150/FACC15/3B82F6?text=Jogos+Mesa' },
         ];
 
-        // Mapeamento de disponibilidade mock para demonstração do calendário/preço
-        // Simula quantos itens (excluindo o grupo 'slide_group', que é 1 max) estão disponíveis em um dia.
-        // Total máximo de estoque (sem contar grupo de slides): 19 - 3 + 1 = 17 unidades
-        const MOCK_AVAILABILITY = {
-            // Dias com alta disponibilidade (Preço Normal - Verde)
-            '2025-12-19': { availableCount: 15, slideBooked: null, discount: 0.0 },
-            '2025-12-20': { availableCount: 17, slideBooked: null, discount: 0.0 },
-            '2025-01-10': { availableCount: 16, slideBooked: null, discount: 0.0 },
-
-            // Dias com média disponibilidade (Amarelo/Laranja)
-            '2025-12-15': { availableCount: 10, slideBooked: 'slide_ball', discount: 0.0 }, // Slide já alugado
-            '2025-01-05': { availableCount: 9, slideBooked: null, discount: 0.0 },
-
-            // Dias com baixa disponibilidade (Preço Mais Barato! - Vermelho)
-            '2025-12-10': { availableCount: 5, slideBooked: null, discount: 0.15 }, // 15% de desconto
-            '2025-12-25': { availableCount: 3, slideBooked: 'medium_toboggan', discount: 0.25 }, // 25% de desconto, slide alugado
-            '2025-01-20': { availableCount: 6, slideBooked: null, discount: 0.10 }, // 10% de desconto
-        };
-
         // Elementos DOM
         const calendarBody = document.getElementById('calendar-body');
         const monthYearDisplay = document.getElementById('month-year');
         const prevMonthBtn = document.getElementById('prev-month');
         const nextMonthBtn = document.getElementById('next-month');
-        const dateSelectionSection = document.getElementById('date-selection-section');
         const itemSelectionSection = document.getElementById('item-selection-section');
         const selectedDateDisplay = document.getElementById('selected-date-display');
         const toyListContainer = document.getElementById('toy-list');
@@ -225,30 +196,12 @@
         const discountMessage = document.getElementById('discount-message');
 
         /**
-         * Retorna os dados de disponibilidade (simulados) para uma data específica.
-         * @param {Date} date O objeto Date para buscar.
-         * @returns {object} { availableCount, slideBooked, discount }
+         * Retorna os dados de disponibilidade (agora simplificados) para uma data específica.
+         * @returns {object} { slideBooked, discount }
          */
         function getDailyAvailability(date) {
-            const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-            // Retorna o mock data ou um objeto padrão (simulando estoque máximo e sem desconto)
-            return MOCK_AVAILABILITY[dateKey] || { availableCount: 17, slideBooked: null, discount: 0.0 };
-        }
-
-        /**
-         * Determina a classe de cor do calendário com base na contagem de itens disponíveis.
-         * @param {number} availableCount Número de itens disponíveis.
-         * @returns {string} Classe Tailwind para cor de fundo.
-         */
-        function getAvailabilityColorClass(availableCount) {
-            // Lógica de cores baseada no total de itens disponíveis
-            if (availableCount < 7) {
-                return 'bg-full-availability text-white font-bold'; // Baixa Disponibilidade (Vermelho/Desconto)
-            } else if (availableCount <= 12) {
-                return 'bg-low-availability text-gray-900'; // Média Disponibilidade (Amarelo/Laranja)
-            } else {
-                return 'bg-high-availability text-white'; // Alta Disponibilidade (Verde)
-            }
+            // Retorna o estado padrão: slide não reservado (null) e 0% de desconto.
+            return { slideBooked: null, discount: 0.0 };
         }
 
         /**
@@ -263,6 +216,13 @@
             monthYearDisplay.textContent = `${MONTH_NAMES[currentMonth]} ${currentYear}`;
             calendarBody.innerHTML = ''; // Limpa o calendário anterior
 
+            // === Lógica para desabilitar o botão de Mês Anterior ===
+            const todayMonth = today.getMonth();
+            const todayYear = today.getFullYear();
+            // Desabilita se o mês atual for exibido ou se estivermos em um ano anterior
+            prevMonthBtn.disabled = currentYear < todayYear || (currentYear === todayYear && currentMonth <= todayMonth);
+            // =================================================================
+
             // Preenche os dias vazios no início do mês
             for (let i = 0; i < firstDay; i++) {
                 calendarBody.innerHTML += '<div></div>';
@@ -271,17 +231,25 @@
             // Preenche os dias do mês
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayDate = new Date(currentYear, currentMonth, day);
+                // Verifica se é uma data passada (dia anterior ao dia de hoje)
                 const isPast = dayDate < today && dayDate.toDateString() !== today.toDateString();
-                const availability = getDailyAvailability(dayDate);
-                const colorClass = getAvailabilityColorClass(availability.availableCount);
 
                 const cell = document.createElement('div');
-                cell.className = `day-cell ${colorClass}`;
+                let cellClass = 'bg-white text-gray-800 available'; // Classe base para dias disponíveis
+
+                // Destaca o dia de hoje
+                const isToday = dayDate.toDateString() === today.toDateString();
+                if (isToday) {
+                    cellClass = 'bg-encanto-blue text-white font-bold shadow-md available';
+                }
+
+                cell.className = `day-cell ${cellClass}`;
                 cell.textContent = day;
                 cell.setAttribute('data-date', dayDate.toISOString().split('T')[0]);
 
                 if (isPast) {
                     cell.classList.add('disabled');
+                    cell.classList.remove('available');
                 } else {
                     cell.addEventListener('click', () => handleDateSelection(dayDate, cell));
                 }
@@ -316,13 +284,16 @@
             // Pula automaticamente para a seção de itens
             setTimeout(() => {
                 itemSelectionSection.style.display = 'block';
-                itemSelectionSection.scrollIntoView({ behavior: 'smooth' });
+                // Adiciona um pequeno atraso para garantir que a rolagem funcione bem após o display:block
+                requestAnimationFrame(() => {
+                    itemSelectionSection.scrollIntoView({ behavior: 'smooth' });
+                });
                 renderToyList();
             }, 100);
         }
 
         /**
-         * Renderiza a lista de brinquedos disponíveis para a data selecionada.
+         * Renderiza a lista de brinquedos disponíveis para a data selecionada (Design Atualizado).
          */
         function renderToyList() {
             if (!selectedDate) return;
@@ -331,63 +302,69 @@
             toyListContainer.innerHTML = '';
             finalizeButton.disabled = true; // Desabilita o botão até que algo seja selecionado
 
-            // Exibe ou esconde a mensagem de desconto
-            if (availability.discount > 0) {
-                discountMessage.classList.remove('hidden');
-            } else {
-                discountMessage.classList.add('hidden');
-            }
+            // Esconde a mensagem de desconto, pois a lógica foi removida.
+            discountMessage.classList.add('hidden');
 
             TOYS.forEach(toy => {
                 const toyId = toy.id;
                 const basePrice = toy.price;
-                // Aplica o desconto se o dia tiver baixa disponibilidade
-                const finalPrice = basePrice * (1 - availability.discount);
+                const finalPrice = basePrice; // Preço é sempre o base
 
                 let currentStock = toy.stock;
                 let isAvailable = true;
                 let reason = '';
 
-                // Verifica a restrição do grupo especial
+                // Verifica a restrição do grupo especial (Tobogã/Escorrega)
                 if (toy.specialGroup === 'slide_group') {
                     if (availability.slideBooked && availability.slideBooked !== toyId) {
                         isAvailable = false;
                         reason = `(Já alugado: ${TOYS.find(t => t.id === availability.slideBooked).name} reservado)`;
                     } else if (availability.slideBooked === toyId) {
-                        // Se for o brinquedo alugado, o estoque é 0
                         currentStock = 0;
                         isAvailable = false;
                         reason = `(Alugado para esta data)`;
                     }
-                    // Se o slideBooked for null, o estoque é 1 (padrão) e está disponível para ser escolhido.
                 }
+                
+                // Classe de estilo mais compacta e atraente
+                const cardClass = `flex bg-white rounded-xl shadow-lg p-4 transition duration-300 transform hover:scale-[1.01] ring-1 ring-gray-100 ${!isAvailable ? 'opacity-50 grayscale' : 'hover:ring-encanto-blue hover:shadow-xl'}`;
 
-                // Renderiza o card do brinquedo
+                // Renderiza o card do brinquedo com o novo layout
                 const card = document.createElement('div');
-                card.className = `flex flex-col md:flex-row bg-white rounded-lg shadow-xl p-4 md:p-6 transition duration-300 ${!isAvailable ? 'opacity-50 grayscale' : 'hover:shadow-encanto-yellow/50'}`;
+                card.className = cardClass;
                 card.innerHTML = `
-                    <div class="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
-                        <img src="${toy.mockImage}" alt="Foto de ${toy.name}" class="w-28 h-28 object-cover rounded-xl border-4 border-encanto-yellow">
-                        <p class="text-xs text-gray-500 mt-1 italic">Medida: ${toy.size}</p>
-                    </div>
+                    <div class="flex items-center justify-between w-full">
+                        <!-- LEFT SIDE: Image and Main Info (Compact) -->
+                        <div class="flex items-center space-x-4 flex-grow">
+                            <!-- Image (menor: w-20 h-20) -->
+                            <img src="${toy.mockImage}" alt="Foto de ${toy.name}" onerror="this.onerror=null;this.src='https://placehold.co/80x80/9CA3AF/FFFFFF?text=Item';" class="w-20 h-20 object-cover rounded-lg border-2 border-encanto-yellow flex-shrink-0">
 
-                    <div class="flex-grow">
-                        <h4 class="text-xl font-bold text-gray-800">${toy.name} <span class="text-sm font-normal text-gray-500">${reason}</span></h4>
-                        <p class="text-3xl font-extrabold text-encanto-blue my-2">
-                            ${finalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        </p>
-                        ${availability.discount > 0 ? `<p class="text-sm text-green-600 font-semibold mb-2">Preço com ${Math.round(availability.discount * 100)}% OFF!</p>` : ''}
-                        
-                        <div class="flex items-center space-x-4 mt-3">
-                            <span class="text-sm font-medium text-gray-600">Disponível: ${currentStock} UN</span>
+                            <!-- Main Details (Ao lado da foto) -->
+                            <div class="flex flex-col min-w-0">
+                                <h4 class="text-lg font-bold text-gray-900 truncate">${toy.name}</h4>
+                                <p class="text-sm font-medium text-gray-500 italic">Tamanho: ${toy.size}</p>
+                                <p class="text-2xl font-extrabold text-encanto-blue mt-1">
+                                    ${finalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                </p>
+                                <span class="text-xs text-red-500">${reason}</span>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT SIDE: Quantity Control (Redesenhado) -->
+                        <div class="flex flex-col items-end ml-4 flex-shrink-0">
+                            <span class="text-xs text-gray-600 mb-2">Disponível: ${currentStock} UN</span>
                             
-                            <div class="flex items-center border border-gray-300 rounded-lg p-1 ${!isAvailable || currentStock === 0 ? 'pointer-events-none bg-gray-100' : ''}">
-                                <button data-id="${toyId}" data-action="decrement" class="p-1 text-encanto-blue hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" ${!isAvailable || currentStock === 0 ? 'disabled' : ''}>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                            <!-- Botão de Unidades Redesenhado -->
+                            <div class="flex items-center rounded-lg overflow-hidden border-2 border-encanto-blue/50 shadow-md transition ${!isAvailable || currentStock === 0 ? 'pointer-events-none opacity-50' : ''}">
+                                <!-- Botão Diminuir -->
+                                <button data-id="${toyId}" data-action="decrement" class="w-8 h-8 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
+                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
                                 </button>
-                                <span id="qty-${toyId}" class="w-8 text-center font-bold text-gray-800">${cart[toyId] || 0}</span>
-                                <button data-id="${toyId}" data-action="increment" data-max="${currentStock}" data-group="${toy.specialGroup}" class="p-1 text-encanto-blue hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" ${!isAvailable || currentStock === 0 ? 'disabled' : ''}>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                <!-- Display de Quantidade -->
+                                <span id="qty-${toyId}" class="w-10 h-8 flex items-center justify-center bg-blue-50 text-encanto-blue font-bold text-lg">${cart[toyId] || 0}</span>
+                                <!-- Botão Aumentar -->
+                                <button data-id="${toyId}" data-action="increment" data-max="${currentStock}" data-group="${toy.specialGroup}" class="w-8 h-8 bg-encanto-blue text-white hover:bg-blue-700 transition duration-150 p-0 disabled:bg-gray-400">
+                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 </button>
                             </div>
                         </div>
@@ -450,15 +427,13 @@
          */
         function updateBudget() {
             let total = 0;
-            const availability = getDailyAvailability(selectedDate || new Date()); // Usa data atual se nenhuma for selecionada
-
+            
             for (const id in cart) {
                 const quantity = cart[id];
                 const toy = TOYS.find(t => t.id === id);
                 if (toy && quantity > 0) {
-                    // Aplica o desconto do dia
-                    const finalPrice = toy.price * (1 - availability.discount);
-                    total += finalPrice * quantity;
+                    // Usa o preço base do brinquedo
+                    total += toy.price * quantity;
                 }
             }
 
