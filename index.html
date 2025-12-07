@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <!-- Viewport ajustado para máxima compatibilidade mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Encanto Festas - Locação de Brinquedos</title>
     
@@ -16,12 +17,12 @@
     <style>
         /* CONFIGURAÇÕES GERAIS ANTIFALHA */
         html, body {
-            overflow-x: hidden; /* O SEGREDO: Impede rolagem lateral */
+            overflow-x: hidden; /* Impede rolagem lateral */
             width: 100%;
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
-            -webkit-tap-highlight-color: transparent; /* Remove flash azul no toque em mobile */
-            scroll-behavior: smooth; /* Adicionado para navegação suave */
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
         }
 
         /* Fonte lúdica para títulos (Baloo 2) */
@@ -44,7 +45,7 @@
         /* --- AJUSTES DA BARRA INFERIOR (Safe Area para iPhone) --- */
         #bottom-nav {
             padding-bottom: env(safe-area-inset-bottom);
-            height: calc(4rem + env(safe-area-inset-bottom)); /* 4rem (h-16) + área segura */
+            height: calc(4rem + env(safe-area-inset-bottom));
         }
 
         /* Animação suave no botão central */
@@ -56,29 +57,29 @@
         #site-status-modal {
             background-color: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
-            z-index: 100; /* Garante que fique acima de tudo */
+            z-index: 100;
         }
         
-        /* Oculta scrollbar para scroll horizontal de categorias, mas permite a rolagem */
+        /* Oculta scrollbar para scroll horizontal de categorias */
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
         .scrollbar-hide {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
-        /* ESTILOS DO PAINEL DE NOTIFICAÇÕES (AGORA TELA CHEIA) */
+        /* ESTILOS DO PAINEL DE NOTIFICAÇÕES (TELA CHEIA) */
         #notification-panel {
             z-index: 90; 
             transition: transform 0.3s ease-out;
             position: fixed;
-            inset: 0; /* Cobre toda a tela */
+            inset: 0;
             max-width: 100vw;
             width: 100vw;
             height: 100vh;
             top: 0; 
-            background-color: #2563EB; /* Fundo azul principal */
+            background-color: #2563EB;
         }
         
         /* Garante que o conteúdo role */
@@ -88,259 +89,10 @@
             flex-direction: column;
         }
     </style>
-
-    <script>
-        // Variáveis de estado
-        let isPanelOpen = false;
-
-        // --- DADOS MOCKADOS (SIMULAÇÃO DO JSON) ---
-        const mockNotificacoes = [
-          {
-            "id": 1,
-            "titulo": "Promoção Relâmpago!",
-            "mensagem": "Castelo Pula-Pula com 20% de desconto por tempo limitado! Agende agora.",
-            "tipo": "promocao",
-            "lida": false,
-            "data": "2024-12-05T14:30:00Z"
-          },
-          {
-            "id": 2,
-            "titulo": "Seu Carrinho Expirou",
-            "mensagem": "Os itens no seu carrinho foram liberados. Por favor, agende novamente.",
-            "tipo": "alerta",
-            "lida": true,
-            "data": "2024-12-04T10:00:00Z"
-          },
-          {
-            "id": 3,
-            "titulo": "Novo Brinquedo na Área!",
-            "mensagem": "Adicionamos a 'Piscina de Bolinhas Gigante' ao nosso catálogo. Confira!",
-            "tipo": "novo_produto",
-            "lida": false,
-            "data": "2024-12-03T09:15:00Z"
-          }
-        ];
-
-        // Função simples de feedback visual (Toast)
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-message');
-            toastMsg.innerText = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            // Remove after 3s
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        // --- SISTEMA DE ARMAZENAMENTO LOCAL (PERSISTÊNCIA) ---
-        function getReadNotifications() {
-            const stored = localStorage.getItem('encanto_notificacoes_lidas');
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        function saveReadNotification(id) {
-            const readIds = getReadNotifications();
-            if (!readIds.includes(id)) {
-                readIds.push(id);
-                localStorage.setItem('encanto_notificacoes_lidas', JSON.stringify(readIds));
-            }
-        }
-
-        function saveAllAsRead(notificacoes) {
-            const readIds = getReadNotifications();
-            notificacoes.forEach(n => {
-                if (!readIds.includes(n.id)) {
-                    readIds.push(n.id);
-                }
-            });
-            localStorage.setItem('encanto_notificacoes_lidas', JSON.stringify(readIds));
-        }
-
-        // --- ATUALIZAÇÃO DA UI ---
-
-        // Função para atualizar o contador em todas as UI (desktop e mobile)
-        function updateNotificationCount(count) {
-            const elements = document.querySelectorAll('.notification-counter');
-            elements.forEach(el => {
-                if (count > 0) {
-                    el.classList.remove('hidden');
-                    el.innerText = count > 9 ? '9+' : count;
-                } else {
-                    el.classList.add('hidden');
-                }
-            });
-            
-            // Oculta/Mostra o botão "Marcar todas como lidas"
-            const markAllButton = document.getElementById('mark-all-button');
-            if (markAllButton) {
-                if (count > 0) {
-                    markAllButton.classList.remove('opacity-0', 'pointer-events-none');
-                } else {
-                    markAllButton.classList.add('opacity-0', 'pointer-events-none');
-                }
-            }
-        }
-
-        /**
-         * Carrega as notificações (do MOCK), compara com LocalStorage e renderiza.
-         * Renderiza APENAS as notificações NÃO LIDOS, conforme solicitado.
-         */
-        let currentNotificationsData = []; // Armazena os dados atuais para uso no "Marcar todas"
-
-        async function fetchNotificacoesAndRender(onlyUpdateCount = false) {
-            const panelList = document.getElementById('notification-list');
-            const loadingIndicator = document.getElementById('loading-notifications');
-            
-            if (!onlyUpdateCount) {
-                panelList.innerHTML = ''; 
-                loadingIndicator.classList.remove('hidden'); 
-            }
-
-            try {
-                // Simula um pequeno delay de rede para parecer real (300ms)
-                await new Promise(resolve => setTimeout(resolve, 300));
-                
-                const notificacoes = mockNotificacoes; 
-                currentNotificationsData = notificacoes; 
-
-                // Pega IDs lidos do navegador
-                const readIds = getReadNotifications();
-
-                // MUDANÇA: Filtra apenas itens NÃO LIDOS para exibição (conforme solicitado)
-                const unreadItems = notificacoes.filter(n => !readIds.includes(n.id));
-                const unreadCount = unreadItems.length;
-
-                // Atualiza as bolinhas vermelhas
-                updateNotificationCount(unreadCount);
-
-                if (onlyUpdateCount) return;
-
-                loadingIndicator.classList.add('hidden');
-                
-                if (unreadItems.length === 0) {
-                    // MUDANÇA: Mensagem para quando não há itens não lidos (tema azul)
-                    panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações.</li>';
-                    return;
-                }
-
-                // Renderiza APENAS a lista de itens NÃO LIDOS
-                unreadItems.forEach(notificacao => {
-                    const li = document.createElement('li');
-                    
-                    // MUDANÇA: Classes para fundo azul/branco e itens centralizados
-                    const bgClass = 'bg-blue-700 hover:bg-blue-800';
-                    const icon = notificacao.tipo === 'promocao' ? '🎁' : 
-                                 notificacao.tipo === 'alerta' ? '🚨' : '✨';
-                    
-                    li.className = `p-5 border-b border-blue-800 cursor-pointer transition ${bgClass} rounded-xl mb-3 text-white shadow-lg`;
-                    
-                    const dateObj = new Date(notificacao.data);
-                    const dataFormatada = isNaN(dateObj) ? notificacao.data : dateObj.toLocaleDateString('pt-BR', {
-                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-                    });
-
-                    // MUDANÇA: Usando flex-col e items-center para CENTRALIZAR o conteúdo do item
-                    li.innerHTML = `
-                        <div class="flex flex-col items-center gap-2">
-                            <div class="text-4xl mb-2">${icon}</div>
-                            <div class="flex-grow text-center">
-                                <h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4>
-                                <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
-                                <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
-                            </div>
-                            <!-- NOVO BOTÃO DE AÇÃO "Marcar como Lida" (conforme solicitado) -->
-                            <button data-id="${notificacao.id}" class="mark-single-read mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md">
-                                Marcar como Lida
-                            </button>
-                        </div>
-                    `;
-                    
-                    // Adiciona o listener ao botão
-                    li.querySelector('.mark-single-read').onclick = (e) => {
-                        e.stopPropagation(); 
-                        
-                        saveReadNotification(notificacao.id);
-                        showToast(`"${notificacao.titulo}" marcado como lido.`);
-
-                        // Recarrega a lista para remover o item lido
-                        fetchNotificacoesAndRender(false);
-                    };
-
-                    panelList.appendChild(li);
-                });
-
-            } catch (error) {
-                console.error("Erro ao carregar notificações:", error);
-                if (!onlyUpdateCount) {
-                    loadingIndicator.classList.add('hidden');
-                    // MUDANÇA: Mensagem de erro no tema azul
-                    panelList.innerHTML = `<li class="p-4 text-center text-red-300 text-sm">Erro ao carregar. Tente novamente.</li>`;
-                }
-            }
-        }
-
-        /**
-         * Marca todas como lidas e salva no navegador
-         */
-        function markAllAsRead() {
-            if (currentNotificationsData.length > 0) {
-                // Salva TODOS os IDs atuais no LocalStorage
-                saveAllAsRead(currentNotificationsData);
-                
-                // Atualiza a lista visualmente (recarrega para esconder os itens)
-                fetchNotificacoesAndRender(false);
-                
-                showToast(`Todas as notificações marcadas como lidas.`);
-            }
-        }
-        
-        /**
-         * Alterna a visibilidade do painel de notificações (FULL SCREEN).
-         */
-        function toggleNotificationPanel() {
-            const panel = document.getElementById('notification-panel');
-            const overlay = document.getElementById('notification-overlay');
-
-            if (!isPanelOpen) {
-                // Abre
-                panel.classList.remove('translate-x-full');
-                overlay.classList.remove('hidden'); // Mantém o overlay, mas o painel cobre ele
-                document.body.classList.add('overflow-hidden'); 
-                // Carrega a lista completa e renderiza (agora só não lidas)
-                fetchNotificacoesAndRender(false); 
-            } else {
-                // Fecha
-                panel.classList.add('translate-x-full');
-                overlay.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
-            }
-            isPanelOpen = !isPanelOpen;
-        }
-
-        // --- INICIALIZAÇÃO ---
-        function showStatusModal() {
-            document.getElementById('site-status-modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('site-status-modal').classList.add('hidden');
-        }
-
-        function openWhatsApp() {
-            window.open('https://wa.me/5547992277324', '_blank');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            showStatusModal();
-            // Ao carregar a página, busca o JSON apenas para atualizar o NÚMERO (contador)
-            fetchNotificacoesAndRender(true);
-        });
-    </script>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
 
-    <!-- 0. MODAL DE AVISO (SITE EM CONSTRUÇÃO) - INALTERADO -->
+    <!-- 0. MODAL DE AVISO (SITE EM CONSTRUÇÃO) -->
     <div id="site-status-modal" class="hidden fixed inset-0 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center transform transition-all duration-300 scale-100">
             <div class="text-4xl text-secondary mb-3">⚠️</div>
@@ -352,7 +104,7 @@
                 Para agendar brinquedos, por favor, utilize nosso canal de atendimento:
             </p>
             <button onclick="openWhatsApp()" class="bg-green-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-green-600 transition duration-200 w-full flex items-center justify-center gap-2">
-                <!-- Ícone WhatsApp (SVG oficial para melhor visual) -->
+                <!-- Ícone WhatsApp -->
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12.04 0C5.45 0 .07 5.38.07 12c0 2.06.54 4.02 1.58 5.76L.01 24l6.39-1.68c1.64.91 3.49 1.4 5.25 1.4 6.59 0 11.97-5.38 11.97-12S18.63 0 12.04 0zM12.04 22.1c-1.68 0-3.3-.43-4.75-1.25l-.34-.2-3.48.92.93-3.41-.22-.35c-1.74-2.78-2.67-5.83-2.67-8.99 0-5.46 4.43-9.9 9.88-9.9 4.84 0 9.17 3.86 9.88 8.94.02.13.04.26.04.39s0 .26-.04.39c-.71 5.08-5.04 8.94-9.88 8.94zM16.92 14.28c-.28-.14-1.66-.82-1.92-.91s-.45-.14-.64.14c-.19.28-.73.91-.89 1.09s-.31.14-.58.07c-.28-.08-1.18-.43-2.25-1.39-1.07-.97-1.78-2.16-1.99-2.5S5.95 9.77 6.09 9.5c.14-.28.31-.43.45-.64s.31-.48.45-.73.19-.48.19-.64c0-.14-.09-.28-.19-.52s-.64-1.55-.89-2.12c-.25-.56-.5-.49-.69-.49s-.39-.03-.58-.03c-.2-.01-.52.07-.8.35s-1.11 1.09-1.11 2.66c0 1.57 1.14 3.09 1.3 3.32s2.22 3.56 5.37 4.96c3.15 1.4 3.15 .93 3.73.87s1.82-.74 2.1-.87c.28-.14.45-.22.64-.35s.25-.21.25-.39c0-.18-.1-.28-.28-.42z"/>
                 </svg>
@@ -365,7 +117,7 @@
     </div>
     <!-- FIM MODAL DE AVISO -->
 
-    <!-- TOAST DE NOTIFICAÇÃO (Feedback visual) - INALTERADO -->
+    <!-- TOAST DE NOTIFICAÇÃO (Feedback visual) -->
     <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-[60] transition-all duration-300 translate-y-20 opacity-0 flex items-center gap-2 w-max max-w-[90%]">
         <span class="text-green-400 text-xl">✓</span>
         <span id="toast-message" class="text-sm font-medium">Ação realizada com sucesso</span>
@@ -388,15 +140,12 @@
             <!-- Ações Direita (Desktop) -->
             <div class="hidden md:flex items-center space-x-4">
                 
-                <!-- ÍCONE DE NOTIFICAÇÕES (IGUAL IMAGEM VETOR) -->
-                <button onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
+                <!-- ÍCONE DE NOTIFICAÇÕES -->
+                <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
                     <!-- Ícone de Sino Personalizado -->
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Alça do topo -->
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
-                        <!-- Corpo do sino -->
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
-                        <!-- Pêndulo (Clapper) -->
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
                     </svg>
                     <!-- Contador de Notificação Nova -->
@@ -415,11 +164,8 @@
             <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
                 <!-- Ícone de Sino Personalizado -->
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Alça do topo -->
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
-                    <!-- Corpo do sino -->
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
-                    <!-- Pêndulo (Clapper) -->
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
                 </svg>
                 <!-- Contador de Notificação Nova -->
@@ -432,7 +178,7 @@
 
     <!-- === PAINEL DE NOTIFICAÇÕES (MODAL DESLIZANTE FULL SCREEN) === -->
     
-    <!-- Overlay para fechar ao clicar fora (Manter por boas práticas, mesmo que o painel o cubra) -->
+    <!-- Overlay para fechar ao clicar fora (Manter por boas práticas) -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
 
     <!-- Painel de Notificações (TELA CHEIA) -->
@@ -461,7 +207,7 @@
 
             <!-- Botão Marcar Todas como Lidas -->
             <div class="p-4 border-t border-blue-800 sticky bottom-0 bg-blue-700 text-center">
-                 <button id="mark-all-button" onclick="markAllAsRead()" class="text-white text-sm font-semibold hover:underline transition opacity-100 pointer-events-auto">Marcar todas como lidas</button>
+                   <button id="mark-all-button" onclick="markAllAsRead()" class="text-white text-sm font-semibold hover:underline transition opacity-100 pointer-events-auto">Marcar todas como lidas</button>
             </div>
         </div>
     </div>
@@ -609,7 +355,7 @@
 
     </main>
 
-    <!-- 3. FOOTER (Rodapé - Desktop Only) - INALTERADO -->
+    <!-- 3. FOOTER (Rodapé - Desktop Only) -->
     <footer class="bg-white border-t border-gray-200 py-8 hidden md:block">
         <div class="max-w-7xl mx-auto px-4 text-center text-gray-500">
             <p>&copy; 2024 Encanto Festas Locações. Feito com diversão.</p>
@@ -627,30 +373,32 @@
                 <span class="text-[10px] font-medium">Início</span>
             </button>
 
-            <!-- Botão 2: Aluguéis (Lista de Pedidos/Recibos) -->
-            <button onclick="showToast('Meus Aluguéis')" class="flex flex-col items-center justify-center text-gray-400 hover:text-blue-600 h-full transition group">
-                <!-- Ícone de Lista/Recibo -->
+            <!-- Botão 2: JOGOS (Antigo Aluguéis) -->
+            <button onclick="showToast('Meus Jogos')" class="flex flex-col items-center justify-center text-gray-400 hover:text-blue-600 h-full transition group">
+                <!-- Ícone de Gamepad/Controle -->
                 <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                 </svg>
-                <span class="text-[10px] font-medium">Aluguéis</span>
+                <span class="text-[10px] font-medium">Jogos</span>
             </button>
 
-            <!-- Botão 3: AGENDAR (Central FAB - Calendário) -->
+            <!-- Botão 3: AGENDAR (Central FAB - Calendário Profissional) -->
             <div class="relative flex justify-center items-center h-full">
                 <button onclick="showToast('Agendamento/Disponibilidade')" class="floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50">
-                    <!-- Ícone de Calendário -->
+                    <!-- Ícone de Calendário Profissional (Detalhado) -->
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        <!-- Adicionando detalhes extras (linhas de data) para parecer "profissional" -->
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11h4m-4 4h4" opacity="0.6"/>
                     </svg>
                 </button>
             </div>
 
-            <!-- Botão 4: Catálogo (Revista/Livro) -->
+            <!-- Botão 4: CATÁLOGO (Revista/Livro Profissional) -->
             <button onclick="showToast('Catálogo de Brinquedos')" class="flex flex-col items-center justify-center text-gray-400 hover:text-blue-600 h-full transition group">
-                <!-- Ícone de Livro Aberto/Revista -->
+                <!-- Ícone de Revista/Jornal Aberto -->
                 <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.206 5 7.5 5A4.5 4.5 0 003 9.5c0 1.493.585 2.868 1.554 3.923l6.446 7.077m0-13C13.168 5.477 14.794 5 16.5 5A4.5 4.5 0 0121 9.5c0 1.493-.585 2.868-1.554 3.923l-6.446 7.077"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
                 </svg>
                 <span class="text-[10px] font-medium">Catálogo</span>
             </button>
@@ -664,5 +412,338 @@
         </div>
     </nav>
 
+    <!-- SCRIPT FIREBASE & LÓGICA DO APP (type="module" para imports) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, 
+            query, where, writeBatch, Timestamp, setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Ativar logs para depuração
+        setLogLevel('debug');
+        
+        // --- VARIÁVEIS GLOBAIS (FORNECIDAS PELO AMBIENTE) ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        // Variáveis de estado do Firebase
+        let app, db, auth;
+        let userId = null;
+        let isAuthReady = false;
+        let unsubscribeNotifications = null;
+
+        // Variáveis de estado do App
+        let isPanelOpen = false;
+        let currentNotificationsData = []; // Armazena os dados mockados
+        let readNotificationsIds = new Set(); // Armazena IDs lidos do Firestore
+
+        // --- DADOS MOCKADOS (SIMULAÇÃO DA API/SERVIÇO DE NOTIFICAÇÕES) ---
+        const mockNotificacoes = [
+            {
+                "id": "1",
+                "titulo": "Promoção Relâmpago!",
+                "mensagem": "Castelo Pula-Pula com 20% de desconto por tempo limitado! Agende agora.",
+                "tipo": "promocao",
+                "data": "2024-12-05T14:30:00Z"
+            },
+            {
+                "id": "2",
+                "titulo": "Seu Carrinho Expirou",
+                "mensagem": "Os itens no seu carrinho foram liberados. Por favor, agende novamente.",
+                "tipo": "alerta",
+                "data": "2024-12-04T10:00:00Z"
+            },
+            {
+                "id": "3",
+                "titulo": "Novo Brinquedo na Área!",
+                "mensagem": "Adicionamos a 'Piscina de Bolinhas Gigante' ao nosso catálogo. Confira!",
+                "tipo": "novo_produto",
+                "data": "2024-12-03T09:15:00Z"
+            }
+        ];
+        
+        // --- UTILITÁRIOS ---
+
+        // Função simples de feedback visual (Toast)
+        window.showToast = function(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        window.openWhatsApp = function() {
+            window.open('https://wa.me/5547992277324', '_blank');
+        }
+
+        window.closeModal = function() {
+            document.getElementById('site-status-modal').classList.add('hidden');
+        }
+
+        window.showStatusModal = function() {
+            document.getElementById('site-status-modal').classList.remove('hidden');
+        }
+
+        // --- PERSISTÊNCIA FIREBASE ---
+
+        function getReadNotificationsCollection(uid) {
+            return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
+        }
+
+        /**
+         * Marca uma única notificação como lida no Firestore.
+         * @param {string} notificationId - ID da notificação.
+         */
+        window.markSingleAsRead = async function(notificationId, title) {
+            if (!userId) return showToast("Usuário não autenticado.");
+
+            try {
+                // Cria um documento com o ID da notificação como campo
+                const docRef = doc(getReadNotificationsCollection(userId), notificationId);
+                await setDoc(docRef, { 
+                    readAt: Timestamp.now(),
+                    notificationId: notificationId
+                });
+                showToast(`"${title}" marcado como lido e salvo.`);
+                // onSnapshot irá recarregar a lista automaticamente
+            } catch (error) {
+                console.error("Erro ao marcar como lido:", error);
+                showToast("Erro ao salvar o status de leitura.");
+            }
+        }
+
+        /**
+         * Marca todas as notificações atuais (mockadas) como lidas.
+         */
+        window.markAllAsRead = async function() {
+            if (!userId || currentNotificationsData.length === 0) return;
+
+            const batch = writeBatch(db);
+            const now = Timestamp.now();
+            let count = 0;
+
+            currentNotificationsData.forEach(n => {
+                // Verifica se já está lida antes de tentar escrever
+                if (!readNotificationsIds.has(n.id)) {
+                    const docRef = doc(getReadNotificationsCollection(userId), n.id);
+                    batch.set(docRef, { 
+                        readAt: now,
+                        notificationId: n.id
+                    });
+                    count++;
+                }
+            });
+
+            if (count > 0) {
+                try {
+                    await batch.commit();
+                    showToast(`Marcadas ${count} notificações como lidas.`);
+                    // onSnapshot irá recarregar a lista automaticamente
+                } catch (error) {
+                    console.error("Erro ao marcar todas:", error);
+                    showToast("Erro ao marcar todas como lidas.");
+                }
+            } else {
+                 showToast("Nenhuma notificação nova para marcar.");
+            }
+        }
+
+        // --- ATUALIZAÇÃO DA UI ---
+
+        /**
+         * Atualiza o contador de notificações em todos os elementos da UI.
+         */
+        function updateNotificationCount(count) {
+            const elements = document.querySelectorAll('.notification-counter');
+            
+            // Oculta/Mostra o botão "Marcar todas como lidas"
+            const markAllButton = document.getElementById('mark-all-button');
+            if (markAllButton) {
+                if (count > 0) {
+                    markAllButton.classList.remove('opacity-0', 'pointer-events-none');
+                } else {
+                    markAllButton.classList.add('opacity-0', 'pointer-events-none');
+                }
+            }
+
+            elements.forEach(el => {
+                if (count > 0) {
+                    el.classList.remove('hidden');
+                    el.innerText = count > 9 ? '9+' : count;
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        /**
+         * Renderiza as notificações não lidas no painel.
+         */
+        function renderNotifications() {
+            const panelList = document.getElementById('notification-list');
+            const loadingIndicator = document.getElementById('loading-notifications');
+            
+            loadingIndicator.classList.add('hidden');
+            panelList.innerHTML = ''; 
+
+            // Filtra apenas itens NÃO LIDOS (aqueles cujos IDs não estão no Set do Firestore)
+            const unreadItems = currentNotificationsData.filter(n => !readNotificationsIds.has(n.id));
+            const unreadCount = unreadItems.length;
+
+            // Atualiza o contador (visível mesmo se o painel estiver fechado)
+            updateNotificationCount(unreadCount);
+
+            // Se o painel estiver fechado, paramos a renderização de lista detalhada
+            if (!isPanelOpen) return;
+            
+            if (unreadItems.length === 0) {
+                panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>';
+                return;
+            }
+
+            // Renderiza a lista de itens NÃO LIDOS
+            unreadItems.forEach(notificacao => {
+                const li = document.createElement('li');
+                
+                const bgClass = 'bg-blue-700 hover:bg-blue-800';
+                const icon = notificacao.tipo === 'promocao' ? '🎁' : 
+                             notificacao.tipo === 'alerta' ? '🚨' : '✨';
+                
+                li.className = `p-5 border-b border-blue-800 cursor-pointer transition ${bgClass} rounded-xl mb-3 text-white shadow-lg`;
+                
+                const dateObj = new Date(notificacao.data);
+                const dataFormatada = isNaN(dateObj) ? notificacao.data : dateObj.toLocaleDateString('pt-BR', {
+                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                });
+
+                li.innerHTML = `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="text-4xl mb-2">${icon}</div>
+                        <div class="flex-grow text-center">
+                            <h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4>
+                            <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
+                            <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
+                        </div>
+                        <!-- Botão de Ação: Chama a função global markSingleAsRead -->
+                        <button onclick="markSingleAsRead('${notificacao.id}', '${notificacao.titulo.replace(/'/g, "\\'")}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md">
+                            Marcar como Lida
+                        </button>
+                    </div>
+                `;
+                
+                panelList.appendChild(li);
+            });
+        }
+
+
+        /**
+         * Função principal de inicialização e escuta de notificações.
+         */
+        async function setupNotificationListener() {
+            // 1. Define os dados globais mockados (simula dados do servidor)
+            currentNotificationsData = mockNotificacoes;
+            
+            // 2. Se a autenticação não estiver pronta, apenas atualiza o contador para 0 e aguarda
+            if (!isAuthReady || !userId) {
+                updateNotificationCount(0);
+                return;
+            }
+
+            // 3. Inicia o loading no painel
+            document.getElementById('loading-notifications').classList.remove('hidden');
+
+            // 4. Cria a referência da coleção privada do usuário para status de leitura
+            const readCollectionRef = getReadNotificationsCollection(userId);
+
+            // 5. Usa onSnapshot para escutar em tempo real
+            unsubscribeNotifications = onSnapshot(readCollectionRef, (snapshot) => {
+                // Limpa o Set de IDs lidos
+                readNotificationsIds.clear();
+
+                // Popula o Set com os IDs dos documentos (notificações lidas)
+                snapshot.docs.forEach(doc => {
+                    readNotificationsIds.add(doc.id);
+                });
+
+                // Renderiza a UI baseada nos dados lidos e mockados
+                renderNotifications();
+            }, (error) => {
+                console.error("Erro ao escutar o Firestore (Notificações):", error);
+                document.getElementById('loading-notifications').classList.add('hidden');
+                document.getElementById('notification-list').innerHTML = `<li class="p-4 text-center text-red-300 text-sm">Erro: Não foi possível carregar o status de leitura.</li>`;
+            });
+        }
+
+
+        // --- LÓGICA DO PAINEL SLIDING ---
+        window.toggleNotificationPanel = function() {
+            const panel = document.getElementById('notification-panel');
+            const overlay = document.getElementById('notification-overlay');
+
+            if (!isPanelOpen) {
+                // Abre
+                panel.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden'); 
+                
+                // Força a renderização ao abrir (que será feita pelo onSnapshot, mas chamamos para garantir o loading)
+                renderNotifications();
+            } else {
+                // Fecha
+                panel.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+            isPanelOpen = !isPanelOpen;
+        }
+
+        // --- INICIALIZAÇÃO DO FIREBASE E AUTENTICAÇÃO ---
+        async function initializeFirebaseAndAuth() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Tenta autenticar
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Espera o estado de autenticação mudar
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        isAuthReady = true;
+                        // Inicia a escuta de notificações
+                        setupNotificationListener(); 
+                    } else {
+                        userId = null;
+                        isAuthReady = true; 
+                        // Limpa o listener se existir e reseta o contador
+                        if (unsubscribeNotifications) unsubscribeNotifications();
+                        updateNotificationCount(0);
+                    }
+                });
+                
+            } catch (e) {
+                console.error("Erro na inicialização do Firebase:", e);
+                isAuthReady = true;
+                showToast("Erro ao conectar com o serviço de dados.");
+            }
+        }
+
+        // --- INICIALIZAÇÃO GERAL ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showStatusModal();
+            initializeFirebaseAndAuth();
+        });
+    </script>
 </body>
 </html>
