@@ -383,21 +383,21 @@
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto <span class="text-yellow-300">Festas</span></span>
             </div>
 
-            <!-- Navegação Desktop -->
-            <nav class="hidden md:flex space-x-8">
-                <a href="#" class="text-white font-medium hover:text-yellow-300 transition">Catálogo</a>
-                <a href="#" class="text-white font-medium hover:text-yellow-300 transition">Como Funciona</a>
-                <a href="#" class="text-white font-medium hover:text-yellow-300 transition">Contato</a>
-            </nav>
-
+            <!-- NAVEGAÇÃO DESKTOP REMOVIDA AQUI -->
+            
             <!-- Ações Direita (Desktop) -->
             <div class="hidden md:flex items-center space-x-4">
                 
-                <!-- ÍCONE DE NOTIFICAÇÕES (AGORA COM SINO) -->
+                <!-- ÍCONE DE NOTIFICAÇÕES (IGUAL IMAGEM VETOR) -->
                 <button onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
-                    <!-- Ícone de Sino (Outline) -->
+                    <!-- Ícone de Sino Personalizado -->
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.472 6.136 6.5 7.558 6.5 9.158V14.16a2.032 2.032 0 01-.595 1.405L4 17h5m6 0a2 2 0 100 4 2 2 0 000-4z"/>
+                        <!-- Alça do topo -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
+                        <!-- Corpo do sino -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
+                        <!-- Pêndulo (Clapper) -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
                     </svg>
                     <!-- Contador de Notificação Nova -->
                     <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
@@ -413,9 +413,14 @@
 
             <!-- Botão Menu Mobile (Notificações) -->
             <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
-                <!-- Ícone de Sino (Outline) -->
+                <!-- Ícone de Sino Personalizado -->
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.472 6.136 6.5 7.558 6.5 9.158V14.16a2.032 2.032 0 01-.595 1.405L4 17h5m6 0a2 2 0 100 4 2 2 0 000-4z"/>
+                    <!-- Alça do topo -->
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
+                    <!-- Corpo do sino -->
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
+                    <!-- Pêndulo (Clapper) -->
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
                 </svg>
                 <!-- Contador de Notificação Nova -->
                 <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
@@ -460,7 +465,7 @@
     </div>
     <!-- FIM PAINEL DE NOTIFICAÇÕES -->
 
-    <!-- 2. CONTEÚDO PRINCIPAL (Padding ajustado para as barras fixas) - INALTERADO -->
+    <!-- 2. CONTEÚDO PRINCIPAL (Padding ajustado para as barras fixas) -->
     <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-gray-50 overflow-hidden">
         
         <!-- Hero Banner -->
@@ -469,11 +474,14 @@
             <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, #ffffff 2px, transparent 2px); background-size: 30px 30px;"></div>
             
             <span class="bg-blue-800 text-blue-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Diversão Garantida</span>
-            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">Leve a magia para <br/><span class="text-yellow-300">sua festa!</span></h1>
-            <p class="text-blue-100 mb-6 max-w-lg mx-auto text-sm md:text-base">Brinquedos higienizados, seguros e entregues na sua porta. A solução inteligente para pais modernos.</p>
+            <!-- TÍTULO ATUALIZADO -->
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">Realize a festa dos <br/><span class="text-yellow-300">seus sonhos!</span></h1>
+            <!-- SUBTÍTULO ATUALIZADO -->
+            <p class="text-blue-100 mb-6 max-w-lg mx-auto text-sm md:text-base">Aluguel de brinquedos fácil, rápido e seguro. Solução completa para pais modernos.</p>
             
             <div class="flex justify-center gap-3">
-                <button onclick="showToast('Filtrando por Populares')" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition transform active:scale-95 text-sm">Ver Destaques</button>
+                <!-- BOTÃO ATUALIZADO -->
+                <button onclick="showToast('Abrindo Agendamento/Disponibilidade')" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition transform active:scale-95 text-sm">Ver disponibilidade</button>
             </div>
         </section>
 
