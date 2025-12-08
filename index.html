@@ -67,6 +67,7 @@
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
 
+    <!-- MODAL DE AVISO (REMOVIDO A CHAMADA DE SHOW NO JS) -->
     <div id="site-status-modal" class="hidden fixed inset-0 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center transform transition-all duration-300 scale-100">
             <div class="text-4xl text-secondary mb-3">⚠️</div>
@@ -89,6 +90,7 @@
         </div>
     </div>
 
+    <!-- TOAST DE NOTIFICAÇÃO (OCULTO - AVISOS REMOVIDOS) -->
     <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-[60] transition-all duration-300 translate-y-20 opacity-0 flex items-center gap-2 w-max max-w-[90%] pointer-events-none">
         <span class="text-green-400 text-xl">✓</span>
         <span id="toast-message" class="text-sm font-medium">Ação realizada com sucesso</span>
@@ -114,8 +116,8 @@
                     <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
                     </div>
                 </button>
-                <button onclick="showToast('Abrindo Login...')" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg transition text-sm font-semibold">Entrar</button>
-                <button onclick="showToast('Ver Carrinho')" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg transform hover:-translate-y-0.5">
+                <button onclick="window.location.href='perfil.html'" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg transition text-sm font-semibold">Entrar</button>
+                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg transform hover:-translate-y-0.5">
                     Agendar Agora
                 </button>
             </div>
@@ -156,16 +158,22 @@
         </div>
     </div>
 
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-gray-50 overflow-hidden">
-        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-10 text-center relative overflow-hidden mb-8">
+        
+        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-6 md:py-8 text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, #ffffff 2px, transparent 2px); background-size: 30px 30px;"></div>
-            <span class="bg-blue-800 text-blue-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Diversão Garantida</span>
-            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4">
+            
+            <span class="bg-blue-800 text-blue-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Diversão Garantida</span>
+            
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-2">
                 Realize a festa dos seus <span class="text-yellow-300">sonhos!</span>
             </h1>
-            <p class="text-blue-100 mb-6 max-w-lg mx-auto text-sm md:text-base">Aluguel de brinquedos fácil, rápido e seguro. Solução completa para pais modernos.</p>
+            
+            <p class="text-blue-100 mb-5 max-w-lg mx-auto text-sm md:text-base">Aluguel de brinquedos fácil, rápido e seguro. Solução completa para pais modernos.</p>
+            
             <div class="flex justify-center gap-3">
-                <button onclick="showToast('Abrindo Agendamento/Disponibilidade')" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition transform active:scale-95 text-sm">Ver disponibilidade</button>
+                <button onclick="window.location.href='agendamento.html'" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition transform active:scale-95 text-sm">Ver disponibilidade</button>
             </div>
         </section>
     </main>
@@ -179,7 +187,7 @@
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
             
-            <!-- Início (Index) - SELECIONADO: Pointer Events None para não clicar -->
+            <!-- Início (Index) - SELECIONADO: Não clicável, cor ativa -->
             <div class="flex flex-col items-center justify-center w-full h-full text-blue-600 cursor-default pointer-events-none">
                 <svg class="w-6 h-6 mb-1 transition" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
                 <span class="text-[10px] font-medium">Início</span>
@@ -193,14 +201,14 @@
                 <span class="text-[10px] font-medium">Jogos</span>
             </a>
 
-            <!-- Agendar/Calendário - CLICÁVEL SEMPRE (Ação JS) -->
+            <!-- Agendar/Calendário - CLICÁVEL (Ação de Navegação) -->
             <div class="relative flex justify-center items-center h-full w-full">
-                <button onclick="showToast('Agendamento/Disponibilidade')" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10">
+                <a href="agendamento.html" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11h4m-4 4h4" opacity="0.6"/>
                     </svg>
-                </button>
+                </a>
             </div>
 
             <!-- Catálogo - CLICÁVEL -->
@@ -224,8 +232,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
-            getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, 
-            query, where, writeBatch, Timestamp, setLogLevel
+            getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, 
+            writeBatch, Timestamp, setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         setLogLevel('debug');
@@ -240,8 +248,8 @@
         let isPanelOpen = false;
         let currentNotificationsData = []; 
         let readNotificationsIds = new Set(); 
-        let toastTimeout; 
-
+        
+        // DADOS MOCKADOS (A persistência agora é tratada pelo Firestore)
         const mockNotificacoes = [
             {
                 "id": "1",
@@ -266,24 +274,7 @@
             }
         ];
         
-        window.showToast = function(message) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-message');
-            
-            // Limpa o timeout anterior para evitar que o toast feche se clicar rápido
-            if (toastTimeout) {
-                clearTimeout(toastTimeout);
-            }
-
-            toastMsg.innerText = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            
-            // Define novo timeout para fechar
-            toastTimeout = setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
+        // Funções de feedback e modal (Mantidas, mas sem chamadas no fluxo normal)
         window.openWhatsApp = function() {
             window.open('https://wa.me/5547992277324', '_blank');
         }
@@ -292,16 +283,31 @@
             document.getElementById('site-status-modal').classList.add('hidden');
         }
 
-        window.showStatusModal = function() {
-            document.getElementById('site-status-modal').classList.remove('hidden');
+        // Função Toast Mantida para uso interno da notificação
+        let toastTimeout;
+        window.showToast = function(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
         }
 
+        // FIREBASE PERSISTENCE
         function getReadNotificationsCollection(uid) {
             return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
         }
 
         window.markSingleAsRead = async function(notificationId, title) {
-            if (!userId) return showToast("Usuário não autenticado.");
+            if (!userId) return; // Não mostra toast, apenas falha silenciosamente
 
             try {
                 const docRef = doc(getReadNotificationsCollection(userId), notificationId);
@@ -309,10 +315,8 @@
                     readAt: Timestamp.now(),
                     notificationId: notificationId
                 });
-                showToast(`"${title}" marcado como lido e salvo.`);
             } catch (error) {
                 console.error("Erro ao marcar como lido:", error);
-                showToast("Erro ao salvar o status de leitura.");
             }
         }
 
@@ -337,16 +341,13 @@
             if (count > 0) {
                 try {
                     await batch.commit();
-                    showToast(`Marcadas ${count} notificações como lidas.`);
                 } catch (error) {
                     console.error("Erro ao marcar todas:", error);
-                    showToast("Erro ao marcar todas como lidas.");
                 }
-            } else {
-                 showToast("Nenhuma notificação nova para marcar.");
             }
         }
 
+        // UI Updates
         function updateNotificationCount(count) {
             const elements = document.querySelectorAll('.notification-counter');
             const markAllButton = document.getElementById('mark-all-button');
@@ -419,6 +420,7 @@
             });
         }
 
+        // Notification Setup
         async function setupNotificationListener() {
             currentNotificationsData = mockNotificacoes;
             
@@ -460,6 +462,7 @@
             isPanelOpen = !isPanelOpen;
         }
 
+        // Firebase Auth
         async function initializeFirebaseAndAuth() {
             try {
                 app = initializeApp(firebaseConfig);
@@ -488,12 +491,11 @@
             } catch (e) {
                 console.error("Erro na inicialização do Firebase:", e);
                 isAuthReady = true;
-                showToast("Erro ao conectar com o serviço de dados.");
             }
         }
 
+        // Initialization (Removido showStatusModal() aqui)
         document.addEventListener('DOMContentLoaded', () => {
-            showStatusModal();
             initializeFirebaseAndAuth();
         });
     </script>
