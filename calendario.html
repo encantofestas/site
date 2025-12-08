@@ -88,6 +88,19 @@
             font-size: 1rem;
             z-index: 10;
         }
+
+        /* Estilo da Notificação Toast */
+        #toast-notification {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s linear, transform 0.3s ease-out;
+            transform: translateY(20px);
+        }
+        #toast-notification.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -169,13 +182,24 @@
         </div>
     </div>
 
+    <!-- NOTIFICAÇÃO TOAST (Mensagem de Limite) -->
+    <div id="toast-notification" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl z-[60] flex items-center space-x-3 w-[90%] max-w-sm justify-center">
+        <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        <span class="text-sm font-semibold text-center">Reservas permitidas apenas até 6 meses.</span>
+    </div>
+
     <!-- CONTEÚDO PRINCIPAL: CALENDÁRIO PREMIUM (Ocupa o main) -->
-    <main class="flex-grow w-full pt-4 pb-28 md:pb-12 bg-gray-50 flex justify-center p-2 sm:p-4">
+    <!-- pt-16 para compensar a altura exata do header (64px/4rem), sem espaço extra -->
+    <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-gray-50 flex justify-center px-2 sm:px-4">
         
         <!-- Contêiner do Calendário -->
-        <!-- Reduzido padding do main para pt-4, e agora adiciona mt-2 ao contêiner para posicionar bem no topo -->
-        <div class="w-full max-w-5xl bg-white p-3 md:p-6 rounded-xl shadow-2xl mt-2">
-            <!-- Título Removido conforme solicitação -->
+        <!-- mt-1 para um ajuste fino mínimo -->
+        <div class="w-full max-w-5xl bg-white p-3 md:p-6 rounded-xl shadow-2xl mt-1 h-fit">
+            
+            <!-- TÍTULO BEM MAIOR E DESTACADO -->
+            <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-4 text-center leading-tight">
+                Qual a data do seu evento?
+            </h2>
 
             <!-- Navegação e Título do Mês -->
             <div class="flex justify-between items-center mb-4">
@@ -323,17 +347,13 @@
         maxFutureDate.setMonth(maxFutureDate.getMonth() + 6);
         maxFutureDate.setDate(1); // Considera o primeiro dia do 7º mês como limite
 
-        // Mocked Data: Simula disponibilidade/status e dias de valor elevado/feriados
-        // Formato: 'YYYY-MM-DD'
+        // Mocked Data
         const mockedDayData = {
-            // Este mês
             [`${currentCalendarDate.getFullYear()}-${String(currentCalendarDate.getMonth() + 1).padStart(2, '0')}-05`]: { color: 'bg-green-500', isHoliday: false },
             [`${currentCalendarDate.getFullYear()}-${String(currentCalendarDate.getMonth() + 1).padStart(2, '0')}-12`]: { color: 'bg-yellow-500', isHoliday: false },
             [`${currentCalendarDate.getFullYear()}-${String(currentCalendarDate.getMonth() + 1).padStart(2, '0')}-20`]: { color: 'bg-red-500', isHoliday: false },
-            
-            // Próximo mês
             [`${new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getFullYear()}-${String(new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getMonth() + 1).padStart(2, '0')}-01`]: { color: 'bg-yellow-500', isHoliday: false },
-            [`${new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getFullYear()}-${String(new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getMonth() + 1).padStart(2, '0')}-25`]: { color: 'bg-red-500', isHoliday: true }, // Exemplo de feriado/alto valor
+            [`${new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getFullYear()}-${String(new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getMonth() + 1).padStart(2, '0')}-25`]: { color: 'bg-red-500', isHoliday: true },
         };
 
         const monthNames = [
@@ -341,101 +361,82 @@
             "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
         ];
         
-        // Elementos DOM do Calendário
+        // Elementos DOM
         const monthYearDisplay = document.getElementById('current-month-year');
         const calendarBody = document.getElementById('calendar-body');
         const prevButton = document.getElementById('prev-month');
         const nextButton = document.getElementById('next-month');
+        const toast = document.getElementById('toast-notification');
 
-        /**
-         * Retorna a chave de status e cor para um determinado dia.
-         * Se não houver status mockado, retorna 'Disponível' (verde).
-         */
+        // Função para mostrar o Toast
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
         function getDayStatus(year, month, day) {
             const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            // Se a data estiver no mock, retorna o status. Caso contrário, retorna 'Disponível' (verde) por padrão.
             return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false };
         }
 
-        /**
-         * Gera e exibe o calendário com as restrições e cores.
-         */
         function renderCalendar() {
             const currentMonth = currentCalendarDate.getMonth();
             const currentYear = currentCalendarDate.getFullYear();
 
-            // 1. Atualiza o título
             monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
             calendarBody.innerHTML = '';
 
-            // 2. Determina o primeiro dia do mês e o número de dias
-            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0 (Dom) a 6 (Sáb)
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-            // 3. Verifica as restrições de navegação e atualiza os botões
             const firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1);
             const firstDayOfNextMonth = new Date(currentYear, currentMonth + 1, 1);
 
-            // Botão Anterior: Desabilita se for o mês atual
             const isCurrentMonth = firstDayOfCurrentMonth.getTime() === new Date(today.getFullYear(), today.getMonth(), 1).getTime();
             prevButton.disabled = isCurrentMonth;
 
-            // Botão Próximo: Desabilita se for o limite de 6 meses
             const isAtMaxFuture = firstDayOfNextMonth.getTime() >= maxFutureDate.getTime();
             nextButton.disabled = isAtMaxFuture;
             
-            // Se estiver no limite máximo, adiciona o alert ao botão Próximo
             if (isAtMaxFuture) {
-                nextButton.onclick = () => {
-                     // Utiliza alert() conforme solicitado, mas idealmente seria um modal customizado
-                    alert("Atenção: Não é possível fazer reservas com mais de 6 meses de antecedência.");
-                };
+                nextButton.onclick = showToast; // Mostra o toast personalizado
             } else {
-                 nextButton.onclick = navigateNext; // Restaura a navegação normal
+                 nextButton.onclick = navigateNext;
             }
 
-
-            // 4. Cria células vazias para preencher o espaço antes do primeiro dia
             for (let i = 0; i < firstDayOfMonth; i++) {
                 const emptyCell = document.createElement('div');
                 emptyCell.className = 'dia-vazio p-2 rounded-lg';
                 calendarBody.appendChild(emptyCell);
             }
 
-            // 5. Cria as células para cada dia do mês
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(currentYear, currentMonth, day);
                 const status = getDayStatus(currentYear, currentMonth, day);
                 
                 const cell = document.createElement('div');
                 cell.className = 'dia-celula rounded-lg shadow-sm relative overflow-hidden';
-                
-                // Aplica a cor de fundo completa
                 cell.classList.add(status.color);
 
                 const isPastDay = date.getTime() < today.getTime();
                 const isToday = date.getTime() === today.getTime();
 
-                // Aplica estilos e restrições
                 if (isPastDay) {
                     cell.classList.add('dia-passado');
-                    // Remove o handler de clique para dias passados
                     cell.onclick = null; 
                 } else {
                     cell.classList.add('text-gray-900');
-                    cell.onclick = () => alert(`Dia ${day}/${currentMonth + 1}/${currentYear} selecionado. Status: ${status.color.replace('bg-', '')}`);
+                    cell.onclick = () => alert(`Dia ${day}/${currentMonth + 1}/${currentYear} selecionado.`);
                 }
                 
                 if (isToday) {
-                    cell.classList.add('dia-hoje'); // Adiciona borda azul para o dia atual
+                    cell.classList.add('dia-hoje');
                 }
 
-                // Conteúdo da célula
                 cell.innerHTML = `
-                    <!-- Número do dia (sempre no canto superior direito para mobile) -->
                     <div class="dia-numero">${day}</div>
-                    
-                    <!-- Ícone de Valor Elevado/Feriado (sempre no canto inferior esquerdo) -->
                     ${status.isHoliday ? '<span class="high-value-icon">👑</span>' : ''}
                 `;
 
@@ -443,29 +444,24 @@
             }
         }
 
-        /**
-         * Navega para o mês anterior.
-         */
         function navigatePrev() {
-            if (prevButton.disabled) return; // Segurança extra
+            if (prevButton.disabled) return;
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
             renderCalendar();
         }
 
-        /**
-         * Navega para o próximo mês.
-         */
         function navigateNext() {
-            if (nextButton.disabled) return; // Segurança extra
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-            renderCalendar();
+            const nextMonthCheck = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1);
+            if (nextMonthCheck.getTime() < maxFutureDate.getTime()) {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                renderCalendar();
+            }
         }
 
-        // Adiciona Listeners aos botões de navegação
         prevButton.addEventListener('click', navigatePrev);
-        nextButton.addEventListener('click', navigateNext); // O evento será substituído pelo alert se estiver no limite
+        nextButton.addEventListener('click', navigateNext);
         
-        // --- 2. LÓGICA DO FIREBASE E AUTENTICAÇÃO (MANTIDA) ---
+        // --- Firebase ---
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
         
@@ -482,7 +478,7 @@
                 try {
                     const docRef = doc(getReadNotificationsCollection(userId), idStr);
                     await setDoc(docRef, { readAt: Timestamp.now(), notificationId: idStr });
-                } catch (error) { console.error("Erro ao salvar leitura na nuvem:", error); }
+                } catch (error) { console.error("Erro ao salvar:", error); }
             }
         }
 
@@ -508,9 +504,7 @@
                 const docRef = doc(getReadNotificationsCollection(userId), id);
                 batch.set(docRef, { readAt: now, notificationId: id });
             });
-            try {
-                await batch.commit();
-            } catch (error) { console.error("Erro ao marcar todas na nuvem:", error); }
+            try { await batch.commit(); } catch (error) { console.error("Erro:", error); }
         }
 
         function updateNotificationCount(count) {
@@ -554,8 +548,7 @@
             unreadItems.forEach(notificacao => {
                 const li = document.createElement('li');
                 const bgClass = 'bg-blue-700 hover:bg-blue-800';
-                const icon = notificacao.tipo === 'promocao' ? '🎁' : 
-                             notificacao.tipo === 'alerta' ? '🚨' : '✨';
+                const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨';
                 const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
                 li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`;
                 if (notificacao.link) {
@@ -657,11 +650,10 @@
 
         window.openWhatsApp = function() { window.open('https://wa.me/5547992277324', '_blank'); }
 
-        // Inicialização Principal
         document.addEventListener('DOMContentLoaded', () => {
             fetchNotifications();
             initializeFirebaseAndAuth();
-            renderCalendar(); // Inicializa o novo calendário
+            renderCalendar();
         });
     </script>
 </body>
