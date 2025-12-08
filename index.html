@@ -118,7 +118,6 @@
             
             <!-- Cabeçalho (Fixo no topo) -->
             <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10">
-                <!-- TÍTULO ALTERADO -->
                 <h3 class="text-xl font-bold brand-font text-white">Notificações</h3>
                 <button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -127,7 +126,7 @@
 
             <!-- Área de Rolagem (Ocupa o meio) -->
             <div class="flex-grow overflow-y-auto relative">
-                <ul id="notification-list" class="p-4 space-y-3 pb-24"></ul> <!-- pb-24 garante espaço no fim da lista -->
+                <ul id="notification-list" class="p-4 space-y-3 pb-24"></ul>
                 
                 <div id="loading-notifications" class="p-4 text-center hidden">
                     <div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div>
@@ -136,9 +135,7 @@
             </div>
 
             <!-- Rodapé (Fixo no fundo) - ALTURA REDUZIDA -->
-            <!-- Alterado p-4 para p-2 e padding-bottom de 1.5rem para 0.5rem -->
             <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
-                   <!-- BOTÃO ALTERADO: py-2 reduzido para py-1 -->
                    <button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline transition opacity-100 pointer-events-auto active:scale-95 py-1">
                        Marcar todas como lidas
                    </button>
@@ -244,33 +241,8 @@
         // --- 1. CARREGAR CACHE LOCAL IMEDIATAMENTE ---
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         
-        // --- DADOS DAS NOTIFICAÇÕES (Com Links) ---
-        const notificationsData = [
-          {
-            "id": "1", 
-            "titulo": "Promoção Relâmpago!",
-            "mensagem": "Castelo Pula-Pula com 20% de desconto por tempo limitado! Agende agora.",
-            "tipo": "promocao",
-            "data": "2024-12-05T14:30:00Z",
-            "link": "combos.html" // Link de Exemplo
-          },
-          {
-            "id": "2",
-            "titulo": "Seu Carrinho Expirou",
-            "mensagem": "Os itens no seu carrinho foram liberados. Por favor, agende novamente.",
-            "tipo": "alerta",
-            "data": "2024-12-04T10:00:00Z",
-            "link": "carrinho.html" // Link de Exemplo
-          },
-          {
-            "id": "3",
-            "titulo": "Novo Brinquedo na Área!",
-            "mensagem": "Adicionamos a 'Piscina de Bolinhas Gigante' ao nosso catálogo. Confira!",
-            "tipo": "novo_produto",
-            "data": "2024-12-03T09:15:00Z",
-            "link": "catalogo.html" // Link de Exemplo
-          }
-        ];
+        // Dados das Notificações - Variável VAZIA que será preenchida pelo JSON externo
+        let notificationsData = [];
         
         // Função auxiliar para atualizar o cache local
         function updateLocalCache() {
@@ -283,7 +255,7 @@
 
         // --- AÇÃO: MARCAR COMO LIDA ---
         window.markSingleAsRead = async function(e, notificationId) {
-            e.stopPropagation(); // Impede o clique de ir para o link
+            e.stopPropagation(); // Impede o clique de ir para o link (se houver)
             const idStr = String(notificationId);
             
             readNotificationsIds.add(idStr);
@@ -305,7 +277,9 @@
 
         // --- AÇÃO: NAVEGAR ---
         window.navigateTo = function(url) {
-            window.location.href = url;
+            if (url && url !== '#') {
+                window.location.href = url;
+            }
         }
 
         window.markAllAsRead = async function() {
@@ -353,7 +327,7 @@
                     markAllButton.innerText = "Marcar todas como lidas";
                     markAllButton.disabled = false;
                 } else {
-                    // Estado inativo, mas visível (opcional, ou pode esconder)
+                    // Estado inativo
                     markAllButton.classList.add('opacity-50', 'pointer-events-none');
                     markAllButton.innerText = "Nenhuma nova notificação";
                     markAllButton.disabled = true;
@@ -397,9 +371,13 @@
                 const icon = notificacao.tipo === 'promocao' ? '🎁' : 
                              notificacao.tipo === 'alerta' ? '🚨' : '✨';
                 
-                // MUDANÇA: Adicionado onclick para navegação
-                li.className = `p-5 border-b border-blue-800 cursor-pointer transition ${bgClass} rounded-xl mb-3 text-white shadow-lg active:scale-[0.98] transform`;
-                li.onclick = () => window.navigateTo(notificacao.link || '#');
+                // Link opcional
+                const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
+                li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`;
+                
+                if (notificacao.link) {
+                    li.onclick = () => window.navigateTo(notificacao.link);
+                }
 
                 const dateObj = new Date(notificacao.data);
                 const dataFormatada = isNaN(dateObj) ? notificacao.data : dateObj.toLocaleDateString('pt-BR', {
@@ -414,7 +392,6 @@
                             <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
                             <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
                         </div>
-                        <!-- MUDANÇA: event passadp para markSingleAsRead para parar propagação -->
                         <button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md z-10 relative">
                             Marcar como Lida
                         </button>
@@ -425,9 +402,28 @@
             });
         }
 
-        async function setupNotificationListener() {
-            renderNotifications();
+        // --- BUSCA NOTIFICAÇÕES DO ARQUIVO EXTERNO ---
+        async function fetchNotifications() {
+            try {
+                // Tenta carregar o arquivo notificacoes.json
+                const response = await fetch('notificacoes.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    // Converte IDs para String para evitar erros de tipo
+                    notificationsData = data.map(item => ({ ...item, id: String(item.id) }));
+                    // Renderiza imediatamente após carregar
+                    renderNotifications();
+                } else {
+                    console.warn("Arquivo notificacoes.json não encontrado.");
+                }
+            } catch (error) {
+                console.error("Erro ao buscar notificações:", error);
+            }
+        }
 
+        async function setupNotificationListener() {
+            // fetchNotifications já cuida do render inicial
+            
             if (!isAuthReady || !userId) return;
 
             const readCollectionRef = getReadNotificationsCollection(userId);
@@ -496,7 +492,6 @@
             } catch (e) {
                 console.error("Erro Firebase:", e);
                 isAuthReady = true; 
-                renderNotifications();
             }
         }
 
@@ -507,7 +502,9 @@
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
-            renderNotifications();
+            // 1. Busca os dados do arquivo JSON
+            fetchNotifications();
+            // 2. Inicia Firebase
             initializeFirebaseAndAuth();
         });
     </script>
