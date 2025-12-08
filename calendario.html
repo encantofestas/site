@@ -119,10 +119,34 @@
                             <input type="text" id="event-time" name="event-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ex: 14:00 - 18:00">
                         </div>
 
+                        <!-- === OPÇÕES EXTRAS === -->
+                        
                         <!-- Opção de Entrega Antecipada -->
                         <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
                             <input type="checkbox" id="delivery-day-before" onchange="calculateTotal()" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <label for="delivery-day-before" class="text-sm font-medium text-gray-700 select-none">Deseja receber 1 dia antes? (Sem custo adicional)</label>
+                        </div>
+
+                        <!-- Opção de Monitores -->
+                        <div class="space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <label for="has-monitors" class="block text-sm font-bold text-gray-800 mb-1">Deseja contratar monitores?</label>
+                            <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-white appearance-none">
+                                <option value="Nao">Não</option>
+                                <option value="Sim">Sim</option>
+                            </select>
+
+                            <div id="monitor-options" class="space-y-3 mt-3 hidden">
+                                <div>
+                                    <label for="monitor-count" class="block text-sm font-medium text-gray-700 mb-1">Quantos monitores?</label>
+                                    <select id="monitor-count" onchange="renderMonitorHours(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-white appearance-none">
+                                        <option value="1">1 Monitor</option>
+                                        <option value="2">2 Monitores</option>
+                                    </select>
+                                </div>
+                                <div id="monitor-hours-fields" class="space-y-3">
+                                    <!-- Campos de horas injetados aqui -->
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Seguro Adicional -->
@@ -133,6 +157,19 @@
                             </div>
                             <span class="text-sm font-bold text-green-700">+ R$ 9,90</span>
                         </div>
+
+                        <!-- Nota Fiscal / CNPJ -->
+                        <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200">
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-5 h-5 text-gray-600 border-gray-300 rounded focus:ring-gray-500">
+                                <label for="request-invoice" class="text-sm font-medium text-gray-700 select-none">Deseja Nota Fiscal (CNPJ)?</label>
+                            </div>
+                            <div id="cnpj-field" class="hidden">
+                                <label for="client-cnpj" class="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
+                                <input type="text" id="client-cnpj" name="client-cnpj" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="00.000.000/0000-00">
+                            </div>
+                        </div>
+
                     </div>
                 </form>
             </div>
@@ -277,6 +314,18 @@
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const shippingFee = (neighborhood === 'Ervino') ? 25.00 : 0;
 
+            const insuranceChecked = document.getElementById('additional-insurance')?.checked;
+            const insuranceFee = insuranceChecked ? 9.90 : 0;
+            
+            const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
+            let monitorFee = 0;
+            if (monitorCount > 0) {
+                for (let i = 1; i <= monitorCount; i++) {
+                    const hours = parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0);
+                    monitorFee += hours * 30;
+                }
+            }
+
             // --- Exibição Detalhada do Pedido ---
             details.forEach(item => {
                 const itemContainer = document.createElement('div');
@@ -285,27 +334,23 @@
                 summaryDiv.appendChild(itemContainer);
             });
             
-            // --- Exibição de Descontos e Frete ---
+            // --- Exibição de Descontos e Frete (Rodapé Detalhado) ---
             const summaryTotalDiv = document.getElementById('total-summary-rows');
             summaryTotalDiv.innerHTML = '';
 
-            // Subtotal
             summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Subtotal:</span><span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span></div>`;
             
-            // Desconto (se houver)
+            if (monitorFee > 0) {
+                 summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores:</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
+            }
             if (discount > 0) {
                  summaryTotalDiv.innerHTML += `<div class="flex justify-between text-red-500 font-bold"><span>Desconto (10%):</span><span>- R$ ${discount.toFixed(2).replace('.', ',')}</span></div>`;
             }
-
-            // Frete (se houver)
             if (shippingFee > 0) {
                 summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Frete (Ervino):</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`;
             }
-
-            // Seguro Adicional
-            const insuranceChecked = document.getElementById('additional-insurance')?.checked;
-            if (insuranceChecked) {
-                summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ 9,90</span></div>`;
+            if (insuranceFee > 0) {
+                summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`;
             }
         }
         
@@ -315,14 +360,22 @@
             const discountRate = itemCount >= 2 ? 0.10 : 0;
             const discount = subtotal * discountRate;
 
-            // Pega o bairro e o status do seguro
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
+            const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
+            
+            let monitorFee = 0;
+            if (monitorCount > 0) {
+                for (let i = 1; i <= monitorCount; i++) {
+                    const hours = parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0);
+                    monitorFee += hours * 30;
+                }
+            }
 
             const shippingFee = (neighborhood === 'Ervino') ? 25.00 : 0;
             const insuranceFee = insuranceChecked ? 9.90 : 0;
 
-            const finalTotal = subtotal - discount + shippingFee + insuranceFee;
+            const finalTotal = subtotal - discount + shippingFee + insuranceFee + monitorFee;
 
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
             
@@ -387,15 +440,34 @@
             
             const insuranceChecked = document.getElementById('additional-insurance').checked;
             const deliveryDayBefore = document.getElementById('delivery-day-before').checked;
-            const reference = document.getElementById('client-reference').value;
+            const invoiceChecked = document.getElementById('request-invoice').checked;
+            const cnpj = document.getElementById('client-cnpj').value;
+            
+            if (invoiceChecked && !cnpj) {
+                alert('Por favor, insira o CNPJ para a Nota Fiscal.');
+                return;
+            }
 
             const { details, total } = getSelectedItemDetails();
             let orderSummary = `--- NOVO AGENDAMENTO ---\n`;
             orderSummary += `Data: ${document.getElementById('selected-date-display').innerText.replace('Mostrando itens para: ', '')}\n`;
-            orderSummary += `--- DADOS DO CLIENTE ---\nNome: ${name}\nBairro: ${neighborhood}\nRua: ${street}, Nº ${number}\nReferência: ${reference || 'N/A'}\nHorário do Evento: ${eventTime}\n`;
+            orderSummary += `--- DADOS DO CLIENTE ---\nNome: ${name}\nBairro: ${neighborhood}\nRua: ${street}, Nº ${number}\n`;
+            orderSummary += `CNPJ (Nota Fiscal): ${invoiceChecked ? cnpj : 'Não Solicitado'}\n`;
+            orderSummary += `Horário do Evento: ${eventTime}\n`;
             orderSummary += `--- LOGÍSTICA E EXTRAS ---\nEntrega no dia anterior: ${deliveryDayBefore ? 'SIM' : 'NÃO'}\nSeguro Adicional: ${insuranceChecked ? 'SIM (+R$ 9,90)' : 'NÃO'}\n`;
+
+            const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
+            if (monitorCount > 0) {
+                orderSummary += `Monitores (${monitorCount}):\n`;
+                for (let i = 1; i <= monitorCount; i++) {
+                    const hours = parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0);
+                    orderSummary += `  - Monitor ${i}: ${hours} horas (R$ ${(hours * 30).toFixed(2)})\n`;
+                }
+            } else {
+                 orderSummary += `Monitores: NÃO\n`;
+            }
+
             orderSummary += `--- ITENS (${details.length}) ---\n`;
-            
             details.forEach(item => { orderSummary += `- ${item.quantity}x ${item.name} (R$ ${item.lineTotal.toFixed(2).replace('.', ',')})\n`; });
             orderSummary += `\nVALOR FINAL: R$ ${total.toFixed(2).replace('.', ',')}\n`;
             
@@ -407,7 +479,17 @@
             const dateStr = `${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
             document.getElementById('selected-date-display').innerText = `Mostrando itens para: ${dateStr}`;
             const listContainer = document.getElementById('toys-list-container');
-            listContainer.innerHTML = ''; selectedItems = {}; changeStep('selection'); 
+            listContainer.innerHTML = ''; selectedItems = {}; 
+            
+            // Garante que os campos de monitor e CNPJ estão escondidos ao reabrir
+            document.getElementById('has-monitors').value = 'Nao';
+            document.getElementById('delivery-day-before').checked = false;
+            document.getElementById('additional-insurance').checked = false;
+            document.getElementById('request-invoice').checked = false;
+            toggleMonitorFields(true); 
+            toggleCnpjField();
+            
+            changeStep('selection'); 
 
             toysInventory.forEach(toy => {
                 const maxStock = toy.stock; const currentQty = selectedItems[toy.id] || 0;
@@ -441,6 +523,48 @@
         window.closeToysPanel = function() {
             document.getElementById('toys-panel').classList.remove('open'); document.getElementById('toys-overlay').classList.remove('open'); document.body.style.overflow = '';
         }
+
+        // --- LÓGICA DE MONITORES E CNPJ (NOVAS) ---
+        window.renderMonitorHours = function() {
+            const count = parseInt(document.getElementById('monitor-count').value);
+            const hoursContainer = document.getElementById('monitor-hours-fields');
+            hoursContainer.innerHTML = '';
+
+            for (let i = 1; i <= count; i++) {
+                hoursContainer.innerHTML += `
+                    <div>
+                        <label for="monitor-hours-${i}" class="block text-sm font-medium text-gray-700 mb-1">Monitor ${i} - Horas (R$ 30,00/hora)</label>
+                        <input type="number" id="monitor-hours-${i}" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas">
+                    </div>
+                `;
+            }
+        }
+        
+        window.toggleMonitorFields = function(isInitialLoad = false) {
+            const shouldShow = document.getElementById('has-monitors').value === 'Sim';
+            document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow);
+            
+            if (shouldShow && !isInitialLoad) {
+                // Renderiza os campos de horas apenas se for Sim
+                renderMonitorHours();
+            } else if (!shouldShow) {
+                // Limpa os campos se for Não
+                document.getElementById('monitor-hours-fields').innerHTML = '';
+            }
+        }
+        
+        window.toggleCnpjField = function() {
+            const shouldShow = document.getElementById('request-invoice').checked;
+            document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow);
+            document.getElementById('client-cnpj').required = shouldShow;
+        }
+        
+        // --- INICIALIZAÇÃO ---
+        window.onload = function() {
+            // Garante que os campos de monitor estejam escondidos ao carregar
+            toggleMonitorFields(true);
+            toggleCnpjField();
+        };
 
         function showToast() {
             toast.classList.add('show');
