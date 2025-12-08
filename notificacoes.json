@@ -1,26 +1,10 @@
 [
   {
     "id": 1,
-    "titulo": "Promoção Relâmpago!",
-    "mensagem": "Castelo Pula-Pula com 20% de desconto por tempo limitado! Agende agora.",
-    "tipo": "promocao",
-    "lida": false,
-    "data": "2024-12-05T14:30:00Z"
-  },
-  {
-    "id": 2,
-    "titulo": "Seu Carrinho Expirou",
-    "mensagem": "Os itens no seu carrinho foram liberados. Por favor, agende novamente.",
+    "titulo": "Bem-vindo à Encanto Festas! ✨",
+    "mensagem": "Que alegria ter você aqui! Nosso site está passando por uma reforma mágica para te atender melhor. Em breve, novidades incríveis!",
     "tipo": "alerta",
-    "lida": true,
-    "data": "2024-12-04T10:00:00Z"
-  },
-  {
-    "id": 3,
-    "titulo": "Novo Brinquedo na Área!",
-    "mensagem": "Adicionamos a 'Piscina de Bolinhas Gigante' ao nosso catálogo. Confira!",
-    "tipo": "novo_produto",
     "lida": false,
-    "data": "2024-12-03T09:15:00Z"
+    "data": "2025-12-08T20:55:00Z"
   }
 ]
