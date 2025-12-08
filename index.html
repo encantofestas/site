@@ -107,11 +107,8 @@
     </header>
 
     <!-- PAINEL DE NOTIFICAÇÕES (MODAL DESLIZANTE FULL SCREEN) -->
-    
-    <!-- Overlay -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
 
-    <!-- Painel -->
     <div id="notification-panel" class="fixed right-0 bg-primary shadow-2xl transform translate-x-full overflow-y-auto">
         <div id="notification-content" class="w-full max-w-lg mx-auto">
             <div class="bg-blue-700 border-b border-blue-800 p-4 sticky top-0 z-10 flex justify-between items-center">
@@ -121,7 +118,6 @@
                 </button>
             </div>
 
-            <!-- Lista Dinâmica -->
             <ul id="notification-list" class="p-4 space-y-3"></ul>
             
             <div id="loading-notifications" class="p-4 text-center hidden">
@@ -260,10 +256,6 @@
           }
         ];
         
-        window.openWhatsApp = function() {
-            window.open('https://wa.me/5547992277324', '_blank');
-        }
-
         // --- FIRESTORE LOGIC ---
         function getReadNotificationsCollection(uid) {
             return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
@@ -348,8 +340,7 @@
 
             updateNotificationCount(unreadCount);
 
-            // AQUI ESTAVA O PROBLEMA: Se o painel estiver fechado, não desenhamos a lista para economizar memória.
-            // Mas a contagem já foi atualizada acima.
+            // A contagem é atualizada acima, mas a lista só se o painel estiver aberto
             if (!isPanelOpen) return;
             
             if (unreadItems.length === 0) {
@@ -395,6 +386,10 @@
                 return;
             }
 
+            // CORREÇÃO CRÍTICA: Chama renderização inicial IMEDIATA para mostrar a contagem inicial
+            // antes mesmo de conectar ao Firestore. Isso faz a bolinha aparecer no load.
+            renderNotifications();
+
             document.getElementById('loading-notifications').classList.remove('hidden');
             const readCollectionRef = getReadNotificationsCollection(userId);
 
@@ -410,23 +405,23 @@
             });
         }
 
-        // --- LÓGICA DE ABERTURA CORRIGIDA ---
+        // --- LÓGICA DE ABERTURA ---
         window.toggleNotificationPanel = function() {
             const panel = document.getElementById('notification-panel');
             const overlay = document.getElementById('notification-overlay');
 
-            // 1. Atualiza o estado PRIMEIRO
+            // 1. Atualiza estado
             isPanelOpen = !isPanelOpen;
 
             if (isPanelOpen) {
-                // 2. Abre a UI
+                // 2. Abre UI
                 panel.classList.remove('translate-x-full');
                 overlay.classList.remove('hidden');
                 document.body.classList.add('overflow-hidden'); 
-                // 3. Renderiza a lista (agora isPanelOpen é true, então a lista será criada)
+                // 3. Renderiza a lista (agora sim com isPanelOpen=true)
                 renderNotifications();
             } else {
-                // Fecha a UI
+                // Fecha UI
                 panel.classList.add('translate-x-full');
                 overlay.classList.add('hidden');
                 document.body.classList.remove('overflow-hidden');
