@@ -103,7 +103,8 @@
                     alt="Logo Encanto Festas" 
                     class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner"
                     onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
-                <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto <span class="text-yellow-300">Festas</span></span>
+                <!-- Nome da Marca Compactado -->
+                <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
             
             <div class="hidden md:flex items-center space-x-4">
@@ -180,7 +181,7 @@
 
     <footer class="bg-white border-t border-gray-200 py-8 hidden md:block">
         <div class="max-w-7xl mx-auto px-4 text-center text-gray-500">
-            <p>&copy; 2024 Encanto Festas Locações. Feito com diversão.</p>
+            <p>&copy; 2024 EncantoFestas Locações. Feito com diversão.</p>
         </div>
     </footer>
 
@@ -249,7 +250,6 @@
         let currentNotificationsData = []; 
         let readNotificationsIds = new Set(); 
         
-        // DADOS MOCKADOS (A persistência agora é tratada pelo Firestore)
         const mockNotificacoes = [
             {
                 "id": "1",
@@ -274,7 +274,6 @@
             }
         ];
         
-        // Funções de feedback e modal (Mantidas, mas sem chamadas no fluxo normal)
         window.openWhatsApp = function() {
             window.open('https://wa.me/5547992277324', '_blank');
         }
@@ -283,7 +282,6 @@
             document.getElementById('site-status-modal').classList.add('hidden');
         }
 
-        // Função Toast Mantida para uso interno da notificação
         let toastTimeout;
         window.showToast = function(message) {
             const toast = document.getElementById('toast');
@@ -301,13 +299,12 @@
             }, 3000);
         }
 
-        // FIREBASE PERSISTENCE
         function getReadNotificationsCollection(uid) {
             return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
         }
 
         window.markSingleAsRead = async function(notificationId, title) {
-            if (!userId) return; // Não mostra toast, apenas falha silenciosamente
+            if (!userId) return;
 
             try {
                 const docRef = doc(getReadNotificationsCollection(userId), notificationId);
@@ -347,7 +344,6 @@
             }
         }
 
-        // UI Updates
         function updateNotificationCount(count) {
             const elements = document.querySelectorAll('.notification-counter');
             const markAllButton = document.getElementById('mark-all-button');
@@ -420,7 +416,6 @@
             });
         }
 
-        // Notification Setup
         async function setupNotificationListener() {
             currentNotificationsData = mockNotificacoes;
             
@@ -462,7 +457,6 @@
             isPanelOpen = !isPanelOpen;
         }
 
-        // Firebase Auth
         async function initializeFirebaseAndAuth() {
             try {
                 app = initializeApp(firebaseConfig);
@@ -494,7 +488,6 @@
             }
         }
 
-        // Initialization (Removido showStatusModal() aqui)
         document.addEventListener('DOMContentLoaded', () => {
             initializeFirebaseAndAuth();
         });
