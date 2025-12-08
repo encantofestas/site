@@ -215,7 +215,6 @@
             writeBatch, Timestamp, setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Desativar logs excessivos em produção
         setLogLevel('silent');
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -228,14 +227,13 @@
         let isPanelOpen = false;
         let readNotificationsIds = new Set(); 
         
-        // --- DADOS DAS NOTIFICAÇÕES (Garantia de funcionamento sem servidor local) ---
+        // --- DADOS DAS NOTIFICAÇÕES (Embutidos para garantia de performance) ---
         const notificationsData = [
           {
             "id": "1", 
             "titulo": "Promoção Relâmpago!",
             "mensagem": "Castelo Pula-Pula com 20% de desconto por tempo limitado! Agende agora.",
             "tipo": "promocao",
-            "lida": false,
             "data": "2024-12-05T14:30:00Z"
           },
           {
@@ -243,7 +241,6 @@
             "titulo": "Seu Carrinho Expirou",
             "mensagem": "Os itens no seu carrinho foram liberados. Por favor, agende novamente.",
             "tipo": "alerta",
-            "lida": true,
             "data": "2024-12-04T10:00:00Z"
           },
           {
@@ -251,55 +248,71 @@
             "titulo": "Novo Brinquedo na Área!",
             "mensagem": "Adicionamos a 'Piscina de Bolinhas Gigante' ao nosso catálogo. Confira!",
             "tipo": "novo_produto",
-            "lida": false,
             "data": "2024-12-03T09:15:00Z"
           }
         ];
         
-        // --- FIRESTORE LOGIC ---
+        window.openWhatsApp = function() {
+            window.open('https://wa.me/5547992277324', '_blank');
+        }
+
         function getReadNotificationsCollection(uid) {
             return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
         }
 
+        // --- AÇÃO: MARCAR COMO LIDA (Com Atualização Visual Otimista) ---
         window.markSingleAsRead = async function(notificationId, title) {
-            if (!userId) return;
-
-            try {
-                const docRef = doc(getReadNotificationsCollection(userId), String(notificationId));
-                await setDoc(docRef, { 
-                    readAt: Timestamp.now(),
-                    notificationId: String(notificationId)
-                });
-                // Não mostra toast, apenas salva
-            } catch (error) {
-                console.error("Erro ao salvar leitura:", error);
+            // 1. Atualização Visual Imediata (Otimista)
+            // Adiciona o ID à lista local de lidos
+            readNotificationsIds.add(String(notificationId));
+            
+            // Força a re-renderização da lista e do contador INSTANTANEAMENTE
+            renderNotifications();
+            
+            // 2. Persistência em Segundo Plano (Firestore)
+            if (userId) {
+                try {
+                    const docRef = doc(getReadNotificationsCollection(userId), String(notificationId));
+                    await setDoc(docRef, { 
+                        readAt: Timestamp.now(),
+                        notificationId: String(notificationId)
+                    });
+                } catch (error) {
+                    console.error("Erro ao salvar leitura:", error);
+                    // Opcional: Reverter a mudança visual se falhar (não implementado para simplicidade)
+                }
             }
         }
 
         window.markAllAsRead = async function() {
-            if (!userId || notificationsData.length === 0) return;
+            // 1. Atualização Visual Imediata
+            const batchIds = [];
+            notificationsData.forEach(n => {
+                if (!readNotificationsIds.has(String(n.id))) {
+                    readNotificationsIds.add(String(n.id));
+                    batchIds.push(String(n.id));
+                }
+            });
+            renderNotifications(); // Limpa tudo visualmente agora
+
+            // 2. Persistência em Segundo Plano
+            if (!userId || batchIds.length === 0) return;
 
             const batch = writeBatch(db);
             const now = Timestamp.now();
-            let count = 0;
 
-            notificationsData.forEach(n => {
-                if (!readNotificationsIds.has(String(n.id))) {
-                    const docRef = doc(getReadNotificationsCollection(userId), String(n.id));
-                    batch.set(docRef, { 
-                        readAt: now,
-                        notificationId: String(n.id)
-                    });
-                    count++;
-                }
+            batchIds.forEach(id => {
+                const docRef = doc(getReadNotificationsCollection(userId), id);
+                batch.set(docRef, { 
+                    readAt: now,
+                    notificationId: id
+                });
             });
 
-            if (count > 0) {
-                try {
-                    await batch.commit();
-                } catch (error) {
-                    console.error("Erro ao marcar todas:", error);
-                }
+            try {
+                await batch.commit();
+            } catch (error) {
+                console.error("Erro ao marcar todas:", error);
             }
         }
 
@@ -308,7 +321,6 @@
             const elements = document.querySelectorAll('.notification-counter');
             const markAllButton = document.getElementById('mark-all-button');
             
-            // Atualiza Botão "Marcar Todas"
             if (markAllButton) {
                 if (count > 0) {
                     markAllButton.classList.remove('opacity-0', 'pointer-events-none');
@@ -317,7 +329,6 @@
                 }
             }
 
-            // Atualiza Bolinhas Vermelhas
             elements.forEach(el => {
                 if (count > 0) {
                     el.classList.remove('hidden');
@@ -333,16 +344,20 @@
             const loadingIndicator = document.getElementById('loading-notifications');
             
             loadingIndicator.classList.add('hidden');
-            panelList.innerHTML = ''; 
-
+            
+            // Filtra o que ainda NÃO foi lido
             const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id)));
             const unreadCount = unreadItems.length;
 
+            // Atualiza o contador (Bolinha vermelha)
             updateNotificationCount(unreadCount);
 
-            // A contagem é atualizada acima, mas a lista só se o painel estiver aberto
+            // Se o painel estiver fechado, não gasta processamento desenhando a lista
             if (!isPanelOpen) return;
             
+            // Limpa a lista atual
+            panelList.innerHTML = ''; 
+
             if (unreadItems.length === 0) {
                 panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>';
                 return;
@@ -362,6 +377,9 @@
                     day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                 });
 
+                // Título escapado para evitar erros no onclick
+                const safeTitle = notificacao.titulo.replace(/'/g, "\\'");
+
                 li.innerHTML = `
                     <div class="flex flex-col items-center gap-2">
                         <div class="text-4xl mb-2">${icon}</div>
@@ -370,7 +388,7 @@
                             <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
                             <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
                         </div>
-                        <button onclick="markSingleAsRead('${notificacao.id}', '${notificacao.titulo.replace(/'/g, "\\'")}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md">
+                        <button onclick="markSingleAsRead('${notificacao.id}', '${safeTitle}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md">
                             Marcar como Lida
                         </button>
                     </div>
@@ -381,16 +399,15 @@
         }
 
         async function setupNotificationListener() {
-            if (!isAuthReady || !userId) {
-                updateNotificationCount(0);
-                return;
-            }
-
-            // CORREÇÃO CRÍTICA: Chama renderização inicial IMEDIATA para mostrar a contagem inicial
-            // antes mesmo de conectar ao Firestore. Isso faz a bolinha aparecer no load.
+            // Chamada INICIAL IMEDIATA:
+            // Isso garante que a bolinha vermelha apareça assim que o script carregar,
+            // assumindo inicialmente que nada foi lido (3 notificações).
+            // Se o usuário já tiver lido algo, a bolinha se ajustará em segundos quando o Firestore conectar.
             renderNotifications();
 
-            document.getElementById('loading-notifications').classList.remove('hidden');
+            if (!isAuthReady || !userId) return;
+
+            // Conecta ao Firestore para ouvir mudanças reais
             const readCollectionRef = getReadNotificationsCollection(userId);
 
             unsubscribeNotifications = onSnapshot(readCollectionRef, (snapshot) => {
@@ -398,30 +415,25 @@
                 snapshot.docs.forEach(doc => {
                     readNotificationsIds.add(doc.id);
                 });
+                // Atualiza a tela com os dados reais do banco
                 renderNotifications();
             }, (error) => {
                 console.error("Erro Firestore:", error);
-                document.getElementById('loading-notifications').classList.add('hidden');
             });
         }
 
-        // --- LÓGICA DE ABERTURA ---
         window.toggleNotificationPanel = function() {
             const panel = document.getElementById('notification-panel');
             const overlay = document.getElementById('notification-overlay');
 
-            // 1. Atualiza estado
             isPanelOpen = !isPanelOpen;
 
             if (isPanelOpen) {
-                // 2. Abre UI
                 panel.classList.remove('translate-x-full');
                 overlay.classList.remove('hidden');
                 document.body.classList.add('overflow-hidden'); 
-                // 3. Renderiza a lista (agora sim com isPanelOpen=true)
                 renderNotifications();
             } else {
-                // Fecha UI
                 panel.classList.add('translate-x-full');
                 overlay.classList.add('hidden');
                 document.body.classList.remove('overflow-hidden');
@@ -449,17 +461,23 @@
                         userId = null;
                         isAuthReady = true; 
                         if (unsubscribeNotifications) unsubscribeNotifications();
+                        // Reset visual
                         updateNotificationCount(0);
                     }
                 });
                 
             } catch (e) {
                 console.error("Erro Firebase:", e);
-                isAuthReady = true;
+                // Mesmo sem firebase, mostramos as notificações locais
+                isAuthReady = true; 
+                renderNotifications();
             }
         }
 
+        // Garante que roda assim que o HTML estiver pronto
         document.addEventListener('DOMContentLoaded', () => {
+            // Chamada extra de segurança para pintar a bolinha antes de qualquer lógica complexa
+            renderNotifications(); 
             initializeFirebaseAndAuth();
         });
     </script>
