@@ -255,27 +255,35 @@
         let isAuthReady = false;
         let unsubscribeNotifications = null;
         let isPanelOpen = false;
-        let currentNotificationsData = []; 
         let readNotificationsIds = new Set(); 
         
-        // --- FUNÇÃO PARA CARREGAR DO ARQUIVO JSON REAL ---
-        async function fetchNotificationsFromFile() {
-            try {
-                // Tenta buscar o arquivo notificacoes.json na raiz
-                const response = await fetch('notificacoes.json');
-                if (!response.ok) {
-                    throw new Error('Arquivo notificacoes.json não encontrado ou erro na rede');
-                }
-                const data = await response.json();
-                console.log("Notificações carregadas do arquivo:", data);
-                // IMPORTANTE: Converte IDs para String para evitar erro de comparação com Firestore
-                return data.map(item => ({ ...item, id: String(item.id) }));
-            } catch (error) {
-                console.error("Erro ao carregar notificações do arquivo JSON:", error);
-                // Retorna array vazio para não quebrar a tela, mas loga o erro
-                return [];
-            }
-        }
+        // --- DADOS DAS NOTIFICAÇÕES (Embutidos para garantir funcionamento local e mobile) ---
+        const notificationsData = [
+          {
+            "id": "1", // Convertido para String para match com Firestore
+            "titulo": "Promoção Relâmpago!",
+            "mensagem": "Castelo Pula-Pula com 20% de desconto por tempo limitado! Agende agora.",
+            "tipo": "promocao",
+            "lida": false,
+            "data": "2024-12-05T14:30:00Z"
+          },
+          {
+            "id": "2",
+            "titulo": "Seu Carrinho Expirou",
+            "mensagem": "Os itens no seu carrinho foram liberados. Por favor, agende novamente.",
+            "tipo": "alerta",
+            "lida": true,
+            "data": "2024-12-04T10:00:00Z"
+          },
+          {
+            "id": "3",
+            "titulo": "Novo Brinquedo na Área!",
+            "mensagem": "Adicionamos a 'Piscina de Bolinhas Gigante' ao nosso catálogo. Confira!",
+            "tipo": "novo_produto",
+            "lida": false,
+            "data": "2024-12-03T09:15:00Z"
+          }
+        ];
         
         window.openWhatsApp = function() {
             window.open('https://wa.me/5547992277324', '_blank');
@@ -310,10 +318,10 @@
             if (!userId) return;
 
             try {
-                const docRef = doc(getReadNotificationsCollection(userId), notificationId);
+                const docRef = doc(getReadNotificationsCollection(userId), String(notificationId));
                 await setDoc(docRef, { 
                     readAt: Timestamp.now(),
-                    notificationId: notificationId
+                    notificationId: String(notificationId)
                 });
             } catch (error) {
                 console.error("Erro ao marcar como lido:", error);
@@ -321,18 +329,18 @@
         }
 
         window.markAllAsRead = async function() {
-            if (!userId || currentNotificationsData.length === 0) return;
+            if (!userId || notificationsData.length === 0) return;
 
             const batch = writeBatch(db);
             const now = Timestamp.now();
             let count = 0;
 
-            currentNotificationsData.forEach(n => {
-                if (!readNotificationsIds.has(n.id)) {
-                    const docRef = doc(getReadNotificationsCollection(userId), n.id);
+            notificationsData.forEach(n => {
+                if (!readNotificationsIds.has(String(n.id))) {
+                    const docRef = doc(getReadNotificationsCollection(userId), String(n.id));
                     batch.set(docRef, { 
                         readAt: now,
-                        notificationId: n.id
+                        notificationId: String(n.id)
                     });
                     count++;
                 }
@@ -375,7 +383,7 @@
             loadingIndicator.classList.add('hidden');
             panelList.innerHTML = ''; 
 
-            const unreadItems = currentNotificationsData.filter(n => !readNotificationsIds.has(n.id));
+            const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id)));
             const unreadCount = unreadItems.length;
 
             updateNotificationCount(unreadCount);
@@ -420,8 +428,8 @@
         }
 
         async function setupNotificationListener() {
-            // AQUI É A MUDANÇA: Carrega do arquivo JSON em vez de mock
-            currentNotificationsData = await fetchNotificationsFromFile();
+            // Usa os dados embutidos
+            // notificationsData já está definido lá em cima
             
             if (!isAuthReady || !userId) {
                 updateNotificationCount(0);
