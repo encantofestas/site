@@ -206,10 +206,14 @@
             <!-- Os brinquedos serão injetados aqui via JS -->
         </div>
 
-        <!-- Botão de Ação -->
-        <div class="p-4 border-t border-gray-100 bg-white pb-8 md:pb-4">
-            <button onclick="closeToysPanel()" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition transform active:scale-95">
-                Confirmar Seleção
+        <!-- Rodapé do Painel (Total) -->
+        <div class="p-4 border-t border-gray-100 bg-white shadow-lg pb-8 md:pb-4">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-lg font-bold text-gray-800">Valor Total Estimado:</span>
+                <span id="total-price-display" class="text-2xl font-extrabold text-green-600">R$ 0,00</span>
+            </div>
+            <button onclick="console.log('Finalizar pedido com o total: ' + document.getElementById('total-price-display').innerText)" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition transform active:scale-95">
+                Continuar Agendamento
             </button>
         </div>
     </div>
@@ -307,6 +311,9 @@
         let isAuthReady = false;
         let unsubscribeNotifications = null;
         let isPanelOpen = false;
+        
+        // --- ESTADO DE SELEÇÃO GLOBAL ---
+        let selectedItems = {}; // { toyId: quantity }
 
         // --- DADOS DOS BRINQUEDOS ---
         const toysInventory = [
@@ -347,7 +354,44 @@
         const nextButton = document.getElementById('next-month');
         const toast = document.getElementById('toast-notification');
 
-        // Logic for Toys Panel
+        // --- FUNÇÕES DE LÓGICA DE ITENS ---
+        
+        function calculateTotal() {
+            let total = 0;
+            toysInventory.forEach(toy => {
+                const quantity = selectedItems[toy.id] || 0;
+                total += quantity * toy.price;
+            });
+            document.getElementById('total-price-display').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+        
+        window.updateQuantity = function(toyId, change) {
+            const toy = toysInventory.find(t => t.id === toyId);
+            if (!toy) return;
+
+            let currentQty = selectedItems[toyId] || 0;
+            let newQty = currentQty + change;
+            
+            // Lógica de limite (0 a estoque)
+            if (newQty < 0) newQty = 0;
+            if (newQty > toy.stock) newQty = toy.stock;
+            
+            selectedItems[toyId] = newQty;
+            
+            // Atualiza a UI do item específico
+            const qtyDisplay = document.getElementById(`qty-display-${toyId}`);
+            if (qtyDisplay) qtyDisplay.innerText = newQty;
+
+            // Atualiza o total
+            calculateTotal();
+
+            // Atualiza o estado dos botões (desabilitar se atingir 0 ou estoque máximo)
+            document.getElementById(`btn-minus-${toyId}`).disabled = newQty === 0;
+            document.getElementById(`btn-plus-${toyId}`).disabled = newQty === toy.stock;
+        }
+
+        // --- FUNÇÕES DE PAINEL ---
+
         window.openToysPanel = function(day, month, year) {
             const dateStr = `${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
             document.getElementById('selected-date-display').innerText = `Mostrando itens para: ${dateStr}`;
@@ -355,42 +399,51 @@
             const listContainer = document.getElementById('toys-list-container');
             listContainer.innerHTML = ''; // Limpa lista
 
+            // Reinicia a seleção para a nova data (opcional, mas comum em calendários)
+            // Se você quiser manter a seleção entre datas, remova a linha abaixo
+            selectedItems = {}; 
+            
             toysInventory.forEach(toy => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md';
-                
-                // Formatação do preço
+                const currentQty = selectedItems[toy.id] || 0;
                 const priceFormatted = toy.note ? `R$ ${toy.price},00 / ${toy.note}` : `R$ ${toy.price},00`;
 
+                const item = document.createElement('div');
+                item.className = 'flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md';
+                
                 item.innerHTML = `
                     <!-- Foto 1:1 Placeholder -->
                     <div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
                     
-                    <!-- Detalhes -->
+                    <!-- Detalhes e Controles -->
                     <div class="flex-grow min-w-0">
                         <h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4>
                         <p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-medium px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">${toy.stock} un. disp.</span>
-                        </div>
-                    </div>
+                        <span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span>
 
-                    <!-- Preço e Ação -->
-                    <div class="flex flex-col items-end gap-2">
-                        <span class="font-bold text-green-600 text-sm whitespace-nowrap">${priceFormatted}</span>
-                        <button class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 p-1.5 rounded-lg transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                        </button>
+                        <!-- Controle de Quantidade -->
+                        <div class="flex items-center space-x-2 text-sm font-medium">
+                            <button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full transition disabled:opacity-50" ${currentQty === 0 ? 'disabled' : ''}>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                            </button>
+                            
+                            <span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">${currentQty}</span>
+
+                            <button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full transition disabled:opacity-50" ${currentQty === toy.stock ? 'disabled' : ''}>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            </button>
+                            <span class="text-xs text-gray-400">(${toy.stock} máx.)</span>
+                        </div>
                     </div>
                 `;
                 listContainer.appendChild(item);
             });
 
+            calculateTotal(); // Recalcula o total inicial
             document.getElementById('toys-panel').classList.add('open');
             document.getElementById('toys-overlay').classList.add('open');
-            document.body.style.overflow = 'hidden'; // Evita scroll na página de trás
+            document.body.style.overflow = 'hidden';
         }
 
         window.closeToysPanel = function() {
@@ -443,7 +496,6 @@
                     cell.classList.add('dia-passado');
                 } else {
                     cell.classList.add('text-gray-900');
-                    // AQUI ESTÁ A LÓGICA DE ABRIR O PAINEL
                     cell.onclick = () => openToysPanel(day, currentMonth, currentYear);
                 }
                 
