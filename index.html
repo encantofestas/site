@@ -53,6 +53,7 @@
             top: 0; 
             background-color: #2563EB;
         }
+        /* Ajuste do conteúdo para ocupar 100% e usar flexbox corretamente */
         #notification-content {
             height: 100%;
             display: flex;
@@ -109,23 +110,32 @@
     <!-- PAINEL DE NOTIFICAÇÕES (MODAL DESLIZANTE FULL SCREEN) -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
 
-    <div id="notification-panel" class="fixed right-0 bg-primary shadow-2xl transform translate-x-full overflow-y-auto">
-        <div id="notification-content" class="w-full max-w-lg mx-auto">
-            <div class="bg-blue-700 border-b border-blue-800 p-4 sticky top-0 z-10 flex justify-between items-center">
+    <!-- MUDANÇA AQUI: Removido overflow-y-auto do painel principal para evitar rolagem dupla -->
+    <div id="notification-panel" class="fixed right-0 bg-primary shadow-2xl transform translate-x-full h-full">
+        <div id="notification-content" class="w-full max-w-lg mx-auto h-full flex flex-col">
+            
+            <!-- Cabeçalho (Fixo no topo) -->
+            <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10">
                 <h3 class="text-xl font-bold brand-font text-white">Suas Notificações</h3>
                 <button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <ul id="notification-list" class="p-4 space-y-3"></ul>
-            
-            <div id="loading-notifications" class="p-4 text-center hidden">
-                <div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div>
-                <p class="text-sm text-blue-200 mt-2">Carregando...</p>
+            <!-- Área de Rolagem (Ocupa o meio) -->
+            <!-- MUDANÇA AQUI: flex-grow e overflow-y-auto garantem que SÓ ISSO role -->
+            <div class="flex-grow overflow-y-auto relative">
+                <ul id="notification-list" class="p-4 space-y-3"></ul>
+                
+                <div id="loading-notifications" class="p-4 text-center hidden">
+                    <div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div>
+                    <p class="text-sm text-blue-200 mt-2">Carregando...</p>
+                </div>
             </div>
 
-            <div class="p-4 border-t border-blue-800 sticky bottom-0 bg-blue-700 text-center">
+            <!-- Rodapé (Fixo no fundo) -->
+            <!-- MUDANÇA AQUI: flex-none garante que não encolha. pb-safe para iPhones -->
+            <div class="p-4 border-t border-blue-800 bg-blue-700 text-center flex-none" style="padding-bottom: calc(1rem + env(safe-area-inset-bottom));">
                    <button id="mark-all-button" onclick="markAllAsRead()" class="text-white text-sm font-semibold hover:underline transition opacity-100 pointer-events-auto">Marcar todas como lidas</button>
             </div>
         </div>
@@ -225,9 +235,11 @@
         let isAuthReady = false;
         let unsubscribeNotifications = null;
         let isPanelOpen = false;
-        let readNotificationsIds = new Set(); 
         
-        // --- DADOS DAS NOTIFICAÇÕES (Embutidos para garantia de performance) ---
+        // --- 1. CARREGAR CACHE LOCAL IMEDIATAMENTE ---
+        let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
+        
+        // --- DADOS DAS NOTIFICAÇÕES (Fixos para performance) ---
         const notificationsData = [
           {
             "id": "1", 
@@ -252,50 +264,49 @@
           }
         ];
         
-        window.openWhatsApp = function() {
-            window.open('https://wa.me/5547992277324', '_blank');
+        // Função auxiliar para atualizar o cache local
+        function updateLocalCache() {
+            localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
         }
 
         function getReadNotificationsCollection(uid) {
             return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
         }
 
-        // --- AÇÃO: MARCAR COMO LIDA (Com Atualização Visual Otimista) ---
+        // --- AÇÃO: MARCAR COMO LIDA ---
         window.markSingleAsRead = async function(notificationId, title) {
-            // 1. Atualização Visual Imediata (Otimista)
-            // Adiciona o ID à lista local de lidos
-            readNotificationsIds.add(String(notificationId));
+            const idStr = String(notificationId);
             
-            // Força a re-renderização da lista e do contador INSTANTANEAMENTE
+            readNotificationsIds.add(idStr);
+            updateLocalCache();
             renderNotifications();
             
-            // 2. Persistência em Segundo Plano (Firestore)
             if (userId) {
                 try {
-                    const docRef = doc(getReadNotificationsCollection(userId), String(notificationId));
+                    const docRef = doc(getReadNotificationsCollection(userId), idStr);
                     await setDoc(docRef, { 
                         readAt: Timestamp.now(),
-                        notificationId: String(notificationId)
+                        notificationId: idStr
                     });
                 } catch (error) {
-                    console.error("Erro ao salvar leitura:", error);
-                    // Opcional: Reverter a mudança visual se falhar (não implementado para simplicidade)
+                    console.error("Erro ao salvar leitura na nuvem:", error);
                 }
             }
         }
 
         window.markAllAsRead = async function() {
-            // 1. Atualização Visual Imediata
             const batchIds = [];
             notificationsData.forEach(n => {
-                if (!readNotificationsIds.has(String(n.id))) {
-                    readNotificationsIds.add(String(n.id));
-                    batchIds.push(String(n.id));
+                const idStr = String(n.id);
+                if (!readNotificationsIds.has(idStr)) {
+                    readNotificationsIds.add(idStr);
+                    batchIds.push(idStr);
                 }
             });
-            renderNotifications(); // Limpa tudo visualmente agora
+            
+            updateLocalCache();
+            renderNotifications();
 
-            // 2. Persistência em Segundo Plano
             if (!userId || batchIds.length === 0) return;
 
             const batch = writeBatch(db);
@@ -312,7 +323,7 @@
             try {
                 await batch.commit();
             } catch (error) {
-                console.error("Erro ao marcar todas:", error);
+                console.error("Erro ao marcar todas na nuvem:", error);
             }
         }
 
@@ -343,19 +354,15 @@
             const panelList = document.getElementById('notification-list');
             const loadingIndicator = document.getElementById('loading-notifications');
             
-            loadingIndicator.classList.add('hidden');
+            if (loadingIndicator) loadingIndicator.classList.add('hidden');
             
-            // Filtra o que ainda NÃO foi lido
             const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id)));
             const unreadCount = unreadItems.length;
 
-            // Atualiza o contador (Bolinha vermelha)
             updateNotificationCount(unreadCount);
 
-            // Se o painel estiver fechado, não gasta processamento desenhando a lista
             if (!isPanelOpen) return;
             
-            // Limpa a lista atual
             panelList.innerHTML = ''; 
 
             if (unreadItems.length === 0) {
@@ -377,7 +384,6 @@
                     day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                 });
 
-                // Título escapado para evitar erros no onclick
                 const safeTitle = notificacao.titulo.replace(/'/g, "\\'");
 
                 li.innerHTML = `
@@ -399,24 +405,25 @@
         }
 
         async function setupNotificationListener() {
-            // Chamada INICIAL IMEDIATA:
-            // Isso garante que a bolinha vermelha apareça assim que o script carregar,
-            // assumindo inicialmente que nada foi lido (3 notificações).
-            // Se o usuário já tiver lido algo, a bolinha se ajustará em segundos quando o Firestore conectar.
             renderNotifications();
 
             if (!isAuthReady || !userId) return;
 
-            // Conecta ao Firestore para ouvir mudanças reais
             const readCollectionRef = getReadNotificationsCollection(userId);
 
             unsubscribeNotifications = onSnapshot(readCollectionRef, (snapshot) => {
-                readNotificationsIds.clear();
+                let hasChanges = false;
                 snapshot.docs.forEach(doc => {
-                    readNotificationsIds.add(doc.id);
+                    if (!readNotificationsIds.has(doc.id)) {
+                        readNotificationsIds.add(doc.id);
+                        hasChanges = true;
+                    }
                 });
-                // Atualiza a tela com os dados reais do banco
-                renderNotifications();
+                
+                if (hasChanges) {
+                    updateLocalCache();
+                    renderNotifications();
+                }
             }, (error) => {
                 console.error("Erro Firestore:", error);
             });
@@ -461,23 +468,25 @@
                         userId = null;
                         isAuthReady = true; 
                         if (unsubscribeNotifications) unsubscribeNotifications();
-                        // Reset visual
                         updateNotificationCount(0);
                     }
                 });
                 
             } catch (e) {
                 console.error("Erro Firebase:", e);
-                // Mesmo sem firebase, mostramos as notificações locais
                 isAuthReady = true; 
                 renderNotifications();
             }
         }
 
-        // Garante que roda assim que o HTML estiver pronto
+        // --- FUNÇÕES DE NAVEGAÇÃO E UTILITÁRIOS ---
+        window.openWhatsApp = function() {
+            window.open('https://wa.me/5547992277324', '_blank');
+        }
+
+        // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
-            // Chamada extra de segurança para pintar a bolinha antes de qualquer lógica complexa
-            renderNotifications(); 
+            renderNotifications();
             initializeFirebaseAndAuth();
         });
     </script>
