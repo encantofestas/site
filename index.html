@@ -2,65 +2,44 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport ajustado para máxima compatibilidade mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Encanto Festas - Locação de Brinquedos</title>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter (Texto) e Baloo 2 (Títulos Divertidos) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
     <style>
-        /* CONFIGURAÇÕES GERAIS ANTIFALHA */
         html, body {
-            overflow-x: hidden; /* Impede rolagem lateral */
+            overflow-x: hidden;
             width: 100%;
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
             -webkit-tap-highlight-color: transparent;
             scroll-behavior: smooth;
         }
-
-        /* Fonte lúdica para títulos (Baloo 2) */
         h1, h2, h3, h4, .brand-font {
             font-family: 'Baloo 2', cursive;
         }
-
-        /* --- CORREÇÃO DA ALTURA MOBILE (Modern Fix) --- */
         .min-h-screen-safe {
-            min-height: 100vh; /* Fallback */
-            min-height: 100dvh; /* Altura dinâmica real do mobile */
+            min-height: 100vh;
+            min-height: 100dvh;
         }
-
-        /* --- CORES DA MARCA --- */
-        .bg-primary { background-color: #2563EB; } /* Azul Royal */
+        .bg-primary { background-color: #2563EB; }
         .text-primary { color: #2563EB; }
-        .bg-secondary { background-color: #FACC15; } /* Amarelo Vibrante */
+        .bg-secondary { background-color: #FACC15; }
         .text-secondary { color: #CA8A04; }
-
-        /* --- AJUSTES DA BARRA INFERIOR (Safe Area para iPhone) --- */
         #bottom-nav {
             padding-bottom: env(safe-area-inset-bottom);
             height: calc(4rem + env(safe-area-inset-bottom));
         }
-
-        /* Animação suave no botão central */
         .floating-fab {
             box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
         }
-        
-        /* Estilos do Modal de Aviso */
         #site-status-modal {
             background-color: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(5px);
             z-index: 100;
         }
-        
-        /* Oculta scrollbar para scroll horizontal de categorias */
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
@@ -68,8 +47,6 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-
-        /* ESTILOS DO PAINEL DE NOTIFICAÇÕES (TELA CHEIA) */
         #notification-panel {
             z-index: 90; 
             transition: transform 0.3s ease-out;
@@ -81,8 +58,6 @@
             top: 0; 
             background-color: #2563EB;
         }
-        
-        /* Garante que o conteúdo role */
         #notification-content {
             height: 100%;
             display: flex;
@@ -92,7 +67,6 @@
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
 
-    <!-- 0. MODAL DE AVISO (SITE EM CONSTRUÇÃO) -->
     <div id="site-status-modal" class="hidden fixed inset-0 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center transform transition-all duration-300 scale-100">
             <div class="text-4xl text-secondary mb-3">⚠️</div>
@@ -104,7 +78,6 @@
                 Para agendar brinquedos, por favor, utilize nosso canal de atendimento:
             </p>
             <button onclick="openWhatsApp()" class="bg-green-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-green-600 transition duration-200 w-full flex items-center justify-center gap-2">
-                <!-- Ícone WhatsApp -->
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12.04 0C5.45 0 .07 5.38.07 12c0 2.06.54 4.02 1.58 5.76L.01 24l6.39-1.68c1.64.91 3.49 1.4 5.25 1.4 6.59 0 11.97-5.38 11.97-12S18.63 0 12.04 0zM12.04 22.1c-1.68 0-3.3-.43-4.75-1.25l-.34-.2-3.48.92.93-3.41-.22-.35c-1.74-2.78-2.67-5.83-2.67-8.99 0-5.46 4.43-9.9 9.88-9.9 4.84 0 9.17 3.86 9.88 8.94.02.13.04.26.04.39s0 .26-.04.39c-.71 5.08-5.04 8.94-9.88 8.94zM16.92 14.28c-.28-.14-1.66-.82-1.92-.91s-.45-.14-.64.14c-.19.28-.73.91-.89 1.09s-.31.14-.58.07c-.28-.08-1.18-.43-2.25-1.39-1.07-.97-1.78-2.16-1.99-2.5S5.95 9.77 6.09 9.5c.14-.28.31-.43.45-.64s.31-.48.45-.73.19-.48.19-.64c0-.14-.09-.28-.19-.52s-.64-1.55-.89-2.12c-.25-.56-.5-.49-.69-.49s-.39-.03-.58-.03c-.2-.01-.52.07-.8.35s-1.11 1.09-1.11 2.66c0 1.57 1.14 3.09 1.3 3.32s2.22 3.56 5.37 4.96c3.15 1.4 3.15 .93 3.73.87s1.82-.74 2.1-.87c.28-.14.45-.22.64-.35s.25-.21.25-.39c0-.18-.1-.28-.28-.42z"/>
                 </svg>
@@ -115,277 +88,114 @@
             </button>
         </div>
     </div>
-    <!-- FIM MODAL DE AVISO -->
 
-    <!-- TOAST DE NOTIFICAÇÃO (Feedback visual) -->
-    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-[60] transition-all duration-300 translate-y-20 opacity-0 flex items-center gap-2 w-max max-w-[90%]">
+    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-[60] transition-all duration-300 translate-y-20 opacity-0 flex items-center gap-2 w-max max-w-[90%] pointer-events-none">
         <span class="text-green-400 text-xl">✓</span>
         <span id="toast-message" class="text-sm font-medium">Ação realizada com sucesso</span>
     </div>
 
-    <!-- 1. HEADER (FIXO TOPO) -->
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
-            
-            <!-- Logo / Brand -->
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
                     alt="Logo Encanto Festas" 
                     class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner"
                     onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
-                
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto <span class="text-yellow-300">Festas</span></span>
             </div>
             
-            <!-- Ações Direita (Desktop) -->
             <div class="hidden md:flex items-center space-x-4">
-                
-                <!-- ÍCONE DE NOTIFICAÇÕES -->
                 <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
-                    <!-- Ícone de Sino Personalizado -->
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
                     </svg>
-                    <!-- Contador de Notificação Nova -->
                     <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
-                        <!-- Número preenchido por JS -->
                     </div>
                 </button>
-                
                 <button onclick="showToast('Abrindo Login...')" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg transition text-sm font-semibold">Entrar</button>
                 <button onclick="showToast('Ver Carrinho')" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg transform hover:-translate-y-0.5">
                     Agendar Agora
                 </button>
             </div>
 
-            <!-- Botão Menu Mobile (Notificações) -->
             <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
-                <!-- Ícone de Sino Personalizado -->
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
                 </svg>
-                <!-- Contador de Notificação Nova -->
                 <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
-                    <!-- Número preenchido por JS -->
                 </div>
             </button>
         </div>
     </header>
 
-    <!-- === PAINEL DE NOTIFICAÇÕES (MODAL DESLIZANTE FULL SCREEN) === -->
-    
-    <!-- Overlay para fechar ao clicar fora (Manter por boas práticas) -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
 
-    <!-- Painel de Notificações (TELA CHEIA) -->
     <div id="notification-panel" class="fixed right-0 bg-primary shadow-2xl transform translate-x-full overflow-y-auto">
-        
         <div id="notification-content" class="w-full max-w-lg mx-auto">
-            <!-- Cabeçalho do Painel -->
             <div class="bg-blue-700 border-b border-blue-800 p-4 sticky top-0 z-10 flex justify-between items-center">
                 <h3 class="text-xl font-bold brand-font text-white">Suas Notificações</h3>
                 <button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1">
-                    <!-- Ícone de Fechar (X) -->
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <!-- Lista de Notificações -->
-            <ul id="notification-list" class="p-4 space-y-3">
-                <!-- As notificações carregadas via JS serão inseridas aqui -->
-            </ul>
+            <ul id="notification-list" class="p-4 space-y-3"></ul>
             
-            <!-- Indicador de Carregamento -->
             <div id="loading-notifications" class="p-4 text-center hidden">
                 <div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div>
                 <p class="text-sm text-blue-200 mt-2">Carregando...</p>
             </div>
 
-            <!-- Botão Marcar Todas como Lidas -->
             <div class="p-4 border-t border-blue-800 sticky bottom-0 bg-blue-700 text-center">
                    <button id="mark-all-button" onclick="markAllAsRead()" class="text-white text-sm font-semibold hover:underline transition opacity-100 pointer-events-auto">Marcar todas como lidas</button>
             </div>
         </div>
     </div>
-    <!-- FIM PAINEL DE NOTIFICAÇÕES -->
 
-    <!-- 2. CONTEÚDO PRINCIPAL (Padding ajustado para as barras fixas) -->
     <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-gray-50 overflow-hidden">
-        
-        <!-- Hero Banner -->
         <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-10 text-center relative overflow-hidden mb-8">
-            <!-- Efeito de fundo decorativo -->
             <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, #ffffff 2px, transparent 2px); background-size: 30px 30px;"></div>
-            
             <span class="bg-blue-800 text-blue-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Diversão Garantida</span>
-            
-            <!-- TÍTULO PRINCIPAL QUE DEVE SER MANTIDO -->
             <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4">
                 Realize a festa dos seus <span class="text-yellow-300">sonhos!</span>
             </h1>
-            
-            <!-- SUBTÍTULO -->
             <p class="text-blue-100 mb-6 max-w-lg mx-auto text-sm md:text-base">Aluguel de brinquedos fácil, rápido e seguro. Solução completa para pais modernos.</p>
-            
             <div class="flex justify-center gap-3">
-                <!-- BOTÃO -->
                 <button onclick="showToast('Abrindo Agendamento/Disponibilidade')" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition transform active:scale-95 text-sm">Ver disponibilidade</button>
             </div>
         </section>
-
-        <!-- Categorias (Scroll Horizontal Suave) -->
-        <section class="px-4 mb-8">
-            <h3 class="font-bold text-gray-800 text-lg mb-4 ml-1">Categorias</h3>
-            <!-- Container com scroll horizontal e snap-scroll -->
-            <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x" style="-webkit-overflow-scrolling: touch;">
-                <!-- Card Categoria 1 -->
-                <div class="snap-center shrink-0 w-24 flex flex-col items-center gap-2">
-                    <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-3xl shadow-sm cursor-pointer hover:bg-red-200 transition" onclick="showToast('Categoria: Infláveis')">🏰</div>
-                    <span class="text-xs font-semibold text-gray-600">Infláveis</span>
-                </div>
-                <!-- Card Categoria 2 -->
-                <div class="snap-center shrink-0 w-24 flex flex-col items-center gap-2">
-                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl shadow-sm cursor-pointer hover:bg-blue-200 transition" onclick="showToast('Categoria: Educativos')">🧩</div>
-                    <span class="text-xs font-semibold text-gray-600">Educativos</span>
-                </div>
-                <!-- Card Categoria 3 -->
-                <div class="snap-center shrink-0 w-24 flex flex-col items-center gap-2">
-                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-3xl shadow-sm cursor-pointer hover:bg-green-200 transition" onclick="showToast('Categoria: Bebês')">👶</div>
-                    <span class="text-xs font-semibold text-gray-600">Bebês</span>
-                </div>
-                <!-- Card Categoria 4 -->
-                <div class="snap-center shrink-0 w-24 flex flex-col items-center gap-2">
-                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-3xl shadow-sm cursor-pointer hover:bg-purple-200 transition" onclick="showToast('Categoria: Jogos')">🎲</div>
-                    <span class="text-xs font-semibold text-gray-600">Jogos</span>
-                </div>
-                <!-- Adicione mais categorias se necessário -->
-            </div>
-        </section>
-
-        <!-- Lista de Produtos (Grid Seguro) -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
-            <div class="flex justify-between items-end mb-4">
-                <h3 class="font-bold text-gray-800 text-xl">Mais Alugados</h3>
-                <a href="catalogo.html" class="text-blue-600 text-sm font-semibold">Ver todos</a>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                <!-- Produto 1: Castelo Pula-Pula -->
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-lg transition flex flex-col">
-                    <div class="relative mb-3 rounded-xl overflow-hidden h-48 bg-gray-100 group">
-                        <img src="https://placehold.co/400x300/3b82f6/ffffff?text=Pula+Pula" alt="Pula Pula" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <span class="absolute top-2 left-2 bg-secondary text-blue-900 text-xs font-bold px-2 py-1 rounded-md shadow-sm">Promoção</span>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-800 text-lg leading-tight mb-1">Castelo Pula-Pula</h4>
-                        <p class="text-gray-500 text-xs mb-3">Ideal para 2-5 anos • 2x2 metros</p>
-                        <div class="flex justify-between items-center mt-auto">
-                            <div>
-                                <span class="text-xs text-gray-400 line-through">R$ 180</span>
-                                <p class="text-blue-600 font-extrabold text-lg">R$ 149<span class="text-xs font-normal text-gray-500">/dia</span></p>
-                            </div>
-                            <button onclick="showToast('Adicionado: Pula Pula')" class="bg-blue-50 text-blue-600 p-2 rounded-xl hover:bg-blue-600 hover:text-white transition">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produto 2: Piscina de Bolinhas -->
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-lg transition flex flex-col">
-                    <div class="relative mb-3 rounded-xl overflow-hidden h-48 bg-gray-100 group">
-                        <img src="https://placehold.co/400x300/facc15/3b82f6?text=Piscina+Bolas" alt="Piscina Bolinhas" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-800 text-lg leading-tight mb-1">Piscina de Bolinhas</h4>
-                        <p class="text-gray-500 text-xs mb-3">500 bolinhas inclusas • Higienizada</p>
-                        <div class="flex justify-between items-center mt-auto">
-                            <p class="text-blue-600 font-extrabold text-lg">R$ 90<span class="text-xs font-normal text-gray-500">/dia</span></p>
-                            <button onclick="showToast('Adicionado: Piscina')" class="bg-blue-50 text-blue-600 p-2 rounded-xl hover:bg-blue-600 hover:text-white transition">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produto 3: Escorregador Baby -->
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-lg transition flex flex-col">
-                    <div class="relative mb-3 rounded-xl overflow-hidden h-48 bg-gray-100 group">
-                        <img src="https://placehold.co/400x300/green/ffffff?text=Escorregador" alt="Escorregador" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-800 text-lg leading-tight mb-1">Escorregador Baby</h4>
-                        <p class="text-gray-500 text-xs mb-3">Plástico reforçado • Multicolor</p>
-                        <div class="flex justify-between items-center mt-auto">
-                            <p class="text-blue-600 font-extrabold text-lg">R$ 65<span class="text-xs font-normal text-gray-500">/dia</span></p>
-                            <button onclick="showToast('Adicionado: Escorregador')" class="bg-blue-50 text-blue-600 p-2 rounded-xl hover:bg-blue-600 hover:text-white transition">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-        </section>
-        
-        <!-- WIDGET: AVALIAÇÕES TAGGBOX -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
-            <div class="text-center mb-6">
-                <h2 class="text-3xl md:text-4xl font-extrabold brand-font text-gray-800 mb-2">
-                    Festa Real? Reclamação Real!
-                </h2>
-                <p class="text-gray-600 text-sm">Veja o que as famílias estão dizendo sobre a Encanto Festas nas Redes Sociais.</p>
-            </div>
-
-            <!-- Container do Taggbox - Definindo altura fixa para o widget funcionar -->
-            <div class="bg-white rounded-xl shadow-xl overflow-hidden p-0 h-[600px] w-full border border-gray-200">
-                <!-- Código de Incorporação do Taggbox -->
-                <div class="taggbox" style="width:100%;height:100%;overflow:auto;" data-widget-id="310470" data-website="1"></div>
-            </div>
-            
-            <!-- Script do Taggbox (Importante que esteja após o elemento DIV) -->
-            <script src="https://widget.taggbox.com/embed.min.js" type="text/javascript"></script>
-
-        </section>
-
     </main>
 
-    <!-- 3. FOOTER (Rodapé - Desktop Only) -->
     <footer class="bg-white border-t border-gray-200 py-8 hidden md:block">
         <div class="max-w-7xl mx-auto px-4 text-center text-gray-500">
             <p>&copy; 2024 Encanto Festas Locações. Feito com diversão.</p>
         </div>
     </footer>
 
-    <!-- 4. BOTTOM BAR (FIXA RODAPÉ - MOBILE) -->
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
-        
         <div class="grid grid-cols-5 w-full h-full relative">
             
-            <!-- Botão 1: Início (Home) - ATIVO (AZUL) -->
-            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-blue-600 group">
-                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+            <!-- Início (Index) - SELECIONADO: Pointer Events None para não clicar -->
+            <div class="flex flex-col items-center justify-center w-full h-full text-blue-600 cursor-default pointer-events-none">
+                <svg class="w-6 h-6 mb-1 transition" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
                 <span class="text-[10px] font-medium">Início</span>
-            </a>
+            </div>
 
-            <!-- Botão 2: JOGOS (Antigo Aluguéis) - INATIVO (CINZA) -->
-            <a href="jogos.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group">
-                <!-- Ícone de Gamepad/Controle -->
+            <!-- Jogos - CLICÁVEL -->
+            <a href="jogos.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
                 <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                 </svg>
                 <span class="text-[10px] font-medium">Jogos</span>
             </a>
 
-            <!-- Botão 3: AGENDAR (Central FAB - Calendário Profissional) -->
-            <div class="relative flex justify-center items-center h-full w-full pointer-events-none">
-                <button onclick="showToast('Agendamento/Disponibilidade')" class="pointer-events-auto floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50">
-                    <!-- Ícone de Calendário Profissional (Detalhado) -->
+            <!-- Agendar/Calendário - CLICÁVEL SEMPRE (Ação JS) -->
+            <div class="relative flex justify-center items-center h-full w-full">
+                <button onclick="showToast('Agendamento/Disponibilidade')" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11h4m-4 4h4" opacity="0.6"/>
@@ -393,17 +203,16 @@
                 </button>
             </div>
 
-            <!-- Botão 4: CATÁLOGO (Revista/Livro Profissional) - INATIVO (CINZA) -->
-            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group">
-                <!-- Ícone de Revista/Jornal Aberto -->
+            <!-- Catálogo - CLICÁVEL -->
+            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
                 <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
                 </svg>
                 <span class="text-[10px] font-medium">Catálogo</span>
             </a>
 
-            <!-- Botão 5: PERFIL (Conta) - INATIVO (CINZA) -->
-            <a href="perfil.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group">
+            <!-- Perfil - CLICÁVEL -->
+            <a href="perfil.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
                 <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 <span class="text-[10px] font-medium">Perfil</span>
             </a>
@@ -411,7 +220,6 @@
         </div>
     </nav>
 
-    <!-- SCRIPT FIREBASE & LÓGICA DO APP (type="module" para imports) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -420,25 +228,20 @@
             query, where, writeBatch, Timestamp, setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Ativar logs para depuração
         setLogLevel('debug');
         
-        // --- VARIÁVEIS GLOBAIS (FORNECIDAS PELO AMBIENTE) ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
-        // Variáveis de estado do Firebase
         let app, db, auth;
         let userId = null;
         let isAuthReady = false;
         let unsubscribeNotifications = null;
-
-        // Variáveis de estado do App
         let isPanelOpen = false;
-        let currentNotificationsData = []; // Armazena os dados mockados
-        let readNotificationsIds = new Set(); // Armazena IDs lidos do Firestore
+        let currentNotificationsData = []; 
+        let readNotificationsIds = new Set(); 
+        let toastTimeout; 
 
-        // --- DADOS MOCKADOS (SIMULAÇÃO DA API/SERVIÇO DE NOTIFICAÇÕES) ---
         const mockNotificacoes = [
             {
                 "id": "1",
@@ -463,15 +266,20 @@
             }
         ];
         
-        // --- UTILITÁRIOS ---
-
-        // Função simples de feedback visual (Toast)
         window.showToast = function(message) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-message');
+            
+            // Limpa o timeout anterior para evitar que o toast feche se clicar rápido
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+
             toastMsg.innerText = message;
             toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
+            
+            // Define novo timeout para fechar
+            toastTimeout = setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
         }
@@ -488,37 +296,26 @@
             document.getElementById('site-status-modal').classList.remove('hidden');
         }
 
-        // --- PERSISTÊNCIA FIREBASE ---
-
         function getReadNotificationsCollection(uid) {
             return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
         }
 
-        /**
-         * Marca uma única notificação como lida no Firestore.
-         * @param {string} notificationId - ID da notificação.
-         */
         window.markSingleAsRead = async function(notificationId, title) {
             if (!userId) return showToast("Usuário não autenticado.");
 
             try {
-                // Cria um documento com o ID da notificação como campo
                 const docRef = doc(getReadNotificationsCollection(userId), notificationId);
                 await setDoc(docRef, { 
                     readAt: Timestamp.now(),
                     notificationId: notificationId
                 });
                 showToast(`"${title}" marcado como lido e salvo.`);
-                // onSnapshot irá recarregar a lista automaticamente
             } catch (error) {
                 console.error("Erro ao marcar como lido:", error);
                 showToast("Erro ao salvar o status de leitura.");
             }
         }
 
-        /**
-         * Marca todas as notificações atuais (mockadas) como lidas.
-         */
         window.markAllAsRead = async function() {
             if (!userId || currentNotificationsData.length === 0) return;
 
@@ -527,7 +324,6 @@
             let count = 0;
 
             currentNotificationsData.forEach(n => {
-                // Verifica se já está lida antes de tentar escrever
                 if (!readNotificationsIds.has(n.id)) {
                     const docRef = doc(getReadNotificationsCollection(userId), n.id);
                     batch.set(docRef, { 
@@ -542,7 +338,6 @@
                 try {
                     await batch.commit();
                     showToast(`Marcadas ${count} notificações como lidas.`);
-                    // onSnapshot irá recarregar a lista automaticamente
                 } catch (error) {
                     console.error("Erro ao marcar todas:", error);
                     showToast("Erro ao marcar todas como lidas.");
@@ -552,15 +347,8 @@
             }
         }
 
-        // --- ATUALIZAÇÃO DA UI ---
-
-        /**
-         * Atualiza o contador de notificações em todos os elementos da UI.
-         */
         function updateNotificationCount(count) {
             const elements = document.querySelectorAll('.notification-counter');
-            
-            // Oculta/Mostra o botão "Marcar todas como lidas"
             const markAllButton = document.getElementById('mark-all-button');
             if (markAllButton) {
                 if (count > 0) {
@@ -580,9 +368,6 @@
             });
         }
 
-        /**
-         * Renderiza as notificações não lidas no painel.
-         */
         function renderNotifications() {
             const panelList = document.getElementById('notification-list');
             const loadingIndicator = document.getElementById('loading-notifications');
@@ -590,14 +375,11 @@
             loadingIndicator.classList.add('hidden');
             panelList.innerHTML = ''; 
 
-            // Filtra apenas itens NÃO LIDOS (aqueles cujos IDs não estão no Set do Firestore)
             const unreadItems = currentNotificationsData.filter(n => !readNotificationsIds.has(n.id));
             const unreadCount = unreadItems.length;
 
-            // Atualiza o contador (visível mesmo se o painel estiver fechado)
             updateNotificationCount(unreadCount);
 
-            // Se o painel estiver fechado, paramos a renderização de lista detalhada
             if (!isPanelOpen) return;
             
             if (unreadItems.length === 0) {
@@ -605,7 +387,6 @@
                 return;
             }
 
-            // Renderiza a lista de itens NÃO LIDOS
             unreadItems.forEach(notificacao => {
                 const li = document.createElement('li');
                 
@@ -628,7 +409,6 @@
                             <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
                             <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
                         </div>
-                        <!-- Botão de Ação: Chama a função global markSingleAsRead -->
                         <button onclick="markSingleAsRead('${notificacao.id}', '${notificacao.titulo.replace(/'/g, "\\'")}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md">
                             Marcar como Lida
                         </button>
@@ -639,37 +419,22 @@
             });
         }
 
-
-        /**
-         * Função principal de inicialização e escuta de notificações.
-         */
         async function setupNotificationListener() {
-            // 1. Define os dados globais mockados (simula dados do servidor)
             currentNotificationsData = mockNotificacoes;
             
-            // 2. Se a autenticação não estiver pronta, apenas atualiza o contador para 0 e aguarda
             if (!isAuthReady || !userId) {
                 updateNotificationCount(0);
                 return;
             }
 
-            // 3. Inicia o loading no painel
             document.getElementById('loading-notifications').classList.remove('hidden');
-
-            // 4. Cria a referência da coleção privada do usuário para status de leitura
             const readCollectionRef = getReadNotificationsCollection(userId);
 
-            // 5. Usa onSnapshot para escutar em tempo real
             unsubscribeNotifications = onSnapshot(readCollectionRef, (snapshot) => {
-                // Limpa o Set de IDs lidos
                 readNotificationsIds.clear();
-
-                // Popula o Set com os IDs dos documentos (notificações lidas)
                 snapshot.docs.forEach(doc => {
                     readNotificationsIds.add(doc.id);
                 });
-
-                // Renderiza a UI baseada nos dados lidos e mockados
                 renderNotifications();
             }, (error) => {
                 console.error("Erro ao escutar o Firestore (Notificações):", error);
@@ -678,22 +443,16 @@
             });
         }
 
-
-        // --- LÓGICA DO PAINEL SLIDING ---
         window.toggleNotificationPanel = function() {
             const panel = document.getElementById('notification-panel');
             const overlay = document.getElementById('notification-overlay');
 
             if (!isPanelOpen) {
-                // Abre
                 panel.classList.remove('translate-x-full');
                 overlay.classList.remove('hidden');
                 document.body.classList.add('overflow-hidden'); 
-                
-                // Força a renderização ao abrir (que será feita pelo onSnapshot, mas chamamos para garantir o loading)
                 renderNotifications();
             } else {
-                // Fecha
                 panel.classList.add('translate-x-full');
                 overlay.classList.add('hidden');
                 document.body.classList.remove('overflow-hidden');
@@ -701,31 +460,26 @@
             isPanelOpen = !isPanelOpen;
         }
 
-        // --- INICIALIZAÇÃO DO FIREBASE E AUTENTICAÇÃO ---
         async function initializeFirebaseAndAuth() {
             try {
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
-                // Tenta autenticar
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
 
-                // Espera o estado de autenticação mudar
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userId = user.uid;
                         isAuthReady = true;
-                        // Inicia a escuta de notificações
                         setupNotificationListener(); 
                     } else {
                         userId = null;
                         isAuthReady = true; 
-                        // Limpa o listener se existir e reseta o contador
                         if (unsubscribeNotifications) unsubscribeNotifications();
                         updateNotificationCount(0);
                     }
@@ -738,7 +492,6 @@
             }
         }
 
-        // --- INICIALIZAÇÃO GERAL ---
         document.addEventListener('DOMContentLoaded', () => {
             showStatusModal();
             initializeFirebaseAndAuth();
