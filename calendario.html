@@ -46,27 +46,26 @@
 
         /* Estilos do Calendário */
         .dia-celula {
-            /* Otimização Mobile: Altura mínima para clique, mas permite ser compacto */
-            min-height: 60px; 
+            /* ALTURA VERTICAL DIMINUÍDA */
+            min-height: 50px; 
             position: relative;
             cursor: pointer;
-            transition: transform 0.1s, background-color 0.3s; /* Adicionado background-color transition */
-            padding: 4px; /* Diminuído padding para mais espaço */
+            transition: transform 0.1s, background-color 0.3s;
+            padding: 4px;
         }
         .dia-celula:hover:not(.dia-passado) {
             transform: scale(1.03);
-            /* Mantém a cor de fundo, apenas um leve efeito de sombra */
             box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.05); 
         }
         .dia-passado {
             opacity: 0.5;
             cursor: not-allowed;
-            background-color: #f3f4f6; /* cinza claro fixo */
+            background-color: #f3f4f6 !important; /* Cor de fundo para dias passados */
         }
         .dia-hoje {
             border: 2px solid #2563EB; /* Blue-600 */
-            /* Remove a cor de fundo do hoje, deixando apenas a borda, para que a cor de status predomine */
             font-weight: 700;
+            z-index: 5; /* Garante que a borda do dia atual apareça */
         }
         .dia-vazio {
             background-color: #fafafa;
@@ -76,9 +75,9 @@
             position: absolute;
             top: 2px;
             right: 4px;
-            font-size: 0.9rem; /* Tamanho ajustado para mobile */
+            font-size: 0.9rem;
             font-weight: 600;
-            color: rgba(0, 0, 0, 0.75); /* Cor escura para contraste */
+            color: rgba(0, 0, 0, 0.75);
             z-index: 10;
         }
         /* Estilos para o ícone de valor elevado */
@@ -86,7 +85,7 @@
             position: absolute;
             bottom: 2px;
             left: 2px;
-            font-size: 1rem; /* Tamanho ajustado para mobile */
+            font-size: 1rem;
             z-index: 10;
         }
     </style>
@@ -171,10 +170,11 @@
     </div>
 
     <!-- CONTEÚDO PRINCIPAL: CALENDÁRIO PREMIUM (Ocupa o main) -->
-    <main class="flex-grow w-full pt-20 pb-28 md:pb-12 bg-gray-50 flex justify-center p-2 sm:p-4">
+    <main class="flex-grow w-full pt-4 pb-28 md:pb-12 bg-gray-50 flex justify-center p-2 sm:p-4">
         
         <!-- Contêiner do Calendário -->
-        <div class="w-full max-w-5xl bg-white p-3 md:p-6 rounded-xl shadow-2xl">
+        <!-- Reduzido padding do main para pt-4, e agora adiciona mt-2 ao contêiner para posicionar bem no topo -->
+        <div class="w-full max-w-5xl bg-white p-3 md:p-6 rounded-xl shadow-2xl mt-2">
             <!-- Título Removido conforme solicitação -->
 
             <!-- Navegação e Título do Mês -->
@@ -332,7 +332,7 @@
             [`${currentCalendarDate.getFullYear()}-${String(currentCalendarDate.getMonth() + 1).padStart(2, '0')}-20`]: { color: 'bg-red-500', isHoliday: false },
             
             // Próximo mês
-            [`${new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getFullYear()}-${String(new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getMonth() + 1).padStart(2, '0')}-01`]: { color: 'bg-green-500', isHoliday: false },
+            [`${new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getFullYear()}-${String(new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getMonth() + 1).padStart(2, '0')}-01`]: { color: 'bg-yellow-500', isHoliday: false },
             [`${new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getFullYear()}-${String(new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1).getMonth() + 1).padStart(2, '0')}-25`]: { color: 'bg-red-500', isHoliday: true }, // Exemplo de feriado/alto valor
         };
 
@@ -349,10 +349,12 @@
 
         /**
          * Retorna a chave de status e cor para um determinado dia.
+         * Se não houver status mockado, retorna 'Disponível' (verde).
          */
         function getDayStatus(year, month, day) {
             const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            return mockedDayData[dateKey] || { color: 'bg-gray-200', isHoliday: false };
+            // Se a data estiver no mock, retorna o status. Caso contrário, retorna 'Disponível' (verde) por padrão.
+            return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false };
         }
 
         /**
@@ -379,7 +381,19 @@
             prevButton.disabled = isCurrentMonth;
 
             // Botão Próximo: Desabilita se for o limite de 6 meses
-            nextButton.disabled = firstDayOfNextMonth.getTime() >= maxFutureDate.getTime();
+            const isAtMaxFuture = firstDayOfNextMonth.getTime() >= maxFutureDate.getTime();
+            nextButton.disabled = isAtMaxFuture;
+            
+            // Se estiver no limite máximo, adiciona o alert ao botão Próximo
+            if (isAtMaxFuture) {
+                nextButton.onclick = () => {
+                     // Utiliza alert() conforme solicitado, mas idealmente seria um modal customizado
+                    alert("Atenção: Não é possível fazer reservas com mais de 6 meses de antecedência.");
+                };
+            } else {
+                 nextButton.onclick = navigateNext; // Restaura a navegação normal
+            }
+
 
             // 4. Cria células vazias para preencher o espaço antes do primeiro dia
             for (let i = 0; i < firstDayOfMonth; i++) {
@@ -405,6 +419,8 @@
                 // Aplica estilos e restrições
                 if (isPastDay) {
                     cell.classList.add('dia-passado');
+                    // Remove o handler de clique para dias passados
+                    cell.onclick = null; 
                 } else {
                     cell.classList.add('text-gray-900');
                     cell.onclick = () => alert(`Dia ${day}/${currentMonth + 1}/${currentYear} selecionado. Status: ${status.color.replace('bg-', '')}`);
@@ -431,9 +447,7 @@
          * Navega para o mês anterior.
          */
         function navigatePrev() {
-            if (currentCalendarDate.getFullYear() === today.getFullYear() && currentCalendarDate.getMonth() === today.getMonth()) {
-                return; // Já está no mês atual, não pode voltar
-            }
+            if (prevButton.disabled) return; // Segurança extra
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
             renderCalendar();
         }
@@ -442,16 +456,14 @@
          * Navega para o próximo mês.
          */
         function navigateNext() {
-            const nextMonthCheck = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1);
-            if (nextMonthCheck.getTime() < maxFutureDate.getTime()) {
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-                renderCalendar();
-            }
+            if (nextButton.disabled) return; // Segurança extra
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
         }
 
-        // Adiciona Listeners aos botões
+        // Adiciona Listeners aos botões de navegação
         prevButton.addEventListener('click', navigatePrev);
-        nextButton.addEventListener('click', navigateNext);
+        nextButton.addEventListener('click', navigateNext); // O evento será substituído pelo alert se estiver no limite
         
         // --- 2. LÓGICA DO FIREBASE E AUTENTICAÇÃO (MANTIDA) ---
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
