@@ -118,7 +118,8 @@
             
             <!-- Cabeçalho (Fixo no topo) -->
             <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10">
-                <h3 class="text-xl font-bold brand-font text-white">Suas Notificações</h3>
+                <!-- TÍTULO ALTERADO -->
+                <h3 class="text-xl font-bold brand-font text-white">Notificações</h3>
                 <button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
@@ -136,7 +137,10 @@
 
             <!-- Rodapé (Fixo no fundo) -->
             <div class="p-4 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));">
-                   <button id="mark-all-button" onclick="markAllAsRead()" class="bg-white text-blue-700 font-bold py-3 px-6 rounded-full w-full shadow-lg text-sm hover:bg-blue-50 transition opacity-100 pointer-events-auto active:scale-95">Marcar todas como lidas</button>
+                   <!-- BOTÃO ALTERADO: Removido bg-white, agora é estilo link limpo -->
+                   <button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-sm hover:text-blue-200 hover:underline transition opacity-100 pointer-events-auto active:scale-95 py-2">
+                       Marcar todas como lidas
+                   </button>
             </div>
         </div>
     </div>
@@ -239,28 +243,31 @@
         // --- 1. CARREGAR CACHE LOCAL IMEDIATAMENTE ---
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         
-        // --- DADOS DAS NOTIFICAÇÕES (Fixos para performance) ---
+        // --- DADOS DAS NOTIFICAÇÕES (Com Links) ---
         const notificationsData = [
           {
             "id": "1", 
             "titulo": "Promoção Relâmpago!",
             "mensagem": "Castelo Pula-Pula com 20% de desconto por tempo limitado! Agende agora.",
             "tipo": "promocao",
-            "data": "2024-12-05T14:30:00Z"
+            "data": "2024-12-05T14:30:00Z",
+            "link": "combos.html" // Link de Exemplo
           },
           {
             "id": "2",
             "titulo": "Seu Carrinho Expirou",
             "mensagem": "Os itens no seu carrinho foram liberados. Por favor, agende novamente.",
             "tipo": "alerta",
-            "data": "2024-12-04T10:00:00Z"
+            "data": "2024-12-04T10:00:00Z",
+            "link": "carrinho.html" // Link de Exemplo
           },
           {
             "id": "3",
             "titulo": "Novo Brinquedo na Área!",
             "mensagem": "Adicionamos a 'Piscina de Bolinhas Gigante' ao nosso catálogo. Confira!",
             "tipo": "novo_produto",
-            "data": "2024-12-03T09:15:00Z"
+            "data": "2024-12-03T09:15:00Z",
+            "link": "catalogo.html" // Link de Exemplo
           }
         ];
         
@@ -274,7 +281,8 @@
         }
 
         // --- AÇÃO: MARCAR COMO LIDA ---
-        window.markSingleAsRead = async function(notificationId, title) {
+        window.markSingleAsRead = async function(e, notificationId) {
+            e.stopPropagation(); // Impede o clique de ir para o link
             const idStr = String(notificationId);
             
             readNotificationsIds.add(idStr);
@@ -292,6 +300,11 @@
                     console.error("Erro ao salvar leitura na nuvem:", error);
                 }
             }
+        }
+
+        // --- AÇÃO: NAVEGAR ---
+        window.navigateTo = function(url) {
+            window.location.href = url;
         }
 
         window.markAllAsRead = async function() {
@@ -334,10 +347,15 @@
             
             if (markAllButton) {
                 if (count > 0) {
-                    markAllButton.parentElement.classList.remove('hidden'); // Garante que o pai (rodapé) apareça
-                    markAllButton.classList.remove('opacity-0', 'pointer-events-none');
+                    markAllButton.classList.remove('opacity-0', 'pointer-events-none', 'text-blue-300'); // Ativo
+                    markAllButton.classList.add('text-white', 'hover:text-blue-200');
+                    markAllButton.innerText = "Marcar todas como lidas";
+                    markAllButton.disabled = false;
                 } else {
-                    markAllButton.classList.add('opacity-0', 'pointer-events-none');
+                    // Estado inativo, mas visível (opcional, ou pode esconder)
+                    markAllButton.classList.add('opacity-50', 'pointer-events-none');
+                    markAllButton.innerText = "Nenhuma nova notificação";
+                    markAllButton.disabled = true;
                 }
             }
 
@@ -378,14 +396,14 @@
                 const icon = notificacao.tipo === 'promocao' ? '🎁' : 
                              notificacao.tipo === 'alerta' ? '🚨' : '✨';
                 
-                li.className = `p-5 border-b border-blue-800 cursor-pointer transition ${bgClass} rounded-xl mb-3 text-white shadow-lg`;
-                
+                // MUDANÇA: Adicionado onclick para navegação
+                li.className = `p-5 border-b border-blue-800 cursor-pointer transition ${bgClass} rounded-xl mb-3 text-white shadow-lg active:scale-[0.98] transform`;
+                li.onclick = () => window.navigateTo(notificacao.link || '#');
+
                 const dateObj = new Date(notificacao.data);
                 const dataFormatada = isNaN(dateObj) ? notificacao.data : dateObj.toLocaleDateString('pt-BR', {
                     day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                 });
-
-                const safeTitle = notificacao.titulo.replace(/'/g, "\\'");
 
                 li.innerHTML = `
                     <div class="flex flex-col items-center gap-2">
@@ -395,7 +413,8 @@
                             <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
                             <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
                         </div>
-                        <button onclick="markSingleAsRead('${notificacao.id}', '${safeTitle}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md">
+                        <!-- MUDANÇA: event passadp para markSingleAsRead para parar propagação -->
+                        <button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md z-10 relative">
                             Marcar como Lida
                         </button>
                     </div>
