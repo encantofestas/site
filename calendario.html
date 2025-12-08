@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Estrutura Base Vazia - Encanto Festas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos base mantidos, sem alterações */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'Baloo 2', cursive;
+        }
+        .min-h-screen-safe {
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        .bg-primary { background-color: #2563EB; }
+        .text-primary { color: #2563EB; }
+        .bg-secondary { background-color: #FACC15; }
+        .text-secondary { color: #CA8A04; }
+        #bottom-nav {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(4rem + env(safe-area-inset-bottom));
+        }
+        .floating-fab {
+            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* CORREÇÃO DO PAINEL MOBILE (Mantido) */
+        #notification-panel {
+            z-index: 100;
+            transition: transform 0.3s ease-out;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            max-width: 100vw;
+            height: 100dvh;
+            background-color: #2563EB;
+        }
+        
+        #notification-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="text-gray-700 min-h-screen-safe flex flex-col">
+
+    <!-- HEADER (FIXO TOPO) - MANTIDO -->
+    <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
+            
+            <!-- Logo / Brand -->
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
+                    alt="Logo Encanto Festas" 
+                    class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner"
+                    onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
+                <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
+            </div>
+            
+            <!-- Ações Direita (Desktop) -->
+            <div class="hidden md:flex items-center space-x-4">
+                <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
+                    </svg>
+                    <!-- Contador de Notificação -->
+                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
+                    </div>
+                </button>
+                <button onclick="window.location.href='perfil.html'" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg transition text-sm font-semibold">Entrar</button>
+                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg transform hover:-translate-y-0.5">
+                    Agendar Agora
+                </button>
+            </div>
+
+            <!-- Botão Menu Mobile (Notificações) -->
+            <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
+                </svg>
+                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <!-- PAINEL DE NOTIFICAÇÕES (MODAL DESLIZANTE FULL SCREEN) - MANTIDO -->
+    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
+
+    <div id="notification-panel" class="transform translate-x-full">
+        <div id="notification-content">
+            
+            <!-- Cabeçalho (Fixo no topo) -->
+            <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10">
+                <h3 class="text-xl font-bold brand-font text-white">Notificações</h3>
+                <button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Área de Rolagem (Ocupa o meio) -->
+            <div class="flex-grow overflow-y-auto relative">
+                <ul id="notification-list" class="p-4 space-y-3 pb-24"></ul>
+                
+                <div id="loading-notifications" class="p-4 text-center hidden">
+                    <div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div>
+                    <p class="text-sm text-blue-200 mt-2">Carregando...</p>
+                </div>
+            </div>
+
+            <!-- Rodapé (Fixo no fundo) -->
+            <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+                   <button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline transition opacity-100 pointer-events-auto active:scale-95 py-1">
+                       Marcar todas como lidas
+                   </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL: AGORA VAZIO, APENAS PREENCHE O ESPAÇO ENTRE HEADER E FOOTER -->
+    <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-gray-50 flex items-center justify-center text-gray-400">
+        <p class="text-xl font-bold brand-font">Conteúdo principal removido. Comece a criar aqui!</p>
+    </main>
+
+    <!-- FOOTER (Desktop) - MANTIDO -->
+    <footer class="bg-white border-t border-gray-200 py-8 hidden md:block">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500">
+            <p>&copy; 2024 EncantoFestas Locações. Feito com diversão.</p>
+        </div>
+    </footer>
+
+    <!-- BOTTOM BAR (Mobile) - "Início" desmarcado, todos neutros -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
+        <div class="grid grid-cols-5 w-full h-full relative">
+            
+            <!-- Início (Index) - AGORA NEUTRO/INATIVO -->
+            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
+                 <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                <span class="text-[10px] font-medium">Início</span>
+            </a>
+
+            <!-- Combos -->
+            <a href="combos.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
+                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4H8a2 2 0 00-2 2v1" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8V6a2 2 0 00-2-2h-3" />
+                </svg>
+                <span class="text-[10px] font-medium">Combos</span>
+            </a>
+
+            <!-- Agendar -->
+            <div class="relative flex justify-center items-center h-full w-full">
+                <a href="agendamento.html" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11h4m-4 4h4" opacity="0.6"/>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Catálogo -->
+            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
+                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                </svg>
+                <span class="text-[10px] font-medium">Catálogo</span>
+            </a>
+
+            <!-- Perfil -->
+            <a href="perfil.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
+                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <span class="text-[10px] font-medium">Perfil</span>
+            </a>
+
+        </div>
+    </nav>
+
+    <!-- SCRIPT DO APLICATIVO - MANTIDO NA ÍNTEGRA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, 
+            writeBatch, Timestamp, setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        setLogLevel('silent');
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        let app, db, auth;
+        let userId = null;
+        let isAuthReady = false;
+        let unsubscribeNotifications = null;
+        let isPanelOpen = false;
+        
+        // --- 1. CARREGAR CACHE LOCAL IMEDIATAMENTE ---
+        let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
+        
+        // Dados das Notificações - Variável VAZIA que será preenchida pelo JSON externo
+        let notificationsData = [];
+        
+        // Função auxiliar para atualizar o cache local
+        function updateLocalCache() {
+            localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
+        }
+
+        function getReadNotificationsCollection(uid) {
+            return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
+        }
+
+        // --- AÇÃO: MARCAR COMO LIDA ---
+        window.markSingleAsRead = async function(e, notificationId) {
+            e.stopPropagation(); // Impede o clique de ir para o link (se houver)
+            const idStr = String(notificationId);
+            
+            readNotificationsIds.add(idStr);
+            updateLocalCache();
+            renderNotifications();
+            
+            if (userId) {
+                try {
+                    const docRef = doc(getReadNotificationsCollection(userId), idStr);
+                    await setDoc(docRef, { 
+                        readAt: Timestamp.now(),
+                        notificationId: idStr
+                    });
+                } catch (error) {
+                    console.error("Erro ao salvar leitura na nuvem:", error);
+                }
+            }
+        }
+
+        // --- AÇÃO: NAVEGAR ---
+        window.navigateTo = function(url) {
+            if (url && url !== '#') {
+                window.location.href = url;
+            }
+        }
+
+        window.markAllAsRead = async function() {
+            const batchIds = [];
+            notificationsData.forEach(n => {
+                const idStr = String(n.id);
+                if (!readNotificationsIds.has(idStr)) {
+                    readNotificationsIds.add(idStr);
+                    batchIds.push(idStr);
+                }
+            });
+            
+            updateLocalCache();
+            renderNotifications();
+
+            if (!userId || batchIds.length === 0) return;
+
+            const batch = writeBatch(db);
+            const now = Timestamp.now();
+
+            batchIds.forEach(id => {
+                const docRef = doc(getReadNotificationsCollection(userId), id);
+                batch.set(docRef, { 
+                    readAt: now,
+                    notificationId: id
+                });
+            });
+
+            try {
+                await batch.commit();
+            } catch (error) {
+                console.error("Erro ao marcar todas na nuvem:", error);
+            }
+        }
+
+        // --- UI UPDATES ---
+        function updateNotificationCount(count) {
+            const elements = document.querySelectorAll('.notification-counter');
+            const markAllButton = document.getElementById('mark-all-button');
+            
+            if (markAllButton) {
+                if (count > 0) {
+                    markAllButton.classList.remove('opacity-0', 'pointer-events-none', 'text-blue-300'); // Ativo
+                    markAllButton.classList.add('text-white', 'hover:text-blue-200');
+                    markAllButton.innerText = "Marcar todas como lidas";
+                    markAllButton.disabled = false;
+                } else {
+                    // Estado inativo
+                    markAllButton.classList.add('opacity-50', 'pointer-events-none');
+                    markAllButton.innerText = "Nenhuma nova notificação";
+                    markAllButton.disabled = true;
+                }
+            }
+
+            elements.forEach(el => {
+                if (count > 0) {
+                    el.classList.remove('hidden');
+                    el.innerText = count > 9 ? '9+' : count;
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        function renderNotifications() {
+            const panelList = document.getElementById('notification-list');
+            const loadingIndicator = document.getElementById('loading-notifications');
+            
+            if (loadingIndicator) loadingIndicator.classList.add('hidden');
+            
+            const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id)));
+            const unreadCount = unreadItems.length;
+
+            updateNotificationCount(unreadCount);
+
+            if (!isPanelOpen) return;
+            
+            panelList.innerHTML = ''; 
+
+            if (unreadItems.length === 0) {
+                panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>';
+                return;
+            }
+
+            unreadItems.forEach(notificacao => {
+                const li = document.createElement('li');
+                
+                const bgClass = 'bg-blue-700 hover:bg-blue-800';
+                const icon = notificacao.tipo === 'promocao' ? '🎁' : 
+                             notificacao.tipo === 'alerta' ? '🚨' : '✨';
+                
+                // Link opcional
+                const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
+                li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`;
+                
+                if (notificacao.link) {
+                    li.onclick = () => window.navigateTo(notificacao.link);
+                }
+
+                const dateObj = new Date(notificacao.data);
+                const dataFormatada = isNaN(dateObj) ? notificacao.data : dateObj.toLocaleDateString('pt-BR', {
+                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                });
+
+                li.innerHTML = `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="text-4xl mb-2">${icon}</div>
+                        <div class="flex-grow text-center">
+                            <h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4>
+                            <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
+                            <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
+                        </div>
+                        <button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md z-10 relative">
+                            Marcar como Lida
+                        </button>
+                    </div>
+                `;
+                
+                panelList.appendChild(li);
+            });
+        }
+
+        // --- BUSCA NOTIFICAÇÕES DO ARQUIVO EXTERNO ---
+        async function fetchNotifications() {
+            try {
+                // Tenta carregar o arquivo notificacoes.json
+                const response = await fetch('notificacoes.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    // Converte IDs para String para evitar erros de tipo
+                    notificationsData = data.map(item => ({ ...item, id: String(item.id) }));
+                    // Renderiza imediatamente após carregar
+                    renderNotifications();
+                } else {
+                    console.warn("Arquivo notificacoes.json não encontrado.");
+                }
+            } catch (error) {
+                console.error("Erro ao buscar notificações:", error);
+            }
+        }
+
+        async function setupNotificationListener() {
+            // fetchNotifications já cuida do render inicial
+            
+            if (!isAuthReady || !userId) return;
+
+            const readCollectionRef = getReadNotificationsCollection(userId);
+
+            unsubscribeNotifications = onSnapshot(readCollectionRef, (snapshot) => {
+                let hasChanges = false;
+                snapshot.docs.forEach(doc => {
+                    if (!readNotificationsIds.has(doc.id)) {
+                        readNotificationsIds.add(doc.id);
+                        hasChanges = true;
+                    }
+                });
+                
+                if (hasChanges) {
+                    updateLocalCache();
+                    renderNotifications();
+                }
+            }, (error) => {
+                console.error("Erro Firestore:", error);
+            });
+        }
+
+        window.toggleNotificationPanel = function() {
+            const panel = document.getElementById('notification-panel');
+            const overlay = document.getElementById('notification-overlay');
+
+            isPanelOpen = !isPanelOpen;
+
+            if (isPanelOpen) {
+                panel.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden'); 
+                renderNotifications();
+            } else {
+                panel.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+
+        async function initializeFirebaseAndAuth() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        isAuthReady = true;
+                        setupNotificationListener(); 
+                    } else {
+                        userId = null;
+                        isAuthReady = true; 
+                        if (unsubscribeNotifications) unsubscribeNotifications();
+                        updateNotificationCount(0);
+                    }
+                });
+                
+            } catch (e) {
+                console.error("Erro Firebase:", e);
+                isAuthReady = true; 
+            }
+        }
+
+        // --- FUNÇÕES DE NAVEGAÇÃO E UTILITÁRIOS ---
+        window.openWhatsApp = function() {
+            window.open('https://wa.me/5547992277324', '_blank');
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Busca os dados do arquivo JSON
+            fetchNotifications();
+            // 2. Inicia Firebase
+            initializeFirebaseAndAuth();
+        });
+    </script>
+</body>
+</html>
