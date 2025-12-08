@@ -268,7 +268,8 @@
                 }
                 const data = await response.json();
                 console.log("Notificações carregadas do arquivo:", data);
-                return data;
+                // IMPORTANTE: Converte IDs para String para evitar erro de comparação com Firestore
+                return data.map(item => ({ ...item, id: String(item.id) }));
             } catch (error) {
                 console.error("Erro ao carregar notificações do arquivo JSON:", error);
                 // Retorna array vazio para não quebrar a tela, mas loga o erro
