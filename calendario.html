@@ -15,28 +15,20 @@
         .text-primary { color: #2563EB; }
         .bg-secondary { background-color: #FACC15; }
         .floating-fab { box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5); }
-        
-        /* Ajuste de clique para mobile */
         .dia-celula { min-height: 50px; position: relative; cursor: pointer; transition: transform 0.1s, background-color 0.3s; padding: 2px; user-select: none; -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
         .dia-celula:active { transform: scale(0.95); }
         .dia-passado { opacity: 0.4; cursor: not-allowed; background-color: #f8fafc !important; color: #cbd5e1; pointer-events: none; }
         .dia-hoje { border: 2px solid #2563EB; font-weight: 700; z-index: 5; }
         .dia-numero { position: absolute; top: 2px; right: 4px; font-size: 0.85rem; font-weight: 600; color: rgba(0, 0, 0, 0.7); z-index: 10; }
-        
-        /* Painéis e Overlays */
         #toast-notification { visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translate(-50%, 20px); left: 50%; position: fixed; bottom: 6rem; width: 90%; max-width: 400px; z-index: 80; pointer-events: none; }
         #toast-notification.show { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
-        
-        #toys-panel { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; z-index: 70; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; box-shadow: 0 -4px 25px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; display: flex; flex-direction: column; pointer-events: none; /* Bloqueia cliques quando fechado */ }
-        #toys-panel.open { transform: translateY(0); pointer-events: auto; /* Reabilita cliques quando aberto */ }
-        
+        #toys-panel { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; z-index: 70; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; box-shadow: 0 -4px 25px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; display: flex; flex-direction: column; pointer-events: none; }
+        #toys-panel.open { transform: translateY(0); pointer-events: auto; }
         #toys-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 60; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; pointer-events: none; }
         #toys-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
-        
         #notification-panel { z-index: 100; transition: transform 0.3s ease-out; position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; background-color: #2563EB; pointer-events: none; }
-        #notification-panel.open { pointer-events: auto; transform: translateX(0); } /* Classe para abrir */
+        #notification-panel.open { pointer-events: auto; transform: translateX(0); }
         #notification-panel:not(.open) { transform: translateX(100%); }
-
         #notification-content { height: 100%; display: flex; flex-direction: column; }
     </style>
 </head>
@@ -64,13 +56,13 @@
         <span class="text-sm font-semibold leading-tight">Reservas permitidas apenas até 6 meses à frente.</span>
     </div>
 
-    <!-- OVERLAY E PAINEL DE BRINQUEDOS -->
+    <!-- PAINEL -->
     <div id="toys-overlay" onclick="closeToysPanel()"></div>
     <div id="toys-panel">
         <div class="w-full flex justify-center pt-3 pb-1" onclick="closeToysPanel()"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
-        
         <div id="panel-content-area" class="flex-grow overflow-y-auto" style="padding-bottom: 2rem;">
-            <!-- View 1: Seleção -->
+            
+            <!-- View 1 -->
             <div id="selection-view">
                 <div class="px-5 pb-3 border-b border-gray-100 flex justify-between items-center">
                     <div><h3 class="text-lg font-bold text-gray-800 brand-font">Brinquedos Disponíveis</h3><p id="selected-date-display" class="text-sm text-blue-600 font-medium">Data selecionada</p></div>
@@ -80,24 +72,17 @@
                 <div class="p-4 space-y-4" id="toys-list-container"></div>
             </div>
 
-            <!-- View 2: Checkout -->
+            <!-- View 2 -->
             <div id="checkout-view" class="px-5 py-4 hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-800 brand-font">Finalizar Reserva</h3>
                     <button onclick="changeStep('selection')" class="text-blue-600 text-sm font-medium hover:text-blue-700">← Voltar</button>
                 </div>
-                <div class="p-4 bg-gray-50 rounded-lg shadow-inner mb-6 border border-gray-100">
-                    <h4 class="font-bold text-gray-700 mb-2">Seu Pedido:</h4>
-                    <div id="checkout-summary" class="text-sm text-gray-600 space-y-2"></div>
-                </div>
+                <div class="p-4 bg-gray-50 rounded-lg shadow-inner mb-6 border border-gray-100"><h4 class="font-bold text-gray-700 mb-2">Seu Pedido:</h4><div id="checkout-summary" class="text-sm text-gray-600 space-y-2"></div></div>
                 <form id="checkout-form" onsubmit="event.preventDefault(); submitOrder()">
                     <div class="space-y-4">
                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="client-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label>
-                            <select id="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
-                                <option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option>
-                            </select>
-                        </div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label><select id="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option></select></div>
                         <div class="flex space-x-2">
                             <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label><input type="text" id="client-street" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
                             <div class="w-24"><label class="block text-sm font-medium text-gray-700 mb-1">Nº</label><input type="number" id="client-number" maxlength="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Nº"></div>
@@ -107,49 +92,31 @@
                             <div><label class="block text-sm font-medium text-gray-700 mb-1">Início</label><select id="event-start-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option><option value="18:00">18:00</option><option value="19:00">19:00</option><option value="20:00">20:00</option><option value="21:00">21:00</option></select></div>
                             <div><label class="block text-sm font-medium text-gray-700 mb-1">Término</label><select id="event-end-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option><option value="18:00">18:00</option><option value="19:00">19:00</option><option value="20:00">20:00</option><option value="21:00">21:00</option></select></div>
                         </div>
-                        <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                            <input type="checkbox" id="delivery-day-before" onchange="calculateTotal()" class="w-5 h-5 text-blue-600 border-gray-300 rounded">
-                            <label for="delivery-day-before" class="text-sm font-medium text-gray-700">Receber 1 dia antes? (Grátis)</label>
-                        </div>
-                        <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden">
-                            <div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-5 h-5 text-red-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Piscina protegida contra chuva?</label></div>
-                        </div>
+                        <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"><input type="checkbox" id="delivery-day-before" onchange="calculateTotal()" class="w-5 h-5 text-blue-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Receber 1 dia antes? (Grátis)</label></div>
+                        <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden"><div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-5 h-5 text-red-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Piscina protegida contra chuva?</label></div></div>
                         <div class="space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                             <label class="block text-sm font-bold text-gray-800 mb-1">Deseja monitores?</label>
                             <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select>
-                            <div id="monitor-options" class="space-y-3 mt-3 hidden">
-                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Quantos?</label><select id="monitor-count" onchange="renderMonitorHours(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="1">1</option><option value="2">2</option></select></div>
-                                <div id="monitor-hours-fields" class="space-y-3"></div>
-                            </div>
+                            <div id="monitor-options" class="space-y-3 mt-3 hidden"><div><label class="block text-sm font-medium text-gray-700 mb-1">Quantos?</label><select id="monitor-count" onchange="renderMonitorHours(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="1">1</option><option value="2">2</option></select></div><div id="monitor-hours-fields" class="space-y-3"></div></div>
                         </div>
                         <div class="space-y-2 p-3 bg-green-50 rounded-lg border border-green-200">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3"><input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Seguro Adicional</label></div>
-                                <span class="text-sm font-bold text-green-700">+ R$ 10,00</span>
-                            </div>
+                            <div class="flex items-center justify-between"><div class="flex items-center space-x-3"><input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Seguro Adicional</label></div><span class="text-sm font-bold text-green-700">+ R$ 10,00</span></div>
                             <p class="text-xs text-gray-500 mt-1">Ao adicionar o seguro, você não paga por danos acidentais. Sem seguro, reparos podem custar até R$ 300,00.</p>
                         </div>
-                        <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200">
-                            <div class="flex items-center space-x-3"><input type="checkbox" id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-5 h-5 text-gray-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Nota Fiscal (CNPJ)?</label></div>
-                            <div id="cnpj-field" class="hidden"><input type="text" id="client-cnpj" name="client-cnpj" pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="00.000.000/0000-00"></div>
-                        </div>
+                        <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200"><div class="flex items-center space-x-3"><input type="checkbox" id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-5 h-5 text-gray-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Nota Fiscal (CNPJ)?</label></div><div id="cnpj-field" class="hidden"><input type="text" id="client-cnpj" name="client-cnpj" pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="00.000.000/0000-00"></div></div>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Rodapé do Painel (Total) -->
+        <!-- RODAPÉ -->
         <div class="p-4 border-t border-gray-100 bg-white shadow-lg pb-8 md:pb-4 flex-shrink-0">
             <div id="total-summary-rows" class="space-y-1 text-sm text-gray-700 mb-2"></div>
-            <div class="flex justify-between items-center mb-3 pt-2 border-t border-gray-300">
-                <span class="text-lg font-bold text-gray-800">Total:</span>
-                <span id="total-price-display" class="text-xl md:text-2xl font-extrabold text-green-600">R$ 0,00</span>
-            </div>
+            <div class="flex justify-between items-center mb-3 pt-2 border-t border-gray-300"><span class="text-lg font-bold text-gray-800">Total:</span><span id="total-price-display" class="text-xl md:text-2xl font-extrabold text-green-600">R$ 0,00</span></div>
             <button id="action-button" onclick="handleActionButton()" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 disabled:bg-gray-400">Continuar Agendamento</button>
         </div>
     </div>
 
-    <!-- NOTIFICAÇÕES (Lateral) -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
     <div id="notification-panel">
         <div id="notification-content">
@@ -159,7 +126,7 @@
         </div>
     </div>
 
-    <!-- MAIN CALENDÁRIO -->
+    <!-- MAIN -->
     <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-white md:bg-gray-50 flex flex-col items-center justify-start">
         <div class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100">
             <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Qual a data do seu evento?</h2>
@@ -190,7 +157,6 @@
         </div>
     </nav>
 
-    <!-- SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -201,8 +167,7 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/main/estoque.json'; // URL CORRIGIDA SEM refs/heads
-
+        
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -212,20 +177,18 @@
         async function fetchData() {
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             try {
-                if (!GITHUB_JSON_URL) { useFallbackData(); } 
-                else {
-                    const response = await fetch(GITHUB_JSON_URL);
-                    if (!response.ok) throw new Error('Erro');
-                    const data = await response.json();
-                    toysInventory = data.brinquedos; processAvailability(data);
-                }
+                // Fetch directly from the file we generated
+                const response = await fetch('estoque.json');
+                if (!response.ok) throw new Error('Erro');
+                const data = await response.json();
+                toysInventory = data.brinquedos; processAvailability(data);
             } catch (error) { console.error(error); useFallbackData(); } 
             finally { document.getElementById('panel-loading').classList.add('hidden'); document.getElementById('toys-list-container').classList.remove('hidden'); renderCalendar(); }
         }
 
         function useFallbackData() {
-            // Fallback apenas se o JSON não carregar
-            toysInventory = [{ id: 1, name: "Cama Elástica Pequena", total_stock: 1, price: 170, measure: "2,00m Ø" }, { id: 2, name: "Cama Elástica Média", total_stock: 3, price: 190, measure: "3,05m Ø", scarcityGroup: 'ELASTIC' }, { id: 3, name: "Castelinho Pula Pula", total_stock: 1, price: 210, measure: "2,50 x 2,50m", exclusiveGroup: 'LONA' }, { id: 4, name: "Piscina de Bolinhas", total_stock: 2, price: 160, measure: "1,50 x 1,50m", scarcityGroup: 'BALL' }, { id: 5, name: "Área Baby", total_stock: 1, price: 110, measure: "3,00 x 3,00m" }, { id: 6, name: "Mini Baby Inflável", total_stock: 1, price: 220, measure: "2,80 x 2,80m" }, { id: 7, name: "Escorrega com Bolinha", total_stock: 1, price: 400, measure: "4,50 x 2,50m", exclusiveGroup: 'LONA' }, { id: 8, name: "Tobogã Médio", total_stock: 1, price: 400, measure: "5,00 x 3,00m", exclusiveGroup: 'LONA' }, { id: 9, name: "Futebol de Sabão", total_stock: 1, price: 600, measure: "8,00 x 4,00m", exclusiveGroup: "LONA" }, { id: 10, name: "Pebolim", total_stock: 1, price: 200, measure: "1,40 x 0,80m" }, { id: 11, name: "Air Hockey", total_stock: 1, price: 200, measure: "1,80 x 0,90m" }, { id: 12, name: "Ping Pong", total_stock: 1, price: 200, measure: "2,74 x 1,52m" }, { id: 13, name: "Jogos de Mesa", total_stock: 4, price: 15, measure: "Padrão", note: "O jogo" }];
+             // Basic Fallback if JSON fails
+            toysInventory = [{ id: 1, name: "Cama Elástica Pequena", total_stock: 1, price: 170, measure: "2,00m Ø" }];
             globalAgendamentos = {};
         }
 
@@ -276,19 +239,26 @@
         window.updateCheckoutSummary = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const summaryDiv = document.getElementById('checkout-summary'); summaryDiv.innerHTML = '';
+            
             const itemCount = details.length;
             const discountRate = itemCount >= 2 ? 0.10 : 0;
             const discount = subtotal * discountRate;
+
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const shippingFee = (neighborhood === 'Ervino') ? 25.00 : 0;
+
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
             const insuranceFee = insuranceChecked ? 10.00 : 0;
+            
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             let monitorFee = 0;
             if (monitorCount > 0) { for (let i = 1; i <= monitorCount; i++) { monitorFee += (parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0) * 30); } }
 
             details.forEach(item => {
-                summaryDiv.innerHTML += `<div class="flex justify-between border-b border-gray-200 py-1.5"><span class="font-medium text-gray-700">${item.quantity}x ${item.name}</span><span class="text-green-600 font-bold">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</span></div>`;
+                const itemContainer = document.createElement('div');
+                itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
+                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</div>`;
+                summaryDiv.appendChild(itemContainer);
             });
             
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
@@ -314,12 +284,12 @@
             
             const finalTotal = subtotal - discount + shippingFee + insuranceFee + monitorFee;
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
-            
             const actionButton = document.getElementById('action-button');
-            const totalItems = details.length;
+            const totalItems = window.getSelectedItemDetails().details.length;
             actionButton.disabled = totalItems === 0;
-            if (currentStep === 'selection') actionButton.innerText = `Continuar Agendamento`;
-            else if (currentStep === 'checkout') actionButton.innerText = `Confirmar Reserva`;
+            if (totalItems > 0 && currentStep === 'selection') { actionButton.innerText = `Continuar Agendamento`; } 
+            else if (currentStep === 'checkout') { actionButton.innerText = `Confirmar Reserva`; } 
+            else { actionButton.innerText = `Continuar Agendamento`; }
             
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
@@ -334,7 +304,7 @@
             if (toy.exclusiveGroup === 'LONA' && change > 0) {
                 if (currentQty === 0) {
                     const otherLonaItem = toysInventory.find(t => t.exclusiveGroup === 'LONA' && t.id !== toyId && (selectedItems[t.id] || 0) > 0);
-                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado. Remova o(a) ${otherLonaItem.name} antes.`); return; }
+                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado por dia. Remova o(a) ${otherLonaItem.name} antes de adicionar.`); return; }
                 }
                 if (newQty > 1) newQty = 1;
             }
