@@ -68,7 +68,10 @@
                     <div><h3 class="text-lg font-bold text-gray-800 brand-font">Brinquedos Disponíveis</h3><p id="selected-date-display" class="text-sm text-blue-600 font-medium">Data selecionada</p></div>
                     <button onclick="closeToysPanel()" class="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
-                <div id="panel-loading" class="p-8 text-center text-gray-500 hidden"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div><p>Carregando...</p></div>
+                <!-- Loading State e Mensagem de Erro -->
+                <div id="panel-loading" class="p-8 text-center text-gray-500 hidden"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div><p>Carregando estoque...</p></div>
+                <div id="panel-error" class="p-8 text-center text-red-500 hidden"><p class="font-bold">Erro ao carregar estoque.</p><p class="text-sm mt-2">Não foi possível acessar os dados. Verifique sua conexão ou se o arquivo JSON está acessível.</p></div>
+                
                 <div class="p-4 space-y-4" id="toys-list-container"></div>
             </div>
 
@@ -187,7 +190,7 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/main/estoque.json';
+        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/main/estoque.json'; // LINK CORRETO
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
@@ -197,18 +200,22 @@
 
         async function fetchData() {
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
+            document.getElementById('panel-error').classList.add('hidden');
             try {
-                if (!GITHUB_JSON_URL || GITHUB_JSON_URL.includes('SEU_USUARIO')) { console.warn("URL não config."); return; } 
-                else {
-                    const response = await fetch(GITHUB_JSON_URL);
-                    if (!response.ok) throw new Error('Erro');
-                    const data = await response.json();
-                    toysInventory = data.brinquedos; processAvailability(data);
-                }
+                const response = await fetch(GITHUB_JSON_URL);
+                if (!response.ok) throw new Error('Erro');
+                const data = await response.json();
+                toysInventory = data.brinquedos; processAvailability(data);
+                document.getElementById('toys-list-container').classList.remove('hidden');
             } catch (error) { 
-                console.error(error);
+                console.error(error); 
+                document.getElementById('panel-error').classList.remove('hidden');
+                // Se falhar o fetch, não carregamos nada, conforme solicitado (sem fallback interno)
             } 
-            finally { document.getElementById('panel-loading').classList.add('hidden'); document.getElementById('toys-list-container').classList.remove('hidden'); renderCalendar(); }
+            finally { 
+                document.getElementById('panel-loading').classList.add('hidden'); 
+                renderCalendar(); 
+            }
         }
 
         function processAvailability(data) {
@@ -217,12 +224,12 @@
                 for (const [date, items] of Object.entries(data.agendamentos)) {
                     const totalRented = Object.values(items).reduce((a, b) => a + b, 0);
                     let color = 'bg-green-500';
-                    if (totalRented >= 3) color = 'bg-yellow-500'; 
+                    if (totalRented >= 3) color = 'bg-yellow-500';
                     const isLonaBooked = Object.keys(items).some(bookedId => {
                          const bookedToy = toysInventory.find(t => t.id == bookedId);
                          return bookedToy && bookedToy.exclusiveGroup === 'LONA';
                     });
-                    if (isLonaBooked || totalRented > 5) color = 'bg-yellow-500'; 
+                    if (isLonaBooked || totalRented > 5) color = 'bg-yellow-500';
                     mockedDayData[date] = { color: color };
                 }
             }
@@ -258,31 +265,16 @@
         function calculateDurationFee() {
             const startStr = document.getElementById('event-start-time').value;
             const endStr = document.getElementById('event-end-time').value;
-
             if (!startStr || !endStr) return 0;
-
-            const startHour = parseInt(startStr);
-            const endHour = parseInt(endStr);
+            const startHour = parseInt(startStr); const endHour = parseInt(endStr);
             let duration = endHour - startHour;
-            
             if (duration <= 0) return 0; 
-
-            let fee = 0;
-            let warningText = "";
-            const warningEl = document.getElementById('time-fee-warning');
-
+            let fee = 0; let warningText = ""; const warningEl = document.getElementById('time-fee-warning');
             if (duration > 6) {
                 fee = duration >= 8 ? 40 : 20;
-                warningText = "Eventos com mais de 6 horas de duração possuem uma taxa de serviço adicional.";
+                warningText = "Duração > 6h: taxa extra aplicada automaticamente.";
             }
-
-            if (fee > 0) {
-                warningEl.innerText = warningText;
-                warningEl.classList.remove('hidden');
-            } else {
-                warningEl.classList.add('hidden');
-            }
-
+            if (fee > 0) { warningEl.innerText = warningText; warningEl.classList.remove('hidden'); } else { warningEl.classList.add('hidden'); }
             return fee;
         }
 
@@ -294,14 +286,7 @@
                     const pricePerUnit = window.calculatePriceWithScarcity(toy);
                     const lineTotal = quantity * pricePerUnit;
                     total += lineTotal; 
-                    details.push({ 
-                        name: toy.name, 
-                        quantity: quantity, 
-                        price: pricePerUnit, 
-                        lineTotal: lineTotal, 
-                        id: toy.id, 
-                        needsPower: toy.needsPower 
-                    });
+                    details.push({ name: toy.name, quantity: quantity, price: pricePerUnit, lineTotal: lineTotal, id: toy.id, needsPower: toy.needsPower });
                 }
             }); return { details, total };
         }
@@ -314,7 +299,6 @@
             
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0;
-            
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
             const quantityDiscount = subtotal * discountRate;
 
@@ -330,17 +314,12 @@
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
-            if (monitorCount > 0) {
-                monitorFee = monitorCount * monitorHours * 30;
-            }
+            if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
             
             const timeFee = calculateDurationFee(); 
 
             details.forEach(item => {
-                const itemContainer = document.createElement('div');
-                itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
-                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</div>`;
-                summaryDiv.appendChild(itemContainer);
+                summaryDiv.innerHTML += `<div class="flex justify-between border-b border-gray-200 py-1.5"><span class="font-medium text-gray-700">${item.quantity}x ${item.name}</span><span class="text-green-600 font-bold">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</span></div>`;
             });
             
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
@@ -356,10 +335,8 @@
         window.calculateTotal = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
-            
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
             const quantityDiscount = subtotal * discountRate;
-            
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0; 
             const neighborhood = document.getElementById('client-neighborhood')?.value;
@@ -368,20 +345,18 @@
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
             if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
-
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
             let shippingFee = 0;
             if (neighborhood === 'Ervino') shippingFee = 25.00;
             else if (extraShippingNeighborhoods.includes(neighborhood)) shippingFee = 10.00;
-
             const insuranceFee = insuranceChecked ? 10.00 : 0;
+            const timeFee = calculateDurationFee(); 
             const finalTotal = (subtotal - quantityDiscount - couponDiscount) + shippingFee + insuranceFee + monitorFee + timeFee;
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
             
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
             
-            // VALIDAÇÃO EM TEMPO REAL PARA A COR DO BOTÃO
             const isValid = validateForm();
             
             actionButton.disabled = totalItems === 0;
@@ -412,17 +387,13 @@
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
         }
         
-        // --- FUNÇÃO DE VALIDAÇÃO VISUAL ---
         window.validateForm = function() {
             if (currentStep !== 'checkout') return true; 
-
             const name = document.getElementById('client-name').value.trim();
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value.trim();
             const startTime = document.getElementById('event-start-time').value;
             const delivery = document.getElementById('delivery-day-before').value;
-
-            // Retorna true se TODOS os campos obrigatórios estiverem preenchidos
             return (name !== "" && neighborhood !== "" && street !== "" && startTime !== "" && delivery !== "");
         }
         
@@ -513,6 +484,16 @@
         }
 
         window.submitOrder = function() {
+            if (!validateForm()) {
+                let missing = [];
+                if (!document.getElementById('client-name').value.trim()) missing.push("Nome");
+                if (!document.getElementById('client-neighborhood').value) missing.push("Bairro");
+                if (!document.getElementById('client-street').value.trim()) missing.push("Nome da Rua");
+                if (!document.getElementById('event-start-time').value) missing.push("Horário de Início");
+                if (!document.getElementById('delivery-day-before').value) missing.push("Opção de Entrega Antecipada");
+                alert("Por favor, preencha os seguintes campos obrigatórios antes de confirmar:\n- " + missing.join("\n- "));
+                return;
+            }
             const name = document.getElementById('client-name').value;
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value;
@@ -541,21 +522,16 @@
             const { details, total } = window.getSelectedItemDetails();
             let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n📄 CNPJ: ${invoiceChecked ? (cnpj || 'Não informado') : 'Não Solicitado'}\n⏰ Horário: ${eventStartTime} - ${eventEndTime}\n🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
             if (coupon) orderSummary += `🎟️ Cupom: ${coupon}\n`;
-            
             const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
             if (isBallPitIncluded) orderSummary += `🌧 Piscina Coberta: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
-            
             if (powerDetails) orderSummary += `\n*ENERGIA:*\n${powerDetails}`;
-
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             if (monitorCount > 0) {
                 const monitorHours = document.getElementById('monitor-hours').value;
                 orderSummary += `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
             }
-            
             const timeFee = calculateDurationFee();
             if (timeFee > 0) orderSummary += `🕒 Taxa Duração: R$ ${timeFee.toFixed(2)}\n`;
-
             orderSummary += `\n*ITENS:*\n`;
             details.forEach(item => { orderSummary += `• ${item.quantity}x ${item.name}\n`; });
             const finalTotalText = document.getElementById('total-price-display').innerText;
@@ -569,7 +545,6 @@
             document.getElementById('selected-date-display').innerText = `Para ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
             const listContainer = document.getElementById('toys-list-container');
             listContainer.innerHTML = ''; selectedItems = {}; 
-            
             document.getElementById('has-monitors').value = 'Nao'; 
             document.getElementById('delivery-day-before').value = 'Nao'; 
             document.getElementById('additional-insurance').checked = false; 
@@ -578,9 +553,7 @@
             if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
              const powerContainer = document.getElementById('power-outlet-fields-container');
              if(powerContainer) powerContainer.innerHTML = '';
-
             window.toggleMonitorFields(true); window.toggleCnpjField(); window.changeStep('selection'); 
-
             toysInventory.forEach(toy => {
                 const maxStock = getStockForDate(toy.id, currentSelectedDateISO);
                 if (maxStock === 0) return; 
@@ -588,13 +561,10 @@
                 const priceFormatted = toy.note ? `R$ ${finalPrice.toFixed(2).replace('.', ',')} / ${toy.note}` : `R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
                 let scarcityLabel = '';
                 if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-green-500 block">Promoção</span>`; }
-                
                 const item = document.createElement('div');
                 item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md`;
                 const measureHtml = toy.measure ? `<p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>` : '';
-                
                 const imgTag = toy.image ? `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden"><img src="${toy.image}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></div>` : `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
-
                 item.innerHTML = `${imgTag}<div class="flex-grow min-w-0"><h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4>${measureHtml}${scarcityLabel}<span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span><div class="flex items-center space-x-2 text-sm font-medium"><button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full disabled:opacity-50" disabled><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></button><span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">0</span><button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full disabled:opacity-50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg></button><span class="text-xs text-gray-400">(${maxStock} máx.)</span></div></div>`;
                 document.getElementById('toys-list-container').appendChild(item);
             }); 
