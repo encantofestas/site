@@ -1,27 +1,25 @@
 {
   "brinquedos": [
-    { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX2Tga0PM2k0Z1rIWz2bIW73rW1VFIkDCYPg&s" },
-    { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "scarcityGroup": "ELASTIC", "image": "https://raw.githubusercontent.com/encantofestas/site/7a37b74c8c65dbab1e792c834ee21f8e904d806d/mockup1760749737810.png" },
-    { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "image": "" },
-    { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "scarcityGroup": "BALL", "image": "" },
-    { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "image": "" },
-    { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "needsPower": true, "image": "" },
-    { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "exclusiveGroup": "LONA", "needsPower": true, "image": "" },
-    { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "exclusiveGroup": "LONA", "needsPower": true, "image": "" },
-    { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "exclusiveGroup": "LONA", "needsPower": true, "image": "" },
-    { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "image": "" },
-    { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "needsPower": true, "image": "" },
-    { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "image": "" },
-    { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "note": "O jogo", "image": "" }
+    { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX2Tga0PM2k0Z1rIWz2bIW73rW1VFIkDCYPg&s" },
+    { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "image": "https://raw.githubusercontent.com/encantofestas/site/7a37b74c8c65dbab1e792c834ee21f8e904d806d/mockup1760749737810.png" },
+    { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3m", "image": "" },
+    { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL", "image": "" },
+    { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "", "image": "" },
+    { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "", "image": "" },
+    { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "", "exclusiveGroup": "LONA", "image": "" },
+    { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "image": "" },
+    { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8 x 4m", "exclusiveGroup": "LONA", "image": "" },
+    { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "", "image": "" },
+    { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "", "image": "" },
+    { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "", "image": "" },
+    { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "O jogo", "image": "" }
   ],
   "agendamentos": {
-    "2025-10-12": { "2": 3, "4": 1 },
     "2025-12-10": { "2": 1, "4": 1 },
     "2025-12-13": { "1": 1, "2": 1, "8": 1, "9": 1 },
     "2025-12-14": { "2": 1, "4": 1, "1": 1 },
     "2025-12-21": { "7": 1 },
     "2025-12-24": { "3": 1, "13": 4 },
-    "2025-12-25": { "9": 1 },
     "2026-01-10": { "3": 1, "2": 1, "4": 1 },
     "2026-04-18": { "10": 1, "11": 1, "12": 1 }
   }
