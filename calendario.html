@@ -157,6 +157,39 @@
     </nav>
 
     <script>
+        // --- DADOS EMBUTIDOS (JSON ORIGINAL FORNECIDO) ---
+        const EMBEDDED_STOCK_DATA = {
+            "brinquedos": [
+                { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX2Tga0PM2k0Z1rIWz2bIW73rW1VFIkDCYPg&s" },
+                { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "image": "https://raw.githubusercontent.com/encantofestas/site/7a37b74c8c65dbab1e792c834ee21f8e904d806d/mockup1760749737810.png" },
+                { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3m", "image": "" },
+                { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL", "image": "" },
+                { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "", "image": "" },
+                { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "", "image": "" },
+                { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "", "exclusiveGroup": "LONA", "image": "" },
+                { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "image": "" },
+                { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8 x 4m", "exclusiveGroup": "LONA", "image": "" },
+                { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "", "image": "" },
+                { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "", "image": "" },
+                { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "", "image": "" },
+                { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "Kit", "image": "" }
+            ],
+            "agendamentos": {
+                // Datas de 2025 para teste (O calendário só mostra 6 meses à frente de Dezembro/2025)
+                // Se estiver vendo em 2024, só verá estas se mudar a data atual do computador.
+                "2025-12-10": { "2": 1, "4": 1 },
+                "2025-12-13": { "1": 1, "2": 1, "8": 1, "9": 1 }, // LONA (8 ou 9) + 2 itens: POUCA DISPONIBILIDADE
+                "2025-12-14": { "2": 2, "4": 2, "1": 1 }, // 5 itens: ESGOTADO
+                "2025-12-17": { "10": 1, "12": 1, "2": 2, "4": 1, "11": 1, "8": 1, "5": 1, "3": 1, "6": 1 }, // Mais de 5 itens: ESGOTADO
+                "2025-12-21": { "7": 1 }, // 1 item LONA: POUCA DISPONIBILIDADE
+                "2025-12-24": { "3": 1, "13": 4, "2": 1, "4": 1 }, // 7 itens: ESGOTADO
+                "2026-01-10": { "3": 1, "2": 1, "4": 1 }, // 3 itens: POUCA DISPONIBILIDADE
+                "2026-04-18": { "10": 1, "11": 1, "12": 1 }, // 3 itens: POUCA DISPONIBILIDADE
+                "2026-04-01": { "7": 1 } // 1 item LONA: POUCA DISPONIBILIDADE
+            }
+        };
+        // --- FIM DOS DADOS EMBUTIDOS ---
+
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -165,41 +198,24 @@
         let selectedItems = {};
         let currentStep = 'selection';
 
-        // LÓGICA DE BUSCA LOCAL
+        // LÓGICA DE BUSCA EMBUTIDA
         async function fetchData() {
             document.getElementById('panel-loading').classList.remove('hidden'); 
             document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             
             try {
-                // Tenta buscar o arquivo local
-                const response = await fetch('estoque.json');
+                // Não fazemos mais fetch, usamos os dados locais
+                const data = EMBEDDED_STOCK_DATA; 
                 
-                if (!response.ok) {
-                    throw new Error('Arquivo não encontrado (404) ou erro de servidor.');
-                }
-                
-                const data = await response.json();
                 toysInventory = data.brinquedos || []; 
                 processAvailability(data);
                 document.getElementById('toys-list-container').classList.remove('hidden');
             } catch (error) { 
-                console.error("Erro:", error); 
+                // Este bloco é apenas para fins de debug, pois teoricamente não deve falhar
+                console.error("Erro no processamento de dados locais:", error); 
                 document.getElementById('panel-error').classList.remove('hidden');
-                
-                // Mensagem de erro amigável e explicativa
-                const errorMsg = document.getElementById('error-message-detail');
-                if (window.location.protocol === 'file:') {
-                    errorMsg.innerHTML = `
-                        <span class="block mb-2 font-bold text-red-600">⚠️ Bloqueio de Segurança do Navegador</span>
-                        Você abriu o arquivo clicando nele diretamente? Navegadores não permitem ler arquivos JSON assim.<br><br>
-                        <b>Solução Fácil:</b><br>
-                        Use a extensão <b>"Live Server"</b> no VS Code.<br>
-                        <i>(Clique com botão direito no index.html > Open with Live Server)</i>
-                    `;
-                } else {
-                    errorMsg.textContent = `Não foi possível ler "estoque.json". Verifique se o nome está correto e na mesma pasta.`;
-                }
+                document.getElementById('error-message-detail').textContent = `Erro interno ao processar os dados de estoque.`;
             } 
             finally { 
                 document.getElementById('panel-loading').classList.add('hidden'); 
@@ -213,8 +229,7 @@
 
             if (data.agendamentos && toysInventory.length > 0) {
                 for (const [rawDate, items] of Object.entries(data.agendamentos)) {
-                    // Garante que a data do JSON (ex: "2025-12-10") seja lida corretamente
-                    // Se o JSON tiver "2025-12-10", rawDate é isso.
+                    // Aqui mantemos a data bruta do JSON, pois o calendário usará a ISO formatada
                     
                     let totalRentedCount = 0;
                     for (const quantity of Object.values(items)) { totalRentedCount += quantity; }
@@ -241,6 +256,7 @@
             if (!toysInventory || toysInventory.length === 0) return 0;
             const toy = toysInventory.find(t => t.id === toyId); if (!toy) return 0;
             
+            // CORREÇÃO: Usar a data ISO formatada pelo calendário para buscar no globalAgendamentos
             const rentedCount = globalAgendamentos[dateISO]?.[toyId] || 0;
                                 
             if (toy.exclusiveGroup === 'LONA') {
@@ -507,9 +523,14 @@
             nextButton.onclick = isAtMaxFuture ? showToast : navigateNext;
             for (let i = 0; i < firstDayOfMonth; i++) { const emptyCell = document.createElement('div'); emptyCell.className = 'dia-vazio p-2'; calendarBody.appendChild(emptyCell); }
             for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(currentYear, currentMonth, day); const status = getDayStatus(currentYear, currentMonth, day);
+                const date = new Date(currentYear, currentMonth, day); 
+                // CORREÇÃO DA DATA: Garante que a data do dia corrente seja formatada corretamente para a busca no mockedDayData
+                const dateISO = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                // Busca o status usando a data ISO formatada
+                const status = mockedDayData[dateISO] || { cssClass: 'status-livre' };
+                
                 const cell = document.createElement('div'); 
-                // CORREÇÃO: Aplicação correta da classe CSS
                 cell.className = `dia-celula rounded-lg shadow-sm relative overflow-hidden ${status.cssClass}`;
                 if (date.getTime() < today.getTime()) { cell.classList.add('dia-passado'); } else { cell.classList.add('text-gray-900'); cell.onclick = () => window.openToysPanel(day, currentMonth, currentYear); }
                 if (date.getTime() === today.getTime()) cell.classList.add('dia-hoje');
@@ -518,14 +539,19 @@
         }
         function navigatePrev() { if (prevButton.disabled) return; currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1); renderCalendar(); }
         function navigateNext() { const nextMonthCheck = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1); if (nextMonthCheck.getTime() < maxFutureDate.getTime()) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); renderCalendar(); }}
-        prevButton.addEventListener('click', navigatePrev);
+        prevButton.addEventListener('click', navigateNext);
 
         // Notificação simplificada
         window.toggleNotificationPanel = function() { 
-            // Implementação simples caso necessário, mas removi o painel HTML para simplificar
             alert("Notificações em breve!");
         }
-        function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
+        function showToast() { 
+            const toast = document.getElementById('toast-notification');
+            if (toast) {
+                toast.classList.add('show'); 
+                setTimeout(() => toast.classList.remove('show'), 3000); 
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => { fetchData(); renderCalendar(); });
     </script>
