@@ -20,25 +20,18 @@
         .dia-passado { opacity: 0.4; cursor: not-allowed; background-color: #f8fafc !important; color: #cbd5e1; pointer-events: none; }
         .dia-hoje { border: 2px solid #2563EB; font-weight: 700; z-index: 5; }
         .dia-numero { position: absolute; top: 2px; right: 4px; font-size: 0.85rem; font-weight: 600; color: rgba(0, 0, 0, 0.7); z-index: 10; }
-        /* Cores de Status Forçadas */
+        
+        /* Cores de Status */
         .status-livre { background-color: #22c55e !important; color: white !important; } /* Verde */
         .status-pouco { background-color: #eab308 !important; color: white !important; } /* Amarelo */
         .status-esgotado { background-color: #ef4444 !important; color: white !important; } /* Vermelho */
-        
+
         #toast-notification { visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translate(-50%, 20px); left: 50%; position: fixed; bottom: 6rem; width: 90%; max-width: 400px; z-index: 80; pointer-events: none; }
         #toast-notification.show { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
         #toys-panel { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; z-index: 70; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; box-shadow: 0 -4px 25px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; display: flex; flex-direction: column; pointer-events: none; }
         #toys-panel.open { transform: translateY(0); pointer-events: auto; }
         #toys-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 60; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; pointer-events: none; }
         #toys-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
-        /* CSS Painel Notificações */
-        #notification-panel { z-index: 100; transition: transform 0.3s ease-out; position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; background-color: #2563EB; pointer-events: none; transform: translateX(100%); }
-        #notification-panel.open { pointer-events: auto; transform: translateX(0); }
-        #notification-content { height: 100%; display: flex; flex-direction: column; }
-        
-        /* Debug Console Visual */
-        #debug-console { position: fixed; bottom: 80px; right: 10px; background: rgba(0,0,0,0.8); color: lime; font-family: monospace; font-size: 10px; padding: 10px; border-radius: 8px; z-index: 9999; max-width: 200px; max-height: 200px; overflow-y: auto; display: none; }
-        #debug-toggle { position: fixed; bottom: 80px; right: 10px; z-index: 10000; background: red; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -47,21 +40,14 @@
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo Encanto Festas" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner" onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner" onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
-            <div class="hidden md:flex items-center space-x-4">
-                <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
-                <button onclick="window.location.href='perfil.html'" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold">Entrar</button>
-                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 shadow-lg">Agendar Agora</button>
+            <div class="flex items-center space-x-4">
+                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 shadow-lg hidden md:block">Agendar Agora</button>
             </div>
-            <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600" onclick="toggleNotificationPanel()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
         </div>
     </header>
-
-    <!-- DEBUG TOGGLE -->
-    <div id="debug-toggle" onclick="toggleDebug()">🛠️</div>
-    <div id="debug-console">Carregando logs...</div>
 
     <!-- TOAST -->
     <div id="toast-notification" class="bg-gray-800/95 backdrop-blur-sm text-white px-5 py-4 rounded-xl shadow-2xl z-[60] flex items-center justify-center space-x-3 text-center border border-gray-700">
@@ -82,7 +68,7 @@
                     <button onclick="closeToysPanel()" class="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
                 <div id="panel-loading" class="p-8 text-center text-gray-500 hidden"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div><p>Carregando estoque...</p></div>
-                <div id="panel-error" class="p-8 text-center text-red-500 hidden"><p class="font-bold">Erro ao carregar estoque.</p><p class="text-sm mt-2">Não foi possível acessar os dados. Verifique sua conexão ou se o arquivo JSON está acessível.</p></div>
+                <div id="panel-error" class="p-8 text-center text-red-500 hidden"><p class="font-bold">Erro ao carregar estoque.</p><p class="text-sm mt-2">Verifique se o arquivo <b>estoque.json</b> está na mesma pasta.</p></div>
                 
                 <div class="p-4 space-y-4" id="toys-list-container"></div>
             </div>
@@ -122,7 +108,7 @@
                             <div id="time-fee-warning" class="text-xs text-red-600 mt-1 hidden font-normal"></div>
                         </div>
                         
-                        <!-- ÂNCORA CORRIGIDA PARA OS CAMPOS DE TOMADA -->
+                        <!-- Container para inputs de tomada (Injetado via JS) -->
                         <div id="power-outlet-anchor"></div>
 
                         <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"><select id="delivery-day-before" onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select><label class="text-sm font-medium text-gray-700">Pode levar um dia antes, pelo mesmo valor?</label></div>
@@ -151,16 +137,6 @@
             <div id="total-summary-rows" class="space-y-1 text-sm text-gray-700 mb-2"></div>
             <div class="flex justify-between items-center mb-3 pt-2 border-t border-gray-300"><span class="text-lg font-bold text-gray-800">Total:</span><span id="total-price-display" class="text-xl md:text-2xl font-extrabold text-green-600">R$ 0,00</span></div>
             <button id="action-button" onclick="handleActionButton()" class="w-full bg-gray-400 text-white font-bold py-3 rounded-xl shadow-lg transition transform active:scale-95 disabled:bg-gray-400" disabled>Continuar Agendamento</button>
-        </div>
-    </div>
-
-    <!-- NOTIFICAÇÕES (Lateral) -->
-    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
-    <div id="notification-panel">
-        <div id="notification-content">
-            <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10"><h3 class="text-xl font-bold brand-font text-white">Notificações</h3><button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
-            <div class="flex-grow overflow-y-auto relative"><ul id="notification-list" class="p-4 space-y-3 pb-24"></ul><div id="loading-notifications" class="p-4 text-center hidden"><div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div><p class="text-sm text-blue-200 mt-2">Carregando...</p></div></div>
-            <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));"><button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline disabled:opacity-50">Marcar todas como lidas</button></div>
         </div>
     </div>
 
@@ -195,62 +171,30 @@
         </div>
     </nav>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, writeBatch, Timestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        setLogLevel('silent');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-
-        let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        
-        // URL ORIGINAL COM CACHE BUSTING
-        const GITHUB_JSON_URL_BASE = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
-
+    <script>
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const monthYearDisplay = document.getElementById('current-month-year'); const calendarBody = document.getElementById('calendar-body'); const prevButton = document.getElementById('prev-month'); const nextButton = document.getElementById('next-month'); const toast = document.getElementById('toast-notification');
         let currentSelectedDateISO = "";
+        let selectedItems = {};
+        let currentStep = 'selection';
 
-        // DEBUG TOOLS
-        window.logDebug = function(msg) {
-            const console = document.getElementById('debug-console');
-            console.innerHTML += `<div>> ${msg}</div>`;
-            console.scrollTop = console.scrollHeight;
-        }
-        window.toggleDebug = function() {
-            const console = document.getElementById('debug-console');
-            console.style.display = console.style.display === 'none' ? 'block' : 'none';
-        }
-
+        // LÓGICA DE BUSCA: Busca 'estoque.json' na mesma pasta, com cache busting
         async function fetchData() {
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             try {
-                const cacheBusterUrl = `${GITHUB_JSON_URL_BASE}?t=${new Date().getTime()}`;
-                window.logDebug(`Buscando: ${cacheBusterUrl}`);
-                
-                const response = await fetch(cacheBusterUrl);
-                if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-                
+                // O timestamp (?t=...) força o navegador a baixar uma versão nova toda vez
+                const response = await fetch('estoque.json?t=' + new Date().getTime());
+                if (!response.ok) throw new Error('Erro ao buscar estoque.json');
                 const data = await response.json();
-                toysInventory = data.brinquedos; 
                 
-                // Processamento de dados
-                if (data.agendamentos) {
-                    window.logDebug(`Encontrados ${Object.keys(data.agendamentos).length} dias com reservas.`);
-                    processAvailability(data);
-                } else {
-                    window.logDebug("Sem reservas no JSON.");
-                }
-
+                toysInventory = data.brinquedos || []; 
+                processAvailability(data);
                 document.getElementById('toys-list-container').classList.remove('hidden');
             } catch (error) { 
                 console.error("Erro:", error); 
-                window.logDebug(`Erro fatal: ${error.message}`);
                 document.getElementById('panel-error').classList.remove('hidden');
             } 
             finally { 
@@ -259,25 +203,14 @@
             }
         }
 
-        function normalizeDateKey(dateString) {
-            // Converte chaves 'YYYY-M-D' ou 'YYYY-MM-D' para 'YYYY-MM-DD' estrito
-            const parts = dateString.split('-');
-            if (parts.length === 3) {
-                const y = parts[0];
-                const m = parts[1].padStart(2, '0');
-                const d = parts[2].padStart(2, '0');
-                return `${y}-${m}-${d}`;
-            }
-            return dateString;
-        }
-
+        // PROCESSA DATAS E CORES
         function processAvailability(data) {
             globalAgendamentos = data.agendamentos || {};
             mockedDayData = {};
 
             if (data.agendamentos && toysInventory.length > 0) {
                 for (const [rawDate, items] of Object.entries(data.agendamentos)) {
-                    // CORREÇÃO CRÍTICA: Normalizar a data do JSON para casar com o calendário
+                    // Normaliza a data para garantir formato YYYY-MM-DD (ex: 2025-05-01)
                     const normalizedDate = normalizeDateKey(rawDate);
                     
                     let totalRentedCount = 0;
@@ -285,6 +218,7 @@
 
                     let cssClass = 'status-livre'; // Verde
                     
+                    // Lógica para brinquedos exclusivos ("LONA")
                     const isLonaBooked = Object.keys(items).some(bookedId => {
                          const bookedToy = toysInventory.find(t => t.id == bookedId);
                          return bookedToy && bookedToy.exclusiveGroup === 'LONA' && items[bookedId] > 0;
@@ -297,19 +231,31 @@
                     }
                     
                     mockedDayData[normalizedDate] = { cssClass: cssClass };
-                    window.logDebug(`${normalizedDate}: ${totalRentedCount} itens -> ${cssClass}`);
                 }
             }
+        }
+
+        function normalizeDateKey(dateString) {
+            const parts = dateString.split('-');
+            if (parts.length === 3) {
+                const y = parts[0];
+                const m = parts[1].padStart(2, '0');
+                const d = parts[2].padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            return dateString;
         }
 
         function getStockForDate(toyId, dateISO) {
             if (!toysInventory || toysInventory.length === 0) return 0;
             const toy = toysInventory.find(t => t.id === toyId); if (!toy) return 0;
-            // Tenta buscar pela data normalizada ISO
+            
+            // Tenta buscar data normalizada ou formato original
             const rentedCount = globalAgendamentos[dateISO]?.[toyId] || 
-                                globalAgendamentos[dateISO.replace(/-0/g, '-')]?.[toyId] || // Tenta buscar formato não normalizado se necessário
+                                globalAgendamentos[dateISO.replace(/-0/g, '-')]?.[toyId] || 
                                 0;
                                 
+            // Regra de Exclusividade (LONA)
             if (toy.exclusiveGroup === 'LONA') {
                  const agendamentosDia = globalAgendamentos[dateISO] || {};
                  const isAnyLonaBooked = Object.keys(agendamentosDia).some(bookedId => {
@@ -321,7 +267,7 @@
             return Math.max(0, toy.total_stock - rentedCount);
         }
 
-        // ... Resto das funções auxiliares ...
+        // Funções de Cálculo e UI
         window.calculatePriceWithScarcity = function(toy) {
             if (toy.scarcityGroup === 'ELASTIC' || toy.scarcityGroup === 'BALL') {
                 const maxStockIdeal = toy.scarcityGroup === 'ELASTIC' ? 3 : 2;
@@ -585,8 +531,7 @@
         window.toggleMonitorFields = function(isInitialLoad = false) { const shouldShow = document.getElementById('has-monitors').value === 'Sim'; document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow); if (shouldShow && !isInitialLoad) { window.renderMonitorHours(); } else if (!shouldShow) { document.getElementById('monitor-hours-fields').innerHTML = ''; } }
         window.toggleCnpjField = function() { const shouldShow = document.getElementById('request-invoice').checked; document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); document.getElementById('client-cnpj').required = shouldShow; }
         
-        window.onload = function() { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); fetchData(); };
-        function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
+        window.onload = function() { window.toggleMonitorFields(true); window.toggleCnpjField(); fetchData(); };
         function getDayStatus(year, month, day) { const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; return mockedDayData[dateKey] || { cssClass: 'status-livre' }; }
         function renderCalendar() {
             const currentMonth = currentCalendarDate.getMonth(); const currentYear = currentCalendarDate.getFullYear();
@@ -609,40 +554,20 @@
         function navigateNext() { const nextMonthCheck = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1); if (nextMonthCheck.getTime() < maxFutureDate.getTime()) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); renderCalendar(); }}
         prevButton.addEventListener('click', navigatePrev);
 
-        // ... Firebase/Notificações ...
-        let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]')); let notificationsData = [];
-        function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
-        function getReadNotificationsCollection(uid) { return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`); }
-        window.markSingleAsRead = async function(e, notificationId) { e.stopPropagation(); const idStr = String(notificationId); readNotificationsIds.add(idStr); updateLocalCache(); renderNotifications(); if (userId) { try { const docRef = doc(getReadNotificationsCollection(userId), idStr); await setDoc(docRef, { readAt: Timestamp.now(), notificationId: idStr }); } catch (error) { console.error("Erro:", error); } } }
-        window.navigateTo = function(url) { if (url && url !== '#') window.location.href = url; }
-        window.markAllAsRead = async function() { const batchIds = []; notificationsData.forEach(n => { const idStr = String(n.id); if (!readNotificationsIds.has(idStr)) { readNotificationsIds.add(idStr); batchIds.push(idStr); } }); updateLocalCache(); renderNotifications(); if (!userId || batchIds.length === 0) return; const batch = writeBatch(db); const now = Timestamp.now(); batchIds.forEach(id => { const docRef = doc(getReadNotificationsCollection(userId), id); batch.set(docRef, { readAt: now, notificationId: id }); }); try { await batch.commit(); } catch (error) { console.error("Erro:", error); } }
-        function updateNotificationCount(count) { const elements = document.querySelectorAll('.notification-counter'); const markAllButton = document.getElementById('mark-all-button'); if (markAllButton) { if (count > 0) { markAllButton.classList.remove('opacity-50', 'pointer-events-none'); markAllButton.innerText = "Marcar todas como lidas"; markAllButton.disabled = false; } else { markAllButton.classList.add('opacity-50', 'pointer-events-none'); markAllButton.innerText = "Nenhuma nova notificação"; markAllButton.disabled = true; } } elements.forEach(el => { if (count > 0) { el.classList.remove('hidden'); el.innerText = count > 9 ? '9+' : count; } else { el.classList.add('hidden'); } }); }
-        function renderNotifications() { const panelList = document.getElementById('notification-list'); const loadingIndicator = document.getElementById('loading-notifications'); if (loadingIndicator) loadingIndicator.classList.add('hidden'); const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id))); updateNotificationCount(unreadItems.length); if (!isPanelOpen) return; panelList.innerHTML = ''; if (unreadItems.length === 0) { panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>'; return; } unreadItems.forEach(notificacao => { const li = document.createElement('li'); const bgClass = 'bg-blue-700 hover:bg-blue-800'; const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨'; const hasLink = `cursor-pointer active:scale-[0.98]`; li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`; if (notificacao.link) { li.onclick = () => window.navigateTo(notificacao.link); } const dataFormatada = isNaN(new Date(notificacao.data)) ? notificacao.data : new Date(notificacao.data).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); li.innerHTML = `<div class="flex flex-col items-center gap-2"><div class="text-4xl mb-2">${icon}</div><div class="flex-grow text-center"><h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4><p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p><span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span></div><button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 relative">Marcar como Lida</button></div>`; panelList.appendChild(li); }); }
-        async function fetchNotifications() { try { const response = await fetch('notificacoes.json'); if (response.ok) { notificationsData = (await response.json()).map(item => ({ ...item, id: String(item.id) })); renderNotifications(); } else { console.warn("Arquivo notificacoes.json não encontrado."); } } catch (error) { console.error("Erro ao buscar notificações:", error); } }
-        async function setupNotificationListener() { if (!isAuthReady || !userId) return; unsubscribeNotifications = onSnapshot(getReadNotificationsCollection(userId), (snapshot) => { let hasChanges = false; snapshot.docs.forEach(doc => { if (!readNotificationsIds.has(doc.id)) { readNotificationsIds.add(doc.id); hasChanges = true; } }); if (hasChanges) { updateLocalCache(); renderNotifications(); } }, (error) => { console.error("Erro Firestore:", error); }); }
-        
-        // CORREÇÃO: Função Toggle Notification Simplificada
+        // Funções de notificação simplificadas (sem Firebase/Links Externos)
         window.toggleNotificationPanel = function() { 
             const panel = document.getElementById('notification-panel'); 
             const overlay = document.getElementById('notification-overlay'); 
-            isPanelOpen = !isPanelOpen; 
-            
-            if (isPanelOpen) { 
-                panel.classList.add('open'); 
-                overlay.classList.remove('hidden'); 
-                document.body.classList.add('overflow-hidden'); 
-                renderNotifications(); 
+            const isOpen = panel.classList.contains('open');
+            if (!isOpen) { 
+                panel.classList.add('open'); overlay.classList.remove('hidden'); document.body.classList.add('overflow-hidden');
             } else { 
-                panel.classList.remove('open'); 
-                overlay.classList.add('hidden'); 
-                document.body.classList.remove('overflow-hidden'); 
+                panel.classList.remove('open'); overlay.classList.add('hidden'); document.body.classList.remove('overflow-hidden'); 
             } 
         }
+        function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
 
-        async function initializeFirebaseAndAuth() { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } onAuthStateChanged(auth, (user) => { if (user) { userId = user.uid; isAuthReady = true; setupNotificationListener(); } else { userId = null; isAuthReady = true; if (unsubscribeNotifications) unsubscribeNotifications(); updateNotificationCount(0); } }); } catch (e) { console.error("Erro Firebase:", e); isAuthReady = true; } }
-        window.openWhatsApp = function() { window.open('https://wa.me/5547992277324', '_blank'); }
-
-        document.addEventListener('DOMContentLoaded', () => { fetchNotifications(); initializeFirebaseAndAuth(); renderCalendar(); });
+        document.addEventListener('DOMContentLoaded', () => { fetchData(); renderCalendar(); });
     </script>
 </body>
 </html>
