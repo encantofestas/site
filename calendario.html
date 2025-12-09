@@ -193,7 +193,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        // Mantemos o link para a 'main', pois é a versão mais recente
+        // CORREÇÃO: Mudamos de um commit específico (hash) para 'main' para pegar sempre a versão mais recente
         const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
@@ -206,17 +206,8 @@
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             try {
-                // ALTERAÇÃO CRÍTICA: Headers 'no-store' para forçar o navegador a ignorar cache
-                // Nota: O GitHub ainda pode levar 2-5 minutos para propagar a mudança no servidor deles
-                const response = await fetch(GITHUB_JSON_URL + '?v=' + new Date().getTime(), {
-                    cache: 'no-store', 
-                    headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
-                        'Pragma': 'no-cache',
-                        'Expires': '0'
-                    }
-                });
-                
+                // CORREÇÃO: Adicionamos '?t=' + timestamp para evitar que o navegador use cache antigo
+                const response = await fetch(GITHUB_JSON_URL + '?t=' + new Date().getTime());
                 if (!response.ok) throw new Error('Erro');
                 const data = await response.json();
                 toysInventory = data.brinquedos; processAvailability(data);
