@@ -193,7 +193,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        // URL BASE PARA BUSCAR A VERSÃO MAIS RECENTE (BRANCH MAIN)
+        // CORREÇÃO FINAL DA URL: Apontando para o branch 'main' para pegar a última versão do arquivo.
         const GITHUB_JSON_URL_BASE = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
@@ -213,7 +213,9 @@
                 
                 if (!response.ok) throw new Error('Erro');
                 const data = await response.json();
-                toysInventory = data.brinquedos; processAvailability(data);
+                toysInventory = data.brinquedos; 
+                // CORREÇÃO CRÍTICA: Chama processAvailability com os dados completos, incluindo agendamentos
+                processAvailability(data);
                 document.getElementById('toys-list-container').classList.remove('hidden');
             } catch (error) { 
                 console.error("Erro ao buscar dados do GitHub:", error); 
@@ -227,17 +229,36 @@
         }
 
         function processAvailability(data) {
+            // Inicializa agendamentos
             globalAgendamentos = data.agendamentos || {};
+            mockedDayData = {}; // Limpa dados anteriores
+
+            // CORREÇÃO LÓGICA: Calcula o status de cor de cada dia com base nos agendamentos
             if (data.agendamentos) {
                 for (const [date, items] of Object.entries(data.agendamentos)) {
-                    const totalRented = Object.values(items).reduce((a, b) => a + b, 0);
-                    let color = 'bg-green-500';
-                    if (totalRented >= 3) color = 'bg-yellow-500';
+                    let totalRentedCount = 0;
+                    
+                    // Soma a quantidade total de brinquedos alugados (não apenas os diferentes IDs)
+                    for (const quantity of Object.values(items)) {
+                        totalRentedCount += quantity;
+                    }
+
+                    let color = 'bg-green-500'; // Padrão: muita disponibilidade
+                    
+                    // Verifica se há brinquedos de lona exclusivos agendados
                     const isLonaBooked = Object.keys(items).some(bookedId => {
                          const bookedToy = toysInventory.find(t => t.id == bookedId);
-                         return bookedToy && bookedToy.exclusiveGroup === 'LONA';
+                         return bookedToy && bookedToy.exclusiveGroup === 'LONA' && items[bookedId] > 0;
                     });
-                    if (isLonaBooked || totalRented > 5) color = 'bg-yellow-500';
+                    
+                    // Regras de cor baseadas no total de itens/exclusivos
+                    if (totalRentedCount >= 5) {
+                        color = 'bg-red-500'; // Indisponível (mais de 5 itens é o limite)
+                    } else if (totalRentedCount >= 3 || isLonaBooked) {
+                         // Pouca disponibilidade se 3 ou mais itens ou se uma lona exclusiva estiver reservada
+                        color = 'bg-yellow-500';
+                    }
+                    
                     mockedDayData[date] = { color: color };
                 }
             }
