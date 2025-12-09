@@ -31,11 +31,11 @@
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
 
-    <!-- HEADER (FIXO TOPO) -->
+    <!-- HEADER -->
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo Encanto Festas" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner" onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner" onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
             <div class="hidden md:flex items-center space-x-4">
@@ -47,33 +47,29 @@
         </div>
     </header>
 
-    <!-- NOTIFICAÇÃO TOAST -->
+    <!-- TOAST -->
     <div id="toast-notification" class="bg-gray-800/95 backdrop-blur-sm text-white px-5 py-4 rounded-xl shadow-2xl z-[60] flex items-center justify-center space-x-3 text-center border border-gray-700">
         <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         <span class="text-sm font-semibold leading-tight">Reservas permitidas apenas até 6 meses à frente.</span>
     </div>
 
-    <!-- OVERLAY E PAINEL DE BRINQUEDOS -->
+    <!-- PAINEL DE BRINQUEDOS -->
     <div id="toys-overlay" onclick="closeToysPanel()"></div>
     <div id="toys-panel">
         <div class="w-full flex justify-center pt-3 pb-1" onclick="closeToysPanel()"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
         
         <div id="panel-content-area" class="flex-grow overflow-y-auto" style="padding-bottom: 2rem;">
-            <!-- View 1: Seleção de Brinquedos -->
+            <!-- View 1: Seleção -->
             <div id="selection-view">
                 <div class="px-5 pb-3 border-b border-gray-100 flex justify-between items-center">
                     <div><h3 class="text-lg font-bold text-gray-800 brand-font">Brinquedos Disponíveis</h3><p id="selected-date-display" class="text-sm text-blue-600 font-medium">Data selecionada</p></div>
                     <button onclick="closeToysPanel()" class="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
-                <!-- Loading State do Painel -->
-                <div id="panel-loading" class="p-8 text-center text-gray-500 hidden">
-                    <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div>
-                    <p>Carregando disponibilidade...</p>
-                </div>
+                <div id="panel-loading" class="p-8 text-center text-gray-500 hidden"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div><p>Carregando...</p></div>
                 <div class="p-4 space-y-4" id="toys-list-container"></div>
             </div>
 
-            <!-- View 2: Formulário de Checkout -->
+            <!-- View 2: Checkout -->
             <div id="checkout-view" class="px-5 py-4 hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-800 brand-font">Finalizar Reserva</h3>
@@ -85,96 +81,53 @@
                 </div>
                 <form id="checkout-form" onsubmit="event.preventDefault(); submitOrder()">
                     <div class="space-y-4">
-                        <div>
-                            <label for="client-name" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
-                            <input type="text" id="client-name" name="client-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Seu nome">
-                        </div>
-                        <div>
-                            <label for="client-neighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label>
-                            <select id="client-neighborhood" name="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none">
-                                <option value="" disabled selected>Selecione um bairro</option>
-                                <option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="client-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label>
+                            <select id="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
+                                <option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option>
                             </select>
                         </div>
                         <div class="flex space-x-2">
-                            <div class="flex-grow">
-                                <label for="client-street" class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label>
-                                <input type="text" id="client-street" name="client-street" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Rua">
-                            </div>
-                            <div class="w-24">
-                                <label for="client-number" class="block text-sm font-medium text-gray-700 mb-1">Nº</label>
-                                <input type="number" id="client-number" name="client-number" maxlength="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Nº">
-                            </div>
+                            <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label><input type="text" id="client-street" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
+                            <div class="w-24"><label class="block text-sm font-medium text-gray-700 mb-1">Nº</label><input type="number" id="client-number" maxlength="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Nº"></div>
                         </div>
-                        <div>
-                            <label for="client-reference" class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label>
-                            <textarea id="client-reference" name="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Detalhes da casa, cores, portão..."></textarea>
-                        </div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes..."></textarea></div>
                         <div class="flex space-x-2">
-                            <div>
-                                <label for="event-start-time" class="block text-sm font-medium text-gray-700 mb-1">Horário de Início</label>
-                                <select id="event-start-time" name="event-start-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none">
-                                    <option value="" disabled selected>Começa às</option><option value="09:00">09:00h</option><option value="10:00">10:00h</option><option value="11:00">11:00h</option><option value="12:00">12:00h</option><option value="13:00">13:00h</option><option value="14:00">14:00h</option><option value="15:00">15:00h</option><option value="16:00">16:00h</option><option value="17:00">17:00h</option><option value="18:00">18:00h</option><option value="19:00">19:00h</option><option value="20:00">20:00h</option><option value="21:00">21:00h</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="event-end-time" class="block text-sm font-medium text-gray-700 mb-1">Horário de Término</label>
-                                <select id="event-end-time" name="event-end-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none">
-                                    <option value="" disabled selected>Termina às</option><option value="09:00">09:00h</option><option value="10:00">10:00h</option><option value="11:00">11:00h</option><option value="12:00">12:00h</option><option value="13:00">13:00h</option><option value="14:00">14:00h</option><option value="15:00">15:00h</option><option value="16:00">16:00h</option><option value="17:00">17:00h</option><option value="18:00">18:00h</option><option value="19:00">19:00h</option><option value="20:00">20:00h</option><option value="21:00">21:00h</option>
-                                </select>
-                            </div>
+                            <div><label class="block text-sm font-medium text-gray-700 mb-1">Início</label><select id="event-start-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option><option value="18:00">18:00</option><option value="19:00">19:00</option><option value="20:00">20:00</option><option value="21:00">21:00</option></select></div>
+                            <div><label class="block text-sm font-medium text-gray-700 mb-1">Término</label><select id="event-end-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option><option value="18:00">18:00</option><option value="19:00">19:00</option><option value="20:00">20:00</option><option value="21:00">21:00</option></select></div>
                         </div>
                         <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                            <input type="checkbox" id="delivery-day-before" onchange="calculateTotal()" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <label for="delivery-day-before" class="text-sm font-medium text-gray-700 select-none">Deseja receber 1 dia antes? (Sem custo adicional)</label>
+                            <input type="checkbox" id="delivery-day-before" onchange="calculateTotal()" class="w-5 h-5 text-blue-600 border-gray-300 rounded">
+                            <label for="delivery-day-before" class="text-sm font-medium text-gray-700">Receber 1 dia antes? (Grátis)</label>
                         </div>
                         <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden">
-                            <div class="flex items-center space-x-3">
-                                <input type="checkbox" id="rain-protection" class="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500">
-                                <label for="rain-protection" class="text-sm font-medium text-gray-700 select-none">A Piscina de Bolinhas ficará protegida contra chuva?</label>
-                            </div>
+                            <div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-5 h-5 text-red-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Piscina protegida contra chuva?</label></div>
                         </div>
                         <div class="space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <label for="has-monitors" class="block text-sm font-bold text-gray-800 mb-1">Deseja contratar monitores?</label>
-                            <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-white appearance-none">
-                                <option value="Nao">Não</option><option value="Sim">Sim</option>
-                            </select>
+                            <label class="block text-sm font-bold text-gray-800 mb-1">Deseja monitores?</label>
+                            <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select>
                             <div id="monitor-options" class="space-y-3 mt-3 hidden">
-                                <div>
-                                    <label for="monitor-count" class="block text-sm font-medium text-gray-700 mb-1">Quantos monitores?</label>
-                                    <select id="monitor-count" onchange="renderMonitorHours(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 bg-white appearance-none">
-                                        <option value="1">1 Monitor</option><option value="2">2 Monitores</option>
-                                    </select>
-                                </div>
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Quantos?</label><select id="monitor-count" onchange="renderMonitorHours(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="1">1</option><option value="2">2</option></select></div>
                                 <div id="monitor-hours-fields" class="space-y-3"></div>
                             </div>
                         </div>
                         <div class="space-y-2 p-3 bg-green-50 rounded-lg border border-green-200">
                             <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
-                                    <label for="additional-insurance" class="text-sm font-medium text-gray-700 select-none">Seguro Adicional</label>
-                                </div>
+                                <div class="flex items-center space-x-3"><input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Seguro Adicional</label></div>
                                 <span class="text-sm font-bold text-green-700">+ R$ 10,00</span>
                             </div>
-                            <p class="text-xs text-gray-500 mt-1">Ao adicionar o seguro, você não precisa se preocupar em pagar por danos acidentais. Caso contrário, o custo de reparo pode chegar a R$ 300,00.</p>
+                            <p class="text-xs text-gray-500 mt-1">Ao adicionar o seguro, você não paga por danos acidentais. Sem seguro, reparos podem custar até R$ 300,00.</p>
                         </div>
                         <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200">
-                            <div class="flex items-center space-x-3">
-                                <input type="checkbox" id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-5 h-5 text-gray-600 border-gray-300 rounded focus:ring-gray-500">
-                                <label for="request-invoice" class="text-sm font-medium text-gray-700 select-none">Deseja Nota Fiscal (CNPJ)?</label>
-                            </div>
-                            <div id="cnpj-field" class="hidden">
-                                <label for="client-cnpj" class="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
-                                <input type="text" id="client-cnpj" name="client-cnpj" pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="00.000.000/0000-00">
-                            </div>
+                            <div class="flex items-center space-x-3"><input type="checkbox" id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-5 h-5 text-gray-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Nota Fiscal (CNPJ)?</label></div>
+                            <div id="cnpj-field" class="hidden"><input type="text" id="client-cnpj" name="client-cnpj" pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="00.000.000/0000-00"></div>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Rodapé do Painel (Total) -->
+        <!-- RODAPÉ -->
         <div class="p-4 border-t border-gray-100 bg-white shadow-lg pb-8 md:pb-4 flex-shrink-0">
             <div id="total-summary-rows" class="space-y-1 text-sm text-gray-700 mb-2"></div>
             <div class="flex justify-between items-center mb-3 pt-2 border-t border-gray-300">
@@ -185,31 +138,26 @@
         </div>
     </div>
 
-    <!-- PAINEL NOTIFICAÇÕES (Lateral) -->
+    <!-- NOTIFICAÇÕES -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
     <div id="notification-panel" class="transform translate-x-full">
         <div id="notification-content">
             <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10"><h3 class="text-xl font-bold brand-font text-white">Notificações</h3><button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
-            <div class="flex-grow overflow-y-auto relative">
-                <ul id="notification-list" class="p-4 space-y-3 pb-24"></ul>
-                <div id="loading-notifications" class="p-4 text-center hidden"><div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div><p class="text-sm text-blue-200 mt-2">Carregando...</p></div>
-            </div>
+            <div class="flex-grow overflow-y-auto relative"><ul id="notification-list" class="p-4 space-y-3 pb-24"></ul></div>
             <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));"><button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline disabled:opacity-50">Marcar todas como lidas</button></div>
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL: CALENDÁRIO -->
+    <!-- MAIN CALENDÁRIO -->
     <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-white md:bg-gray-50 flex flex-col items-center justify-start">
         <div class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100">
             <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Qual a data do seu evento?</h2>
             <div class="flex justify-between items-center mb-6 px-2">
-                <button id="prev-month" class="nav-btn p-2 rounded-full text-blue-600 hover:bg-blue-50 active:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
+                <button id="prev-month" class="nav-btn p-2 rounded-full text-blue-600 hover:bg-blue-50 active:bg-blue-100 disabled:opacity-30"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
                 <h3 id="current-month-year" class="text-xl md:text-2xl font-extrabold text-gray-800 tracking-wide text-center capitalize"></h3>
-                <button id="next-month" class="nav-btn p-2 rounded-full text-blue-600 hover:bg-blue-50 active:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg></button>
+                <button id="next-month" class="nav-btn p-2 rounded-full text-blue-600 hover:bg-blue-50 active:bg-blue-100 disabled:opacity-30"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg></button>
             </div>
-            <div class="grid grid-cols-7 text-center font-bold text-xs sm:text-sm text-gray-500 border-b border-gray-100 pb-3 mb-2">
-                <span class="p-1">DOM</span><span class="p-1">SEG</span><span class="p-1">TER</span><span class="p-1">QUA</span><span class="p-1">QUI</span><span class="p-1">SEX</span><span class="p-1">SÁB</span>
-            </div>
+            <div class="grid grid-cols-7 text-center font-bold text-xs sm:text-sm text-gray-500 border-b border-gray-100 pb-3 mb-2"><span class="p-1">DOM</span><span class="p-1">SEG</span><span class="p-1">TER</span><span class="p-1">QUA</span><span class="p-1">QUI</span><span class="p-1">SEX</span><span class="p-1">SÁB</span></div>
             <div id="calendar-body" class="grid grid-cols-7 gap-1 md:gap-2"></div>
             <div class="flex flex-wrap justify-center gap-x-3 gap-y-2 text-[10px] sm:text-xs font-semibold text-gray-600 mt-6 pt-4 border-t border-gray-100">
                 <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span>Muita disponibilidade</span></div>
@@ -219,10 +167,8 @@
         </div>
     </main>
 
-    <!-- FOOTER -->
     <footer class="bg-white border-t border-gray-200 py-8 hidden md:block"><div class="max-w-7xl mx-auto px-4 text-center text-gray-500"><p>&copy; 2024 EncantoFestas Locações. Feito com diversão.</p></div></footer>
 
-    <!-- BOTTOM BAR -->
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
             <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" stroke-width="1.6"></path></svg><span class="text-[10px] font-medium mt-1">Início</span></a>
@@ -233,7 +179,6 @@
         </div>
     </nav>
 
-    <!-- SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -244,113 +189,60 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
+        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/refs/heads/main/estoque.json';
 
-        // --- FETCH DE DADOS VIA GITHUB JSON ---
-        // Aqui você substitui pela URL "Raw" do seu arquivo JSON no GitHub
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/refs/heads/main/estoque.json'; // Substitua por sua URL
-
-        let toysInventory = []; // Será preenchido pelo fetch
-        let currentAvailableStock = {}; // Será preenchido, mas idealmente viria do JSON também se fosse "dinâmico"
-        let mockedDayData = {}; // Será preenchido do JSON
+        let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
+        let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const monthYearDisplay = document.getElementById('current-month-year'); const calendarBody = document.getElementById('calendar-body'); const prevButton = document.getElementById('prev-month'); const nextButton = document.getElementById('next-month'); const toast = document.getElementById('toast-notification');
+        let currentSelectedDateISO = "";
 
         async function fetchData() {
-            // Mostra loading no painel
-            document.getElementById('panel-loading').classList.remove('hidden');
-            document.getElementById('toys-list-container').classList.add('hidden');
-
+            document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             try {
-                // Se não tiver URL configurada, usa dados de fallback para não quebrar a demo
-                if (!GITHUB_JSON_URL || GITHUB_JSON_URL.includes('SEU_USUARIO')) {
-                    console.warn("URL do JSON não configurada. Usando dados locais de exemplo.");
-                    useFallbackData();
-                } else {
+                if (!GITHUB_JSON_URL) { useFallbackData(); } 
+                else {
                     const response = await fetch(GITHUB_JSON_URL);
-                    if (!response.ok) throw new Error('Erro ao carregar dados');
+                    if (!response.ok) throw new Error('Erro');
                     const data = await response.json();
-                    
-                    toysInventory = data.brinquedos;
-                    // Mapeia agendamentos do JSON para o formato do calendário (exemplo simplificado)
-                    // Aqui estamos apenas assumindo que se tem agendamento, marca como ocupado
-                    // Para o sistema real, precisaria de lógica para calcular saldo (Total - Agendados)
-                    
-                    // Como o JSON sugerido tem "agendamentos": { "DATA": { "ID": QTD } }
-                    // Vamos processar isso para o mockedDayData (cores do calendário)
-                    processAvailability(data);
+                    toysInventory = data.brinquedos; processAvailability(data);
                 }
-            } catch (error) {
-                console.error("Erro no fetch:", error);
-                useFallbackData(); // Fallback em caso de erro
-            } finally {
-                document.getElementById('panel-loading').classList.add('hidden');
-                document.getElementById('toys-list-container').classList.remove('hidden');
-                renderCalendar(); // Re-renderiza o calendário com os dados novos
-            }
+            } catch (error) { console.error(error); useFallbackData(); } 
+            finally { document.getElementById('panel-loading').classList.add('hidden'); document.getElementById('toys-list-container').classList.remove('hidden'); renderCalendar(); }
         }
 
         function useFallbackData() {
-            // Dados originais para caso o fetch falhe ou não esteja configurado
-            toysInventory = [
-                { id: 1, name: "Cama Elástica Pequena", total_stock: 1, price: 170, measure: "2,00m Ø" }, 
-                { id: 2, name: "Cama Elástica Média", total_stock: 3, price: 190, measure: "3,05m Ø", scarcityGroup: 'ELASTIC' },
-                { id: 3, name: "Castelinho Pula Pula", total_stock: 1, price: 210, measure: "2,50 x 2,50m", exclusiveGroup: 'LONA' },
-                { id: 4, name: "Piscina de Bolinhas", total_stock: 2, price: 160, measure: "1,50 x 1,50m", scarcityGroup: 'BALL' },
-                { id: 5, name: "Área Baby", total_stock: 1, price: 110, measure: "3,00 x 3,00m" },
-                { id: 6, name: "Mini Baby Inflável", total_stock: 1, price: 220, measure: "2,80 x 2,80m" },
-                { id: 7, name: "Escorrega com Bolinha", total_stock: 1, price: 400, measure: "4,50 x 2,50m", exclusiveGroup: 'LONA' },
-                { id: 8, name: "Tobogã Médio", total_stock: 1, price: 400, measure: "5,00 x 3,00m", exclusiveGroup: 'LONA' },
-                { id: 9, name: "Futebol de Sabão", total_stock: 1, price: 600, measure: "8,00 x 4,00m", exclusiveGroup: "LONA" },
-                { id: 10, name: "Pebolim", total_stock: 1, price: 200, measure: "1,40 x 0,80m" },
-                { id: 11, name: "Air Hockey", total_stock: 1, price: 200, measure: "1,80 x 0,90m" },
-                { id: 12, name: "Ping Pong", total_stock: 1, price: 200, measure: "2,74 x 1,52m" },
-                { id: 13, name: "Jogos de Mesa", total_stock: 4, price: 15, measure: "Padrão", note: "O jogo" }
-            ];
-            // Simula disponibilidade (tudo livre por padrão no fallback)
-            currentAvailableStock = {}; 
+            toysInventory = [{ id: 1, name: "Cama Elástica Pequena", total_stock: 1, price: 170, measure: "2,00m Ø" }, { id: 2, name: "Cama Elástica Média", total_stock: 3, price: 190, measure: "3,05m Ø", scarcityGroup: 'ELASTIC' }, { id: 3, name: "Castelinho Pula Pula", total_stock: 1, price: 210, measure: "2,50 x 2,50m", exclusiveGroup: 'LONA' }, { id: 4, name: "Piscina de Bolinhas", total_stock: 2, price: 160, measure: "1,50 x 1,50m", scarcityGroup: 'BALL' }, { id: 5, name: "Área Baby", total_stock: 1, price: 110, measure: "3,00 x 3,00m" }, { id: 6, name: "Mini Baby Inflável", total_stock: 1, price: 220, measure: "2,80 x 2,80m" }, { id: 7, name: "Escorrega com Bolinha", total_stock: 1, price: 400, measure: "4,50 x 2,50m", exclusiveGroup: 'LONA' }, { id: 8, name: "Tobogã Médio", total_stock: 1, price: 400, measure: "5,00 x 3,00m", exclusiveGroup: 'LONA' }, { id: 9, name: "Futebol de Sabão", total_stock: 1, price: 600, measure: "8,00 x 4,00m", exclusiveGroup: "LONA" }, { id: 10, name: "Pebolim", total_stock: 1, price: 200, measure: "1,40 x 0,80m" }, { id: 11, name: "Air Hockey", total_stock: 1, price: 200, measure: "1,80 x 0,90m" }, { id: 12, name: "Ping Pong", total_stock: 1, price: 200, measure: "2,74 x 1,52m" }, { id: 13, name: "Jogos de Mesa", total_stock: 4, price: 15, measure: "Padrão", note: "O jogo" }];
+            globalAgendamentos = {};
         }
 
         function processAvailability(data) {
-            // Lógica simples: Se tem agendamento, vamos assumir que diminui o estoque naquele dia
-            // Para simplificar a visualização do calendário (cores), vamos marcar dias com muitos agendamentos
-            // como "Pouca Disponibilidade" ou "Indisponível".
-            
-            // Exemplo de como usar os dados do JSON para pintar o calendário
+            globalAgendamentos = data.agendamentos || {};
             if (data.agendamentos) {
                 for (const [date, items] of Object.entries(data.agendamentos)) {
-                    // Lógica para determinar a cor com base na quantidade de itens alugados
-                    // Ex: Se mais de 3 itens alugados no dia -> Amarelo
                     const totalRented = Object.values(items).reduce((a, b) => a + b, 0);
                     let color = 'bg-green-500';
                     if (totalRented > 2) color = 'bg-yellow-500';
                     if (totalRented > 5) color = 'bg-red-500';
-                    
-                    mockedDayData[date] = { color: color, isHoliday: false };
+                    mockedDayData[date] = { color: color };
                 }
             }
         }
-        
-        // --- RESTO DAS VARIÁVEIS ---
-        let currentCalendarDate = new Date();
-        const today = new Date(); today.setHours(0, 0, 0, 0); 
-        const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
-        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        const monthYearDisplay = document.getElementById('current-month-year');
-        const calendarBody = document.getElementById('calendar-body');
-        const prevButton = document.getElementById('prev-month');
-        const nextButton = document.getElementById('next-month');
-        const toast = document.getElementById('toast-notification');
 
-        // --- FUNÇÕES DE LÓGICA DE NEGÓCIO ---
+        function getStockForDate(toyId, dateISO) {
+            const toy = toysInventory.find(t => t.id === toyId); if (!toy) return 0;
+            const rentedCount = globalAgendamentos[dateISO]?.[toyId] || 0;
+            return Math.max(0, toy.total_stock - rentedCount);
+        }
+
         window.calculatePriceWithScarcity = function(toy) {
             if (toy.scarcityGroup === 'ELASTIC' || toy.scarcityGroup === 'BALL') {
                 const maxStockIdeal = toy.scarcityGroup === 'ELASTIC' ? 3 : 2;
-                // Importante: Aqui deveríamos checar o estoque DO DIA ESPECÍFICO.
-                // Como simplificação, usamos o total_stock do JSON ou um valor fixo se não tivermos a data.
-                // Em um sistema real, você cruzaria com 'data.agendamentos[selectedDate][toy.id]'
-                const availableStock = toy.total_stock; 
+                const availableStock = getStockForDate(toy.id, currentSelectedDateISO);
                 let basePrice = toy.price;
                 if (availableStock < maxStockIdeal) {
                     const discount = (maxStockIdeal - availableStock) * 20;
-                    return basePrice - discount;
+                    return Math.max(basePrice - discount, basePrice - 60);
                 }
             }
             return toy.price;
@@ -370,44 +262,28 @@
 
         window.updateCheckoutSummary = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
-            const summaryDiv = document.getElementById('checkout-summary');
-            summaryDiv.innerHTML = '';
-            
+            const summaryDiv = document.getElementById('checkout-summary'); summaryDiv.innerHTML = '';
             const itemCount = details.length;
             const discountRate = itemCount >= 2 ? 0.10 : 0;
             const discount = subtotal * discountRate;
-
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const shippingFee = (neighborhood === 'Ervino') ? 25.00 : 0;
-
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
             const insuranceFee = insuranceChecked ? 10.00 : 0;
-            
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             let monitorFee = 0;
-            if (monitorCount > 0) {
-                for (let i = 1; i <= monitorCount; i++) {
-                    const hours = parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0);
-                    monitorFee += hours * 30;
-                }
-            }
+            if (monitorCount > 0) { for (let i = 1; i <= monitorCount; i++) { monitorFee += (parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0) * 30); } }
 
             details.forEach(item => {
-                const itemContainer = document.createElement('div');
-                itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
-                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</div>`;
-                summaryDiv.appendChild(itemContainer);
+                summaryDiv.innerHTML += `<div class="flex justify-between border-b border-gray-200 py-1.5"><span class="font-medium text-gray-700">${item.quantity}x ${item.name}</span><span class="text-green-600 font-bold">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</span></div>`;
             });
             
-            const summaryTotalDiv = document.getElementById('total-summary-rows');
-            summaryTotalDiv.innerHTML = '';
-
+            const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
             summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Subtotal:</span><span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span></div>`;
-            
-            if (monitorFee > 0) { summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores:</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`; }
-            if (discount > 0) { summaryTotalDiv.innerHTML += `<div class="flex justify-between font-bold text-green-600"><span>Desconto (10%):</span><span>- R$ ${discount.toFixed(2).replace('.', ',')}</span></div>`; }
-            if (shippingFee > 0) { summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Frete (Ervino):</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`; }
-            if (insuranceFee > 0) { summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`; }
+            if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores:</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
+            if (discount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto (10%):</span><span>- R$ ${discount.toFixed(2).replace('.', ',')}</span></div>`;
+            if (shippingFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Frete (Ervino):</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`;
+            if (insuranceFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`;
         }
         
         window.calculateTotal = function() {
@@ -415,51 +291,39 @@
             const itemCount = details.length;
             const discountRate = itemCount >= 2 ? 0.10 : 0;
             const discount = subtotal * discountRate;
-
             const neighborhood = document.getElementById('client-neighborhood')?.value;
-            const insuranceChecked = document.getElementById('additional-insurance')?.checked;
-            const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
-            
-            let monitorFee = 0;
-            if (monitorCount > 0) {
-                for (let i = 1; i <= monitorCount; i++) {
-                    const hours = parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0);
-                    monitorFee += hours * 30;
-                }
-            }
-
             const shippingFee = (neighborhood === 'Ervino') ? 25.00 : 0;
+            const insuranceChecked = document.getElementById('additional-insurance')?.checked;
             const insuranceFee = insuranceChecked ? 10.00 : 0;
+            const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
+            let monitorFee = 0;
+            if (monitorCount > 0) { for (let i = 1; i <= monitorCount; i++) { monitorFee += (parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0) * 30); } }
+            
             const finalTotal = subtotal - discount + shippingFee + insuranceFee + monitorFee;
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
+            
             const actionButton = document.getElementById('action-button');
-            const totalItems = window.getSelectedItemDetails().details.length;
+            const totalItems = details.length;
             actionButton.disabled = totalItems === 0;
-            if (totalItems > 0 && currentStep === 'selection') { actionButton.innerText = `Continuar Agendamento`; } 
-            else if (currentStep === 'checkout') { actionButton.innerText = `Confirmar Reserva`; } 
-            else { actionButton.innerText = `Continuar Agendamento`; }
+            if (currentStep === 'selection') actionButton.innerText = `Continuar Agendamento`;
+            else if (currentStep === 'checkout') actionButton.innerText = `Confirmar Reserva`;
             
-            if (document.getElementById('total-summary-rows')) { window.updateCheckoutSummary(); }
-            
+            if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
         }
         
         window.updateQuantity = function(toyId, change) {
             const toy = toysInventory.find(t => t.id === toyId); if (!toy) return;
-            const maxStock = toy.total_stock; // Usa o estoque total do JSON
-            
-            // Aqui entraria a lógica de verificar estoque DO DIA se tivéssemos os dados completos
-            // let availableToday = maxStock - (agendamentosDoDia[toyId] || 0);
-
+            const maxStock = getStockForDate(toyId, currentSelectedDateISO);
             let currentQty = selectedItems[toyId] || 0; let newQty = currentQty + change;
             if (newQty < 0) newQty = 0; if (newQty > maxStock) newQty = maxStock;
             if (toy.exclusiveGroup === 'LONA' && change > 0) {
                 if (currentQty === 0) {
                     const otherLonaItem = toysInventory.find(t => t.exclusiveGroup === 'LONA' && t.id !== toyId && (selectedItems[t.id] || 0) > 0);
-                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado por dia. Remova o(a) ${otherLonaItem.name} antes de adicionar.`); return; }
+                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado. Remova o(a) ${otherLonaItem.name} antes.`); return; }
                 }
-                if (newQty > 1) newQty = 1; 
+                if (newQty > 1) newQty = 1;
             }
             selectedItems[toyId] = newQty;
             const qtyDisplay = document.getElementById(`qty-display-${toyId}`); if (qtyDisplay) qtyDisplay.innerText = newQty;
@@ -472,8 +336,7 @@
 
         window.changeStep = function(step) {
             currentStep = step;
-            const panelContent = document.getElementById('panel-content-area');
-            if (panelContent) panelContent.scrollTop = 0; 
+            const panelContent = document.getElementById('panel-content-area'); if (panelContent) panelContent.scrollTop = 0;
             document.getElementById('selection-view').classList.add('hidden');
             document.getElementById('checkout-view').classList.add('hidden');
             if (step === 'checkout') { window.updateCheckoutSummary(); document.getElementById('checkout-view').classList.remove('hidden'); } 
@@ -483,7 +346,7 @@
 
         window.handleActionButton = function() {
             if (currentStep === 'selection') {
-                if (window.getSelectedItemDetails().details.length === 0) { alert('Por favor, selecione pelo menos um brinquedo para continuar.'); return; }
+                if (window.getSelectedItemDetails().details.length === 0) { alert('Selecione pelo menos um brinquedo.'); return; }
                 window.changeStep('checkout');
             } else if (currentStep === 'checkout') { window.submitOrder(); }
         }
@@ -492,107 +355,73 @@
             const name = document.getElementById('client-name').value;
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value;
-            const number = document.getElementById('client-number').value;
             const eventStartTime = document.getElementById('event-start-time').value;
             const eventEndTime = document.getElementById('event-end-time').value;
-            if (!name || !neighborhood || !street || eventStartTime === "" || eventEndTime === "") { alert('Por favor, preencha todos os campos obrigatórios.'); return; }
+            if (!name || !neighborhood || !street || eventStartTime === "" || eventEndTime === "") { alert('Preencha os campos obrigatórios.'); return; }
+            
+            const number = document.getElementById('client-number').value || 'S/N';
             const insuranceChecked = document.getElementById('additional-insurance').checked;
             const deliveryDayBefore = document.getElementById('delivery-day-before').checked;
             const invoiceChecked = document.getElementById('request-invoice').checked;
             const cnpj = document.getElementById('client-cnpj').value;
             const rainProtection = document.getElementById('rain-protection')?.checked;
             
-            if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { alert('Por favor, insira o CNPJ no formato correto (00.000.000/0000-00).'); return; }
+            if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { alert('CNPJ inválido.'); return; }
 
             const { details, total } = window.getSelectedItemDetails();
-            let orderSummary = `--- NOVO AGENDAMENTO ---\nData: ${document.getElementById('selected-date-display').innerText.replace('Para a data ', '')}\n`;
-            orderSummary += `--- DADOS DO CLIENTE ---\nNome: ${name}\nBairro: ${neighborhood}\nRua: ${street}, Nº ${number || 'N/A'}\nCNPJ (Nota Fiscal): ${invoiceChecked ? cnpj : 'Não Solicitado'}\nHorário do Evento: ${eventStartTime} - ${eventEndTime}\n`;
-            orderSummary += `--- LOGÍSTICA E EXTRAS ---\nEntrega no dia anterior: ${deliveryDayBefore ? 'SIM' : 'NÃO'}\nSeguro Adicional: ${insuranceChecked ? 'SIM (+R$ 10,00)' : 'NÃO'}\n`;
+            let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para a data ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n📄 CNPJ: ${invoiceChecked ? cnpj : 'Não'}\n⏰ Horário: ${eventStartTime} - ${eventEndTime}\n🚚 Entr. Antecipada: ${deliveryDayBefore ? 'SIM' : 'NÃO'}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
             
             const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
-            if (isBallPitIncluded) { orderSummary += `Proteção Chuva (Piscina): ${rainProtection ? 'SIM (Cliente garante)' : 'NÃO (Risco)'}\n`; }
-
+            if (isBallPitIncluded) orderSummary += `🌧 Proteção Chuva: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
+            
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             if (monitorCount > 0) {
-                orderSummary += `Monitores (${monitorCount}):\n`;
-                for (let i = 1; i <= monitorCount; i++) {
-                    const hours = parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0);
-                    orderSummary += `  - Monitor ${i}: ${hours} horas (R$ ${(hours * 30).toFixed(2)})\n`;
-                }
-            } else { orderSummary += `Monitores: NÃO\n`; }
+                orderSummary += `👮 Monitores: ${monitorCount}\n`;
+                for (let i = 1; i <= monitorCount; i++) orderSummary += `  - Monitor ${i}: ${document.getElementById(`monitor-hours-${i}`).value}h\n`;
+            }
 
-            orderSummary += `--- ITENS (${details.length}) ---\n`;
-            details.forEach(item => { orderSummary += `- ${item.quantity}x ${item.name} (R$ ${item.lineTotal.toFixed(2).replace('.', ',')})\n`; });
-            const finalTotalText = document.getElementById('total-price-display').innerText;
-            orderSummary += `\nVALOR FINAL: ${finalTotalText}\n`;
+            orderSummary += `\n*ITENS:*\n`;
+            details.forEach(item => { orderSummary += `• ${item.quantity}x ${item.name}\n`; });
+            orderSummary += `\n💰 *TOTAL: ${document.getElementById('total-price-display').innerText}*`;
             
-            alert('Pedido Enviado! Verifique o console para o resumo da ordem.');
-            console.log(orderSummary); window.closeToysPanel(); window.changeStep('selection'); 
+            window.open(`https://wa.me/5547992277324?text=${encodeURIComponent(orderSummary)}`, '_blank');
+            window.closeToysPanel(); window.changeStep('selection'); 
         }
 
         window.openToysPanel = function(day, month, year) {
-            const dateStr = `${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
-            document.getElementById('selected-date-display').innerText = `Para a data ${dateStr}`;
-            const listContainer = document.getElementById('toys-list-container');
-            listContainer.innerHTML = ''; selectedItems = {}; 
+            currentSelectedDateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            document.getElementById('selected-date-display').innerText = `Para a data ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
+            document.getElementById('toys-list-container').innerHTML = ''; selectedItems = {}; 
             
-            document.getElementById('has-monitors').value = 'Nao';
-            document.getElementById('delivery-day-before').checked = false;
-            document.getElementById('additional-insurance').checked = false;
-            document.getElementById('request-invoice').checked = false;
+            document.getElementById('has-monitors').value = 'Nao'; document.getElementById('delivery-day-before').checked = false; document.getElementById('additional-insurance').checked = false; document.getElementById('request-invoice').checked = false;
             if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
-            window.toggleMonitorFields(true); window.toggleCnpjField();
-            
-            window.changeStep('selection'); 
+            window.toggleMonitorFields(true); window.toggleCnpjField(); window.changeStep('selection'); 
 
             toysInventory.forEach(toy => {
-                const maxStock = toy.total_stock; const currentQty = selectedItems[toy.id] || 0;
+                const maxStock = getStockForDate(toy.id, currentSelectedDateISO);
+                if (maxStock === 0) return;
                 const finalPrice = window.calculatePriceWithScarcity(toy);
                 const priceFormatted = toy.note ? `R$ ${finalPrice.toFixed(2).replace('.', ',')} / ${toy.note}` : `R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
                 let scarcityLabel = '';
-                if (toy.scarcityGroup && toy.total_stock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-red-500 block">Preço ajustado (Escassez!)</span>`; }
-                const isUnavailable = maxStock === 0;
+                if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-red-500 block">Preço ajustado (Escassez!)</span>`; }
+                
                 const item = document.createElement('div');
-                item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md ${isUnavailable ? 'opacity-50 pointer-events-none' : ''}`;
-                item.innerHTML = `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><div class="flex-grow min-w-0"><h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4><p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>${scarcityLabel}<span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span>${isUnavailable ? '<span class="text-red-500 text-sm font-bold">ESGOTADO NO DIA</span>' : `<div class="flex items-center space-x-2 text-sm font-medium"><button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full disabled:opacity-50" ${currentQty === 0 ? 'disabled' : ''}><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></button><span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">${currentQty}</span><button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full disabled:opacity-50" ${currentQty === maxStock ? 'disabled' : ''}><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg></button><span class="text-xs text-gray-400">(${maxStock} máx.)</span></div>`}</div>`;
-                listContainer.appendChild(item);
-            }); window.calculateTotal(); 
-            document.getElementById('toys-panel').classList.add('open'); document.getElementById('toys-overlay').classList.add('open'); document.body.style.overflow = 'hidden';
+                item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md`;
+                item.innerHTML = `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><div class="flex-grow min-w-0"><h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4><p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>${scarcityLabel}<span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span><div class="flex items-center space-x-2 text-sm font-medium"><button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full disabled:opacity-50" disabled><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></button><span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">0</span><button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full disabled:opacity-50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg></button><span class="text-xs text-gray-400">(${maxStock} máx.)</span></div></div>`;
+                document.getElementById('toys-list-container').appendChild(item);
+            }); 
+            window.calculateTotal(); document.getElementById('toys-panel').classList.add('open'); document.getElementById('toys-overlay').classList.add('open'); document.body.style.overflow = 'hidden';
         }
 
         window.closeToysPanel = function() { document.getElementById('toys-panel').classList.remove('open'); document.getElementById('toys-overlay').classList.remove('open'); document.body.style.overflow = ''; }
-        window.renderMonitorHours = function() {
-            const count = parseInt(document.getElementById('monitor-count').value); const hoursContainer = document.getElementById('monitor-hours-fields'); hoursContainer.innerHTML = '';
-            for (let i = 1; i <= count; i++) { hoursContainer.innerHTML += `<div><label for="monitor-hours-${i}" class="block text-sm font-medium text-gray-700 mb-1">Monitor ${i} - Horas (R$ 30,00/hora)</label><input type="number" id="monitor-hours-${i}" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas"></div>`; }
-        }
-        window.toggleMonitorFields = function(isInitialLoad = false) { const shouldShow = document.getElementById('has-monitors').value === 'Sim'; document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow); if (shouldShow && !isInitialLoad) { window.renderMonitorHours(); } else if (!shouldShow) { document.getElementById('monitor-hours-fields').innerHTML = ''; } }
-        window.toggleCnpjField = function() { const shouldShow = document.getElementById('request-invoice').checked; document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); document.getElementById('client-cnpj').required = shouldShow; }
-        
-        window.onload = function() { 
-            // Inicia chamando o fetch
-            fetchData(); 
-            window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); 
-        };
-
-        // ... resto das funcoes iguais (toast, etc)
         function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
-        // ... (resto do código igual ao anterior) ...
-        
-        // ... Copiar as demais funcoes do bloco anterior para completar ...
-        // (Por brevidade, como o foco era a integração do JSON, o restante da lógica de UI se mantém igual ao artifact anterior "Calendário com Agendamento PRO - Compacto")
-        
-        // Mantendo as funcoes auxiliares vitais para o funcionamento:
         function getDayStatus(year, month, day) { const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false }; }
         function renderCalendar() {
-             // ... mesma logica de renderCalendar do artifact anterior ...
-             // (Repliquei a lógica no bloco acima, mas para garantir 100% funcional, vou colar o bloco completo abaixo)
-            const currentMonth = currentCalendarDate.getMonth(); const currentYear = currentCalendarDate.getFullYear();
-            monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`; calendarBody.innerHTML = '';
+            const currentMonth = currentCalendarDate.getMonth(); const currentYear = currentCalendarDate.getFullYear(); monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`; calendarBody.innerHTML = '';
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1); const firstDayOfNextMonth = new Date(currentYear, currentMonth + 1, 1);
             prevButton.disabled = firstDayOfCurrentMonth.getTime() === new Date(today.getFullYear(), today.getMonth(), 1).getTime();
-            const isAtMaxFuture = firstDayOfNextMonth.getTime() >= maxFutureDate.getTime(); nextButton.disabled = isAtMaxFuture;
-            nextButton.onclick = isAtMaxFuture ? showToast : navigateNext;
+            const isAtMaxFuture = firstDayOfNextMonth.getTime() >= maxFutureDate.getTime(); nextButton.disabled = isAtMaxFuture; nextButton.onclick = isAtMaxFuture ? showToast : navigateNext;
             for (let i = 0; i < firstDayOfMonth; i++) { const emptyCell = document.createElement('div'); emptyCell.className = 'dia-vazio p-2'; calendarBody.appendChild(emptyCell); }
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(currentYear, currentMonth, day); const status = getDayStatus(currentYear, currentMonth, day);
@@ -606,19 +435,20 @@
         function navigateNext() { const nextMonthCheck = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1); if (nextMonthCheck.getTime() < maxFutureDate.getTime()) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); renderCalendar(); }}
         prevButton.addEventListener('click', navigatePrev);
 
-        // ... Firebase init ...
-        async function initializeFirebaseAndAuth() { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } onAuthStateChanged(auth, (user) => { if (user) { userId = user.uid; isAuthReady = true; setupNotificationListener(); } else { userId = null; isAuthReady = true; if (unsubscribeNotifications) unsubscribeNotifications(); updateNotificationCount(0); } }); } catch (e) { console.error("Erro Firebase:", e); isAuthReady = true; } }
+        let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]')); let notificationsData = [];
+        function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
+        function getReadNotificationsCollection(uid) { return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`); }
+        window.markSingleAsRead = async function(e, notificationId) { e.stopPropagation(); const idStr = String(notificationId); readNotificationsIds.add(idStr); updateLocalCache(); renderNotifications(); if (userId) { try { const docRef = doc(getReadNotificationsCollection(userId), idStr); await setDoc(docRef, { readAt: Timestamp.now(), notificationId: idStr }); } catch (error) { console.error("Erro:", error); } } }
+        window.navigateTo = function(url) { if (url && url !== '#') window.location.href = url; }
+        window.markAllAsRead = async function() { const batchIds = []; notificationsData.forEach(n => { const idStr = String(n.id); if (!readNotificationsIds.has(idStr)) { readNotificationsIds.add(idStr); batchIds.push(idStr); } }); updateLocalCache(); renderNotifications(); if (!userId || batchIds.length === 0) return; const batch = writeBatch(db); const now = Timestamp.now(); batchIds.forEach(id => { const docRef = doc(getReadNotificationsCollection(userId), id); batch.set(docRef, { readAt: now, notificationId: id }); }); try { await batch.commit(); } catch (error) { console.error("Erro:", error); } }
+        function updateNotificationCount(count) { const elements = document.querySelectorAll('.notification-counter'); const markAllButton = document.getElementById('mark-all-button'); if (markAllButton) { if (count > 0) { markAllButton.classList.remove('opacity-50', 'pointer-events-none'); markAllButton.innerText = "Marcar todas como lidas"; markAllButton.disabled = false; } else { markAllButton.classList.add('opacity-50', 'pointer-events-none'); markAllButton.innerText = "Nenhuma nova notificação"; markAllButton.disabled = true; } } elements.forEach(el => { if (count > 0) { el.classList.remove('hidden'); el.innerText = count > 9 ? '9+' : count; } else { el.classList.add('hidden'); } }); }
+        function renderNotifications() { const panelList = document.getElementById('notification-list'); const loadingIndicator = document.getElementById('loading-notifications'); if (loadingIndicator) loadingIndicator.classList.add('hidden'); const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id))); updateNotificationCount(unreadItems.length); if (!isPanelOpen) return; panelList.innerHTML = ''; if (unreadItems.length === 0) { panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>'; return; } unreadItems.forEach(notificacao => { const li = document.createElement('li'); const bgClass = 'bg-blue-700 hover:bg-blue-800'; const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨'; const hasLink = `cursor-pointer active:scale-[0.98]`; li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`; if (notificacao.link) { li.onclick = () => window.navigateTo(notificacao.link); } const dataFormatada = isNaN(new Date(notificacao.data)) ? notificacao.data : new Date(notificacao.data).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); li.innerHTML = `<div class="flex flex-col items-center gap-2"><div class="text-4xl mb-2">${icon}</div><div class="flex-grow text-center"><h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4><p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p><span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span></div><button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 relative">Marcar como Lida</button></div>`; panelList.appendChild(li); }); }
+        async function fetchNotifications() { try { const response = await fetch('notificacoes.json'); if (response.ok) { notificationsData = (await response.json()).map(item => ({ ...item, id: String(item.id) })); renderNotifications(); } else { console.warn("Arquivo notificacoes.json não encontrado."); } } catch (error) { console.error("Erro ao buscar notificações:", error); } }
         async function setupNotificationListener() { if (!isAuthReady || !userId) return; unsubscribeNotifications = onSnapshot(getReadNotificationsCollection(userId), (snapshot) => { let hasChanges = false; snapshot.docs.forEach(doc => { if (!readNotificationsIds.has(doc.id)) { readNotificationsIds.add(doc.id); hasChanges = true; } }); if (hasChanges) { updateLocalCache(); renderNotifications(); } }, (error) => { console.error("Erro Firestore:", error); }); }
         window.toggleNotificationPanel = function() { const panel = document.getElementById('notification-panel'); const overlay = document.getElementById('notification-overlay'); isPanelOpen = !isPanelOpen; if (isPanelOpen) { panel.classList.remove('translate-x-full'); overlay.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); renderNotifications(); } else { panel.classList.add('translate-x-full'); overlay.classList.add('hidden'); document.body.classList.remove('overflow-hidden'); } }
-
-        // Placeholder functions for notification logic (already defined in previous versions, kept minimal for brevity here as the focus was JSON integration)
-        function updateLocalCache() {} 
-        function getReadNotificationsCollection(uid) {} 
-        window.markSingleAsRead = async function(e, id) {}
-        window.markAllAsRead = async function() {}
-        function updateNotificationCount(c) {}
-        function renderNotifications() {}
-        // (Note: In a real deploy, ensure the notification logic is fully copied from the previous functional version. I focused on the JSON fetch logic here.)
+        async function initializeFirebaseAndAuth() { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } onAuthStateChanged(auth, (user) => { if (user) { userId = user.uid; isAuthReady = true; setupNotificationListener(); } else { userId = null; isAuthReady = true; if (unsubscribeNotifications) unsubscribeNotifications(); updateNotificationCount(0); } }); } catch (e) { console.error("Erro Firebase:", e); isAuthReady = true; } }
+        window.openWhatsApp = function() { window.open('https://wa.me/5547992277324', '_blank'); }
+        document.addEventListener('DOMContentLoaded', () => { fetchNotifications(); initializeFirebaseAndAuth(); renderCalendar(); });
     </script>
 </body>
 </html>
