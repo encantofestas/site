@@ -84,7 +84,7 @@
                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="client-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label>
                             <select id="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
-                                <option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option>
+                                <option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri (+R$10)</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada (+R$10)</option><option value="Ervino">Ervino (+R$25)</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu (+R$10)</option><option value="Laranjeiras">Laranjeiras (+R$10)</option><option value="Majorca">Majorca (+R$10)</option><option value="Miranda">Miranda (+R$10)</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande (+R$10)</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira (+R$10)</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina (+R$10)</option><option value="Tapera">Tapera (+R$10)</option><option value="Ubatuba">Ubatuba (+R$10)</option>
                             </select>
                         </div>
                         <div class="flex space-x-2">
@@ -102,7 +102,7 @@
                             <label class="block text-sm font-bold text-gray-800 mb-1">Deseja contratar monitores?</label>
                             <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select>
                             <div id="monitor-options" class="space-y-3 mt-3 hidden">
-                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Quantos?</label><select id="monitor-count" onchange="calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="1">1</option><option value="2">2</option></select></div>
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Quantos?</label><select id="monitor-count" onchange="renderMonitorHours(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="1">1</option><option value="2">2</option></select></div>
                                 <div id="monitor-hours-fields" class="space-y-3"></div>
                             </div>
                         </div>
@@ -176,9 +176,38 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/main/estoque.json';
 
-        let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
+        // DADOS INTEGRADOS (FALLBACK/PADRÃO) - Caso o fetch falhe, usa estes
+        const DEFAULT_DATA = {
+          "brinquedos": [
+            { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m" },
+            { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC" },
+            { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3,00 x 3,00m" }, // Removido exclusiveGroup: LONA
+            { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,50 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL" },
+            { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "3,00 x 3,00m" },
+            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "2,80 x 2,80m" },
+            { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "4,50 x 2,50m", "exclusiveGroup": "LONA" },
+            { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5,00 x 3,00m", "exclusiveGroup": "LONA" },
+            { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8,00 x 4,00m", "exclusiveGroup": "LONA" },
+            { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "1,40 x 0,80m" },
+            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "1,80 x 0,90m" },
+            { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "2,74 x 1,52m" },
+            { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão" }
+          ],
+          "agendamentos": {
+            "2025-10-12": { "2": 3, "4": 1 },
+            "2025-12-10": { "2": 1, "4": 1 },
+            "2025-12-13": { "1": 1, "2": 1, "8": 1, "9": 1 },
+            "2025-12-14": { "2": 1, "4": 1, "1": 1 },
+            "2025-12-21": { "7": 1 },
+            "2025-12-24": { "3": 1, "13": 4 },
+            "2025-12-25": { "9": 1 },
+            "2026-01-10": { "3": 1, "2": 1, "4": 1 },
+            "2026-04-18": { "10": 1, "11": 1, "12": 1 }
+          }
+        };
+
+        let toysInventory = [], mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const monthYearDisplay = document.getElementById('current-month-year'); const calendarBody = document.getElementById('calendar-body'); const prevButton = document.getElementById('prev-month'); const nextButton = document.getElementById('next-month'); const toast = document.getElementById('toast-notification');
@@ -187,20 +216,20 @@
         async function fetchData() {
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             try {
-                if (!GITHUB_JSON_URL) { useFallbackData(); } 
-                else {
-                    const response = await fetch(GITHUB_JSON_URL);
-                    if (!response.ok) throw new Error('Erro');
-                    const data = await response.json();
-                    toysInventory = data.brinquedos; processAvailability(data);
-                }
-            } catch (error) { console.error(error); useFallbackData(); } 
-            finally { document.getElementById('panel-loading').classList.add('hidden'); document.getElementById('toys-list-container').classList.remove('hidden'); renderCalendar(); }
-        }
-
-        function useFallbackData() {
-            toysInventory = [{ id: 1, name: "Cama Elástica Pequena", total_stock: 1, price: 170, measure: "2,44m" }, { id: 2, name: "Cama Elástica Média", total_stock: 3, price: 190, measure: "3,05m", scarcityGroup: 'ELASTIC' }, { id: 3, name: "Castelinho Pula Pula", total_stock: 1, price: 210, measure: "3,00 x 3,00m", exclusiveGroup: 'LONA' }, { id: 4, name: "Piscina de Bolinhas", total_stock: 2, price: 160, measure: "1,50 (descoberto) / 2m (coberto)", scarcityGroup: 'BALL' }, { id: 5, name: "Área Baby", total_stock: 1, price: 110, measure: "3,00 x 3,00m" }, { id: 6, name: "Mini Baby Inflável", total_stock: 1, price: 220, measure: "2,80 x 2,80m" }, { id: 7, name: "Escorrega com Bolinha", total_stock: 1, price: 400, measure: "4,50 x 2,50m", exclusiveGroup: 'LONA' }, { id: 8, name: "Tobogã Médio", total_stock: 1, price: 400, measure: "5,00 x 3,00m", exclusiveGroup: 'LONA' }, { id: 9, name: "Futebol de Sabão", total_stock: 1, price: 600, measure: "8,00 x 4,00m", exclusiveGroup: "LONA" }, { id: 10, name: "Pebolim", total_stock: 1, price: 200, measure: "1,40 x 0,80m" }, { id: 11, name: "Air Hockey", total_stock: 1, price: 200, measure: "1,80 x 0,90m" }, { id: 12, name: "Ping Pong", total_stock: 1, price: 200, measure: "2,74 x 1,52m" }, { id: 13, name: "Jogos de Mesa", total_stock: 4, price: 15, measure: "Padrão" }];
-            globalAgendamentos = {};
+                // Tenta buscar o arquivo local estoque.json
+                const response = await fetch('estoque.json');
+                if (!response.ok) throw new Error('Erro ao carregar local');
+                const data = await response.json();
+                toysInventory = data.brinquedos; processAvailability(data);
+            } catch (error) { 
+                console.log("Usando dados embutidos (fallback)"); 
+                toysInventory = DEFAULT_DATA.brinquedos; 
+                processAvailability(DEFAULT_DATA); 
+            } finally { 
+                document.getElementById('panel-loading').classList.add('hidden'); 
+                document.getElementById('toys-list-container').classList.remove('hidden'); 
+                renderCalendar(); 
+            }
         }
 
         function processAvailability(data) {
@@ -264,8 +293,10 @@
             const summaryDiv = document.getElementById('checkout-summary'); summaryDiv.innerHTML = '';
             
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
+            
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0;
+            
             const discountRate = itemCount >= 2 ? 0.10 : 0;
             const quantityDiscount = subtotal * discountRate;
 
@@ -281,7 +312,9 @@
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
-            if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
+            if (monitorCount > 0) {
+                monitorFee = monitorCount * monitorHours * 30;
+            }
 
             details.forEach(item => {
                 const itemContainer = document.createElement('div');
@@ -302,29 +335,36 @@
         window.calculateTotal = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
+            
             const discountRate = itemCount >= 2 ? 0.10 : 0;
             const quantityDiscount = subtotal * discountRate;
+            
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0; 
+
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
             if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
+
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
             let shippingFee = 0;
             if (neighborhood === 'Ervino') shippingFee = 25.00;
             else if (extraShippingNeighborhoods.includes(neighborhood)) shippingFee = 10.00;
+
             const insuranceFee = insuranceChecked ? 10.00 : 0;
             const finalTotal = (subtotal - quantityDiscount - couponDiscount) + shippingFee + insuranceFee + monitorFee;
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
+            
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
             actionButton.disabled = totalItems === 0;
             if (totalItems > 0 && currentStep === 'selection') { actionButton.innerText = `Continuar Agendamento`; } 
             else if (currentStep === 'checkout') { actionButton.innerText = `Confirmar Reserva`; } 
             else { actionButton.innerText = `Continuar Agendamento`; }
+            
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
@@ -338,7 +378,7 @@
             if (toy.exclusiveGroup === 'LONA' && change > 0) {
                 if (currentQty === 0) {
                     const otherLonaItem = toysInventory.find(t => t.exclusiveGroup === 'LONA' && t.id !== toyId && (selectedItems[t.id] || 0) > 0);
-                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado. Remova o(a) ${otherLonaItem.name} antes.`); return; }
+                    if (otherLonaItem) { alert(`Não temos motor para dois brinquedos assim.`); return; }
                 }
                 if (newQty > 1) newQty = 1;
             }
@@ -349,16 +389,24 @@
             let disablePlus = newQty === maxStock;
             if (toy.exclusiveGroup === 'LONA' && newQty === 1) disablePlus = true;
             document.getElementById(`btn-plus-${toyId}`).disabled = disablePlus;
-            // Visualmente desabilita outros botões de lona se um estiver selecionado
+            
+            // Visualmente desabilita outros botões de lona
             if (toy.exclusiveGroup === 'LONA') {
-                 // Re-render a lista toda seria pesado, mas podemos iterar pelos botoes de lona
                  const lonaToys = toysInventory.filter(t => t.exclusiveGroup === 'LONA');
                  const isLonaSelected = lonaToys.some(t => (selectedItems[t.id] || 0) > 0);
                  lonaToys.forEach(t => {
                      const btn = document.getElementById(`btn-plus-${t.id}`);
                      if (btn) {
-                         if (isLonaSelected && (selectedItems[t.id] || 0) === 0) btn.disabled = true;
-                         else if (!isLonaSelected && (selectedItems[t.id] || 0) < getStockForDate(t.id, currentSelectedDateISO)) btn.disabled = false;
+                         if (isLonaSelected && (selectedItems[t.id] || 0) === 0) {
+                             btn.disabled = true;
+                             btn.classList.add('opacity-50', 'cursor-not-allowed');
+                         } else {
+                             const stock = getStockForDate(t.id, currentSelectedDateISO);
+                             if ((selectedItems[t.id] || 0) < stock) {
+                                btn.disabled = false;
+                                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                             }
+                         }
                      }
                  });
             }
@@ -441,8 +489,8 @@
 
         window.closeToysPanel = function() { document.getElementById('toys-panel').classList.remove('open'); document.getElementById('toys-overlay').classList.remove('open'); document.body.style.overflow = ''; }
         window.renderMonitorHours = function() {
-            const count = parseInt(document.getElementById('monitor-count').value); const hoursContainer = document.getElementById('monitor-hours-fields'); hoursContainer.innerHTML = '';
-            hoursContainer.innerHTML = `<div><label for="monitor-hours" class="block text-sm font-medium text-gray-700 mb-1">Horas (Total para a equipe)</label><input type="number" id="monitor-hours" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas"></div>`;
+            const hoursContainer = document.getElementById('monitor-hours-fields');
+            hoursContainer.innerHTML = `<div><label for="monitor-hours" class="block text-sm font-medium text-gray-700 mb-1">Horas Total</label><input type="number" id="monitor-hours" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas"></div>`;
         }
         window.toggleMonitorFields = function(isInitialLoad = false) { const shouldShow = document.getElementById('has-monitors').value === 'Sim'; document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow); if (shouldShow && !isInitialLoad) { window.renderMonitorHours(); } else if (!shouldShow) { document.getElementById('monitor-hours-fields').innerHTML = ''; } }
         window.toggleCnpjField = function() { const shouldShow = document.getElementById('request-invoice').checked; document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); document.getElementById('client-cnpj').required = shouldShow; }
