@@ -87,7 +87,8 @@
                         <!-- Bairro -->
                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label>
                             <select id="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
-                                <option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri (+R$10)</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada (+R$10)</option><option value="Ervino">Ervino (+R$25)</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu (+R$10)</option><option value="Laranjeiras">Laranjeiras (+R$10)</option><option value="Majorca">Majorca (+R$10)</option><option value="Miranda">Miranda (+R$10)</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande (+R$10)</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira (+R$10)</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina (+R$10)</option><option value="Tapera">Tapera (+R$10)</option><option value="Ubatuba">Ubatuba (+R$10)</option>
+                                <option value="" disabled selected>Selecione</option>
+                                <option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option>
                             </select>
                         </div>
                         
@@ -106,8 +107,10 @@
                         
                         <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"><input type="checkbox" id="delivery-day-before" onchange="calculateTotal()" class="w-5 h-5 text-blue-600 border-gray-300 rounded"><label for="delivery-day-before" class="text-sm font-medium text-gray-700">Pode levar um dia antes, pelo mesmo valor?</label></div>
                         
-                        <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden"><div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-5 h-5 text-red-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Piscina protegida contra chuva?</label></div></div>
+                        <!-- Proteção Chuva (Opcional - aparece só com Piscina) -->
+                        <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden"><div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-5 h-5 text-red-600 border-gray-300 rounded"><label for="rain-protection" class="text-sm font-medium text-gray-700">A piscina fica totalmente coberta em caso de chuva</label></div></div>
                         
+                        <!-- Monitores -->
                         <div class="space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                             <label class="block text-sm font-bold text-gray-800 mb-1">Deseja contratar monitores?</label>
                             <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select>
@@ -117,6 +120,7 @@
                             </div>
                         </div>
                         
+                        <!-- Seguro Adicional -->
                         <div class="space-y-2 p-3 bg-green-50 rounded-lg border border-green-200">
                             <div class="flex items-center justify-between"><div class="flex items-center space-x-3"><input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded"><label for="additional-insurance" class="text-sm font-medium text-gray-700 select-none">Seguro Adicional</label></div><span class="text-sm font-bold text-green-700">+ R$ 10,00</span></div>
                             <p class="text-xs text-gray-500 mt-1">Ao adicionar o seguro, você não paga por danos acidentais. Sem seguro, reparos podem custar até R$ 300,00.</p>
@@ -188,7 +192,7 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/refs/heads/main/estoque.json';
+        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
@@ -200,16 +204,16 @@
           "brinquedos": [
             { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m" },
             { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC" },
-            { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3,00 x 3,00m" },
-            { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,50 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL" },
-            { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "" },
-            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "" },
-            { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "", "exclusiveGroup": "LONA" },
-            { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5,00 x 3,00m", "exclusiveGroup": "LONA" },
-            { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8,00 x 4,00m", "exclusiveGroup": "LONA" },
-            { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "" },
-            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "" },
-            { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "" },
+            { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3 x 3m", "needsPower": true },
+            { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL" },
+            { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "3 x 3m" },
+            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "2,8 x 2,8m", "needsPower": true },
+            { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "4,5 x 2,5m", "exclusiveGroup": "LONA", "needsPower": true },
+            { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "needsPower": true },
+            { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8 x 4m", "exclusiveGroup": "LONA", "needsPower": true },
+            { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "1,4 x 0,8m" },
+            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "1,8 x 0,9m", "needsPower": true },
+            { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "2,74 x 1,52m" },
             { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "O jogo" }
           ],
           "agendamentos": {
@@ -235,16 +239,11 @@
                     const data = await response.json();
                     toysInventory = data.brinquedos; processAvailability(data);
                 }
-            } catch (error) { 
-                useFallbackData(); 
-            } 
+            } catch (error) { useFallbackData(); } 
             finally { document.getElementById('panel-loading').classList.add('hidden'); document.getElementById('toys-list-container').classList.remove('hidden'); renderCalendar(); }
         }
 
-        function useFallbackData() {
-            toysInventory = DEFAULT_DATA.brinquedos;
-            processAvailability(DEFAULT_DATA);
-        }
+        function useFallbackData() { toysInventory = DEFAULT_DATA.brinquedos; processAvailability(DEFAULT_DATA); }
 
         function processAvailability(data) {
             globalAgendamentos = data.agendamentos || {};
@@ -297,7 +296,15 @@
                 if (quantity > 0) {
                     const pricePerUnit = window.calculatePriceWithScarcity(toy);
                     const lineTotal = quantity * pricePerUnit;
-                    total += lineTotal; details.push({ name: toy.name, quantity: quantity, price: pricePerUnit, lineTotal: lineTotal, id: toy.id });
+                    total += lineTotal; 
+                    details.push({ 
+                        name: toy.name, 
+                        quantity: quantity, 
+                        price: pricePerUnit, 
+                        lineTotal: lineTotal, 
+                        id: toy.id, 
+                        needsPower: toy.needsPower // Flag para saber se precisa de tomada
+                    });
                 }
             }); return { details, total };
         }
@@ -323,12 +330,8 @@
             if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
 
             details.forEach(item => {
-                const itemContainer = document.createElement('div');
-                itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
-                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</div>`;
-                summaryDiv.appendChild(itemContainer);
+                summaryDiv.innerHTML += `<div class="flex justify-between border-b border-gray-200 py-1.5"><span class="font-medium text-gray-700">${item.quantity}x ${item.name}</span><span class="text-green-600 font-bold">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</span></div>`;
             });
-            
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
             summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Subtotal:</span><span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span></div>`;
             if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores:</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
@@ -364,6 +367,7 @@
             if (totalItems > 0 && currentStep === 'selection') { actionButton.innerText = `Continuar Agendamento`; } 
             else if (currentStep === 'checkout') { actionButton.innerText = `Confirmar Reserva`; } 
             else { actionButton.innerText = `Continuar Agendamento`; }
+            
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
@@ -377,7 +381,7 @@
             if (toy.exclusiveGroup === 'LONA' && change > 0) {
                 if (currentQty === 0) {
                     const otherLonaItem = toysInventory.find(t => t.exclusiveGroup === 'LONA' && t.id !== toyId && (selectedItems[t.id] || 0) > 0);
-                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado. Remova o(a) ${otherLonaItem.name} antes.`); return; }
+                    if (otherLonaItem) { alert(`Não temos motor para dois brinquedos assim.`); return; }
                 }
                 if (newQty > 1) newQty = 1;
             }
@@ -388,8 +392,6 @@
             let disablePlus = newQty === maxStock;
             if (toy.exclusiveGroup === 'LONA' && newQty === 1) disablePlus = true;
             document.getElementById(`btn-plus-${toyId}`).disabled = disablePlus;
-            
-            // Visualmente desabilita outros botões de lona
             if (toy.exclusiveGroup === 'LONA') {
                  const lonaToys = toysInventory.filter(t => t.exclusiveGroup === 'LONA');
                  const isLonaSelected = lonaToys.some(t => (selectedItems[t.id] || 0) > 0);
@@ -403,12 +405,65 @@
             }
         }
 
+        // --- RENDERIZAÇÃO DOS CAMPOS DE TOMADA ---
+        window.renderPowerOutletFields = function() {
+            const container = document.getElementById('power-outlet-fields-container');
+            if (!container) {
+                // Cria o container se não existir, logo antes das opções extras
+                const form = document.querySelector('#checkout-form .space-y-4');
+                const newDiv = document.createElement('div');
+                newDiv.id = 'power-outlet-fields-container';
+                newDiv.className = 'space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200';
+                // Insere antes do checkbox de entrega antecipada (aproximadamente na posicao correta)
+                const deliveryCheckbox = document.querySelector('.flex.items-center.space-x-3.p-3.bg-blue-50');
+                form.insertBefore(newDiv, deliveryCheckbox);
+            }
+            
+            const realContainer = document.getElementById('power-outlet-fields-container');
+            realContainer.innerHTML = '';
+            
+            const { details } = window.getSelectedItemDetails();
+            // Filtra brinquedos que precisam de energia e que tem qtd > 0
+            const powerToys = details.filter(item => {
+                const toyDef = toysInventory.find(t => t.id === item.id);
+                return toyDef && toyDef.needsPower;
+            });
+
+            if (powerToys.length > 0) {
+                realContainer.classList.remove('hidden');
+                realContainer.innerHTML = `<label class="block text-sm font-bold text-indigo-800 mb-2">Detalhes de Energia (Máx 20m)</label>`;
+                
+                powerToys.forEach(toy => {
+                    // Para cada unidade desse brinquedo? O usuario pediu "pra cada brinquedo que ela reservar".
+                    // Se reservar 2 airockeys (teoricamente possivel se estoque > 1), precisaria de 2 inputs?
+                    // Assumindo que a pergunta é por TIPO de brinquedo, ou iteramos pela quantidade.
+                    // O usuario disse: "pra cada brinquedo que ela reservar". Vou iterar pela quantidade.
+                    for(let i=1; i<=toy.quantity; i++) {
+                         const label = toy.quantity > 1 ? `${toy.name} (#${i})` : toy.name;
+                         const inputId = `power-dist-${toy.id}-${i}`;
+                         realContainer.innerHTML += `
+                            <div>
+                                <label for="${inputId}" class="block text-xs font-medium text-gray-700">Distância da tomada para ${label} (Metros)</label>
+                                <input type="number" id="${inputId}" name="${inputId}" max="20" required class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Ex: 5">
+                            </div>
+                         `;
+                    }
+                });
+            } else {
+                realContainer.classList.add('hidden');
+            }
+        }
+
         window.changeStep = function(step) {
             currentStep = step;
             const panelContent = document.getElementById('panel-content-area'); if (panelContent) panelContent.scrollTop = 0;
             document.getElementById('selection-view').classList.add('hidden');
             document.getElementById('checkout-view').classList.add('hidden');
-            if (step === 'checkout') { window.updateCheckoutSummary(); document.getElementById('checkout-view').classList.remove('hidden'); } 
+            if (step === 'checkout') { 
+                window.updateCheckoutSummary(); 
+                window.renderPowerOutletFields(); // Renderiza os campos de tomada ao entrar no checkout
+                document.getElementById('checkout-view').classList.remove('hidden'); 
+            } 
             else { document.getElementById('selection-view').classList.remove('hidden'); }
             window.calculateTotal();
         }
@@ -424,27 +479,46 @@
             const name = document.getElementById('client-name').value;
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value;
+            const number = document.getElementById('client-number').value || 'S/N';
             const eventStartTime = document.getElementById('event-start-time').value;
             const eventEndTime = document.getElementById('event-end-time').value;
             if (!name || !neighborhood || !street || eventStartTime === "" || eventEndTime === "") { alert('Preencha os campos obrigatórios.'); return; }
-            const number = document.getElementById('client-number').value || 'S/N';
+            
             const insuranceChecked = document.getElementById('additional-insurance').checked;
             const deliveryDayBefore = document.getElementById('delivery-day-before').checked;
             const invoiceChecked = document.getElementById('request-invoice').checked;
             const cnpj = document.getElementById('client-cnpj').value;
             const rainProtection = document.getElementById('rain-protection')?.checked;
             const coupon = document.getElementById('discount-coupon').value;
+            
             if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { alert('CNPJ inválido.'); return; }
+
+            // Validação das tomadas
+            const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
+            let powerDetails = "";
+            for (let input of powerInputs) {
+                if (!input.value) { alert('Por favor, informe a distância da tomada para todos os brinquedos elétricos.'); return; }
+                if (parseInt(input.value) > 20) { alert('A distância máxima da tomada é 20 metros.'); return; }
+                // Pega o label associado
+                const label = input.previousElementSibling.innerText.replace('Distância da tomada para ', '').replace(' (Metros)', '');
+                powerDetails += `⚡ ${label}: ${input.value}m\n`;
+            }
+
             const { details, total } = window.getSelectedItemDetails();
-            let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para a data ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n📄 CNPJ: ${invoiceChecked ? cnpj : 'Não'}\n⏰ Horário: ${eventStartTime} - ${eventEndTime}\n🚚 Entr. Antecipada: ${deliveryDayBefore ? 'SIM' : 'NÃO'}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
+            let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n📄 CNPJ: ${invoiceChecked ? cnpj : 'Não'}\n⏰ Horário: ${eventStartTime} - ${eventEndTime}\n🚚 Entr. Antecipada: ${deliveryDayBefore ? 'SIM' : 'NÃO'}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
             if (coupon) orderSummary += `🎟️ Cupom: ${coupon}\n`;
+            
             const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
-            if (isBallPitIncluded) orderSummary += `🌧 Proteção Chuva: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
+            if (isBallPitIncluded) orderSummary += `🌧 Piscina Coberta: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
+            
+            if (powerDetails) orderSummary += `\n*ENERGIA:*\n${powerDetails}`;
+
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             if (monitorCount > 0) {
                 const monitorHours = document.getElementById('monitor-hours').value;
                 orderSummary += `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
             }
+
             orderSummary += `\n*ITENS:*\n`;
             details.forEach(item => { orderSummary += `• ${item.quantity}x ${item.name}\n`; });
             const finalTotalText = document.getElementById('total-price-display').innerText;
@@ -452,27 +526,40 @@
             window.open(`https://wa.me/5547992277324?text=${encodeURIComponent(orderSummary)}`, '_blank');
             window.closeToysPanel(); window.changeStep('selection'); 
         }
-
+        
+        // ... (rest of the file remains similar with slight adjustments if needed)
         window.openToysPanel = function(day, month, year) {
             currentSelectedDateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            document.getElementById('selected-date-display').innerText = `Para a data ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
-            document.getElementById('toys-list-container').innerHTML = ''; selectedItems = {}; 
-            document.getElementById('has-monitors').value = 'Nao'; document.getElementById('delivery-day-before').checked = false; document.getElementById('additional-insurance').checked = false; document.getElementById('request-invoice').checked = false;
+            document.getElementById('selected-date-display').innerText = `Para ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
+            // ... (reset fields)
+            const listContainer = document.getElementById('toys-list-container');
+            listContainer.innerHTML = ''; selectedItems = {}; 
+            
+            document.getElementById('has-monitors').value = 'Nao'; 
+            document.getElementById('delivery-day-before').checked = false; 
+            document.getElementById('additional-insurance').checked = false; 
+            document.getElementById('request-invoice').checked = false;
             document.getElementById('discount-coupon').value = '';
             if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
+            // Limpa container de tomadas se existir
+             const powerContainer = document.getElementById('power-outlet-fields-container');
+             if(powerContainer) powerContainer.innerHTML = '';
+
             window.toggleMonitorFields(true); window.toggleCnpjField(); window.changeStep('selection'); 
 
             toysInventory.forEach(toy => {
                 const maxStock = getStockForDate(toy.id, currentSelectedDateISO);
-                if (maxStock === 0) return;
+                if (maxStock === 0) return; // Regra de não mostrar indisponíveis
+                // ... (rest of toy rendering)
                 const finalPrice = window.calculatePriceWithScarcity(toy);
                 const priceFormatted = toy.note ? `R$ ${finalPrice.toFixed(2).replace('.', ',')} / ${toy.note}` : `R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
                 let scarcityLabel = '';
                 if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-green-500 block">Promoção</span>`; }
-                const isUnavailable = maxStock === 0;
+                
                 const item = document.createElement('div');
-                item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md ${isUnavailable ? 'opacity-50 pointer-events-none' : ''}`;
-                // Condicional para não mostrar medida se estiver vazia
+                item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md`;
+                
+                // Lógica para medida vazia
                 const measureHtml = toy.measure ? `<p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>` : '';
                 
                 item.innerHTML = `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><div class="flex-grow min-w-0"><h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4>${measureHtml}${scarcityLabel}<span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span><div class="flex items-center space-x-2 text-sm font-medium"><button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full disabled:opacity-50" disabled><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></button><span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">0</span><button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full disabled:opacity-50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg></button><span class="text-xs text-gray-400">(${maxStock} máx.)</span></div></div>`;
@@ -480,22 +567,17 @@
             }); 
             window.calculateTotal(); document.getElementById('toys-panel').classList.add('open'); document.getElementById('toys-overlay').classList.add('open'); document.body.style.overflow = 'hidden';
         }
-
+        
+        // ... (rest of functions)
         window.closeToysPanel = function() { document.getElementById('toys-panel').classList.remove('open'); document.getElementById('toys-overlay').classList.remove('open'); document.body.style.overflow = ''; }
-        window.renderMonitorHours = function() {
-            const count = parseInt(document.getElementById('monitor-count').value); const hoursContainer = document.getElementById('monitor-hours-fields'); hoursContainer.innerHTML = '';
-            hoursContainer.innerHTML = `<div><label for="monitor-hours" class="block text-sm font-medium text-gray-700 mb-1">Horas Total</label><input type="number" id="monitor-hours" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas"></div>`;
-        }
+        window.renderMonitorHours = function() { const count = parseInt(document.getElementById('monitor-count').value); const hoursContainer = document.getElementById('monitor-hours-fields'); hoursContainer.innerHTML = ''; hoursContainer.innerHTML = `<div><label for="monitor-hours" class="block text-sm font-medium text-gray-700 mb-1">Horas Total</label><input type="number" id="monitor-hours" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas"></div>`; }
         window.toggleMonitorFields = function(isInitialLoad = false) { const shouldShow = document.getElementById('has-monitors').value === 'Sim'; document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow); if (shouldShow && !isInitialLoad) { window.renderMonitorHours(); } else if (!shouldShow) { document.getElementById('monitor-hours-fields').innerHTML = ''; } }
         window.toggleCnpjField = function() { const shouldShow = document.getElementById('request-invoice').checked; document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); document.getElementById('client-cnpj').required = shouldShow; }
         
-        window.onload = function() { 
-            fetchData(); 
-            window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); renderCalendar(); 
-        };
+        window.onload = function() { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); fetchData(); };
         function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
         function getDayStatus(year, month, day) { const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false }; }
-        function renderCalendar() {
+        function renderCalendar() { /* ... same as before ... */
             const currentMonth = currentCalendarDate.getMonth(); const currentYear = currentCalendarDate.getFullYear();
             monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`; calendarBody.innerHTML = '';
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -516,7 +598,7 @@
         function navigateNext() { const nextMonthCheck = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1); if (nextMonthCheck.getTime() < maxFutureDate.getTime()) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); renderCalendar(); }}
         prevButton.addEventListener('click', navigatePrev);
 
-        // --- Firebase/Notificações (MANUTENÇÃO) ---
+        // ... Firebase/Notificações ...
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]')); let notificationsData = [];
         function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
         function getReadNotificationsCollection(uid) { return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`); }
