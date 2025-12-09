@@ -193,7 +193,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        // CORREÇÃO CRÍTICA: Alterado para o branch 'main' para buscar a versão mais recente
+        // CORREÇÃO: Usamos a URL de branch 'main' que sempre pega o arquivo mais recente
         const GITHUB_JSON_URL_BASE = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
@@ -206,8 +206,8 @@
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             try {
-                // FORÇAR ATUALIZAÇÃO (Cache Busting): Adiciona um timestamp (ms) no final da URL
-                // Isso cria uma URL única a cada chamada, forçando o servidor do GitHub e o navegador a buscar a versão mais recente.
+                // CORREÇÃO: Força o navegador a não usar o cache local adicionando um parâmetro de tempo único.
+                // O problema de "sumir" era a falta da variável ou o uso de headers muito agressivos.
                 const cacheBusterUrl = `${GITHUB_JSON_URL_BASE}?t=${new Date().getTime()}`;
                 
                 const response = await fetch(cacheBusterUrl);
@@ -217,8 +217,9 @@
                 toysInventory = data.brinquedos; processAvailability(data);
                 document.getElementById('toys-list-container').classList.remove('hidden');
             } catch (error) { 
-                console.error(error); 
+                console.error("Erro ao buscar dados do GitHub:", error); 
                 document.getElementById('panel-error').classList.remove('hidden');
+                document.getElementById('panel-error').innerHTML = `<p class="font-bold">Erro ao carregar estoque.</p><p class="text-sm mt-2">Falha na conexão com o arquivo JSON. Tente novamente mais tarde.</p>`;
             } 
             finally { 
                 document.getElementById('panel-loading').classList.add('hidden'); 
