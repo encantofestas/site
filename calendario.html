@@ -56,13 +56,13 @@
         <span class="text-sm font-semibold leading-tight">Reservas permitidas apenas até 6 meses à frente.</span>
     </div>
 
-    <!-- PAINEL -->
+    <!-- OVERLAY E PAINEL DE BRINQUEDOS -->
     <div id="toys-overlay" onclick="closeToysPanel()"></div>
     <div id="toys-panel">
         <div class="w-full flex justify-center pt-3 pb-1" onclick="closeToysPanel()"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
+        
         <div id="panel-content-area" class="flex-grow overflow-y-auto" style="padding-bottom: 2rem;">
-            
-            <!-- View 1 -->
+            <!-- View 1: Seleção -->
             <div id="selection-view">
                 <div class="px-5 pb-3 border-b border-gray-100 flex justify-between items-center">
                     <div><h3 class="text-lg font-bold text-gray-800 brand-font">Brinquedos Disponíveis</h3><p id="selected-date-display" class="text-sm text-blue-600 font-medium">Data selecionada</p></div>
@@ -72,7 +72,7 @@
                 <div class="p-4 space-y-4" id="toys-list-container"></div>
             </div>
 
-            <!-- View 2 -->
+            <!-- View 2: Checkout -->
             <div id="checkout-view" class="px-5 py-4 hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-800 brand-font">Finalizar Reserva</h3>
@@ -81,28 +81,59 @@
                 <div class="p-4 bg-gray-50 rounded-lg shadow-inner mb-6 border border-gray-100"><h4 class="font-bold text-gray-700 mb-2">Seu Pedido:</h4><div id="checkout-summary" class="text-sm text-gray-600 space-y-2"></div></div>
                 <form id="checkout-form" onsubmit="event.preventDefault(); submitOrder()">
                     <div class="space-y-4">
+                        <!-- Nome -->
                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="client-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label><select id="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option></select></div>
+                        
+                        <!-- Bairro -->
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label>
+                            <select id="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
+                                <option value="" disabled selected>Selecione</option>
+                                <option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri (+R$10)</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada (+R$10)</option><option value="Ervino">Ervino (+R$25)</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu (+R$10)</option><option value="Laranjeiras">Laranjeiras (+R$10)</option><option value="Majorca">Majorca (+R$10)</option><option value="Miranda">Miranda (+R$10)</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande (+R$10)</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira (+R$10)</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina (+R$10)</option><option value="Tapera">Tapera (+R$10)</option><option value="Ubatuba">Ubatuba (+R$10)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Endereço -->
                         <div class="flex space-x-2">
                             <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label><input type="text" id="client-street" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
                             <div class="w-24"><label class="block text-sm font-medium text-gray-700 mb-1">Nº</label><input type="number" id="client-number" maxlength="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Nº"></div>
                         </div>
                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes..."></textarea></div>
+                        
+                        <!-- Horários -->
                         <div class="flex space-x-2">
                             <div><label class="block text-sm font-medium text-gray-700 mb-1">Início</label><select id="event-start-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option><option value="18:00">18:00</option><option value="19:00">19:00</option><option value="20:00">20:00</option><option value="21:00">21:00</option></select></div>
                             <div><label class="block text-sm font-medium text-gray-700 mb-1">Término</label><select id="event-end-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option><option value="18:00">18:00</option><option value="19:00">19:00</option><option value="20:00">20:00</option><option value="21:00">21:00</option></select></div>
                         </div>
+
+                        <!-- Opções -->
                         <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"><input type="checkbox" id="delivery-day-before" onchange="calculateTotal()" class="w-5 h-5 text-blue-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Receber 1 dia antes? (Grátis)</label></div>
                         <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden"><div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-5 h-5 text-red-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Piscina protegida contra chuva?</label></div></div>
+                        
+                        <!-- Monitores -->
                         <div class="space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <label class="block text-sm font-bold text-gray-800 mb-1">Deseja monitores?</label>
+                            <label class="block text-sm font-bold text-gray-800 mb-1">Deseja contratar monitores?</label>
                             <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select>
-                            <div id="monitor-options" class="space-y-3 mt-3 hidden"><div><label class="block text-sm font-medium text-gray-700 mb-1">Quantos?</label><select id="monitor-count" onchange="renderMonitorHours(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="1">1</option><option value="2">2</option></select></div><div id="monitor-hours-fields" class="space-y-3"></div></div>
+                            <div id="monitor-options" class="space-y-3 mt-3 hidden">
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Quantos?</label><select id="monitor-count" onchange="calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="1">1</option><option value="2">2</option></select></div>
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Horas (Total para a equipe)</label><input type="number" id="monitor-hours" oninput="calculateTotal()" min="1" max="10" value="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Horas"></div>
+                            </div>
                         </div>
+
+                        <!-- Seguro -->
                         <div class="space-y-2 p-3 bg-green-50 rounded-lg border border-green-200">
                             <div class="flex items-center justify-between"><div class="flex items-center space-x-3"><input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Seguro Adicional</label></div><span class="text-sm font-bold text-green-700">+ R$ 10,00</span></div>
                             <p class="text-xs text-gray-500 mt-1">Ao adicionar o seguro, você não paga por danos acidentais. Sem seguro, reparos podem custar até R$ 300,00.</p>
                         </div>
+
+                        <!-- Cupom -->
+                        <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cupom de Desconto</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="discount-coupon" oninput="calculateTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase" placeholder="Código">
+                            </div>
+                        </div>
+
+                        <!-- Nota Fiscal -->
                         <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200"><div class="flex items-center space-x-3"><input type="checkbox" id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-5 h-5 text-gray-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Nota Fiscal (CNPJ)?</label></div><div id="cnpj-field" class="hidden"><input type="text" id="client-cnpj" name="client-cnpj" pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="00.000.000/0000-00"></div></div>
                     </div>
                 </form>
@@ -117,8 +148,9 @@
         </div>
     </div>
 
+    <!-- NOTIFICAÇÕES (Lateral) -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
-    <div id="notification-panel">
+    <div id="notification-panel" class="transform translate-x-full">
         <div id="notification-content">
             <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10"><h3 class="text-xl font-bold brand-font text-white">Notificações</h3><button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
             <div class="flex-grow overflow-y-auto relative"><ul id="notification-list" class="p-4 space-y-3 pb-24"></ul><div id="loading-notifications" class="p-4 text-center hidden"><div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div><p class="text-sm text-blue-200 mt-2">Carregando...</p></div></div>
@@ -167,7 +199,8 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        
+        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/main/estoque.json';
+
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -177,18 +210,19 @@
         async function fetchData() {
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             try {
-                // Fetch directly from the file we generated
-                const response = await fetch('estoque.json');
-                if (!response.ok) throw new Error('Erro');
-                const data = await response.json();
-                toysInventory = data.brinquedos; processAvailability(data);
+                if (!GITHUB_JSON_URL) { useFallbackData(); } 
+                else {
+                    const response = await fetch(GITHUB_JSON_URL);
+                    if (!response.ok) throw new Error('Erro');
+                    const data = await response.json();
+                    toysInventory = data.brinquedos; processAvailability(data);
+                }
             } catch (error) { console.error(error); useFallbackData(); } 
             finally { document.getElementById('panel-loading').classList.add('hidden'); document.getElementById('toys-list-container').classList.remove('hidden'); renderCalendar(); }
         }
 
         function useFallbackData() {
-             // Basic Fallback if JSON fails
-            toysInventory = [{ id: 1, name: "Cama Elástica Pequena", total_stock: 1, price: 170, measure: "2,00m Ø" }];
+            toysInventory = [{ id: 1, name: "Cama Elástica Pequena", total_stock: 1, price: 170, measure: "2,44m" }, { id: 2, name: "Cama Elástica Média", total_stock: 3, price: 190, measure: "3,05m", scarcityGroup: 'ELASTIC' }, { id: 3, name: "Castelinho Pula Pula", total_stock: 1, price: 210, measure: "3,00 x 3,00m", exclusiveGroup: 'LONA' }, { id: 4, name: "Piscina de Bolinhas", total_stock: 2, price: 160, measure: "1,50 x 1,50m", scarcityGroup: 'BALL' }, { id: 5, name: "Área Baby", total_stock: 1, price: 110, measure: "3,00 x 3,00m" }, { id: 6, name: "Mini Baby Inflável", total_stock: 1, price: 220, measure: "2,80 x 2,80m" }, { id: 7, name: "Escorrega com Bolinha", total_stock: 1, price: 400, measure: "4,50 x 2,50m", exclusiveGroup: 'LONA' }, { id: 8, name: "Tobogã Médio", total_stock: 1, price: 400, measure: "5,00 x 3,00m", exclusiveGroup: 'LONA' }, { id: 9, name: "Futebol de Sabão", total_stock: 1, price: 600, measure: "8,00 x 4,00m", exclusiveGroup: "LONA" }, { id: 10, name: "Pebolim", total_stock: 1, price: 200, measure: "1,40 x 0,80m" }, { id: 11, name: "Air Hockey", total_stock: 1, price: 200, measure: "1,80 x 0,90m" }, { id: 12, name: "Ping Pong", total_stock: 1, price: 200, measure: "2,74 x 1,52m" }, { id: 13, name: "Jogos de Mesa", total_stock: 4, price: 15, measure: "Padrão" }];
             globalAgendamentos = {};
         }
 
@@ -198,8 +232,12 @@
                 for (const [date, items] of Object.entries(data.agendamentos)) {
                     const totalRented = Object.values(items).reduce((a, b) => a + b, 0);
                     let color = 'bg-green-500';
-                    if (totalRented > 2) color = 'bg-yellow-500';
-                    if (totalRented > 5) color = 'bg-red-500';
+                    if (totalRented >= 3) color = 'bg-yellow-500';
+                    const isLonaBooked = Object.keys(items).some(bookedId => {
+                         const bookedToy = toysInventory.find(t => t.id == bookedId);
+                         return bookedToy && bookedToy.exclusiveGroup === 'LONA';
+                    });
+                    if (isLonaBooked || totalRented > 5) color = 'bg-yellow-500';
                     mockedDayData[date] = { color: color };
                 }
             }
@@ -208,6 +246,14 @@
         function getStockForDate(toyId, dateISO) {
             const toy = toysInventory.find(t => t.id === toyId); if (!toy) return 0;
             const rentedCount = globalAgendamentos[dateISO]?.[toyId] || 0;
+            if (toy.exclusiveGroup === 'LONA') {
+                 const agendamentosDia = globalAgendamentos[dateISO] || {};
+                 const isAnyLonaBooked = Object.keys(agendamentosDia).some(bookedId => {
+                     const bookedToy = toysInventory.find(t => t.id == bookedId);
+                     return bookedToy && bookedToy.exclusiveGroup === 'LONA' && agendamentosDia[bookedId] > 0;
+                 });
+                 if (isAnyLonaBooked) return 0;
+            }
             return Math.max(0, toy.total_stock - rentedCount);
         }
 
@@ -240,58 +286,83 @@
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const summaryDiv = document.getElementById('checkout-summary'); summaryDiv.innerHTML = '';
             
-            const itemCount = details.length;
+            const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
+            
+            const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
+            const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0;
+            
             const discountRate = itemCount >= 2 ? 0.10 : 0;
-            const discount = subtotal * discountRate;
+            const quantityDiscount = subtotal * discountRate;
 
             const neighborhood = document.getElementById('client-neighborhood')?.value;
-            const shippingFee = (neighborhood === 'Ervino') ? 25.00 : 0;
+            const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
+            let shippingFee = 0;
+            if (neighborhood === 'Ervino') shippingFee = 25.00;
+            else if (extraShippingNeighborhoods.includes(neighborhood)) shippingFee = 10.00;
 
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
             const insuranceFee = insuranceChecked ? 10.00 : 0;
             
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
+            const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
-            if (monitorCount > 0) { for (let i = 1; i <= monitorCount; i++) { monitorFee += (parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0) * 30); } }
+            if (monitorCount > 0) {
+                monitorFee = monitorCount * monitorHours * 30;
+            }
 
             details.forEach(item => {
-                const itemContainer = document.createElement('div');
-                itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
-                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</div>`;
-                summaryDiv.appendChild(itemContainer);
+                summaryDiv.innerHTML += `<div class="flex justify-between border-b border-gray-200 py-1.5"><span class="font-medium text-gray-700">${item.quantity}x ${item.name}</span><span class="text-green-600 font-bold">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</span></div>`;
             });
             
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
             summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Subtotal:</span><span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span></div>`;
             if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores:</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
-            if (discount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto (10%):</span><span>- R$ ${discount.toFixed(2).replace('.', ',')}</span></div>`;
-            if (shippingFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Frete (Ervino):</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`;
+            if (quantityDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto Qtd (10%):</span><span>- R$ ${quantityDiscount.toFixed(2).replace('.', ',')}</span></div>`;
+            if (couponDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Cupom (10%):</span><span>- R$ ${couponDiscount.toFixed(2).replace('.', ',')}</span></div>`;
+            if (shippingFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Frete:</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`;
             if (insuranceFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`;
         }
         
         window.calculateTotal = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
-            const itemCount = details.length;
-            const discountRate = itemCount >= 2 ? 0.10 : 0;
-            const discount = subtotal * discountRate;
-            const neighborhood = document.getElementById('client-neighborhood')?.value;
-            const shippingFee = (neighborhood === 'Ervino') ? 25.00 : 0;
-            const insuranceChecked = document.getElementById('additional-insurance')?.checked;
-            const insuranceFee = insuranceChecked ? 10.00 : 0;
-            const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
-            let monitorFee = 0;
-            if (monitorCount > 0) { for (let i = 1; i <= monitorCount; i++) { monitorFee += (parseFloat(document.getElementById(`monitor-hours-${i}`)?.value || 0) * 30); } }
+            const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
             
-            const finalTotal = subtotal - discount + shippingFee + insuranceFee + monitorFee;
+            const discountRate = itemCount >= 2 ? 0.10 : 0;
+            const quantityDiscount = subtotal * discountRate;
+            
+            const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
+            const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0; // Desconto sobre subtotal bruto, acumulativo
+
+            const neighborhood = document.getElementById('client-neighborhood')?.value;
+            const insuranceChecked = document.getElementById('additional-insurance')?.checked;
+            const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
+            const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
+            
+            let monitorFee = 0;
+            if (monitorCount > 0) {
+                monitorFee = monitorCount * monitorHours * 30;
+            }
+
+            const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
+            let shippingFee = 0;
+            if (neighborhood === 'Ervino') shippingFee = 25.00;
+            else if (extraShippingNeighborhoods.includes(neighborhood)) shippingFee = 10.00;
+
+            const insuranceFee = insuranceChecked ? 10.00 : 0;
+            // Total = (Subtotal - Descontos) + Taxas
+            // Aplica descontos sobre o valor dos produtos
+            const finalTotal = (subtotal - quantityDiscount - couponDiscount) + shippingFee + insuranceFee + monitorFee;
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
+            
             const actionButton = document.getElementById('action-button');
-            const totalItems = window.getSelectedItemDetails().details.length;
+            const totalItems = details.length;
             actionButton.disabled = totalItems === 0;
             if (totalItems > 0 && currentStep === 'selection') { actionButton.innerText = `Continuar Agendamento`; } 
             else if (currentStep === 'checkout') { actionButton.innerText = `Confirmar Reserva`; } 
             else { actionButton.innerText = `Continuar Agendamento`; }
             
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
+            
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
         }
@@ -304,7 +375,7 @@
             if (toy.exclusiveGroup === 'LONA' && change > 0) {
                 if (currentQty === 0) {
                     const otherLonaItem = toysInventory.find(t => t.exclusiveGroup === 'LONA' && t.id !== toyId && (selectedItems[t.id] || 0) > 0);
-                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado por dia. Remova o(a) ${otherLonaItem.name} antes de adicionar.`); return; }
+                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado. Remova o(a) ${otherLonaItem.name} antes.`); return; }
                 }
                 if (newQty > 1) newQty = 1;
             }
@@ -347,13 +418,22 @@
             const invoiceChecked = document.getElementById('request-invoice').checked;
             const cnpj = document.getElementById('client-cnpj').value;
             const rainProtection = document.getElementById('rain-protection')?.checked;
+            const coupon = document.getElementById('discount-coupon').value;
+            
             if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { alert('CNPJ inválido.'); return; }
+
             const { details, total } = window.getSelectedItemDetails();
             let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para a data ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n📄 CNPJ: ${invoiceChecked ? cnpj : 'Não'}\n⏰ Horário: ${eventStartTime} - ${eventEndTime}\n🚚 Entr. Antecipada: ${deliveryDayBefore ? 'SIM' : 'NÃO'}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
+            if (coupon) orderSummary += `🎟️ Cupom: ${coupon}\n`;
             const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
             if (isBallPitIncluded) orderSummary += `🌧 Proteção Chuva: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
+            
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
-            if (monitorCount > 0) { orderSummary += `👮 Monitores: ${monitorCount}\n`; for (let i = 1; i <= monitorCount; i++) orderSummary += `  - Monitor ${i}: ${document.getElementById(`monitor-hours-${i}`).value}h\n`; }
+            if (monitorCount > 0) {
+                const monitorHours = document.getElementById('monitor-hours').value;
+                orderSummary += `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
+            }
+
             orderSummary += `\n*ITENS:*\n`;
             details.forEach(item => { orderSummary += `• ${item.quantity}x ${item.name}\n`; });
             orderSummary += `\n💰 *TOTAL: ${document.getElementById('total-price-display').innerText}*`;
@@ -365,7 +445,9 @@
             currentSelectedDateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             document.getElementById('selected-date-display').innerText = `Para a data ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
             document.getElementById('toys-list-container').innerHTML = ''; selectedItems = {}; 
+            
             document.getElementById('has-monitors').value = 'Nao'; document.getElementById('delivery-day-before').checked = false; document.getElementById('additional-insurance').checked = false; document.getElementById('request-invoice').checked = false;
+            document.getElementById('discount-coupon').value = '';
             if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
             window.toggleMonitorFields(true); window.toggleCnpjField(); window.changeStep('selection'); 
 
@@ -375,7 +457,8 @@
                 const finalPrice = window.calculatePriceWithScarcity(toy);
                 const priceFormatted = toy.note ? `R$ ${finalPrice.toFixed(2).replace('.', ',')} / ${toy.note}` : `R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
                 let scarcityLabel = '';
-                if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-red-500 block">Preço ajustado (Escassez!)</span>`; }
+                if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-green-500 block">Promoção</span>`; }
+                const isUnavailable = maxStock === 0;
                 const item = document.createElement('div');
                 item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md`;
                 item.innerHTML = `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><div class="flex-grow min-w-0"><h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4><p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>${scarcityLabel}<span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span><div class="flex items-center space-x-2 text-sm font-medium"><button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full disabled:opacity-50" disabled><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></button><span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">0</span><button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full disabled:opacity-50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg></button><span class="text-xs text-gray-400">(${maxStock} máx.)</span></div></div>`;
@@ -386,8 +469,9 @@
 
         window.closeToysPanel = function() { document.getElementById('toys-panel').classList.remove('open'); document.getElementById('toys-overlay').classList.remove('open'); document.body.style.overflow = ''; }
         window.renderMonitorHours = function() {
-            const count = parseInt(document.getElementById('monitor-count').value); const hoursContainer = document.getElementById('monitor-hours-fields'); hoursContainer.innerHTML = '';
-            for (let i = 1; i <= count; i++) { hoursContainer.innerHTML += `<div><label for="monitor-hours-${i}" class="block text-sm font-medium text-gray-700 mb-1">Monitor ${i} - Horas (R$ 30,00/hora)</label><input type="number" id="monitor-hours-${i}" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas"></div>`; }
+            // Unificado: renderiza apenas um campo de horas
+            const hoursContainer = document.getElementById('monitor-hours-fields'); 
+            hoursContainer.innerHTML = `<div><label for="monitor-hours" class="block text-sm font-medium text-gray-700 mb-1">Horas (Total para a equipe)</label><input type="number" id="monitor-hours" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas"></div>`;
         }
         window.toggleMonitorFields = function(isInitialLoad = false) { const shouldShow = document.getElementById('has-monitors').value === 'Sim'; document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow); if (shouldShow && !isInitialLoad) { window.renderMonitorHours(); } else if (!shouldShow) { document.getElementById('monitor-hours-fields').innerHTML = ''; } }
         window.toggleCnpjField = function() { const shouldShow = document.getElementById('request-invoice').checked; document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); document.getElementById('client-cnpj').required = shouldShow; }
