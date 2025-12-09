@@ -192,7 +192,9 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/encantofestas/site/b6b05ba574c9542cfbb221149f052dc97889e475/estoque.json';
+        
+        // CORREÇÃO CRÍTICA: Alterado para o branch 'main' para buscar a versão mais recente
+        const GITHUB_JSON_URL_BASE = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
@@ -204,7 +206,12 @@
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             try {
-                const response = await fetch(GITHUB_JSON_URL);
+                // FORÇAR ATUALIZAÇÃO (Cache Busting): Adiciona um timestamp (ms) no final da URL
+                // Isso cria uma URL única a cada chamada, forçando o servidor do GitHub e o navegador a buscar a versão mais recente.
+                const cacheBusterUrl = `${GITHUB_JSON_URL_BASE}?t=${new Date().getTime()}`;
+                
+                const response = await fetch(cacheBusterUrl);
+                
                 if (!response.ok) throw new Error('Erro');
                 const data = await response.json();
                 toysInventory = data.brinquedos; processAvailability(data);
