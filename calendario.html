@@ -68,7 +68,6 @@
                     <div><h3 class="text-lg font-bold text-gray-800 brand-font">Brinquedos Disponíveis</h3><p id="selected-date-display" class="text-sm text-blue-600 font-medium">Data selecionada</p></div>
                     <button onclick="closeToysPanel()" class="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
-                <!-- Loading State e Mensagem de Erro -->
                 <div id="panel-loading" class="p-8 text-center text-gray-500 hidden"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div><p>Carregando estoque...</p></div>
                 <div id="panel-error" class="p-8 text-center text-red-500 hidden"><p class="font-bold">Erro ao carregar estoque.</p><p class="text-sm mt-2">Não foi possível acessar os dados. Verifique sua conexão ou se o arquivo JSON está acessível.</p></div>
                 
@@ -190,7 +189,7 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/main/estoque.json'; // LINK CORRETO
+        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/encantofestas/site/b6b05ba574c9542cfbb221149f052dc97889e475/estoque.json'; // LINK CORRIGIDO
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
@@ -210,7 +209,6 @@
             } catch (error) { 
                 console.error(error); 
                 document.getElementById('panel-error').classList.remove('hidden');
-                // Se falhar o fetch, não carregamos nada, conforme solicitado (sem fallback interno)
             } 
             finally { 
                 document.getElementById('panel-loading').classList.add('hidden'); 
@@ -265,16 +263,31 @@
         function calculateDurationFee() {
             const startStr = document.getElementById('event-start-time').value;
             const endStr = document.getElementById('event-end-time').value;
+
             if (!startStr || !endStr) return 0;
-            const startHour = parseInt(startStr); const endHour = parseInt(endStr);
+
+            const startHour = parseInt(startStr);
+            const endHour = parseInt(endStr);
             let duration = endHour - startHour;
+            
             if (duration <= 0) return 0; 
-            let fee = 0; let warningText = ""; const warningEl = document.getElementById('time-fee-warning');
+
+            let fee = 0;
+            let warningText = "";
+            const warningEl = document.getElementById('time-fee-warning');
+
             if (duration > 6) {
                 fee = duration >= 8 ? 40 : 20;
                 warningText = "Duração > 6h: taxa extra aplicada automaticamente.";
             }
-            if (fee > 0) { warningEl.innerText = warningText; warningEl.classList.remove('hidden'); } else { warningEl.classList.add('hidden'); }
+
+            if (fee > 0) {
+                warningEl.innerText = warningText;
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+
             return fee;
         }
 
@@ -286,7 +299,14 @@
                     const pricePerUnit = window.calculatePriceWithScarcity(toy);
                     const lineTotal = quantity * pricePerUnit;
                     total += lineTotal; 
-                    details.push({ name: toy.name, quantity: quantity, price: pricePerUnit, lineTotal: lineTotal, id: toy.id, needsPower: toy.needsPower });
+                    details.push({ 
+                        name: toy.name, 
+                        quantity: quantity, 
+                        price: pricePerUnit, 
+                        lineTotal: lineTotal, 
+                        id: toy.id, 
+                        needsPower: toy.needsPower 
+                    });
                 }
             }); return { details, total };
         }
@@ -299,6 +319,7 @@
             
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0;
+            
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
             const quantityDiscount = subtotal * discountRate;
 
@@ -314,12 +335,17 @@
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
-            if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
+            if (monitorCount > 0) {
+                monitorFee = monitorCount * monitorHours * 30;
+            }
             
             const timeFee = calculateDurationFee(); 
 
             details.forEach(item => {
-                summaryDiv.innerHTML += `<div class="flex justify-between border-b border-gray-200 py-1.5"><span class="font-medium text-gray-700">${item.quantity}x ${item.name}</span><span class="text-green-600 font-bold">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</span></div>`;
+                const itemContainer = document.createElement('div');
+                itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
+                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</div>`;
+                summaryDiv.appendChild(itemContainer);
             });
             
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
@@ -545,6 +571,7 @@
             document.getElementById('selected-date-display').innerText = `Para ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
             const listContainer = document.getElementById('toys-list-container');
             listContainer.innerHTML = ''; selectedItems = {}; 
+            
             document.getElementById('has-monitors').value = 'Nao'; 
             document.getElementById('delivery-day-before').value = 'Nao'; 
             document.getElementById('additional-insurance').checked = false; 
