@@ -20,16 +20,25 @@
         .dia-passado { opacity: 0.4; cursor: not-allowed; background-color: #f8fafc !important; color: #cbd5e1; pointer-events: none; }
         .dia-hoje { border: 2px solid #2563EB; font-weight: 700; z-index: 5; }
         .dia-numero { position: absolute; top: 2px; right: 4px; font-size: 0.85rem; font-weight: 600; color: rgba(0, 0, 0, 0.7); z-index: 10; }
+        /* Cores de Status Forçadas */
+        .status-livre { background-color: #22c55e !important; color: white !important; } /* Verde */
+        .status-pouco { background-color: #eab308 !important; color: white !important; } /* Amarelo */
+        .status-esgotado { background-color: #ef4444 !important; color: white !important; } /* Vermelho */
+        
         #toast-notification { visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translate(-50%, 20px); left: 50%; position: fixed; bottom: 6rem; width: 90%; max-width: 400px; z-index: 80; pointer-events: none; }
         #toast-notification.show { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
         #toys-panel { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; z-index: 70; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; box-shadow: 0 -4px 25px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; display: flex; flex-direction: column; pointer-events: none; }
         #toys-panel.open { transform: translateY(0); pointer-events: auto; }
         #toys-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 60; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; pointer-events: none; }
         #toys-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
-        /* CSS Painel Notificações Corrigido */
+        /* CSS Painel Notificações */
         #notification-panel { z-index: 100; transition: transform 0.3s ease-out; position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; background-color: #2563EB; pointer-events: none; transform: translateX(100%); }
         #notification-panel.open { pointer-events: auto; transform: translateX(0); }
         #notification-content { height: 100%; display: flex; flex-direction: column; }
+        
+        /* Debug Console Visual */
+        #debug-console { position: fixed; bottom: 80px; right: 10px; background: rgba(0,0,0,0.8); color: lime; font-family: monospace; font-size: 10px; padding: 10px; border-radius: 8px; z-index: 9999; max-width: 200px; max-height: 200px; overflow-y: auto; display: none; }
+        #debug-toggle { position: fixed; bottom: 80px; right: 10px; z-index: 10000; background: red; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -49,6 +58,10 @@
             <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600" onclick="toggleNotificationPanel()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
         </div>
     </header>
+
+    <!-- DEBUG TOGGLE -->
+    <div id="debug-toggle" onclick="toggleDebug()">🛠️</div>
+    <div id="debug-console">Carregando logs...</div>
 
     <!-- TOAST -->
     <div id="toast-notification" class="bg-gray-800/95 backdrop-blur-sm text-white px-5 py-4 rounded-xl shadow-2xl z-[60] flex items-center justify-center space-x-3 text-center border border-gray-700">
@@ -163,9 +176,9 @@
             <div class="grid grid-cols-7 text-center font-bold text-xs sm:text-sm text-gray-500 border-b border-gray-100 pb-3 mb-2"><span class="p-1">DOM</span><span class="p-1">SEG</span><span class="p-1">TER</span><span class="p-1">QUA</span><span class="p-1">QUI</span><span class="p-1">SEX</span><span class="p-1">SÁB</span></div>
             <div id="calendar-body" class="grid grid-cols-7 gap-1 md:gap-2"></div>
             <div class="flex flex-wrap justify-center gap-x-3 gap-y-2 text-[10px] sm:text-xs font-semibold text-gray-600 mt-6 pt-4 border-t border-gray-100">
-                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span>Muita disponibilidade</span></div>
-                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span><span>Pouca disponibilidade</span></div>
-                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span>Indisponível</span></div>
+                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full status-livre"></span><span>Muita disponibilidade</span></div>
+                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full status-pouco"></span><span>Pouca disponibilidade</span></div>
+                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full status-esgotado"></span><span>Indisponível</span></div>
             </div>
         </div>
     </main>
@@ -193,7 +206,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        // CORREÇÃO FINAL DA URL: Apontando para o branch 'main' para pegar a última versão do arquivo.
+        // URL ORIGINAL COM CACHE BUSTING
         const GITHUB_JSON_URL_BASE = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
@@ -202,25 +215,43 @@
         const monthYearDisplay = document.getElementById('current-month-year'); const calendarBody = document.getElementById('calendar-body'); const prevButton = document.getElementById('prev-month'); const nextButton = document.getElementById('next-month'); const toast = document.getElementById('toast-notification');
         let currentSelectedDateISO = "";
 
+        // DEBUG TOOLS
+        window.logDebug = function(msg) {
+            const console = document.getElementById('debug-console');
+            console.innerHTML += `<div>> ${msg}</div>`;
+            console.scrollTop = console.scrollHeight;
+        }
+        window.toggleDebug = function() {
+            const console = document.getElementById('debug-console');
+            console.style.display = console.style.display === 'none' ? 'block' : 'none';
+        }
+
         async function fetchData() {
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             try {
-                // Monta a URL com o timestamp para forçar a atualização (Cache Busting)
                 const cacheBusterUrl = `${GITHUB_JSON_URL_BASE}?t=${new Date().getTime()}`;
+                window.logDebug(`Buscando: ${cacheBusterUrl}`);
                 
                 const response = await fetch(cacheBusterUrl);
+                if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
                 
-                if (!response.ok) throw new Error('Erro');
                 const data = await response.json();
                 toysInventory = data.brinquedos; 
-                // CORREÇÃO CRÍTICA: Chama processAvailability com os dados completos, incluindo agendamentos
-                processAvailability(data);
+                
+                // Processamento de dados
+                if (data.agendamentos) {
+                    window.logDebug(`Encontrados ${Object.keys(data.agendamentos).length} dias com reservas.`);
+                    processAvailability(data);
+                } else {
+                    window.logDebug("Sem reservas no JSON.");
+                }
+
                 document.getElementById('toys-list-container').classList.remove('hidden');
             } catch (error) { 
-                console.error("Erro ao buscar dados do GitHub:", error); 
+                console.error("Erro:", error); 
+                window.logDebug(`Erro fatal: ${error.message}`);
                 document.getElementById('panel-error').classList.remove('hidden');
-                document.getElementById('panel-error').innerHTML = `<p class="font-bold">Erro ao carregar estoque.</p><p class="text-sm mt-2">Falha na conexão com o arquivo JSON. Tente novamente mais tarde.</p>`;
             } 
             finally { 
                 document.getElementById('panel-loading').classList.add('hidden'); 
@@ -228,38 +259,45 @@
             }
         }
 
+        function normalizeDateKey(dateString) {
+            // Converte chaves 'YYYY-M-D' ou 'YYYY-MM-D' para 'YYYY-MM-DD' estrito
+            const parts = dateString.split('-');
+            if (parts.length === 3) {
+                const y = parts[0];
+                const m = parts[1].padStart(2, '0');
+                const d = parts[2].padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            return dateString;
+        }
+
         function processAvailability(data) {
-            // Inicializa agendamentos
             globalAgendamentos = data.agendamentos || {};
-            mockedDayData = {}; // Limpa dados anteriores
+            mockedDayData = {};
 
-            // CORREÇÃO LÓGICA: Calcula o status de cor de cada dia com base nos agendamentos
-            if (data.agendamentos) {
-                for (const [date, items] of Object.entries(data.agendamentos)) {
+            if (data.agendamentos && toysInventory.length > 0) {
+                for (const [rawDate, items] of Object.entries(data.agendamentos)) {
+                    // CORREÇÃO CRÍTICA: Normalizar a data do JSON para casar com o calendário
+                    const normalizedDate = normalizeDateKey(rawDate);
+                    
                     let totalRentedCount = 0;
-                    
-                    // Soma a quantidade total de brinquedos alugados (não apenas os diferentes IDs)
-                    for (const quantity of Object.values(items)) {
-                        totalRentedCount += quantity;
-                    }
+                    for (const quantity of Object.values(items)) { totalRentedCount += quantity; }
 
-                    let color = 'bg-green-500'; // Padrão: muita disponibilidade
+                    let cssClass = 'status-livre'; // Verde
                     
-                    // Verifica se há brinquedos de lona exclusivos agendados
                     const isLonaBooked = Object.keys(items).some(bookedId => {
                          const bookedToy = toysInventory.find(t => t.id == bookedId);
                          return bookedToy && bookedToy.exclusiveGroup === 'LONA' && items[bookedId] > 0;
                     });
                     
-                    // Regras de cor baseadas no total de itens/exclusivos
                     if (totalRentedCount >= 5) {
-                        color = 'bg-red-500'; // Indisponível (mais de 5 itens é o limite)
+                        cssClass = 'status-esgotado'; // Vermelho
                     } else if (totalRentedCount >= 3 || isLonaBooked) {
-                         // Pouca disponibilidade se 3 ou mais itens ou se uma lona exclusiva estiver reservada
-                        color = 'bg-yellow-500';
+                        cssClass = 'status-pouco'; // Amarelo
                     }
                     
-                    mockedDayData[date] = { color: color };
+                    mockedDayData[normalizedDate] = { cssClass: cssClass };
+                    window.logDebug(`${normalizedDate}: ${totalRentedCount} itens -> ${cssClass}`);
                 }
             }
         }
@@ -267,7 +305,11 @@
         function getStockForDate(toyId, dateISO) {
             if (!toysInventory || toysInventory.length === 0) return 0;
             const toy = toysInventory.find(t => t.id === toyId); if (!toy) return 0;
-            const rentedCount = globalAgendamentos[dateISO]?.[toyId] || 0;
+            // Tenta buscar pela data normalizada ISO
+            const rentedCount = globalAgendamentos[dateISO]?.[toyId] || 
+                                globalAgendamentos[dateISO.replace(/-0/g, '-')]?.[toyId] || // Tenta buscar formato não normalizado se necessário
+                                0;
+                                
             if (toy.exclusiveGroup === 'LONA') {
                  const agendamentosDia = globalAgendamentos[dateISO] || {};
                  const isAnyLonaBooked = Object.keys(agendamentosDia).some(bookedId => {
@@ -279,6 +321,7 @@
             return Math.max(0, toy.total_stock - rentedCount);
         }
 
+        // ... Resto das funções auxiliares ...
         window.calculatePriceWithScarcity = function(toy) {
             if (toy.scarcityGroup === 'ELASTIC' || toy.scarcityGroup === 'BALL') {
                 const maxStockIdeal = toy.scarcityGroup === 'ELASTIC' ? 3 : 2;
@@ -295,31 +338,17 @@
         function calculateDurationFee() {
             const startStr = document.getElementById('event-start-time').value;
             const endStr = document.getElementById('event-end-time').value;
-
             if (!startStr || !endStr) return 0;
-
-            const startHour = parseInt(startStr);
-            const endHour = parseInt(endStr);
+            const startHour = parseInt(startStr); const endHour = parseInt(endStr);
             let duration = endHour - startHour;
-            
             if (duration <= 0) return 0; 
-
-            let fee = 0;
-            let warningText = "";
+            let fee = 0; let warningText = "";
             const warningEl = document.getElementById('time-fee-warning');
-
             if (duration > 6) {
                 fee = duration >= 8 ? 40 : 20;
                 warningText = "Duração > 6h: taxa extra aplicada automaticamente.";
             }
-
-            if (fee > 0) {
-                warningEl.innerText = warningText;
-                warningEl.classList.remove('hidden');
-            } else {
-                warningEl.classList.add('hidden');
-            }
-
+            if (fee > 0) { warningEl.innerText = warningText; warningEl.classList.remove('hidden'); } else { warningEl.classList.add('hidden'); }
             return fee;
         }
 
@@ -331,14 +360,7 @@
                     const pricePerUnit = window.calculatePriceWithScarcity(toy);
                     const lineTotal = quantity * pricePerUnit;
                     total += lineTotal; 
-                    details.push({ 
-                        name: toy.name, 
-                        quantity: quantity, 
-                        price: pricePerUnit, 
-                        lineTotal: lineTotal, 
-                        id: toy.id, 
-                        needsPower: toy.needsPower 
-                    });
+                    details.push({ name: toy.name, quantity: quantity, price: pricePerUnit, lineTotal: lineTotal, id: toy.id, needsPower: toy.needsPower });
                 }
             }); return { details, total };
         }
@@ -346,40 +368,27 @@
         window.updateCheckoutSummary = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const summaryDiv = document.getElementById('checkout-summary'); summaryDiv.innerHTML = '';
-            
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
-            
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0;
-            
-            const discountRate = itemCount >= 2 ? 0.05 : 0; 
-            const quantityDiscount = subtotal * discountRate;
-
+            const discountRate = itemCount >= 2 ? 0.05 : 0; const quantityDiscount = subtotal * discountRate;
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
             let shippingFee = 0;
             if (neighborhood === 'Ervino') shippingFee = 25.00;
             else if (extraShippingNeighborhoods.includes(neighborhood)) shippingFee = 10.00;
-
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
             const insuranceFee = insuranceChecked ? 10.00 : 0;
-            
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
-            let monitorFee = 0;
-            if (monitorCount > 0) {
-                monitorFee = monitorCount * monitorHours * 30;
-            }
-            
+            let monitorFee = 0; if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
             const timeFee = calculateDurationFee(); 
-
             details.forEach(item => {
                 const itemContainer = document.createElement('div');
                 itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
                 itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</div>`;
                 summaryDiv.appendChild(itemContainer);
             });
-            
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
             summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Subtotal:</span><span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span></div>`;
             if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores:</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
@@ -393,16 +402,14 @@
         window.calculateTotal = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
-            const discountRate = itemCount >= 2 ? 0.05 : 0; 
-            const quantityDiscount = subtotal * discountRate;
+            const discountRate = itemCount >= 2 ? 0.05 : 0; const quantityDiscount = subtotal * discountRate;
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0; 
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
-            let monitorFee = 0;
-            if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
+            let monitorFee = 0; if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
             let shippingFee = 0;
             if (neighborhood === 'Ervino') shippingFee = 25.00;
@@ -411,36 +418,17 @@
             const timeFee = calculateDurationFee(); 
             const finalTotal = (subtotal - quantityDiscount - couponDiscount) + shippingFee + insuranceFee + monitorFee + timeFee;
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
-            
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
-            
             const isValid = validateForm();
-            
             actionButton.disabled = totalItems === 0;
-
             if (totalItems > 0 && currentStep === 'selection') { 
-                actionButton.innerText = `Continuar Agendamento`;
-                actionButton.classList.remove('bg-gray-400');
-                actionButton.classList.add('bg-primary');
-            } 
-            else if (currentStep === 'checkout') { 
+                actionButton.innerText = `Continuar Agendamento`; actionButton.classList.remove('bg-gray-400'); actionButton.classList.add('bg-primary');
+            } else if (currentStep === 'checkout') { 
                 actionButton.innerText = `Confirmar Reserva`; 
-                if (isValid) {
-                    actionButton.classList.remove('bg-gray-400');
-                    actionButton.classList.add('bg-primary');
-                } else {
-                    actionButton.classList.add('bg-gray-400');
-                    actionButton.classList.remove('bg-primary');
-                }
-            } 
-            else { 
-                actionButton.innerText = `Continuar Agendamento`; 
-                actionButton.classList.add('bg-gray-400'); 
-            }
-            
+                if (isValid) { actionButton.classList.remove('bg-gray-400'); actionButton.classList.add('bg-primary'); } else { actionButton.classList.add('bg-gray-400'); actionButton.classList.remove('bg-primary'); }
+            } else { actionButton.innerText = `Continuar Agendamento`; actionButton.classList.add('bg-gray-400'); }
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
-            
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
         }
@@ -474,7 +462,6 @@
             let disablePlus = newQty === maxStock;
             if (toy.exclusiveGroup === 'LONA' && newQty === 1) disablePlus = true;
             document.getElementById(`btn-plus-${toyId}`).disabled = disablePlus;
-            
             if (toy.exclusiveGroup === 'LONA') {
                  const lonaToys = toysInventory.filter(t => t.exclusiveGroup === 'LONA');
                  const isLonaSelected = lonaToys.some(t => (selectedItems[t.id] || 0) > 0);
@@ -488,38 +475,21 @@
             }
         }
 
-        // CORREÇÃO: Função RenderPowerOutletFields refeita para usar o âncora fixo
         window.renderPowerOutletFields = function() {
-            const anchor = document.getElementById('power-outlet-anchor');
-            if (!anchor) return; // Segurança
-
-            // Limpa o conteúdo anterior
+            const anchor = document.getElementById('power-outlet-anchor'); if (!anchor) return;
             anchor.innerHTML = '';
-
             const { details } = window.getSelectedItemDetails();
-            // Filtra brinquedos que precisam de energia
-            const powerToys = details.filter(item => {
-                const toyDef = toysInventory.find(t => t.id === item.id);
-                return toyDef && toyDef.needsPower;
-            });
-
+            const powerToys = details.filter(item => { const toyDef = toysInventory.find(t => t.id === item.id); return toyDef && toyDef.needsPower; });
             if (powerToys.length > 0) {
-                const container = document.createElement('div');
-                container.id = 'power-outlet-fields-container';
-                container.className = 'space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200 mt-4 mb-4';
-                
+                const container = document.createElement('div'); container.id = 'power-outlet-fields-container'; container.className = 'space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200 mt-4 mb-4';
                 let htmlContent = `<label class="block text-sm font-bold text-indigo-800 mb-2">Selecione a distância da tomada</label>`;
-                
                 powerToys.forEach(toy => {
                     for(let i=1; i<=toy.quantity; i++) {
-                         const label = toy.quantity > 1 ? `${toy.name} (#${i})` : toy.name;
-                         const inputId = `power-dist-${toy.id}-${i}`;
+                         const label = toy.quantity > 1 ? `${toy.name} (#${i})` : toy.name; const inputId = `power-dist-${toy.id}-${i}`;
                          htmlContent += `<div><label for="${inputId}" class="block text-xs font-medium text-gray-700">${label}</label><input type="number" id="${inputId}" name="${inputId}" max="20" required class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Ex: 5m"></div>`;
                     }
                 });
-                
-                container.innerHTML = htmlContent;
-                anchor.appendChild(container);
+                container.innerHTML = htmlContent; anchor.appendChild(container);
             }
         }
 
@@ -528,12 +498,7 @@
             const panelContent = document.getElementById('panel-content-area'); if (panelContent) panelContent.scrollTop = 0;
             document.getElementById('selection-view').classList.add('hidden');
             document.getElementById('checkout-view').classList.add('hidden');
-            if (step === 'checkout') { 
-                window.updateCheckoutSummary(); 
-                window.renderPowerOutletFields(); // Chama a nova função corrigida
-                document.getElementById('checkout-view').classList.remove('hidden'); 
-            } 
-            else { document.getElementById('selection-view').classList.remove('hidden'); }
+            if (step === 'checkout') { window.updateCheckoutSummary(); window.renderPowerOutletFields(); document.getElementById('checkout-view').classList.remove('hidden'); } else { document.getElementById('selection-view').classList.remove('hidden'); }
             window.calculateTotal();
         }
 
@@ -568,19 +533,13 @@
             const cnpj = document.getElementById('client-cnpj').value;
             const rainProtection = document.getElementById('rain-protection')?.checked;
             const coupon = document.getElementById('discount-coupon').value;
-            
             if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { alert('CNPJ inválido.'); return; }
-
-            // Validação de inputs de energia
-            const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
-            let powerDetails = "";
+            const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]'); let powerDetails = "";
             for (let input of powerInputs) {
                 if (!input.value) { alert('Por favor, informe a distância da tomada para todos os brinquedos elétricos.'); return; }
                 if (parseInt(input.value) > 20) { alert('A distância máxima da tomada é 20 metros.'); return; }
-                const label = input.previousElementSibling.innerText;
-                powerDetails += `⚡ ${label}: ${input.value}\n`;
+                const label = input.previousElementSibling.innerText; powerDetails += `⚡ ${label}: ${input.value}\n`;
             }
-
             const { details, total } = window.getSelectedItemDetails();
             let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n📄 CNPJ: ${invoiceChecked ? (cnpj || 'Não informado') : 'Não Solicitado'}\n⏰ Horário: ${eventStartTime} - ${eventEndTime}\n🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
             if (coupon) orderSummary += `🎟️ Cupom: ${coupon}\n`;
@@ -588,16 +547,10 @@
             if (isBallPitIncluded) orderSummary += `🌧 Piscina Coberta: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
             if (powerDetails) orderSummary += `\n*ENERGIA:*\n${powerDetails}`;
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
-            if (monitorCount > 0) {
-                const monitorHours = document.getElementById('monitor-hours').value;
-                orderSummary += `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
-            }
-            const timeFee = calculateDurationFee();
-            if (timeFee > 0) orderSummary += `🕒 Taxa Duração: R$ ${timeFee.toFixed(2)}\n`;
-            orderSummary += `\n*ITENS:*\n`;
-            details.forEach(item => { orderSummary += `• ${item.quantity}x ${item.name}\n`; });
-            const finalTotalText = document.getElementById('total-price-display').innerText;
-            orderSummary += `\n💰 *TOTAL: ${finalTotalText}*`;
+            if (monitorCount > 0) { const monitorHours = document.getElementById('monitor-hours').value; orderSummary += `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`; }
+            const timeFee = calculateDurationFee(); if (timeFee > 0) orderSummary += `🕒 Taxa Duração: R$ ${timeFee.toFixed(2)}\n`;
+            orderSummary += `\n*ITENS:*\n`; details.forEach(item => { orderSummary += `• ${item.quantity}x ${item.name}\n`; });
+            const finalTotalText = document.getElementById('total-price-display').innerText; orderSummary += `\n💰 *TOTAL: ${finalTotalText}*`;
             window.open(`https://wa.me/5547992277324?text=${encodeURIComponent(orderSummary)}`, '_blank');
             window.closeToysPanel(); window.changeStep('selection'); 
         }
@@ -605,28 +558,18 @@
         window.openToysPanel = function(day, month, year) {
             currentSelectedDateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             document.getElementById('selected-date-display').innerText = `Para ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
-            const listContainer = document.getElementById('toys-list-container');
-            listContainer.innerHTML = ''; selectedItems = {}; 
-            
-            document.getElementById('has-monitors').value = 'Nao'; 
-            document.getElementById('delivery-day-before').value = 'Nao'; 
-            document.getElementById('additional-insurance').checked = false; 
-            document.getElementById('request-invoice').checked = false;
-            document.getElementById('discount-coupon').value = '';
-            if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
-            
-            // Limpa container de energia ao abrir painel
-            const anchor = document.getElementById('power-outlet-anchor');
-            if(anchor) anchor.innerHTML = '';
-
+            const listContainer = document.getElementById('toys-list-container'); listContainer.innerHTML = ''; selectedItems = {}; 
+            document.getElementById('has-monitors').value = 'Nao'; document.getElementById('delivery-day-before').value = 'Nao'; 
+            document.getElementById('additional-insurance').checked = false; document.getElementById('request-invoice').checked = false;
+            document.getElementById('discount-coupon').value = ''; if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
+            const anchor = document.getElementById('power-outlet-anchor'); if(anchor) anchor.innerHTML = '';
             window.toggleMonitorFields(true); window.toggleCnpjField(); window.changeStep('selection'); 
             toysInventory.forEach(toy => {
                 const maxStock = getStockForDate(toy.id, currentSelectedDateISO);
                 if (maxStock === 0) return; 
                 const finalPrice = window.calculatePriceWithScarcity(toy);
                 const priceFormatted = toy.note ? `R$ ${finalPrice.toFixed(2).replace('.', ',')} / ${toy.note}` : `R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
-                let scarcityLabel = '';
-                if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-green-500 block">Promoção</span>`; }
+                let scarcityLabel = ''; if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-green-500 block">Promoção</span>`; }
                 const item = document.createElement('div');
                 item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md`;
                 const measureHtml = toy.measure ? `<p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>` : '';
@@ -644,7 +587,7 @@
         
         window.onload = function() { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); fetchData(); };
         function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
-        function getDayStatus(year, month, day) { const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false }; }
+        function getDayStatus(year, month, day) { const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; return mockedDayData[dateKey] || { cssClass: 'status-livre' }; }
         function renderCalendar() {
             const currentMonth = currentCalendarDate.getMonth(); const currentYear = currentCalendarDate.getFullYear();
             monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`; calendarBody.innerHTML = '';
@@ -656,7 +599,7 @@
             for (let i = 0; i < firstDayOfMonth; i++) { const emptyCell = document.createElement('div'); emptyCell.className = 'dia-vazio p-2'; calendarBody.appendChild(emptyCell); }
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(currentYear, currentMonth, day); const status = getDayStatus(currentYear, currentMonth, day);
-                const cell = document.createElement('div'); cell.className = 'dia-celula rounded-lg shadow-sm relative overflow-hidden'; cell.classList.add(status.color);
+                const cell = document.createElement('div'); cell.className = `dia-celula rounded-lg shadow-sm relative overflow-hidden ${status.cssClass}`;
                 if (date.getTime() < today.getTime()) { cell.classList.add('dia-passado'); } else { cell.classList.add('text-gray-900'); cell.onclick = () => window.openToysPanel(day, currentMonth, currentYear); }
                 if (date.getTime() === today.getTime()) cell.classList.add('dia-hoje');
                 cell.innerHTML = `<div class="dia-numero">${day}</div>`; calendarBody.appendChild(cell);
