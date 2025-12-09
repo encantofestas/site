@@ -15,17 +15,28 @@
         .text-primary { color: #2563EB; }
         .bg-secondary { background-color: #FACC15; }
         .floating-fab { box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5); }
-        .dia-celula { min-height: 50px; position: relative; cursor: pointer; transition: transform 0.1s, background-color 0.3s; padding: 2px; }
-        .dia-passado { opacity: 0.4; cursor: not-allowed; background-color: #f8fafc !important; color: #cbd5e1; }
+        
+        /* Ajuste de clique para mobile */
+        .dia-celula { min-height: 50px; position: relative; cursor: pointer; transition: transform 0.1s, background-color 0.3s; padding: 2px; user-select: none; -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
+        .dia-celula:active { transform: scale(0.95); }
+        .dia-passado { opacity: 0.4; cursor: not-allowed; background-color: #f8fafc !important; color: #cbd5e1; pointer-events: none; }
         .dia-hoje { border: 2px solid #2563EB; font-weight: 700; z-index: 5; }
         .dia-numero { position: absolute; top: 2px; right: 4px; font-size: 0.85rem; font-weight: 600; color: rgba(0, 0, 0, 0.7); z-index: 10; }
-        #toast-notification { visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translate(-50%, 20px); left: 50%; position: fixed; bottom: 6rem; width: 90%; max-width: 400px; }
+        
+        /* Painéis e Overlays */
+        #toast-notification { visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translate(-50%, 20px); left: 50%; position: fixed; bottom: 6rem; width: 90%; max-width: 400px; z-index: 80; pointer-events: none; }
         #toast-notification.show { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
-        #toys-panel { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; z-index: 70; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; box-shadow: 0 -4px 25px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; display: flex; flex-direction: column; }
-        #toys-panel.open { transform: translateY(0); }
-        #toys-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 60; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
-        #toys-overlay.open { opacity: 1; visibility: visible; }
-        #notification-panel { z-index: 100; transition: transform 0.3s ease-out; position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; background-color: #2563EB; }
+        
+        #toys-panel { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; z-index: 70; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; box-shadow: 0 -4px 25px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; display: flex; flex-direction: column; pointer-events: none; /* Bloqueia cliques quando fechado */ }
+        #toys-panel.open { transform: translateY(0); pointer-events: auto; /* Reabilita cliques quando aberto */ }
+        
+        #toys-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 60; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; pointer-events: none; }
+        #toys-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
+        
+        #notification-panel { z-index: 100; transition: transform 0.3s ease-out; position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; background-color: #2563EB; pointer-events: none; }
+        #notification-panel.open { pointer-events: auto; transform: translateX(0); } /* Classe para abrir */
+        #notification-panel:not(.open) { transform: translateX(100%); }
+
         #notification-content { height: 100%; display: flex; flex-direction: column; }
     </style>
 </head>
@@ -53,7 +64,7 @@
         <span class="text-sm font-semibold leading-tight">Reservas permitidas apenas até 6 meses à frente.</span>
     </div>
 
-    <!-- PAINEL DE BRINQUEDOS -->
+    <!-- OVERLAY E PAINEL DE BRINQUEDOS -->
     <div id="toys-overlay" onclick="closeToysPanel()"></div>
     <div id="toys-panel">
         <div class="w-full flex justify-center pt-3 pb-1" onclick="closeToysPanel()"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
@@ -127,7 +138,7 @@
             </div>
         </div>
 
-        <!-- RODAPÉ -->
+        <!-- Rodapé do Painel (Total) -->
         <div class="p-4 border-t border-gray-100 bg-white shadow-lg pb-8 md:pb-4 flex-shrink-0">
             <div id="total-summary-rows" class="space-y-1 text-sm text-gray-700 mb-2"></div>
             <div class="flex justify-between items-center mb-3 pt-2 border-t border-gray-300">
@@ -138,12 +149,12 @@
         </div>
     </div>
 
-    <!-- NOTIFICAÇÕES -->
+    <!-- NOTIFICAÇÕES (Lateral) -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
-    <div id="notification-panel" class="transform translate-x-full">
+    <div id="notification-panel">
         <div id="notification-content">
             <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10"><h3 class="text-xl font-bold brand-font text-white">Notificações</h3><button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
-            <div class="flex-grow overflow-y-auto relative"><ul id="notification-list" class="p-4 space-y-3 pb-24"></ul></div>
+            <div class="flex-grow overflow-y-auto relative"><ul id="notification-list" class="p-4 space-y-3 pb-24"></ul><div id="loading-notifications" class="p-4 text-center hidden"><div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div><p class="text-sm text-blue-200 mt-2">Carregando...</p></div></div>
             <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));"><button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline disabled:opacity-50">Marcar todas como lidas</button></div>
         </div>
     </div>
@@ -179,6 +190,7 @@
         </div>
     </nav>
 
+    <!-- SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -189,7 +201,7 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/refs/heads/main/estoque.json';
+        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/main/estoque.json'; // URL CORRIGIDA SEM refs/heads
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
@@ -212,6 +224,7 @@
         }
 
         function useFallbackData() {
+            // Fallback apenas se o JSON não carregar
             toysInventory = [{ id: 1, name: "Cama Elástica Pequena", total_stock: 1, price: 170, measure: "2,00m Ø" }, { id: 2, name: "Cama Elástica Média", total_stock: 3, price: 190, measure: "3,05m Ø", scarcityGroup: 'ELASTIC' }, { id: 3, name: "Castelinho Pula Pula", total_stock: 1, price: 210, measure: "2,50 x 2,50m", exclusiveGroup: 'LONA' }, { id: 4, name: "Piscina de Bolinhas", total_stock: 2, price: 160, measure: "1,50 x 1,50m", scarcityGroup: 'BALL' }, { id: 5, name: "Área Baby", total_stock: 1, price: 110, measure: "3,00 x 3,00m" }, { id: 6, name: "Mini Baby Inflável", total_stock: 1, price: 220, measure: "2,80 x 2,80m" }, { id: 7, name: "Escorrega com Bolinha", total_stock: 1, price: 400, measure: "4,50 x 2,50m", exclusiveGroup: 'LONA' }, { id: 8, name: "Tobogã Médio", total_stock: 1, price: 400, measure: "5,00 x 3,00m", exclusiveGroup: 'LONA' }, { id: 9, name: "Futebol de Sabão", total_stock: 1, price: 600, measure: "8,00 x 4,00m", exclusiveGroup: "LONA" }, { id: 10, name: "Pebolim", total_stock: 1, price: 200, measure: "1,40 x 0,80m" }, { id: 11, name: "Air Hockey", total_stock: 1, price: 200, measure: "1,80 x 0,90m" }, { id: 12, name: "Ping Pong", total_stock: 1, price: 200, measure: "2,74 x 1,52m" }, { id: 13, name: "Jogos de Mesa", total_stock: 4, price: 15, measure: "Padrão", note: "O jogo" }];
             globalAgendamentos = {};
         }
@@ -358,32 +371,22 @@
             const eventStartTime = document.getElementById('event-start-time').value;
             const eventEndTime = document.getElementById('event-end-time').value;
             if (!name || !neighborhood || !street || eventStartTime === "" || eventEndTime === "") { alert('Preencha os campos obrigatórios.'); return; }
-            
             const number = document.getElementById('client-number').value || 'S/N';
             const insuranceChecked = document.getElementById('additional-insurance').checked;
             const deliveryDayBefore = document.getElementById('delivery-day-before').checked;
             const invoiceChecked = document.getElementById('request-invoice').checked;
             const cnpj = document.getElementById('client-cnpj').value;
             const rainProtection = document.getElementById('rain-protection')?.checked;
-            
             if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { alert('CNPJ inválido.'); return; }
-
             const { details, total } = window.getSelectedItemDetails();
             let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para a data ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n📄 CNPJ: ${invoiceChecked ? cnpj : 'Não'}\n⏰ Horário: ${eventStartTime} - ${eventEndTime}\n🚚 Entr. Antecipada: ${deliveryDayBefore ? 'SIM' : 'NÃO'}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
-            
             const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
             if (isBallPitIncluded) orderSummary += `🌧 Proteção Chuva: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
-            
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
-            if (monitorCount > 0) {
-                orderSummary += `👮 Monitores: ${monitorCount}\n`;
-                for (let i = 1; i <= monitorCount; i++) orderSummary += `  - Monitor ${i}: ${document.getElementById(`monitor-hours-${i}`).value}h\n`;
-            }
-
+            if (monitorCount > 0) { orderSummary += `👮 Monitores: ${monitorCount}\n`; for (let i = 1; i <= monitorCount; i++) orderSummary += `  - Monitor ${i}: ${document.getElementById(`monitor-hours-${i}`).value}h\n`; }
             orderSummary += `\n*ITENS:*\n`;
             details.forEach(item => { orderSummary += `• ${item.quantity}x ${item.name}\n`; });
             orderSummary += `\n💰 *TOTAL: ${document.getElementById('total-price-display').innerText}*`;
-            
             window.open(`https://wa.me/5547992277324?text=${encodeURIComponent(orderSummary)}`, '_blank');
             window.closeToysPanel(); window.changeStep('selection'); 
         }
@@ -392,7 +395,6 @@
             currentSelectedDateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             document.getElementById('selected-date-display').innerText = `Para a data ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
             document.getElementById('toys-list-container').innerHTML = ''; selectedItems = {}; 
-            
             document.getElementById('has-monitors').value = 'Nao'; document.getElementById('delivery-day-before').checked = false; document.getElementById('additional-insurance').checked = false; document.getElementById('request-invoice').checked = false;
             if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
             window.toggleMonitorFields(true); window.toggleCnpjField(); window.changeStep('selection'); 
@@ -404,7 +406,6 @@
                 const priceFormatted = toy.note ? `R$ ${finalPrice.toFixed(2).replace('.', ',')} / ${toy.note}` : `R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
                 let scarcityLabel = '';
                 if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-red-500 block">Preço ajustado (Escassez!)</span>`; }
-                
                 const item = document.createElement('div');
                 item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md`;
                 item.innerHTML = `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><div class="flex-grow min-w-0"><h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4><p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>${scarcityLabel}<span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span><div class="flex items-center space-x-2 text-sm font-medium"><button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full disabled:opacity-50" disabled><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></button><span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">0</span><button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full disabled:opacity-50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg></button><span class="text-xs text-gray-400">(${maxStock} máx.)</span></div></div>`;
@@ -414,14 +415,27 @@
         }
 
         window.closeToysPanel = function() { document.getElementById('toys-panel').classList.remove('open'); document.getElementById('toys-overlay').classList.remove('open'); document.body.style.overflow = ''; }
+        window.renderMonitorHours = function() {
+            const count = parseInt(document.getElementById('monitor-count').value); const hoursContainer = document.getElementById('monitor-hours-fields'); hoursContainer.innerHTML = '';
+            for (let i = 1; i <= count; i++) { hoursContainer.innerHTML += `<div><label for="monitor-hours-${i}" class="block text-sm font-medium text-gray-700 mb-1">Monitor ${i} - Horas (R$ 30,00/hora)</label><input type="number" id="monitor-hours-${i}" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas"></div>`; }
+        }
+        window.toggleMonitorFields = function(isInitialLoad = false) { const shouldShow = document.getElementById('has-monitors').value === 'Sim'; document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow); if (shouldShow && !isInitialLoad) { window.renderMonitorHours(); } else if (!shouldShow) { document.getElementById('monitor-hours-fields').innerHTML = ''; } }
+        window.toggleCnpjField = function() { const shouldShow = document.getElementById('request-invoice').checked; document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); document.getElementById('client-cnpj').required = shouldShow; }
+        
+        window.onload = function() { 
+            fetchData(); 
+            window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); renderCalendar(); 
+        };
         function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
         function getDayStatus(year, month, day) { const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false }; }
         function renderCalendar() {
-            const currentMonth = currentCalendarDate.getMonth(); const currentYear = currentCalendarDate.getFullYear(); monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`; calendarBody.innerHTML = '';
+            const currentMonth = currentCalendarDate.getMonth(); const currentYear = currentCalendarDate.getFullYear();
+            monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`; calendarBody.innerHTML = '';
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1); const firstDayOfNextMonth = new Date(currentYear, currentMonth + 1, 1);
             prevButton.disabled = firstDayOfCurrentMonth.getTime() === new Date(today.getFullYear(), today.getMonth(), 1).getTime();
-            const isAtMaxFuture = firstDayOfNextMonth.getTime() >= maxFutureDate.getTime(); nextButton.disabled = isAtMaxFuture; nextButton.onclick = isAtMaxFuture ? showToast : navigateNext;
+            const isAtMaxFuture = firstDayOfNextMonth.getTime() >= maxFutureDate.getTime(); nextButton.disabled = isAtMaxFuture;
+            nextButton.onclick = isAtMaxFuture ? showToast : navigateNext;
             for (let i = 0; i < firstDayOfMonth; i++) { const emptyCell = document.createElement('div'); emptyCell.className = 'dia-vazio p-2'; calendarBody.appendChild(emptyCell); }
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(currentYear, currentMonth, day); const status = getDayStatus(currentYear, currentMonth, day);
@@ -435,6 +449,7 @@
         function navigateNext() { const nextMonthCheck = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1); if (nextMonthCheck.getTime() < maxFutureDate.getTime()) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); renderCalendar(); }}
         prevButton.addEventListener('click', navigatePrev);
 
+        // --- Firebase/Notificações (MANUTENÇÃO) ---
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]')); let notificationsData = [];
         function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
         function getReadNotificationsCollection(uid) { return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`); }
@@ -448,6 +463,7 @@
         window.toggleNotificationPanel = function() { const panel = document.getElementById('notification-panel'); const overlay = document.getElementById('notification-overlay'); isPanelOpen = !isPanelOpen; if (isPanelOpen) { panel.classList.remove('translate-x-full'); overlay.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); renderNotifications(); } else { panel.classList.add('translate-x-full'); overlay.classList.add('hidden'); document.body.classList.remove('overflow-hidden'); } }
         async function initializeFirebaseAndAuth() { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } onAuthStateChanged(auth, (user) => { if (user) { userId = user.uid; isAuthReady = true; setupNotificationListener(); } else { userId = null; isAuthReady = true; if (unsubscribeNotifications) unsubscribeNotifications(); updateNotificationCount(0); } }); } catch (e) { console.error("Erro Firebase:", e); isAuthReady = true; } }
         window.openWhatsApp = function() { window.open('https://wa.me/5547992277324', '_blank'); }
+
         document.addEventListener('DOMContentLoaded', () => { fetchNotifications(); initializeFirebaseAndAuth(); renderCalendar(); });
     </script>
 </body>
