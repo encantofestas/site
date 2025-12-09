@@ -192,7 +192,9 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/encantofestas/site/b6b05ba574c9542cfbb221149f052dc97889e475/estoque.json';
+        
+        // CORREÇÃO: Mudamos de um commit específico (hash) para 'main' para pegar sempre a versão mais recente
+        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
@@ -204,7 +206,8 @@
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             try {
-                const response = await fetch(GITHUB_JSON_URL);
+                // CORREÇÃO: Adicionamos '?t=' + timestamp para evitar que o navegador use cache antigo
+                const response = await fetch(GITHUB_JSON_URL + '?t=' + new Date().getTime());
                 if (!response.ok) throw new Error('Erro');
                 const data = await response.json();
                 toysInventory = data.brinquedos; processAvailability(data);
