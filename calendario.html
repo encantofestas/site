@@ -38,7 +38,7 @@
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner" onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo Encanto Festas" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner" onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
             <div class="hidden md:flex items-center space-x-4">
@@ -82,32 +82,32 @@
                 <form id="checkout-form" onsubmit="event.preventDefault(); submitOrder()">
                     <div class="space-y-4">
                         <!-- Nome -->
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="client-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="client-name" required oninput="validateForm()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
                         
                         <!-- Bairro -->
                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label>
-                            <select id="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
+                            <select id="client-neighborhood" required onchange="calculateTotal(); validateForm();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
                                 <option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option>
                             </select>
                         </div>
                         
                         <!-- Endereço -->
                         <div class="flex space-x-2">
-                            <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label><input type="text" id="client-street" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
+                            <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label><input type="text" id="client-street" required oninput="validateForm()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
                             <div class="w-24"><label class="block text-sm font-medium text-gray-700 mb-1">Nº</label><input type="number" id="client-number" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Nº"></div>
                         </div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes..."></textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes da casa exemplo sobrado cinza na frente de..."></textarea></div>
                         
                         <!-- Horários -->
                         <div class="flex flex-col">
                             <div class="flex space-x-2">
-                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Início</label><select id="event-start-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
-                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Término</label><select id="event-end-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
+                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Início</label><select id="event-start-time" required onchange="calculateTotal(); validateForm();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
+                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Término</label><select id="event-end-time" required onchange="calculateTotal(); validateForm();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
                             </div>
                             <div id="time-fee-warning" class="text-xs text-red-600 mt-1 hidden font-normal"></div>
                         </div>
                         
-                        <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"><select id="delivery-day-before" onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select><label class="text-sm font-medium text-gray-700">Pode levar um dia antes, pelo mesmo valor?</label></div>
+                        <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"><select id="delivery-day-before" onchange="calculateTotal(); validateForm();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select><label class="text-sm font-medium text-gray-700">Pode levar um dia antes, pelo mesmo valor?</label></div>
                         <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden"><div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-5 h-5 text-red-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">A piscina fica totalmente coberta em caso de chuva</label></div></div>
                         <div class="space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                             <label class="block text-sm font-bold text-gray-800 mb-1">Deseja contratar monitores?</label>
@@ -132,7 +132,7 @@
         <div class="p-4 border-t border-gray-100 bg-white shadow-lg pb-8 md:pb-4 flex-shrink-0">
             <div id="total-summary-rows" class="space-y-1 text-sm text-gray-700 mb-2"></div>
             <div class="flex justify-between items-center mb-3 pt-2 border-t border-gray-300"><span class="text-lg font-bold text-gray-800">Total:</span><span id="total-price-display" class="text-xl md:text-2xl font-extrabold text-green-600">R$ 0,00</span></div>
-            <button id="action-button" onclick="handleActionButton()" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 disabled:bg-gray-400">Continuar Agendamento</button>
+            <button id="action-button" onclick="handleActionButton()" class="w-full bg-gray-400 text-white font-bold py-3 rounded-xl shadow-lg transition transform active:scale-95">Continuar Agendamento</button>
         </div>
     </div>
 
@@ -149,7 +149,7 @@
     <!-- MAIN -->
     <main class="flex-grow w-full pt-24 pb-28 md:pb-12 bg-white md:bg-gray-50 flex flex-col items-center justify-start">
         <div class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100">
-            <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Qual a data do seu evento?</h2>
+            <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Para a data <span id="display-date-main">...</span></h2>
             <div class="flex justify-between items-center mb-6 px-2">
                 <button id="prev-month" class="nav-btn p-2 rounded-full text-blue-600 hover:bg-blue-50 active:bg-blue-100 disabled:opacity-30"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
                 <h3 id="current-month-year" class="text-xl md:text-2xl font-extrabold text-gray-800 tracking-wide text-center capitalize"></h3>
@@ -198,7 +198,7 @@
         const DEFAULT_DATA = {
           "brinquedos": [
             { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX2Tga0PM2k0Z1rIWz2bIW73rW1VFIkDCYPg&s" },
-            { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "image": "mockup1760749737810.png" },
+            { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "image": "https://raw.githubusercontent.com/encantofestas/site/7a37b74c8c65dbab1e792c834ee21f8e904d806d/mockup1760749737810.png" },
             { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3m", "image": "" },
             { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL", "image": "" },
             { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "", "image": "" },
@@ -307,7 +307,7 @@
 
             if (duration > 6) {
                 fee = duration >= 8 ? 40 : 20;
-                warningText = "Eventos com mais de 6 horas de duração possuem uma taxa de serviço adicional.";
+                warningText = "Duração > 6h: taxa extra aplicada automaticamente.";
             }
 
             if (fee > 0) {
@@ -410,13 +410,41 @@
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
-            actionButton.disabled = totalItems === 0;
+            
+            // VALIDAÇÃO EM TEMPO REAL PARA A COR DO BOTÃO
+            const isValid = validateForm();
+            if (isValid) {
+                actionButton.classList.remove('bg-gray-400');
+                actionButton.classList.add('bg-primary');
+            } else {
+                actionButton.classList.add('bg-gray-400');
+                actionButton.classList.remove('bg-primary');
+            }
+            
+            actionButton.disabled = totalItems === 0; // Mantém disabled se 0 itens apenas na seleção
+
             if (totalItems > 0 && currentStep === 'selection') { actionButton.innerText = `Continuar Agendamento`; } 
             else if (currentStep === 'checkout') { actionButton.innerText = `Confirmar Reserva`; } 
             else { actionButton.innerText = `Continuar Agendamento`; }
+            
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
+            
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
+        }
+        
+        // --- FUNÇÃO DE VALIDAÇÃO VISUAL ---
+        window.validateForm = function() {
+            if (currentStep !== 'checkout') return true; // Se não está no checkout, considera "válido" para não bugar botão anterior
+
+            const name = document.getElementById('client-name').value.trim();
+            const neighborhood = document.getElementById('client-neighborhood').value;
+            const street = document.getElementById('client-street').value.trim();
+            const startTime = document.getElementById('event-start-time').value;
+            const delivery = document.getElementById('delivery-day-before').value;
+
+            // Retorna true se TODOS os campos obrigatórios estiverem preenchidos
+            return (name !== "" && neighborhood !== "" && street !== "" && startTime !== "" && delivery !== "");
         }
         
         window.updateQuantity = function(toyId, change) {
@@ -427,7 +455,7 @@
             if (toy.exclusiveGroup === 'LONA' && change > 0) {
                 if (currentQty === 0) {
                     const otherLonaItem = toysInventory.find(t => t.exclusiveGroup === 'LONA' && t.id !== toyId && (selectedItems[t.id] || 0) > 0);
-                    if (otherLonaItem) { alert(`Não temos motor para dois brinquedos assim.`); return; }
+                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado por dia. Remova o(a) ${otherLonaItem.name} antes de adicionar.`); return; }
                 }
                 if (newQty > 1) newQty = 1;
             }
@@ -506,12 +534,27 @@
         }
 
         window.submitOrder = function() {
+            // Se a validação visual falhou (botão cinza), mostra o alerta educativo
+            if (!validateForm()) {
+                let missing = [];
+                if (!document.getElementById('client-name').value.trim()) missing.push("Nome");
+                if (!document.getElementById('client-neighborhood').value) missing.push("Bairro");
+                if (!document.getElementById('client-street').value.trim()) missing.push("Nome da Rua");
+                if (!document.getElementById('event-start-time').value) missing.push("Horário de Início");
+                if (!document.getElementById('delivery-day-before').value) missing.push("Opção de Entrega Antecipada");
+                
+                alert("Por favor, preencha os seguintes campos obrigatórios antes de confirmar:\n- " + missing.join("\n- "));
+                return;
+            }
+
             const name = document.getElementById('client-name').value;
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value;
             const number = document.getElementById('client-number').value || 'S/N';
             const eventStartTime = document.getElementById('event-start-time').value;
             const eventEndTime = document.getElementById('event-end-time').value;
+
+            // Validação secundária de segurança (caso o usuário force)
             if (!name || !neighborhood || !street || eventStartTime === "" || eventEndTime === "") { alert('Preencha os campos obrigatórios.'); return; }
             
             const insuranceChecked = document.getElementById('additional-insurance').checked;
