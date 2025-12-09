@@ -69,7 +69,12 @@
                     <button onclick="closeToysPanel()" class="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
                 <div id="panel-loading" class="p-8 text-center text-gray-500 hidden"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div><p>Carregando estoque...</p></div>
-                <div id="panel-error" class="p-8 text-center text-red-500 hidden"><p class="font-bold">Erro ao carregar estoque.</p><p class="text-sm mt-2">Não foi possível acessar os dados do estoque.</p></div>
+                
+                <div id="panel-error" class="p-8 text-center text-red-500 hidden">
+                    <p class="font-bold">Erro ao carregar estoque.</p>
+                    <p class="text-sm mt-2 mb-4">Verifique sua conexão e tente novamente.</p>
+                    <button onclick="fetchData()" class="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200">Tentar Novamente</button>
+                </div>
                 
                 <div class="p-4 space-y-4" id="toys-list-container"></div>
             </div>
@@ -193,7 +198,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        // URL Oficial - Sem dados de teste
+        // URL Oficial
         const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
@@ -202,17 +207,17 @@
         const monthYearDisplay = document.getElementById('current-month-year'); const calendarBody = document.getElementById('calendar-body'); const prevButton = document.getElementById('prev-month'); const nextButton = document.getElementById('next-month'); const toast = document.getElementById('toast-notification');
         let currentSelectedDateISO = "";
 
-        async function fetchData() {
+        // Adiciona função fetchData ao escopo global para o botão de tentar novamente
+        window.fetchData = async function() {
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             try {
-                // Adicionamos '?t=' + timestamp para evitar cache
-                const response = await fetch(GITHUB_JSON_URL + '?t=' + new Date().getTime());
+                // Removido parâmetro de timestamp que pode estar causando problema
+                const response = await fetch(GITHUB_JSON_URL);
                 if (!response.ok) throw new Error('Erro ao carregar URL externa');
                 
                 const data = await response.json();
                 
-                // Verifica se a estrutura esperada está presente
                 if (!data.brinquedos || data.brinquedos.length === 0) {
                      throw new Error('JSON Válido, mas sem brinquedos na chave "brinquedos".');
                 }
@@ -224,7 +229,7 @@
             } catch (error) { 
                 console.error("Erro no Fetch ou Estrutura:", error.message); 
                 document.getElementById('panel-error').classList.remove('hidden');
-                // IMPORTANTE: Não carregamos nenhum dado falso aqui. Se falhar, o usuário verá o erro.
+                // Sem fallback de simulação conforme solicitado
             } 
             finally { 
                 document.getElementById('panel-loading').classList.add('hidden'); 
@@ -677,7 +682,7 @@
         window.toggleMonitorFields = function(isInitialLoad = false) { const shouldShow = document.getElementById('has-monitors').value === 'Sim'; document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow); if (shouldShow && !isInitialLoad) { window.renderMonitorHours(); } else if (!shouldShow) { document.getElementById('monitor-hours-fields').innerHTML = ''; } }
         window.toggleCnpjField = function() { const shouldShow = document.getElementById('request-invoice').checked; document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); document.getElementById('client-cnpj').required = shouldShow; }
         
-        window.onload = function() { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); fetchData(); };
+        window.onload = function() { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); window.fetchData(); };
         function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
         function getDayStatus(year, month, day) { const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false }; }
         function renderCalendar() {
@@ -734,7 +739,7 @@
         async function initializeFirebaseAndAuth() { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } onAuthStateChanged(auth, (user) => { if (user) { userId = user.uid; isAuthReady = true; setupNotificationListener(); } else { userId = null; isAuthReady = true; if (unsubscribeNotifications) unsubscribeNotifications(); updateNotificationCount(0); } }); } catch (e) { console.error("Erro Firebase:", e); isAuthReady = true; } }
         window.openWhatsApp = function() { window.open('https://wa.me/5547992277324', '_blank'); }
 
-        document.addEventListener('DOMContentLoaded', () => { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); fetchData(); });
+        document.addEventListener('DOMContentLoaded', () => { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); window.fetchData(); });
     </script>
 </body>
 </html>
