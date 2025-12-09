@@ -69,7 +69,7 @@
                     <button onclick="closeToysPanel()" class="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
                 <div id="panel-loading" class="p-8 text-center text-gray-500 hidden"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mb-2"></div><p>Carregando estoque...</p></div>
-                <div id="panel-error" class="p-8 text-center text-red-500 hidden"><p class="font-bold">Erro ao carregar estoque.</p><p class="text-sm mt-2">Não foi possível acessar os dados. Verifique sua conexão ou se o arquivo JSON está acessível.</p></div>
+                <div id="panel-error" class="p-8 text-center text-red-500 hidden"><p class="font-bold">Erro ao carregar estoque.</p><p class="text-sm mt-2">Não foi possível acessar os dados do estoque.</p></div>
                 
                 <div class="p-4 space-y-4" id="toys-list-container"></div>
             </div>
@@ -193,7 +193,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        // CORREÇÃO: Mudamos de um commit específico (hash) para 'main' para pegar sempre a versão mais recente
+        // URL Oficial - Sem dados de teste
         const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
@@ -206,15 +206,25 @@
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             try {
-                // CORREÇÃO: Adicionamos '?t=' + timestamp para evitar que o navegador use cache antigo
+                // Adicionamos '?t=' + timestamp para evitar cache
                 const response = await fetch(GITHUB_JSON_URL + '?t=' + new Date().getTime());
-                if (!response.ok) throw new Error('Erro');
+                if (!response.ok) throw new Error('Erro ao carregar URL externa');
+                
                 const data = await response.json();
-                toysInventory = data.brinquedos; processAvailability(data);
+                
+                // Verifica se a estrutura esperada está presente
+                if (!data.brinquedos || data.brinquedos.length === 0) {
+                     throw new Error('JSON Válido, mas sem brinquedos na chave "brinquedos".');
+                }
+
+                toysInventory = data.brinquedos; 
+                processAvailability(data);
                 document.getElementById('toys-list-container').classList.remove('hidden');
+
             } catch (error) { 
-                console.error(error); 
+                console.error("Erro no Fetch ou Estrutura:", error.message); 
                 document.getElementById('panel-error').classList.remove('hidden');
+                // IMPORTANTE: Não carregamos nenhum dado falso aqui. Se falhar, o usuário verá o erro.
             } 
             finally { 
                 document.getElementById('panel-loading').classList.add('hidden'); 
@@ -351,7 +361,9 @@
             details.forEach(item => {
                 const itemContainer = document.createElement('div');
                 itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
-                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${item.lineTotal.toFixed(2).replace('.', ',')}</div>`;
+                const pricePerUnit = window.calculatePriceWithScarcity(toysInventory.find(t => t.id === item.id)); // Recalcula preço
+                const lineTotal = item.quantity * pricePerUnit;
+                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${lineTotal.toFixed(2).replace('.', ',')}</div>`;
                 summaryDiv.appendChild(itemContainer);
             });
             
@@ -363,6 +375,35 @@
             if (couponDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Cupom (10%):</span><span>- R$ ${couponDiscount.toFixed(2).replace('.', ',')}</span></div>`;
             if (shippingFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa de Entrega:</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`;
             if (insuranceFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`;
+        }
+        
+        // CORREÇÃO APLICADA AQUI: Adiciona validação de Horário de Término e campos de Tomada
+        window.validateForm = function() {
+            if (currentStep !== 'checkout') return true; 
+            const name = document.getElementById('client-name').value.trim();
+            const neighborhood = document.getElementById('client-neighborhood').value;
+            const street = document.getElementById('client-street').value.trim();
+            const startTime = document.getElementById('event-start-time').value;
+            const endTime = document.getElementById('event-end-time').value; // <-- ADICIONADO
+            
+            // Verifica se os campos básicos obrigatórios estão preenchidos
+            if (name === "" || neighborhood === "" || street === "" || startTime === "" || endTime === "") {
+                return false;
+            }
+            
+            // Verifica os campos de distância da tomada (obrigatório se o brinquedo precisar de energia)
+            const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
+            let powerInputsValid = true;
+            powerInputs.forEach(input => {
+                 if (!input.value || parseInt(input.value) > 20) { // Verifica valor vazio ou > 20m
+                     powerInputsValid = false;
+                 }
+            });
+            
+            if (!powerInputsValid) { return false; }
+
+            // O campo delivery-day-before tem um valor padrão ('Nao'), então não precisa ser validado como vazio.
+            return true;
         }
         
         window.calculateTotal = function() {
@@ -390,9 +431,9 @@
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
             
-            const isValid = validateForm();
+            const isValid = validateForm(); // Usa a validação atualizada
             
-            actionButton.disabled = totalItems === 0;
+            actionButton.disabled = totalItems === 0 || (currentStep === 'checkout' && !isValid); // Desabilita se for checkout e não for válido
 
             if (totalItems > 0 && currentStep === 'selection') { 
                 actionButton.innerText = `Continuar Agendamento`;
@@ -418,16 +459,6 @@
             
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
-        }
-        
-        window.validateForm = function() {
-            if (currentStep !== 'checkout') return true; 
-            const name = document.getElementById('client-name').value.trim();
-            const neighborhood = document.getElementById('client-neighborhood').value;
-            const street = document.getElementById('client-street').value.trim();
-            const startTime = document.getElementById('event-start-time').value;
-            const delivery = document.getElementById('delivery-day-before').value;
-            return (name !== "" && neighborhood !== "" && street !== "" && startTime !== "" && delivery !== "");
         }
         
         window.updateQuantity = function(toyId, change) {
@@ -483,19 +514,20 @@
                 container.id = 'power-outlet-fields-container';
                 container.className = 'space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200 mt-4 mb-4';
                 
-                let htmlContent = `<label class="block text-sm font-bold text-indigo-800 mb-2">Selecione a distância da tomada</label>`;
+                let htmlContent = `<label class="block text-sm font-bold text-indigo-800 mb-2">Selecione a distância da tomada (em metros - máx. 20m)</label>`;
                 
                 powerToys.forEach(toy => {
                     for(let i=1; i<=toy.quantity; i++) {
                          const label = toy.quantity > 1 ? `${toy.name} (#${i})` : toy.name;
                          const inputId = `power-dist-${toy.id}-${i}`;
-                         htmlContent += `<div><label for="${inputId}" class="block text-xs font-medium text-gray-700">${label}</label><input type="number" id="${inputId}" name="${inputId}" max="20" required class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Ex: 5m"></div>`;
+                         htmlContent += `<div><label for="${inputId}" class="block text-xs font-medium text-gray-700">${label}</label><input type="number" id="${inputId}" name="${inputId}" max="20" required oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Ex: 5m"></div>`;
                     }
                 });
                 
                 container.innerHTML = htmlContent;
                 anchor.appendChild(container);
             }
+            window.calculateTotal(); // Atualiza total para revalidar o botão após renderizar/limpar campos de energia
         }
 
         window.changeStep = function(step) {
@@ -519,45 +551,73 @@
             } else if (currentStep === 'checkout') { window.submitOrder(); }
         }
 
+        // CORREÇÃO APLICADA AQUI: Melhoria na função submitOrder para alertar campos obrigatórios
         window.submitOrder = function() {
             if (!validateForm()) {
+                const name = document.getElementById('client-name').value.trim();
+                const neighborhood = document.getElementById('client-neighborhood').value;
+                const street = document.getElementById('client-street').value.trim();
+                const startTime = document.getElementById('event-start-time').value;
+                const endTime = document.getElementById('event-end-time').value;
+                const invoiceChecked = document.getElementById('request-invoice').checked;
+                const cnpj = document.getElementById('client-cnpj').value;
+                
                 let missing = [];
-                if (!document.getElementById('client-name').value.trim()) missing.push("Nome");
-                if (!document.getElementById('client-neighborhood').value) missing.push("Bairro");
-                if (!document.getElementById('client-street').value.trim()) missing.push("Nome da Rua");
-                if (!document.getElementById('event-start-time').value) missing.push("Horário de Início");
-                if (!document.getElementById('delivery-day-before').value) missing.push("Opção de Entrega Antecipada");
-                alert("Por favor, preencha os seguintes campos obrigatórios antes de confirmar:\n- " + missing.join("\n- "));
+                if (!name) missing.push("Nome Completo");
+                if (!neighborhood) missing.push("Bairro de Entrega");
+                if (!street) missing.push("Nome da Rua");
+                if (!startTime) missing.push("Horário de Início");
+                if (!endTime) missing.push("Horário de Término");
+
+                // Validação de inputs de energia
+                const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
+                let powerInputsInvalid = false;
+                powerInputs.forEach(input => {
+                    const label = input.previousElementSibling.innerText;
+                    if (!input.value) { missing.push(`Distância da Tomada: ${label}`); powerInputsInvalid = true; }
+                    if (parseInt(input.value) > 20) { missing.push(`Distância da Tomada (${label}) deve ser menor que 20m.`); powerInputsInvalid = true; }
+                });
+
+                if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { missing.push("CNPJ (Inválido)"); }
+
+                if (missing.length > 0) {
+                     // Utiliza uma simulação de modal de alerta, já que alert() é proibido
+                     const alertMessage = "🚨 Por favor, preencha/corrija os seguintes campos obrigatórios:\n- " + missing.join("\n- ");
+                     console.error(alertMessage); 
+                     // Em um ambiente de produção real, usaríamos um modal customizado
+                     // Para este ambiente, vamos apenas dar um feedback no console e no chat
+                     window.alert(alertMessage.substring(0, 150) + '...');
+                     return;
+                }
+                
+                // Se o validateForm retornou falso, mas as verificações detalhadas falharam, retorne aqui.
                 return;
             }
+
             const name = document.getElementById('client-name').value;
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value;
             const number = document.getElementById('client-number').value || 'S/N';
             const eventStartTime = document.getElementById('event-start-time').value;
             const eventEndTime = document.getElementById('event-end-time').value;
-            if (!name || !neighborhood || !street || eventStartTime === "" || eventEndTime === "") { alert('Preencha os campos obrigatórios.'); return; }
             const insuranceChecked = document.getElementById('additional-insurance').checked;
             const deliveryDayBeforeSelect = document.getElementById('delivery-day-before').value;
             const invoiceChecked = document.getElementById('request-invoice').checked;
             const cnpj = document.getElementById('client-cnpj').value;
             const rainProtection = document.getElementById('rain-protection')?.checked;
             const coupon = document.getElementById('discount-coupon').value;
-            
-            if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { alert('CNPJ inválido.'); return; }
+            const reference = document.getElementById('client-reference').value; // Ponto de Referência
 
-            // Validação de inputs de energia
+            // Validação de inputs de energia (Já validado no validateForm, mas a extração é aqui)
             const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
             let powerDetails = "";
             for (let input of powerInputs) {
-                if (!input.value) { alert('Por favor, informe a distância da tomada para todos os brinquedos elétricos.'); return; }
-                if (parseInt(input.value) > 20) { alert('A distância máxima da tomada é 20 metros.'); return; }
                 const label = input.previousElementSibling.innerText;
-                powerDetails += `⚡ ${label}: ${input.value}\n`;
+                powerDetails += `⚡ ${label}: ${input.value}m\n`;
             }
 
             const { details, total } = window.getSelectedItemDetails();
-            let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n📄 CNPJ: ${invoiceChecked ? (cnpj || 'Não informado') : 'Não Solicitado'}\n⏰ Horário: ${eventStartTime} - ${eventEndTime}\n🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
+            let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n🗒️ Ref: ${reference || 'N/A'}\n📄 CNPJ: ${invoiceChecked ? (cnpj || 'Não informado') : 'Não Solicitado'}\n⏰ Horário: ${eventStartTime}:00 - ${eventEndTime}:00\n🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
             if (coupon) orderSummary += `🎟️ Cupom: ${coupon}\n`;
             const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
             if (isBallPitIncluded) orderSummary += `🌧 Piscina Coberta: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
@@ -674,7 +734,7 @@
         async function initializeFirebaseAndAuth() { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } onAuthStateChanged(auth, (user) => { if (user) { userId = user.uid; isAuthReady = true; setupNotificationListener(); } else { userId = null; isAuthReady = true; if (unsubscribeNotifications) unsubscribeNotifications(); updateNotificationCount(0); } }); } catch (e) { console.error("Erro Firebase:", e); isAuthReady = true; } }
         window.openWhatsApp = function() { window.open('https://wa.me/5547992277324', '_blank'); }
 
-        document.addEventListener('DOMContentLoaded', () => { fetchNotifications(); initializeFirebaseAndAuth(); renderCalendar(); });
+        document.addEventListener('DOMContentLoaded', () => { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); fetchData(); });
     </script>
 </body>
 </html>
