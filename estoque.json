@@ -1,9 +1,9 @@
 {
   "brinquedos": [
-    { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,00m Ø" },
-    { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m Ø", "scarcityGroup": "ELASTIC" },
-    { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "2,50 x 2,50m", "exclusiveGroup": "LONA" },
-    { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,50 x 1,50m", "scarcityGroup": "BALL" },
+    { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m" },
+    { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC" },
+    { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3,00 x 3,00m" },
+    { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,50 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL" },
     { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "3,00 x 3,00m" },
     { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "2,80 x 2,80m" },
     { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "4,50 x 2,50m", "exclusiveGroup": "LONA" },
@@ -15,44 +15,14 @@
     { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "O jogo" }
   ],
   "agendamentos": {
-    "2025-10-12": {
-      "2": 3, 
-      "4": 1
-    },
-    "2025-12-10": {
-      "2": 1,
-      "4": 1
-    },
-    "2025-12-13": {
-      "1": 1,
-      "2": 1,
-      "8": 1,
-      "9": 1
-    },
-    "2025-12-14": {
-      "2": 1,
-      "4": 1,
-      "1": 1
-    },
-    "2025-12-21": {
-      "7": 1
-    },
-    "2025-12-24": {
-      "3": 1,
-      "13": 4
-    },
-    "2025-12-25": {
-      "9": 1
-    },
-    "2026-01-10": {
-      "3": 1,
-      "2": 1,
-      "4": 1
-    },
-    "2026-04-18": {
-      "10": 1,
-      "11": 1,
-      "12": 1
-    }
+    "2025-10-12": { "2": 3, "4": 1 },
+    "2025-12-10": { "2": 1, "4": 1 },
+    "2025-12-13": { "1": 1, "2": 1, "8": 1, "9": 1 },
+    "2025-12-14": { "2": 1, "4": 1, "1": 1 },
+    "2025-12-21": { "7": 1 },
+    "2025-12-24": { "3": 1, "13": 4 },
+    "2025-12-25": { "9": 1 },
+    "2026-01-10": { "3": 1, "2": 1, "4": 1 },
+    "2026-04-18": { "10": 1, "11": 1, "12": 1 }
   }
 }
