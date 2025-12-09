@@ -193,7 +193,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        // CORREÇÃO: Usamos a URL de branch 'main' que sempre pega o arquivo mais recente
+        // URL BASE PARA BUSCAR A VERSÃO MAIS RECENTE (BRANCH MAIN)
         const GITHUB_JSON_URL_BASE = 'https://raw.githubusercontent.com/encantofestas/site/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
@@ -206,8 +206,7 @@
             document.getElementById('panel-loading').classList.remove('hidden'); document.getElementById('toys-list-container').classList.add('hidden');
             document.getElementById('panel-error').classList.add('hidden');
             try {
-                // CORREÇÃO: Força o navegador a não usar o cache local adicionando um parâmetro de tempo único.
-                // O problema de "sumir" era a falta da variável ou o uso de headers muito agressivos.
+                // Monta a URL com o timestamp para forçar a atualização (Cache Busting)
                 const cacheBusterUrl = `${GITHUB_JSON_URL_BASE}?t=${new Date().getTime()}`;
                 
                 const response = await fetch(cacheBusterUrl);
