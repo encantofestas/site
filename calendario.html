@@ -104,7 +104,6 @@
                                 <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Início</label><select id="event-start-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
                                 <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Término</label><select id="event-end-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
                             </div>
-                            <!-- AVISO DE TAXA DE HORÁRIO SEM NEGRITO -->
                             <div id="time-fee-warning" class="text-xs text-red-600 mt-1 hidden font-normal"></div>
                         </div>
                         
@@ -188,7 +187,7 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
-        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/refs/heads/main/estoque.json';
+        const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/juliocesar38/EncantoFestas/main/estoque.json';
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
         let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
@@ -198,19 +197,19 @@
 
         const DEFAULT_DATA = {
           "brinquedos": [
-            { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m" },
-            { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC" },
-            { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3,00 x 3,00m" },
-            { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL" },
-            { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "" },
-            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "" },
-            { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "", "exclusiveGroup": "LONA", "needsPower": true },
-            { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "needsPower": true },
-            { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8 x 4m", "exclusiveGroup": "LONA", "needsPower": true },
-            { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "" },
-            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "", "needsPower": true },
-            { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "" },
-            { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "O jogo" }
+            { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX2Tga0PM2k0Z1rIWz2bIW73rW1VFIkDCYPg&s" },
+            { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "image": "mockup1760749737810.png" },
+            { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3m", "image": "" },
+            { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL", "image": "" },
+            { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "", "image": "" },
+            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "", "image": "" },
+            { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "", "exclusiveGroup": "LONA", "image": "" },
+            { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "image": "" },
+            { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8 x 4m", "exclusiveGroup": "LONA", "image": "" },
+            { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "", "image": "" },
+            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "", "image": "" },
+            { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "", "image": "" },
+            { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "O jogo", "image": "" }
           ],
           "agendamentos": {
             "2025-10-12": { "2": 3, "4": 1 },
@@ -290,7 +289,6 @@
             return toy.price;
         }
         
-        // --- FUNÇÃO PARA CALCULAR TAXA DE DURAÇÃO (NOVA) ---
         function calculateDurationFee() {
             const startStr = document.getElementById('event-start-time').value;
             const endStr = document.getElementById('event-end-time').value;
@@ -299,20 +297,15 @@
 
             const startHour = parseInt(startStr);
             const endHour = parseInt(endStr);
-            
-            // Se o final for menor que o início (virada de dia, não suportado mas prevenido), 
-            // ou se forem iguais, assumimos 0 para evitar erros, embora a UI devesse prevenir.
-            // Assumiremos eventos no mesmo dia para simplificação com os dropdowns atuais.
             let duration = endHour - startHour;
             
-            if (duration <= 0) return 0; // Inválido ou 0h
+            if (duration <= 0) return 0; 
 
             let fee = 0;
             let warningText = "";
             const warningEl = document.getElementById('time-fee-warning');
 
             if (duration > 6) {
-                // Simplificação do texto conforme solicitado
                 fee = duration >= 8 ? 40 : 20;
                 warningText = "Eventos com mais de 6 horas de duração possuem uma taxa de serviço adicional.";
             }
@@ -356,7 +349,7 @@
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0;
             
-            const discountRate = itemCount >= 2 ? 0.05 : 0; // ALTERADO PARA 5%
+            const discountRate = itemCount >= 2 ? 0.05 : 0; 
             const quantityDiscount = subtotal * discountRate;
 
             const neighborhood = document.getElementById('client-neighborhood')?.value;
@@ -375,7 +368,7 @@
                 monitorFee = monitorCount * monitorHours * 30;
             }
             
-            const timeFee = calculateDurationFee(); // TAXA DE DURAÇÃO
+            const timeFee = calculateDurationFee(); 
 
             details.forEach(item => {
                 const itemContainer = document.createElement('div');
@@ -387,8 +380,8 @@
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
             summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Subtotal:</span><span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span></div>`;
             if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores:</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
-            if (timeFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa Duração:</span><span>+ R$ ${timeFee.toFixed(2).replace('.', ',')}</span></div>`; // LINHA DA TAXA DE DURAÇÃO
-            if (quantityDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto Combo 5%:</span><span>- R$ ${quantityDiscount.toFixed(2).replace('.', ',')}</span></div>`; // TEXTO 5%
+            if (timeFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa Duração:</span><span>+ R$ ${timeFee.toFixed(2).replace('.', ',')}</span></div>`; 
+            if (quantityDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto Combo 5%:</span><span>- R$ ${quantityDiscount.toFixed(2).replace('.', ',')}</span></div>`; 
             if (couponDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Cupom (10%):</span><span>- R$ ${couponDiscount.toFixed(2).replace('.', ',')}</span></div>`;
             if (shippingFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa de Entrega:</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`;
             if (insuranceFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`;
@@ -397,10 +390,8 @@
         window.calculateTotal = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
-            
-            const discountRate = itemCount >= 2 ? 0.05 : 0; // ALTERADO PARA 5%
+            const discountRate = itemCount >= 2 ? 0.05 : 0; 
             const quantityDiscount = subtotal * discountRate;
-            
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0; 
             const neighborhood = document.getElementById('client-neighborhood')?.value;
@@ -409,28 +400,21 @@
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
             if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
-
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
             let shippingFee = 0;
             if (neighborhood === 'Ervino') shippingFee = 25.00;
             else if (extraShippingNeighborhoods.includes(neighborhood)) shippingFee = 10.00;
-
             const insuranceFee = insuranceChecked ? 10.00 : 0;
-            
-            const timeFee = calculateDurationFee(); // CALCULA TAXA DE DURAÇÃO
-
+            const timeFee = calculateDurationFee(); 
             const finalTotal = (subtotal - quantityDiscount - couponDiscount) + shippingFee + insuranceFee + monitorFee + timeFee;
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
-            
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
             actionButton.disabled = totalItems === 0;
             if (totalItems > 0 && currentStep === 'selection') { actionButton.innerText = `Continuar Agendamento`; } 
             else if (currentStep === 'checkout') { actionButton.innerText = `Confirmar Reserva`; } 
             else { actionButton.innerText = `Continuar Agendamento`; }
-            
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
-            
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
         }
@@ -468,7 +452,6 @@
             }
         }
 
-        // --- RENDERIZAÇÃO DOS CAMPOS DE TOMADA ---
         window.renderPowerOutletFields = function() {
             const container = document.getElementById('power-outlet-fields-container');
             if (!container) {
@@ -604,7 +587,9 @@
                 item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md`;
                 const measureHtml = toy.measure ? `<p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>` : '';
                 
-                item.innerHTML = `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><div class="flex-grow min-w-0"><h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4>${measureHtml}${scarcityLabel}<span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span><div class="flex items-center space-x-2 text-sm font-medium"><button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full disabled:opacity-50" disabled><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></button><span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">0</span><button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full disabled:opacity-50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg></button><span class="text-xs text-gray-400">(${maxStock} máx.)</span></div></div>`;
+                const imgTag = toy.image ? `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden"><img src="${toy.image}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></div>` : `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+
+                item.innerHTML = `${imgTag}<div class="flex-grow min-w-0"><h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4>${measureHtml}${scarcityLabel}<span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span><div class="flex items-center space-x-2 text-sm font-medium"><button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full disabled:opacity-50" disabled><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></button><span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">0</span><button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full disabled:opacity-50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg></button><span class="text-xs text-gray-400">(${maxStock} máx.)</span></div></div>`;
                 document.getElementById('toys-list-container').appendChild(item);
             }); 
             window.calculateTotal(); document.getElementById('toys-panel').classList.add('open'); document.getElementById('toys-overlay').classList.add('open'); document.body.style.overflow = 'hidden';
