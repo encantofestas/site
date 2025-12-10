@@ -561,9 +561,10 @@
             return cleanStr(str).split(/[\s,.-]+/).filter(w => w.length > 1 && !ignoredWords.includes(w));
         }
 
-        // FUNÇÃO ATUALIZADA: Gera um dos 3 cupons fixos (FESTA20, CLIENTE20, AMIGO20) aleatoriamente.
+        // FUNÇÃO ATUALIZADA: Gera um dos 3 cupons fixos (FSD8S2, JOF383, 939FJS) aleatoriamente.
         function generateRandomCoupon() {
-            const fixedCodes = ['FESTA20', 'CLIENTE20', 'AMIGO20'];
+            // Códigos fornecidos pelo usuário
+            const fixedCodes = ['FSD8S2', 'JOF383', '939FJS'];
             const randomIndex = Math.floor(Math.random() * fixedCodes.length);
             return fixedCodes[randomIndex];
         }
@@ -623,7 +624,7 @@
 
                 setTimeout(() => {
                     if (isValid) {
-                        // Agora gera um dos 3 cupons fixos
+                        // Agora gera um dos 3 cupons fixos (FSD8S2, JOF383, 939FJS)
                         const newCode = generateRandomCoupon();
                         document.getElementById('coupon-code-display').innerText = newCode;
                         showCouponStep('result');
