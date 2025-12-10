@@ -288,11 +288,12 @@
           "agendamentos": {
             "2025-12-10": { "2": 1, "4": 1 },
             "2025-12-13": { "1": 1, "2": 1, "8": 1, "9": 1 },
-            "2025-12-14": { "2": 2, "4": 2, "1": 1 },
+            "2025-12-14": { "2": 2, "4": 2 },
             "2025-12-17": { "10": 1, "12": 1, "2": 2, "4": 1, "11": 1, "8": 1, "5": 1, "3": 1, "6": 1 },
             "2025-12-21": { "7": 1 },
             "2025-12-24": { "3": 1, "13": 4, "2": 1, "4": 1 },
             "2026-01-10": { "3": 1, "2": 1, "4": 1 },
+            "2026-01-16": { "1": 1 },
             "2026-04-18": { "10": 1, "11": 1, "12": 1 }
           }
         };
@@ -334,36 +335,29 @@
             return { text: '?', color: 'bg-gray-400', title: 'Idade não informada' };
         }
         
-        // Helper to add days to a date string
         function addDays(dateStr, days) {
             const result = new Date(dateStr + 'T00:00:00');
             result.setDate(result.getDate() + days);
             return result.toISOString().split('T')[0];
         }
 
-        // NOVO: Função para verificar disponibilidade em um intervalo de dias
         function checkRangeAvailability() {
             if (selectedDayCount === 1) return { valid: true };
 
             const startDate = currentSelectedDateISO;
             const itemsToCheck = [];
             
-            // Monta lista de itens selecionados e suas quantidades
             for (const [toyId, qty] of Object.entries(selectedItems)) {
                 if (qty > 0) itemsToCheck.push({ id: parseInt(toyId), qty });
             }
             
             if (itemsToCheck.length === 0) return { valid: true };
 
-            // Verifica cada dia do intervalo (começando do dia seguinte, pois o dia atual já foi validado na seleção)
-            // Na verdade, precisa validar TODOS os dias para garantir consistência se a data for mudada
             for (let i = 0; i < selectedDayCount; i++) {
                 const checkDate = addDays(startDate, i);
                 
                 for (const item of itemsToCheck) {
                     const toy = toysInventory.find(t => t.id === item.id);
-                    // Usa a lógica de estoque para aquela data específica
-                    // Precisamos de uma versão de getStockForDate que aceite data como parâmetro
                     const stockOnDate = getStockForDate(item.id, checkDate);
                     
                     if (stockOnDate < item.qty) {
@@ -391,7 +385,6 @@
             for (const [date, items] of Object.entries(data.agendamentos)) {
                 let realRemainingStock = 0;
                 
-                // Lógica para detecção de LONA alugada no dia
                 const lonaToys = toysInventory.filter(t => t.exclusiveGroup === 'LONA');
                 let isLonaBooked = false;
                 if (lonaToys.length > 0) {
@@ -415,9 +408,7 @@
 
                 let color = 'bg-green-500';
                 
-                // --- NOVA REGRA DE CORES CORRIGIDA ---
-                // Total disponível para alugar (considerando bloqueios de Lona)
-                // Se sobrar 0 itens no total geral -> Vermelho
+                // NOVA LÓGICA DE CORES
                 if (realRemainingStock === 0) {
                     color = 'bg-red-500'; // Indisponível (0 sobrando)
                 } 
@@ -425,13 +416,7 @@
                     color = 'bg-orange-500'; // Poucos disponíveis (< 10 sobrando)
                 } 
                 else if (realRemainingStock >= 10) {
-                    // Aqui entra a regra: "se estiver sobrando 10 ou mais = alguns reservados"
-                    // Mas e o "Tudo disponível"? 
-                    // Se realRemainingStock for igual ao TotalStockInicial, então é Verde.
-                    // Caso contrário (já tem reservas mas sobra muito), é Amarelo.
-                    
-                    // Recalcula o estoque total teórico máximo para esse dia (sem reservas)
-                    // Para simplificar: se não tiver nenhum agendamento no objeto 'items', é verde.
+                    // Verifica se houve alguma reserva
                     const totalRentedToday = Object.values(items).reduce((a, b) => a + b, 0);
                     
                     if (totalRentedToday === 0) {
@@ -448,8 +433,6 @@
         function getStockForDate(toyId, dateISO) {
             if (!toysInventory || toysInventory.length === 0) return 0;
             const toy = toysInventory.find(t => t.id === toyId); if (!toy) return 0;
-            
-            // Verifica agendamentos para a data específica passada
             const rentedCount = globalAgendamentos[dateISO]?.[toyId] || 0;
             
             if (toy.exclusiveGroup === 'LONA') {
@@ -509,19 +492,16 @@
         }
 
         window.selectDays = function(days) {
-            // VERIFICAÇÃO DE DISPONIBILIDADE AO TROCAR DIAS
-            // Se já tiver itens selecionados, verifica se é possível aumentar os dias
             const previousDays = selectedDayCount;
-            selectedDayCount = days; // Atualiza temporariamente para checar
+            selectedDayCount = days; 
             
             const availability = checkRangeAvailability();
             if (!availability.valid) {
                 alert(`Não é possível selecionar ${days} dias para os itens atuais:\n\n${availability.message}`);
-                selectedDayCount = previousDays; // Reverte
-                return; // Aborta mudança
+                selectedDayCount = previousDays; 
+                return; 
             }
 
-            // Se passou, atualiza UI
             for(let i=1; i<=5; i++) {
                 const el = document.getElementById(`day-${i}`);
                 if(i === days) el.classList.add('selected');
@@ -547,7 +527,7 @@
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0;
             
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
-            const quantityDiscount = subtotal * discountRate; // Nota: Desconto combo base nao multiplica pelos dias aqui, logica mantida simples
+            const quantityDiscount = subtotal * discountRate; 
 
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
@@ -683,7 +663,7 @@
                 const priorityMap = {
                     1: 1, 2: 2, // Camas
                     4: 3,       // Piscina
-                    8: 4,       // Tobogã Médio (inflavel)
+                    8: 4,       // Tobogã Médio
                     9: 5,       // Futebol
                     3: 6,       // Castelinho
                     11: 7,      // Air Hockey
@@ -707,12 +687,7 @@
             }
 
             filteredToys.forEach(toy => {
-                // VERIFICA DISPONIBILIDADE NO DIA ATUAL SELECIONADO
                 const maxStock = getStockForDate(toy.id, currentSelectedDateISO);
-                // Se stock for 0 no dia de INÍCIO, nem mostra ou mostra desabilitado?
-                // O comportamento padrão é esconder ou mostrar esgotado. Vamos manter: se 0, não mostra (ou mostra desabilitado se preferir, mas o código atual retorna no inicio).
-                // Mas espere! Se a pessoa selecionou 3 dias, e no dia 1 tem, mas no dia 2 não, o `maxStock` do dia 1 é > 0.
-                // A validação de RANGE acontece ao adicionar ou mudar dias.
                 if (maxStock === 0) return; 
                 
                 const finalPrice = window.calculatePriceWithScarcity(toy);
@@ -767,16 +742,12 @@
             let currentQty = selectedItems[toyId] || 0; let newQty = currentQty + change;
             if (newQty < 0) newQty = 0; if (newQty > maxStock) newQty = maxStock;
             
-            // VERIFICAÇÃO DE RANGE AQUI TAMBÉM
-            // Se estou tentando aumentar, preciso ver se tem estoque nos dias seguintes
             if (change > 0) {
-                 // Cria um objeto temporário simulando a nova seleção
                  const tempItems = { ...selectedItems, [toyId]: newQty };
-                 // Função helper local para validar sem alterar o estado global ainda
                  const isValidRange = (items) => {
                      if (selectedDayCount === 1) return true;
                      const startDate = currentSelectedDateISO;
-                     for (let i = 1; i < selectedDayCount; i++) { // Check subsequent days
+                     for (let i = 1; i < selectedDayCount; i++) { 
                         const checkDate = addDays(startDate, i);
                         const stockOnDate = getStockForDate(toy.id, checkDate);
                         if (stockOnDate < newQty) return false;
@@ -802,7 +773,6 @@
             window.renderToysList(); 
         }
 
-        // Rest of the code remains the same...
         window.renderPowerOutletFields = function() {
             const anchor = document.getElementById('power-outlet-anchor');
             if (!anchor) return; 
@@ -836,16 +806,13 @@
             document.getElementById('selection-view').classList.add('hidden');
             document.getElementById('checkout-view').classList.add('hidden');
             if (step === 'checkout') { 
-                // VALIDAÇÃO FINAL DE RANGE AO IR PARA CHECKOUT
                 const availability = checkRangeAvailability();
                 if (!availability.valid) {
                     alert(availability.message);
-                    // Volta para seleção
                     document.getElementById('selection-view').classList.remove('hidden');
                     currentStep = 'selection';
                     return;
                 }
-
                 window.updateCheckoutSummary(); 
                 window.renderPowerOutletFields(); 
                 document.getElementById('checkout-view').classList.remove('hidden'); 
