@@ -214,13 +214,12 @@
         <section class="px-4 max-w-7xl mx-auto mb-10">
             <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Onde nos Encontrar?</h2>
             
-            <div class="bg-white rounded-2xl shadow-xl p-4 md:p-6 border border-gray-100">
-                <p class="text-center text-sm text-gray-600 mb-4">Clique no mapa para abrir a rota de navegação:</p>
+            <div class="bg-white rounded-2xl shadow-xl p-0 md:p-0 border border-gray-100 overflow-hidden">
                 
                 <a href="https://www.google.com/maps/search/?api=1&query=PREFEITO+JOSÉ+SCHDMIT,+281,+RETA+SÃO+FRANCISCO+DO+SUL" 
                    target="_blank" 
                    rel="noopener noreferrer"
-                   class="block rounded-xl overflow-hidden shadow-lg border-2 border-blue-500 transition duration-300 map-hover-effect cursor-pointer h-96">
+                   class="block w-full h-64 transition duration-300 map-hover-effect cursor-pointer">
                     <!-- Mapa interativo do Google Maps (iframe) -->
                     <iframe 
                         src="https://maps.google.com/maps?q=PREFEITO%20JOSÉ%20SCHDMIT,%20281,%20RETA%20SÃO%20FRANCISCO%20DO%20SUL&t=&z=14&ie=UTF8&iwloc=&output=embed" 
@@ -234,10 +233,9 @@
                     </iframe>
                 </a>
                 
-                <div class="mt-5 text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <p class="text-lg font-bold text-primary brand-font">Endereço:</p>
-                    <p class="text-xl font-semibold text-gray-800">PREFEITO JOSÉ SCHDMIT, 281, RETA SÃO FRANCISCO DO SUL</p>
-                    <p class="text-sm text-gray-500 mt-1">(Clique no mapa acima para ver a rota)</p>
+                <!-- O endereço permanece aqui para referência, mas sem o fundo colorido e subtítulo removido -->
+                <div class="mt-4 mb-4 text-center">
+                    <p class="text-lg font-semibold text-gray-800">PREFEITO JOSÉ SCHDMIT, 281, RETA SÃO FRANCISCO DO SUL</p>
                 </div>
             </div>
         </section>
