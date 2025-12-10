@@ -41,6 +41,31 @@
         .scroll-hint-active {
             animation: gentle-float 2.5s ease-in-out infinite;
         }
+
+        /* ESTILO DOS BOTÕES DE DIÁRIAS */
+        .day-option {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-family: 'Baloo 2', cursive;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #e2e8f0;
+            background-color: white;
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+        .day-option.selected {
+            background-color: #2563EB;
+            color: white;
+            border-color: #2563EB;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -92,6 +117,20 @@
                 <div class="p-4 bg-gray-50 rounded-lg shadow-inner mb-6 border border-gray-100"><h4 class="font-bold text-gray-700 mb-2">Seu Pedido:</h4><div id="checkout-summary" class="text-sm text-gray-600 space-y-2"></div></div>
                 <form id="checkout-form" onsubmit="event.preventDefault(); submitOrder()">
                     <div class="space-y-4">
+                        
+                        <!-- NOVA ÁREA DE DIÁRIAS (HORIZONTAL E RESPONSIVA) -->
+                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                            <label class="block text-sm font-bold text-gray-800 mb-2">Quantas Diárias? <span class="text-xs font-normal text-blue-600 ml-1">(Promoção!)</span></label>
+                            <div class="flex gap-3 overflow-x-auto pb-1" style="scrollbar-width: none; -ms-overflow-style: none;">
+                                <div id="day-1" onclick="selectDays(1)" class="day-option selected cursor-pointer">1</div>
+                                <div id="day-2" onclick="selectDays(2)" class="day-option cursor-pointer">2</div>
+                                <div id="day-3" onclick="selectDays(3)" class="day-option cursor-pointer">3</div>
+                                <div id="day-4" onclick="selectDays(4)" class="day-option cursor-pointer">4</div>
+                                <div id="day-5" onclick="selectDays(5)" class="day-option cursor-pointer">5</div>
+                            </div>
+                            <p id="promo-message" class="text-xs text-blue-600 font-medium mt-2">Valor normal.</p>
+                        </div>
+
                         <!-- Nome -->
                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="client-name" oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
                         
@@ -203,6 +242,8 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
+        let selectedDayCount = 1; // Variável global para armazenar dias selecionados
+
         // DADOS ESTÁTICOS
         const staticData = {
           "brinquedos": [
@@ -370,6 +411,30 @@
             }); return { details, total };
         }
 
+        // FUNÇÃO DE SELEÇÃO DE DIAS
+        window.selectDays = function(days) {
+            selectedDayCount = days;
+            
+            // Atualiza UI
+            for(let i=1; i<=5; i++) {
+                const el = document.getElementById(`day-${i}`);
+                if(i === days) {
+                    el.classList.add('selected');
+                } else {
+                    el.classList.remove('selected');
+                }
+            }
+            
+            // Atualiza Mensagem Promo
+            const promoEl = document.getElementById('promo-message');
+            if (days === 1) promoEl.innerText = "Valor normal.";
+            else if (days === 2) promoEl.innerText = "Promoção: 30% OFF no 2º dia!";
+            else if (days === 3) promoEl.innerText = "Super Promo: 3 diárias com desconto!";
+            else promoEl.innerText = "Pacote estendido com desconto aplicado!";
+            
+            calculateTotal();
+        }
+
         window.updateCheckoutSummary = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const summaryDiv = document.getElementById('checkout-summary'); summaryDiv.innerHTML = '';
@@ -394,8 +459,17 @@
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
+            
+            // CÁLCULO DE MULTIPLICADOR DE DIAS
+            let daysMultiplier = 1;
+            if (selectedDayCount === 2) daysMultiplier = 1.7; // 2 dias = 1.7x (30% desconto no 2o dia)
+            else if (selectedDayCount === 3) daysMultiplier = 2.3;
+            else if (selectedDayCount === 4) daysMultiplier = 2.8;
+            else if (selectedDayCount === 5) daysMultiplier = 3.2;
+            
             if (monitorCount > 0) {
-                monitorFee = monitorCount * monitorHours * 30;
+                // Monitor também multiplica pelos dias (pois trabalha todo dia)
+                monitorFee = (monitorCount * monitorHours * 30) * selectedDayCount;
             }
             
             const timeFee = calculateDurationFee(); 
@@ -403,18 +477,28 @@
             details.forEach(item => {
                 const itemContainer = document.createElement('div');
                 itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
-                const pricePerUnit = window.calculatePriceWithScarcity(toysInventory.find(t => t.id === item.id)); // Recalcula preço
-                const lineTotal = item.quantity * pricePerUnit;
-                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name}</div><div class="text-sm font-bold text-green-600">R$ ${lineTotal.toFixed(2).replace('.', ',')}</div>`;
+                const pricePerUnit = window.calculatePriceWithScarcity(toysInventory.find(t => t.id === item.id)); 
+                // Preço unitário ajustado pelos dias
+                const lineTotal = (item.quantity * pricePerUnit) * daysMultiplier;
+                
+                itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name} <span class="text-xs text-blue-500">(${selectedDayCount} dias)</span></div><div class="text-sm font-bold text-green-600">R$ ${lineTotal.toFixed(2).replace('.', ',')}</div>`;
                 summaryDiv.appendChild(itemContainer);
             });
             
+            // Subtotal ajustado pelos dias
+            const adjustedSubtotal = subtotal * daysMultiplier;
+            const adjustedQtyDiscount = adjustedSubtotal * discountRate;
+            const adjustedCouponDiscount = (couponCode === 'encanto10') ? (adjustedSubtotal * 0.10) : 0;
+
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
-            summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Subtotal:</span><span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span></div>`;
-            if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores:</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
+            
+            // Mostra subtotal com dias
+            summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Itens (${selectedDayCount} diárias):</span><span>R$ ${adjustedSubtotal.toFixed(2).replace('.', ',')}</span></div>`;
+            
+            if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores (${selectedDayCount} dias):</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
             if (timeFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa Duração:</span><span>+ R$ ${timeFee.toFixed(2).replace('.', ',')}</span></div>`; 
-            if (quantityDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto Combo (5%):</span><span>- R$ ${quantityDiscount.toFixed(2).replace('.', ',')}</span></div>`; 
-            if (couponDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Cupom (10%):</span><span>- R$ ${couponDiscount.toFixed(2).replace('.', ',')}</span></div>`;
+            if (quantityDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto Combo (5%):</span><span>- R$ ${adjustedQtyDiscount.toFixed(2).replace('.', ',')}</span></div>`; 
+            if (couponDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Cupom (10%):</span><span>- R$ ${adjustedCouponDiscount.toFixed(2).replace('.', ',')}</span></div>`;
             if (shippingFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa de Entrega:</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`;
             if (insuranceFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`;
         }
@@ -422,31 +506,50 @@
         window.calculateTotal = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
+            
+            // Multiplicador de dias
+            let daysMultiplier = 1;
+            if (selectedDayCount === 2) daysMultiplier = 1.7;
+            else if (selectedDayCount === 3) daysMultiplier = 2.3;
+            else if (selectedDayCount === 4) daysMultiplier = 2.8;
+            else if (selectedDayCount === 5) daysMultiplier = 3.2;
+
+            // Subtotal Base ajustado pelos dias
+            const adjustedSubtotal = subtotal * daysMultiplier;
+
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
-            const quantityDiscount = subtotal * discountRate;
+            const quantityDiscount = adjustedSubtotal * discountRate;
+            
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
-            const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0; 
+            const couponDiscount = (couponCode === 'encanto10') ? (adjustedSubtotal * 0.10) : 0; 
+            
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
+            
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
-            if (monitorCount > 0) { monitorFee = monitorCount * monitorHours * 30; }
+            if (monitorCount > 0) { 
+                // Monitor multiplica pelos dias também
+                monitorFee = (monitorCount * monitorHours * 30) * selectedDayCount; 
+            }
+            
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
             let shippingFee = 0;
             if (neighborhood === 'Ervino') shippingFee = 25.00;
             else if (extraShippingNeighborhoods.includes(neighborhood)) shippingFee = 10.00;
-            const insuranceFee = insuranceChecked ? 10.00 : 0;
-            const timeFee = calculateDurationFee(); 
-            const finalTotal = (subtotal - quantityDiscount - couponDiscount) + shippingFee + insuranceFee + monitorFee + timeFee;
+            
+            const insuranceFee = insuranceChecked ? 10.00 : 0; // Seguro é TAXA ÚNICA por aluguel
+            const timeFee = calculateDurationFee(); // Taxa de hora extra é ÚNICA por evento diário (mas vamos assumir única no total para simplificar ou multiplicar? Geralmente taxa de hora é por evento. Vamos manter fixa para não complicar, ou multiplicar. Mantendo fixa pois é taxa de setup/logística estendida)
+            
+            const finalTotal = (adjustedSubtotal - quantityDiscount - couponDiscount) + shippingFee + insuranceFee + monitorFee + timeFee;
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
             
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
             
-            // LÓGICA DO BOTÃO REFEITA
+            // LÓGICA DO BOTÃO
             if (currentStep === 'checkout') {
-                // SEMPRE HABILITADO NO CHECKOUT, SEMPRE AZUL
                 actionButton.disabled = false;
                 actionButton.removeAttribute('disabled');
                 actionButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
@@ -619,7 +722,8 @@
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             if (document.getElementById('has-monitors').value === 'Sim' && monitorCount > 0) {
                 const monitorHours = document.getElementById('monitor-hours').value || 0;
-                monitorText = `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
+                // Monitor também multiplica pelos dias
+                monitorText = `👮 Monitores: ${monitorCount} (${monitorHours}h) [${selectedDayCount} dias]\n`;
             }
 
             // Itens
@@ -637,7 +741,7 @@
 
             // Construção da Mensagem
             let msg = `*NOVO AGENDAMENTO*\n`;
-            msg += `📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n`;
+            msg += `📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')} (${selectedDayCount} diárias)\n`;
             msg += `👤 Nome: ${name}\n`;
             msg += `📍 Local: ${street}, ${number} - ${neighborhood}\n`;
             msg += `🗒️ Ref: ${reference}\n`;
@@ -657,7 +761,7 @@
             if (monitorText) msg += monitorText;
             if (extrasText) msg += extrasText;
             
-            msg += `\n*ITENS:*\n${itemsList}`;
+            msg += `\n*ITENS (${selectedDayCount} dias):*\n${itemsList}`;
             msg += `\n💰 *TOTAL: ${finalTotalText}*`;
 
             // Envio
@@ -678,6 +782,7 @@
             const listContainer = document.getElementById('toys-list-container');
             listContainer.innerHTML = ''; selectedItems = {}; 
             
+            // Reset no painel
             document.getElementById('has-monitors').value = 'Nao'; 
             document.getElementById('delivery-day-before').value = 'Nao'; 
             document.getElementById('additional-insurance').checked = false; 
@@ -685,6 +790,9 @@
             document.getElementById('discount-coupon').value = '';
             if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
             
+            // Reset dias
+            selectDays(1);
+
             // Limpa container de energia ao abrir painel
             const anchor = document.getElementById('power-outlet-anchor');
             if(anchor) anchor.innerHTML = '';
