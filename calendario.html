@@ -211,9 +211,12 @@
             </div>
             <div class="grid grid-cols-7 text-center font-bold text-xs sm:text-sm text-gray-500 border-b border-gray-100 pb-3 mb-2"><span class="p-1">DOM</span><span class="p-1">SEG</span><span class="p-1">TER</span><span class="p-1">QUA</span><span class="p-1">QUI</span><span class="p-1">SEX</span><span class="p-1">SÁB</span></div>
             <div id="calendar-body" class="grid grid-cols-7 gap-1 md:gap-2"></div>
+            
+            <!-- LEGENDA NOVA COM 4 CORES -->
             <div class="flex flex-wrap justify-center gap-x-3 gap-y-2 text-[10px] sm:text-xs font-semibold text-gray-600 mt-6 pt-4 border-t border-gray-100">
-                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span>Muita disponibilidade</span></div>
-                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span><span>Pouca disponibilidade</span></div>
+                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span><span>Tudo disponível</span></div>
+                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span><span>Alguns reservados</span></div>
+                <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span><span>Poucos disponíveis</span></div>
                 <div class="flex items-center space-x-1.5 bg-gray-50 px-2 py-1 rounded-md"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span>Indisponível</span></div>
             </div>
         </div>
@@ -247,19 +250,19 @@
         // DADOS ESTÁTICOS
         const staticData = {
           "brinquedos": [
-            { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "needsPower": false, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" },
-            { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "needsPower": false, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camam.webp" },
-            { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3m", "needsPower": true, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp" },
-            { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL", "needsPower": false, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" },
-            { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "", "needsPower": false, "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/areababy.webp" },
-            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "", "needsPower": true, "image": "https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" },
-            { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "", "exclusiveGroup": "LONA", "needsPower": true, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/escorregobol.webp" },
-            { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "needsPower": true, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/tobogam.webp" },
-            { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8 x 4m", "exclusiveGroup": "LONA", "needsPower": true, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp" },
-            { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "", "needsPower": false, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pebolim.webp" },
-            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "", "needsPower": true, "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" },
-            { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "", "needsPower": false, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pingpong.webp" },
-            { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "Kit", "needsPower": false, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/mesas.webp" }
+            { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "needsPower": false, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" },
+            { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "needsPower": false, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camam.webp" },
+            { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3m", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp" },
+            { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" },
+            { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "", "needsPower": false, "ageRating": 6, "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/areababy.webp" },
+            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "", "needsPower": true, "ageRating": 6, "image": "https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" },
+            { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "", "exclusiveGroup": "LONA", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/escorregobol.webp" },
+            { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/tobogam.webp" },
+            { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8 x 4m", "exclusiveGroup": "LONA", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp" },
+            { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pebolim.webp" },
+            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "", "needsPower": true, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" },
+            { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pingpong.webp" },
+            { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "Kit", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/mesas.webp" }
           ],
           "agendamentos": {
             "2025-12-10": { "2": 1, "4": 1 },
@@ -321,12 +324,20 @@
                 for (const [date, items] of Object.entries(data.agendamentos)) {
                     const totalRented = Object.values(items).reduce((a, b) => a + b, 0);
                     let color = 'bg-green-500';
-                    if (totalRented >= 3) color = 'bg-yellow-500';
-                    const isLonaBooked = Object.keys(items).some(bookedId => {
-                         const bookedToy = toysInventory.find(t => t.id == bookedId);
-                         return bookedToy && bookedToy.exclusiveGroup === 'LONA';
-                    });
-                    if (isLonaBooked || totalRented > 5) color = 'bg-yellow-500';
+                    
+                    // NOVA LÓGICA DE CORES
+                    if (totalRented > 0) {
+                        if (totalRented <= 3) {
+                            color = 'bg-amber-400'; // Alguns reservados (AMARELO BONITO)
+                        } else if (totalRented <= 7) {
+                            color = 'bg-orange-500'; // Poucos disponíveis (Aumentando urgência)
+                        } else {
+                            color = 'bg-red-500'; // Indisponível/Cheio
+                        }
+                    } else {
+                        color = 'bg-green-500'; // Tudo disponível (0 reservas)
+                    }
+
                     mockedDayData[date] = { color: color };
                 }
             }
@@ -548,8 +559,9 @@
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
             
-            // LÓGICA DO BOTÃO
+            // LÓGICA DO BOTÃO REFEITA
             if (currentStep === 'checkout') {
+                // SEMPRE HABILITADO NO CHECKOUT, SEMPRE AZUL
                 actionButton.disabled = false;
                 actionButton.removeAttribute('disabled');
                 actionButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
@@ -722,8 +734,7 @@
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             if (document.getElementById('has-monitors').value === 'Sim' && monitorCount > 0) {
                 const monitorHours = document.getElementById('monitor-hours').value || 0;
-                // Monitor também multiplica pelos dias
-                monitorText = `👮 Monitores: ${monitorCount} (${monitorHours}h) [${selectedDayCount} dias]\n`;
+                monitorText = `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
             }
 
             // Itens
@@ -805,10 +816,21 @@
                 const priceFormatted = toy.note ? `R$ ${finalPrice.toFixed(2).replace('.', ',')} / ${toy.note}` : `R$ ${finalPrice.toFixed(2).replace('.', ',')}`;
                 let scarcityLabel = '';
                 if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-green-500 block">Promoção</span>`; }
+                
+                // AGE RATING BADGE
+                let ageBadge = '';
+                if (toy.ageRating === 'L') {
+                    ageBadge = `<div class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 text-white text-[10px] font-bold flex items-center justify-center rounded-sm shadow-sm" title="Livre">L</div>`;
+                } else if (toy.ageRating === 6) {
+                    ageBadge = `<div class="absolute bottom-1 right-1 w-5 h-5 bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center rounded-sm shadow-sm" title="Até 6 anos">6</div>`;
+                } else if (toy.ageRating === 14) {
+                    ageBadge = `<div class="absolute bottom-1 right-1 w-5 h-5 bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center rounded-sm shadow-sm" title="Até 14 anos">14</div>`;
+                }
+
                 const item = document.createElement('div');
                 item.className = `flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 shadow-sm transition hover:shadow-md`;
                 const measureHtml = toy.measure ? `<p class="text-xs text-gray-500 mb-1">Medida: ${toy.measure}</p>` : '';
-                const imgTag = toy.image ? `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden"><img src="${toy.image}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></div>` : `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>`;
+                const imgTag = toy.image ? `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden relative"><img src="${toy.image}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">${ageBadge}</div>` : `<div class="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400 relative"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>${ageBadge}</div>`;
                 item.innerHTML = `${imgTag}<div class="flex-grow min-w-0"><h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${toy.name}</h4>${measureHtml}${scarcityLabel}<span class="font-bold text-green-600 text-sm whitespace-nowrap block mb-2">${priceFormatted}</span><div class="flex items-center space-x-2 text-sm font-medium"><button id="btn-minus-${toy.id}" onclick="updateQuantity(${toy.id}, -1)" class="p-1.5 bg-white border border-red-500 text-red-500 rounded-full disabled:opacity-50" disabled><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg></button><span id="qty-display-${toy.id}" class="w-6 text-center text-gray-700">0</span><button id="btn-plus-${toy.id}" onclick="updateQuantity(${toy.id}, 1)" class="p-1.5 bg-white border border-green-500 text-green-500 rounded-full disabled:opacity-50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg></button><span class="text-xs text-gray-400">(${maxStock} máx.)</span></div></div>`;
                 document.getElementById('toys-list-container').appendChild(item);
             }); 
