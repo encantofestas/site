@@ -561,13 +561,11 @@
             return cleanStr(str).split(/[\s,.-]+/).filter(w => w.length > 1 && !ignoredWords.includes(w));
         }
 
+        // FUNÇÃO ATUALIZADA: Gera um dos 3 cupons fixos (FESTA20, CLIENTE20, AMIGO20) aleatoriamente.
         function generateRandomCoupon() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Sem O, 0, I, 1 para evitar confusão
-            let result = '';
-            for (let i = 0; i < 6; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
+            const fixedCodes = ['FESTA20', 'CLIENTE20', 'AMIGO20'];
+            const randomIndex = Math.floor(Math.random() * fixedCodes.length);
+            return fixedCodes[randomIndex];
         }
 
         window.validateCoupon = async function() {
@@ -606,6 +604,11 @@
                             const dbStreetWords = getSignificantWords(item.street);
                             const hasCommonStreetWord = inputStreetWords.some(word => dbStreetWords.includes(word));
                             if (hasCommonStreetWord) {
+                                isValid = true;
+                                break;
+                            }
+                        }
+                    }
                     if (isValid && item.street && item.name) {
                         const dbStreetWords = getSignificantWords(item.street);
                         const dbNameWords = getSignificantWords(item.name);
@@ -620,6 +623,7 @@
 
                 setTimeout(() => {
                     if (isValid) {
+                        // Agora gera um dos 3 cupons fixos
                         const newCode = generateRandomCoupon();
                         document.getElementById('coupon-code-display').innerText = newCode;
                         showCouponStep('result');
