@@ -409,16 +409,15 @@
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
             
-            // LÓGICA DO BOTÃO:
+            // LÓGICA DO BOTÃO REFEITA
             if (currentStep === 'checkout') {
-                // PEDIDO: Botão desativado e cinza para sempre nesta etapa
-                actionButton.disabled = true; 
-                actionButton.setAttribute('disabled', 'true');
-                actionButton.classList.add('bg-gray-400', 'cursor-not-allowed');
-                actionButton.classList.remove('bg-primary', 'cursor-pointer');
+                // SEMPRE HABILITADO NO CHECKOUT, SEMPRE AZUL
+                actionButton.disabled = false;
+                actionButton.removeAttribute('disabled');
+                actionButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                actionButton.classList.add('bg-primary', 'cursor-pointer');
                 actionButton.innerText = `Confirmar Reserva`; 
             } else if (totalItems > 0 && currentStep === 'selection') {
-                // ... logic for selection step (remains active if items selected)
                 actionButton.disabled = false;
                 actionButton.classList.remove('bg-gray-400');
                 actionButton.classList.add('bg-primary');
@@ -522,21 +521,30 @@
             } else if (currentStep === 'checkout') { window.submitOrder(); }
         }
 
+        // --- SUBMIT ORDER REFEITO DO ZERO ---
         window.submitOrder = function() {
-            const name = document.getElementById('client-name').value;
-            const neighborhood = document.getElementById('client-neighborhood').value;
-            const street = document.getElementById('client-street').value;
-            const number = document.getElementById('client-number').value || 'S/N';
-            const eventStartTime = document.getElementById('event-start-time').value || '(Não def.)';
-            const eventEndTime = document.getElementById('event-end-time').value || '(Não def.)';
+            // Coleta de dados com fallback para "Não informado"
+            const name = document.getElementById('client-name').value.trim() || '(Não informado)';
+            const neighborhood = document.getElementById('client-neighborhood').value || '(Não informado)';
+            const street = document.getElementById('client-street').value.trim() || '(Não informado)';
+            const number = document.getElementById('client-number').value.trim() || 'S/N';
+            const reference = document.getElementById('client-reference').value.trim() || '(Não informado)';
+            
+            // Horários
+            const startVal = document.getElementById('event-start-time').value;
+            const endVal = document.getElementById('event-end-time').value;
+            const eventStartTime = startVal ? startVal + ":00" : "(Não def.)";
+            const eventEndTime = endVal ? endVal + ":00" : "(Não def.)";
+
+            // Opções extras
             const insuranceChecked = document.getElementById('additional-insurance').checked;
             const deliveryDayBeforeSelect = document.getElementById('delivery-day-before').value;
             const invoiceChecked = document.getElementById('request-invoice').checked;
-            const cnpj = document.getElementById('client-cnpj').value;
+            const cnpj = document.getElementById('client-cnpj').value.trim();
             const rainProtection = document.getElementById('rain-protection')?.checked;
-            const coupon = document.getElementById('discount-coupon').value;
-            const reference = document.getElementById('client-reference').value || '(Não informado)'; 
+            const coupon = document.getElementById('discount-coupon').value.trim();
 
+            // Energia
             const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
             let powerDetails = "";
             for (let input of powerInputs) {
@@ -545,28 +553,63 @@
                 powerDetails += `⚡ ${label}: ${val}\n`;
             }
 
-            const { details, total } = window.getSelectedItemDetails();
-            let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n🗒️ Ref: ${reference}\n📄 CNPJ: ${invoiceChecked ? (cnpj || 'Não informado') : 'Não Solicitado'}\n⏰ Horário: ${eventStartTime}:00 - ${eventEndTime}:00\n🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
-            if (coupon) orderSummary += `🎟️ Cupom: ${coupon}\n`;
-            const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
-            if (isBallPitIncluded) orderSummary += `🌧 Piscina Coberta: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
-            if (powerDetails) orderSummary += `\n*ENERGIA:*\n${powerDetails}`;
+            // Monitores
+            let monitorText = "";
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
-            if (monitorCount > 0) {
-                const monitorHours = document.getElementById('monitor-hours').value;
-                orderSummary += `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
+            if (document.getElementById('has-monitors').value === 'Sim' && monitorCount > 0) {
+                const monitorHours = document.getElementById('monitor-hours').value || 0;
+                monitorText = `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
             }
+
+            // Itens
+            const { details } = window.getSelectedItemDetails();
+            let itemsList = "";
+            details.forEach(item => { itemsList += `• ${item.quantity}x ${item.name}\n`; });
+
+            // Taxas extras
+            let extrasText = "";
             const timeFee = calculateDurationFee();
-            if (timeFee > 0) orderSummary += `🕒 Taxa Duração: R$ ${timeFee.toFixed(2)}\n`;
-            orderSummary += `\n*ITENS:*\n`;
-            details.forEach(item => { orderSummary += `• ${item.quantity}x ${item.name}\n`; });
+            if (timeFee > 0) extrasText += `🕒 Taxa Duração: R$ ${timeFee.toFixed(2)}\n`;
+
+            // Totais
             const finalTotalText = document.getElementById('total-price-display').innerText;
-            orderSummary += `\n💰 *TOTAL: ${finalTotalText}*`;
+
+            // Construção da Mensagem
+            let msg = `*NOVO AGENDAMENTO*\n`;
+            msg += `📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n`;
+            msg += `👤 Nome: ${name}\n`;
+            msg += `📍 Local: ${street}, ${number} - ${neighborhood}\n`;
+            msg += `🗒️ Ref: ${reference}\n`;
             
-            window.open(`https://wa.me/5547992277324?text=${encodeURIComponent(orderSummary)}`, '_blank');
+            if (invoiceChecked) msg += `📄 CNPJ: ${cnpj || 'Não informado'}\n`;
+            
+            msg += `⏰ Horário: ${eventStartTime} - ${eventEndTime}\n`;
+            msg += `🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n`;
+            msg += `🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
+            
+            if (coupon) msg += `🎟️ Cupom: ${coupon}\n`;
+            
+            const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
+            if (isBallPitIncluded) msg += `🌧 Piscina Coberta: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
+            
+            if (powerDetails) msg += `\n*ENERGIA:*\n${powerDetails}`;
+            if (monitorText) msg += monitorText;
+            if (extrasText) msg += extrasText;
+            
+            msg += `\n*ITENS:*\n${itemsList}`;
+            msg += `\n💰 *TOTAL: ${finalTotalText}*`;
+
+            // Envio
+            const whatsappNumber = "5547992277324";
+            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
+            
+            window.open(url, '_blank');
+            
+            // Reset UI
             window.closeToysPanel(); 
             window.changeStep('selection'); 
         }
+        // --- FIM SUBMIT ORDER ---
         
         window.openToysPanel = function(day, month, year) {
             currentSelectedDateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
