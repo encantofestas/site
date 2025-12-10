@@ -78,11 +78,11 @@
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
             <div class="hidden md:flex items-center space-x-4">
-                <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
+                <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
                 <button onclick="window.location.href='perfil.html'" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold">Entrar</button>
                 <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 shadow-lg">Agendar Agora</button>
             </div>
-            <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600" onclick="toggleNotificationPanel()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
+            <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600" onclick="toggleNotificationPanel()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
         </div>
     </header>
 
@@ -523,8 +523,17 @@
             
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
             
+            // LÓGICA DE CUPOM DE DESCONTO ATUALIZADA (20%)
+            const valid20PercentCoupons = ["fsd8s2", "jof383", "939fjs"];
+            const valid10PercentCoupon = "encanto10";
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
-            const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0;
+            
+            let couponRate = 0;
+            if (valid20PercentCoupons.includes(couponCode)) {
+                couponRate = 0.20;
+            } else if (couponCode === valid10PercentCoupon) {
+                couponRate = 0.10;
+            }
             
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
             const quantityDiscount = subtotal * discountRate; 
@@ -566,7 +575,7 @@
             
             const adjustedSubtotal = subtotal * daysMultiplier;
             const adjustedQtyDiscount = adjustedSubtotal * discountRate;
-            const adjustedCouponDiscount = (couponCode === 'encanto10') ? (adjustedSubtotal * 0.10) : 0;
+            const adjustedCouponDiscount = adjustedSubtotal * couponRate;
 
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
             summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Itens (${selectedDayCount} diárias):</span><span>R$ ${adjustedSubtotal.toFixed(2).replace('.', ',')}</span></div>`;
@@ -574,7 +583,7 @@
             if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores (${selectedDayCount} dias):</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
             if (timeFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa Duração:</span><span>+ R$ ${timeFee.toFixed(2).replace('.', ',')}</span></div>`; 
             if (quantityDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto Combo (5%):</span><span>- R$ ${adjustedQtyDiscount.toFixed(2).replace('.', ',')}</span></div>`; 
-            if (couponDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Cupom (10%):</span><span>- R$ ${adjustedCouponDiscount.toFixed(2).replace('.', ',')}</span></div>`;
+            if (adjustedCouponDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Cupom (${(couponRate * 100).toFixed(0)}%):</span><span>- R$ ${adjustedCouponDiscount.toFixed(2).replace('.', ',')}</span></div>`;
             if (shippingFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa de Entrega:</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`;
             if (insuranceFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`;
         }
@@ -592,8 +601,20 @@
             const adjustedSubtotal = subtotal * daysMultiplier;
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
             const quantityDiscount = adjustedSubtotal * discountRate;
+            
+            // LÓGICA DE CUPOM DE DESCONTO ATUALIZADA (20%)
+            const valid20PercentCoupons = ["fsd8s2", "jof383", "939fjs"];
+            const valid10PercentCoupon = "encanto10";
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
-            const couponDiscount = (couponCode === 'encanto10') ? (adjustedSubtotal * 0.10) : 0; 
+            
+            let couponRate = 0;
+            if (valid20PercentCoupons.includes(couponCode)) {
+                couponRate = 0.20;
+            } else if (couponCode === valid10PercentCoupon) {
+                couponRate = 0.10;
+            }
+            const couponDiscount = adjustedSubtotal * couponRate; 
+            
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
