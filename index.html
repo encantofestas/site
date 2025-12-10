@@ -86,6 +86,19 @@
         }
         .ticket-cutout-left { left: -12px; }
         .ticket-cutout-right { right: -12px; }
+        
+        /* ANIMAÇÃO PULSANTE PARA PROMOÇÃO */
+        @keyframes pulse-promo {
+            0%, 100% {
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                box-shadow: 0 6px 15px rgba(250, 204, 21, 0.8), 0 0 0 2px rgba(250, 204, 21, 0.3); /* Yellow glow */
+            }
+        }
+        .promo-pulse {
+            animation: pulse-promo 2s infinite ease-in-out;
+        }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -176,9 +189,9 @@
             </div>
         </section>
         
-        <!-- SEÇÃO: PROMOÇÃO CUPOM FIDELIDADE -->
+        <!-- SEÇÃO: PROMOÇÃO CUPOM FIDELIDADE (PULSANDO) -->
         <section class="px-4 max-w-7xl mx-auto mb-10">
-            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between text-blue-900 overflow-hidden relative">
+            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between text-blue-900 overflow-hidden relative promo-pulse">
                 <!-- Efeito brilho fundo -->
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-white opacity-20 blur-2xl"></div>
                 
@@ -306,7 +319,7 @@
                             <span id="coupon-code-display" class="font-mono font-black text-2xl text-gray-800 tracking-widest select-all">------</span>
                             
                             <button onclick="copyCouponCode()" class="bg-green-100 text-green-700 p-2 rounded hover:bg-green-200 transition active:scale-95 border border-green-200" title="Copiar">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5h10a2 2 0 012 2v3m-4 12V6m0 0H8m4 0V4"></path></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5h10a2 2 0 012 2v3m-4 12V6m0 0H8m4 0V4"></path></svg>
                             </button>
                         </div>
                         <div id="copy-feedback" class="h-4 mt-1 text-xs font-bold text-green-600 opacity-0 transition-opacity">Copiado!</div>
@@ -576,6 +589,7 @@
                 const inputNameWords = getSignificantWords(inputName);
 
                 for (let item of database) {
+                    // REGRA 1: TELEFONE EXATO (CORINGA)
                     if (item.phone) {
                         const dbPhone = String(item.phone).replace(/\D/g, '');
                         if (dbPhone === inputPhone) {
@@ -583,8 +597,13 @@
                             break; 
                         }
                     }
+
+                    // REGRA 2: RUA (Palavras Chave) + NÚMERO
+                    // Precisa acertar pelo menos UMA palavra da rua E o número
                     if (!isValid && item.street && item.number) {
                         const dbNumber = cleanStr(String(item.number)).replace(/^0+/, '');
+                        
+                        // 2a. Verifica se o número bate (tratando S/N como igual a vazio ou S/N)
                         const isNumberMatch = (dbNumber === cleanInputNumber) || 
                                               ((dbNumber === 's/n' || dbNumber === '' || dbNumber === '-') && 
                                                (cleanInputNumber === 's/n' || cleanInputNumber === '' || cleanInputNumber === '-'));
@@ -592,17 +611,25 @@
                         if (isNumberMatch) {
                             const dbStreetWords = getSignificantWords(item.street);
                             const hasCommonStreetWord = inputStreetWords.some(word => dbStreetWords.includes(word));
+                            
+                            // 2b. Aprovado se número bate E pelo menos 1 palavra da rua bate
                             if (hasCommonStreetWord) {
                                 isValid = true;
                                 break;
                             }
                         }
                     }
+
+                    // REGRA 3: NOME (Parcial) + RUA (Parcial)
+                    // Precisa acertar Pelo menos 1 palavra do Nome E 1 palavra da Rua
                     if (!isValid && item.street && item.name) {
                         const dbStreetWords = getSignificantWords(item.street);
                         const dbNameWords = getSignificantWords(item.name);
+                        
                         const hasCommonStreetWord = inputStreetWords.some(word => dbStreetWords.includes(word));
                         const hasCommonNameWord = inputNameWords.some(word => dbNameWords.includes(word));
+
+                        // 3a. Aprovado se pelo menos 1 palavra do nome bate E pelo menos 1 palavra da rua bate
                         if (hasCommonStreetWord && hasCommonNameWord) {
                             isValid = true;
                             break;
@@ -612,7 +639,6 @@
 
                 setTimeout(() => {
                     if (isValid) {
-                        // GERA CUPOM NA HORA
                         const newCode = generateRandomCoupon();
                         document.getElementById('coupon-code-display').innerText = newCode;
                         showCouponStep('result');
