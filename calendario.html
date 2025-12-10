@@ -110,12 +110,13 @@
                     <label class="block text-sm font-medium text-gray-700">Filtrar/Ordenar:</label>
                     <div class="flex space-x-3 overflow-x-auto pb-1">
                         <select id="sort-filter" onchange="renderToysList()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white flex-shrink-0">
+                            <!-- PADRÃO: Mais Adquiridos -->
+                            <option value="most_rented" selected>Mais Adquiridos</option>
                             <option value="name_asc">Nome (A-Z)</option>
                             <option value="name_desc">Nome (Z-A)</option>
-                            <option value="most_rented">Mais Adquiridos</option>
                             <option value="age_asc">Faixa Etária (Cresc.)</option>
                         </select>
-                        <!-- Filtro de Faixa Etária (opcional, pode ser expandido) -->
+                        <!-- Filtro de Faixa Etária -->
                         <select id="age-filter" onchange="renderToysList()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white flex-shrink-0">
                             <option value="all">Todas as Idades</option>
                             <option value="L">Livre</option>
@@ -348,74 +349,89 @@
             return Object.values(agendamentos).reduce((acc, qty) => acc + qty, 0);
         }
 
-        // Função para verificar se o dia está totalmente indisponível
-        function isDayTotallyUnavailable(dateISO) {
-            const rentedItems = globalAgendamentos[dateISO] || {};
-            let isLonaBooked = false;
-            let totalRented = 0;
-            
-            // 1. Verifica se a lotação máxima de Lonas (exclusivas) foi atingida
-            const lonaToys = toysInventory.filter(t => t.exclusiveGroup === 'LONA');
-            if (lonaToys.length > 0) {
-                 isLonaBooked = Object.keys(rentedItems).some(id => {
-                     const toy = toysInventory.find(t => t.id == id);
-                     return toy && toy.exclusiveGroup === 'LONA';
-                 });
-                 if (isLonaBooked) {
-                     // Se qualquer item LONA foi reservado, todos os outros LONA ficam indisponíveis
-                     // Mas o dia só é *totalmente* indisponível se todos os itens INDIVIDUAIS e o grupo LONA estiverem cheios.
-                 }
-            }
-
-            // 2. Verifica se algum brinquedo essencial não está disponível
-            const allToysAvailable = toysInventory.every(toy => {
-                const stock = toy.total_stock;
-                const rented = rentedItems[toy.id] || 0;
-                
-                // Se for do grupo LONA e um item LONA já foi pego, ele está indisponível
-                if (toy.exclusiveGroup === 'LONA' && isLonaBooked) return false;
-                
-                return stock - rented > 0;
-            });
-            
-            // Se ALLTOYSAVAILABLE for FALSE, significa que o estoque global está no limite
-            // A regra do usuário é: "o item só é considerado indisponível se nao sobrar nenhum brinquedo disponivel"
-            if (!allToysAvailable) return true;
-
-            // Esta é uma checagem mais simples e geral baseada no número de reservas (para os status intermediários)
-            totalRented = getTotalReservedItems(dateISO);
-
-            // Se o número de reservas for muito alto (ex: mais que a metade do estoque), podemos considerá-lo lotado
-            // Vamos usar 8 itens como lotação máxima simulada se o 'allToysAvailable' não falhou.
-            if (totalRented >= 8) return true;
-            
-            return false; 
-        }
-
-
         function processAvailability(data) {
             globalAgendamentos = data.agendamentos || {};
-            const totalItemsInStock = toysInventory.reduce((acc, toy) => acc + toy.total_stock, 0);
+            // Calcula estoque total global (soma de todos os itens)
+            const totalGlobalStock = toysInventory.reduce((acc, toy) => acc + toy.total_stock, 0);
             
             for (const [date, items] of Object.entries(data.agendamentos)) {
+                // 1. Calcula quantos itens foram alugados neste dia
                 const totalRented = Object.values(items).reduce((a, b) => a + b, 0);
+                
+                // 2. Calcula quantos itens SOBRAM
+                // Nota: Esta é uma simplificação. Se houver exclusividade (LONA), a disponibilidade real pode ser menor.
+                // Mas para o propósito das cores do calendário, vamos usar a contagem bruta de itens restantes.
+                // Se um item LONA é alugado, ele conta como 1 alugado. Os outros LONAS bloqueados não contam como alugados, mas
+                // para a visão do cliente "quantos brinquedos sobraram para eu escolher", o bloqueio importa.
+                // Vamos refinar: Contar quantos itens estão *indisponíveis* (alugados + bloqueados).
+                
+                let unavailableCount = 0;
+                let isLonaBooked = false;
+                
+                // Verifica se algum LONA foi alugado
+                const lonaToys = toysInventory.filter(t => t.exclusiveGroup === 'LONA');
+                if (lonaToys.length > 0) {
+                     isLonaBooked = Object.keys(items).some(id => {
+                         const toy = toysInventory.find(t => t.id == id);
+                         return toy && toy.exclusiveGroup === 'LONA';
+                     });
+                }
+
+                // Conta itens indisponíveis
+                toysInventory.forEach(toy => {
+                    const rentedQty = items[toy.id] || 0;
+                    
+                    if (toy.exclusiveGroup === 'LONA' && isLonaBooked) {
+                        // Se LONA está bloqueado, todo o estoque deste item conta como "não disponível" para escolha
+                        // (Se foi este o alugado, já está ok. Se não foi, está bloqueado)
+                        unavailableCount += toy.total_stock; 
+                    } else {
+                        unavailableCount += rentedQty;
+                    }
+                });
+
+                // Estoque Restante Disponível para Escolha
+                // Se a lógica acima somou todos os estoques de LONA quando um foi alugado, precisamos ajustar.
+                // Na verdade, se um LONA alugou, 1 pessoa está feliz. O "stock" consumido foi 1.
+                // Mas para a cor do dia (escassez), queremos saber o que sobra.
+                // Vamos simplificar com a regra do usuário:
+                // sobra >= 10: Amarelo
+                // sobra < 10: Laranja
+                // sobra == 0: Vermelho
+                
+                // Vamos usar a contagem simples de *alugados* para deduzir do total,
+                // mas se todos os itens possíveis de serem alugados acabarem, é vermelho.
+                
+                // Abordagem Híbrida mais segura:
+                // Calcular Stock Restante Real (Soma dos getStockForDate de cada item)
+                let realRemainingStock = 0;
+                toysInventory.forEach(toy => {
+                    // Simula a função getStockForDate logicamente aqui dentro
+                     let stock = toy.total_stock;
+                     const rented = items[toy.id] || 0;
+                     if (toy.exclusiveGroup === 'LONA' && isLonaBooked) {
+                         // Se LONA bloqueada e não é este o item alugado (ou se é, estoque é 0 pq ja foi)
+                         // Se este item tem rented > 0, ok. Se não, stock disponivel é 0.
+                         // Simplificando: getStockForDate retorna 0 se bloqueado.
+                         // Precisamos replicar getStockForDate logicamente
+                         if (rented === 0) stock = 0; // Bloqueado
+                         else stock = stock - rented; // Foi o alugado (restante)
+                     } else {
+                         stock = stock - rented;
+                     }
+                     realRemainingStock += Math.max(0, stock);
+                });
+
                 let color = 'bg-green-500';
                 
-                // 1. VERMELHO (Indisponível): O dia está lotado (regra: 8+ itens ou se nenhum item sobrou)
-                if (isDayTotallyUnavailable(date)) {
-                    color = 'bg-red-500'; 
-                } 
-                // 2. LARANJA (Poucos Disponíveis): Se tiver de 4 a 7 itens alugados
-                else if (totalRented >= 4) {
-                    color = 'bg-orange-500';
-                }
-                // 3. AMARELO (Alguns Reservados): Se tiver de 1 a 3 itens alugados (pelo menos 1)
-                else if (totalRented >= 1) {
-                    color = 'bg-amber-400'; 
-                }
-                // 4. VERDE (Tudo Disponível): 0 itens alugados
-                else {
-                    color = 'bg-green-500';
+                if (totalRented === 0) {
+                    color = 'bg-green-500'; // Tudo disponível
+                } else if (realRemainingStock >= 10) {
+                    color = 'bg-amber-400'; // Alguns reservados (Sobrando 10+)
+                } else if (realRemainingStock > 0) {
+                    color = 'bg-orange-500'; // Poucos disponíveis (Sobrando < 10)
+                } else {
+                    color = 'bg-red-500'; // Indisponível (0 sobrando)
                 }
 
                 mockedDayData[date] = { color: color };
@@ -679,7 +695,7 @@
                 filteredToys = filteredToys.filter(toy => String(toy.ageRating) === ageFilter);
             }
 
-            // 2. Aplicar Filtro de Ordem
+            // 2. Aplicar Filtro de Ordem (AGORA INCLUI A ORDEM PERSONALIZADA)
             const sortFilter = document.getElementById('sort-filter')?.value;
             if (sortFilter === 'name_asc') {
                 filteredToys.sort((a, b) => a.name.localeCompare(b.name));
@@ -691,9 +707,28 @@
                     const ageB = b.ageRating === 'L' ? 0 : b.ageRating;
                     return ageA - ageB;
                 });
+            } else if (sortFilter === 'most_rented') {
+                // Mapeamento de prioridade baseado no pedido do usuário
+                const priorityMap = {
+                    1: 1, 2: 1, // Camas
+                    4: 2,       // Piscina
+                    8: 3,       // Tobogã Médio
+                    9: 4,       // Futebol
+                    3: 5,       // Castelinho
+                    11: 6,      // Air Hockey
+                    10: 7,      // Pebolim
+                    7: 8,       // Escorrega Bolinhas
+                    6: 9,       // Mini Baby
+                    5: 10,      // Area Baby
+                    12: 11,     // Ping Pong
+                    13: 12      // Mesas
+                };
+                filteredToys.sort((a, b) => {
+                    const pA = priorityMap[a.id] || 99;
+                    const pB = priorityMap[b.id] || 99;
+                    return pA - pB;
+                });
             }
-            // (A ordem por 'Mais Adquiridos' não é implementada aqui, pois os dados de aquisição não são estáticos e são complexos de simular)
-            
             
             if (filteredToys.length === 0) {
                  listContainer.innerHTML = `<p class="p-4 text-center text-gray-500 italic">Nenhum brinquedo encontrado com o filtro selecionado.</p>`;
