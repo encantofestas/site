@@ -384,12 +384,6 @@
             if (insuranceFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`;
         }
         
-        // FUNÇÃO DE VALIDAÇÃO (SEMPRE VERDADEIRA PARA PERMITIR ENVIO)
-        window.validateForm = function() {
-            // Agora retorna sempre true na etapa de checkout para não bloquear o botão
-            return true;
-        }
-        
         window.calculateTotal = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
@@ -415,14 +409,16 @@
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
             
-            // LÓGICA DO BOTÃO: Sempre HABILITADO no Checkout
+            // LÓGICA DO BOTÃO:
             if (currentStep === 'checkout') {
-                actionButton.disabled = false; 
-                actionButton.removeAttribute('disabled');
-                actionButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                actionButton.classList.add('bg-primary', 'cursor-pointer');
+                // PEDIDO: Botão desativado e cinza para sempre nesta etapa
+                actionButton.disabled = true; 
+                actionButton.setAttribute('disabled', 'true');
+                actionButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                actionButton.classList.remove('bg-primary', 'cursor-pointer');
                 actionButton.innerText = `Confirmar Reserva`; 
             } else if (totalItems > 0 && currentStep === 'selection') {
+                // ... logic for selection step (remains active if items selected)
                 actionButton.disabled = false;
                 actionButton.classList.remove('bg-gray-400');
                 actionButton.classList.add('bg-primary');
@@ -526,12 +522,10 @@
             } else if (currentStep === 'checkout') { window.submitOrder(); }
         }
 
-        // ENVIO DO WHATSAPP SEM BLOQUEIOS
         window.submitOrder = function() {
-            
-            const name = document.getElementById('client-name').value || '(Não informado)';
-            const neighborhood = document.getElementById('client-neighborhood').value || '(Não informado)';
-            const street = document.getElementById('client-street').value || '(Não informado)';
+            const name = document.getElementById('client-name').value;
+            const neighborhood = document.getElementById('client-neighborhood').value;
+            const street = document.getElementById('client-street').value;
             const number = document.getElementById('client-number').value || 'S/N';
             const eventStartTime = document.getElementById('event-start-time').value || '(Não def.)';
             const eventEndTime = document.getElementById('event-end-time').value || '(Não def.)';
@@ -569,7 +563,6 @@
             const finalTotalText = document.getElementById('total-price-display').innerText;
             orderSummary += `\n💰 *TOTAL: ${finalTotalText}*`;
             
-            // Abre o WhatsApp direto
             window.open(`https://wa.me/5547992277324?text=${encodeURIComponent(orderSummary)}`, '_blank');
             window.closeToysPanel(); 
             window.changeStep('selection'); 
