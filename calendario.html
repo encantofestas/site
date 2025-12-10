@@ -266,7 +266,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        let selectedDayCount = 1; // Variável global para armazenar dias selecionados
+        let selectedDayCount = 1; 
 
         // DADOS ESTÁTICOS
         const staticData = {
@@ -325,51 +325,75 @@
                 if (!prevButton.disabled) navigatePrev();
             }
         }
-
-        // --- FUNÇÕES GERAIS ---
-
-        // Função para determinar a classificação etária
+        
+        // HELPERS
         function getAgeRatingBadge(ageRating) {
             if (ageRating === 'L') return { text: 'L', color: 'bg-green-500', title: 'Livre' };
             if (ageRating === 6) return { text: '6', color: 'bg-blue-500', title: 'Até 6 anos' };
             if (ageRating === 14) return { text: '14', color: 'bg-orange-500', title: 'Até 14 anos' };
             return { text: '?', color: 'bg-gray-400', title: 'Idade não informada' };
         }
+        
+        // Helper to add days to a date string
+        function addDays(dateStr, days) {
+            const result = new Date(dateStr + 'T00:00:00');
+            result.setDate(result.getDate() + days);
+            return result.toISOString().split('T')[0];
+        }
 
-        // Função simplificada para carregar dados estáticos
+        // NOVO: Função para verificar disponibilidade em um intervalo de dias
+        function checkRangeAvailability() {
+            if (selectedDayCount === 1) return { valid: true };
+
+            const startDate = currentSelectedDateISO;
+            const itemsToCheck = [];
+            
+            // Monta lista de itens selecionados e suas quantidades
+            for (const [toyId, qty] of Object.entries(selectedItems)) {
+                if (qty > 0) itemsToCheck.push({ id: parseInt(toyId), qty });
+            }
+            
+            if (itemsToCheck.length === 0) return { valid: true };
+
+            // Verifica cada dia do intervalo (começando do dia seguinte, pois o dia atual já foi validado na seleção)
+            // Na verdade, precisa validar TODOS os dias para garantir consistência se a data for mudada
+            for (let i = 0; i < selectedDayCount; i++) {
+                const checkDate = addDays(startDate, i);
+                
+                for (const item of itemsToCheck) {
+                    const toy = toysInventory.find(t => t.id === item.id);
+                    // Usa a lógica de estoque para aquela data específica
+                    // Precisamos de uma versão de getStockForDate que aceite data como parâmetro
+                    const stockOnDate = getStockForDate(item.id, checkDate);
+                    
+                    if (stockOnDate < item.qty) {
+                        const dateObj = new Date(checkDate + 'T00:00:00');
+                        const dateFormatted = dateObj.toLocaleDateString('pt-BR');
+                        return { 
+                            valid: false, 
+                            message: `O item "${toy.name}" não possui estoque suficiente para o dia ${dateFormatted}. (Disponível: ${stockOnDate}, Solicitado: ${item.qty})` 
+                        };
+                    }
+                }
+            }
+            return { valid: true };
+        }
+
         function loadStaticData() {
             toysInventory = staticData.brinquedos; 
             processAvailability(staticData);
             renderCalendar();
         }
 
-        // Função para obter o total de estoque reservado
-        function getTotalReservedItems(dateISO) {
-            const agendamentos = globalAgendamentos[dateISO] || {};
-            return Object.values(agendamentos).reduce((acc, qty) => acc + qty, 0);
-        }
-
         function processAvailability(data) {
             globalAgendamentos = data.agendamentos || {};
-            // Calcula estoque total global (soma de todos os itens)
-            const totalGlobalStock = toysInventory.reduce((acc, toy) => acc + toy.total_stock, 0);
             
             for (const [date, items] of Object.entries(data.agendamentos)) {
-                // 1. Calcula quantos itens foram alugados neste dia
-                const totalRented = Object.values(items).reduce((a, b) => a + b, 0);
+                let realRemainingStock = 0;
                 
-                // 2. Calcula quantos itens SOBRAM
-                // Nota: Esta é uma simplificação. Se houver exclusividade (LONA), a disponibilidade real pode ser menor.
-                // Mas para o propósito das cores do calendário, vamos usar a contagem bruta de itens restantes.
-                // Se um item LONA é alugado, ele conta como 1 alugado. Os outros LONAS bloqueados não contam como alugados, mas
-                // para a visão do cliente "quantos brinquedos sobraram para eu escolher", o bloqueio importa.
-                // Vamos refinar: Contar quantos itens estão *indisponíveis* (alugados + bloqueados).
-                
-                let unavailableCount = 0;
-                let isLonaBooked = false;
-                
-                // Verifica se algum LONA foi alugado
+                // Lógica para detecção de LONA alugada no dia
                 const lonaToys = toysInventory.filter(t => t.exclusiveGroup === 'LONA');
+                let isLonaBooked = false;
                 if (lonaToys.length > 0) {
                      isLonaBooked = Object.keys(items).some(id => {
                          const toy = toysInventory.find(t => t.id == id);
@@ -377,45 +401,12 @@
                      });
                 }
 
-                // Conta itens indisponíveis
                 toysInventory.forEach(toy => {
-                    const rentedQty = items[toy.id] || 0;
-                    
-                    if (toy.exclusiveGroup === 'LONA' && isLonaBooked) {
-                        // Se LONA está bloqueado, todo o estoque deste item conta como "não disponível" para escolha
-                        // (Se foi este o alugado, já está ok. Se não foi, está bloqueado)
-                        unavailableCount += toy.total_stock; 
-                    } else {
-                        unavailableCount += rentedQty;
-                    }
-                });
-
-                // Estoque Restante Disponível para Escolha
-                // Se a lógica acima somou todos os estoques de LONA quando um foi alugado, precisamos ajustar.
-                // Na verdade, se um LONA alugou, 1 pessoa está feliz. O "stock" consumido foi 1.
-                // Mas para a cor do dia (escassez), queremos saber o que sobra.
-                // Vamos simplificar com a regra do usuário:
-                // sobra >= 10: Amarelo
-                // sobra < 10: Laranja
-                // sobra == 0: Vermelho
-                
-                // Vamos usar a contagem simples de *alugados* para deduzir do total,
-                // mas se todos os itens possíveis de serem alugados acabarem, é vermelho.
-                
-                // Abordagem Híbrida mais segura:
-                // Calcular Stock Restante Real (Soma dos getStockForDate de cada item)
-                let realRemainingStock = 0;
-                toysInventory.forEach(toy => {
-                    // Simula a função getStockForDate logicamente aqui dentro
                      let stock = toy.total_stock;
                      const rented = items[toy.id] || 0;
                      if (toy.exclusiveGroup === 'LONA' && isLonaBooked) {
-                         // Se LONA bloqueada e não é este o item alugado (ou se é, estoque é 0 pq ja foi)
-                         // Se este item tem rented > 0, ok. Se não, stock disponivel é 0.
-                         // Simplificando: getStockForDate retorna 0 se bloqueado.
-                         // Precisamos replicar getStockForDate logicamente
-                         if (rented === 0) stock = 0; // Bloqueado
-                         else stock = stock - rented; // Foi o alugado (restante)
+                         if (rented === 0) stock = 0; 
+                         else stock = stock - rented;
                      } else {
                          stock = stock - rented;
                      }
@@ -424,14 +415,30 @@
 
                 let color = 'bg-green-500';
                 
-                if (totalRented === 0) {
-                    color = 'bg-green-500'; // Tudo disponível
-                } else if (realRemainingStock >= 10) {
-                    color = 'bg-amber-400'; // Alguns reservados (Sobrando 10+)
-                } else if (realRemainingStock > 0) {
-                    color = 'bg-orange-500'; // Poucos disponíveis (Sobrando < 10)
-                } else {
+                // --- NOVA REGRA DE CORES CORRIGIDA ---
+                // Total disponível para alugar (considerando bloqueios de Lona)
+                // Se sobrar 0 itens no total geral -> Vermelho
+                if (realRemainingStock === 0) {
                     color = 'bg-red-500'; // Indisponível (0 sobrando)
+                } 
+                else if (realRemainingStock < 10) {
+                    color = 'bg-orange-500'; // Poucos disponíveis (< 10 sobrando)
+                } 
+                else if (realRemainingStock >= 10) {
+                    // Aqui entra a regra: "se estiver sobrando 10 ou mais = alguns reservados"
+                    // Mas e o "Tudo disponível"? 
+                    // Se realRemainingStock for igual ao TotalStockInicial, então é Verde.
+                    // Caso contrário (já tem reservas mas sobra muito), é Amarelo.
+                    
+                    // Recalcula o estoque total teórico máximo para esse dia (sem reservas)
+                    // Para simplificar: se não tiver nenhum agendamento no objeto 'items', é verde.
+                    const totalRentedToday = Object.values(items).reduce((a, b) => a + b, 0);
+                    
+                    if (totalRentedToday === 0) {
+                         color = 'bg-green-500'; // Nenhuma reserva feita
+                    } else {
+                         color = 'bg-amber-400'; // Tem reserva, mas sobra muito (10+)
+                    }
                 }
 
                 mockedDayData[date] = { color: color };
@@ -441,16 +448,17 @@
         function getStockForDate(toyId, dateISO) {
             if (!toysInventory || toysInventory.length === 0) return 0;
             const toy = toysInventory.find(t => t.id === toyId); if (!toy) return 0;
+            
+            // Verifica agendamentos para a data específica passada
             const rentedCount = globalAgendamentos[dateISO]?.[toyId] || 0;
             
-            // Lógica de exclusividade para LONA
             if (toy.exclusiveGroup === 'LONA') {
                  const agendamentosDia = globalAgendamentos[dateISO] || {};
                  const isAnyLonaBooked = Object.keys(agendamentosDia).some(bookedId => {
                      const bookedToy = toysInventory.find(t => t.id == bookedId);
                      return bookedToy && bookedToy.exclusiveGroup === 'LONA' && agendamentosDia[bookedId] > 0;
                  });
-                 if (isAnyLonaBooked && (rentedCount === 0)) return 0; // Se outro LONA foi pego, este não está disponível
+                 if (isAnyLonaBooked && (rentedCount === 0)) return 0;
             }
             return Math.max(0, toy.total_stock - rentedCount);
         }
@@ -471,32 +479,13 @@
         function calculateDurationFee() {
             const startStr = document.getElementById('event-start-time').value;
             const endStr = document.getElementById('event-end-time').value;
-
             if (!startStr || !endStr) return 0;
-
             const startHour = parseInt(startStr);
             const endHour = parseInt(endStr);
             let duration = endHour - startHour;
-            
             if (duration <= 0) return 0; 
-
-            let fee = 0;
-            let warningText = "";
-            const warningEl = document.getElementById('time-fee-warning');
-
-            if (duration > 6) {
-                fee = duration >= 8 ? 40 : 20;
-                warningText = "Duração > 6h: taxa extra aplicada automaticamente.";
-            }
-
-            if (fee > 0) {
-                warningEl.innerText = warningText;
-                warningEl.classList.remove('hidden');
-            } else {
-                warningEl.classList.add('hidden');
-            }
-
-            return fee;
+            if (duration > 6) return duration >= 8 ? 40 : 20;
+            return 0;
         }
 
         window.getSelectedItemDetails = function() {
@@ -519,21 +508,26 @@
             }); return { details, total };
         }
 
-        // FUNÇÃO DE SELEÇÃO DE DIAS
         window.selectDays = function(days) {
-            selectedDayCount = days;
+            // VERIFICAÇÃO DE DISPONIBILIDADE AO TROCAR DIAS
+            // Se já tiver itens selecionados, verifica se é possível aumentar os dias
+            const previousDays = selectedDayCount;
+            selectedDayCount = days; // Atualiza temporariamente para checar
             
-            // Atualiza UI
+            const availability = checkRangeAvailability();
+            if (!availability.valid) {
+                alert(`Não é possível selecionar ${days} dias para os itens atuais:\n\n${availability.message}`);
+                selectedDayCount = previousDays; // Reverte
+                return; // Aborta mudança
+            }
+
+            // Se passou, atualiza UI
             for(let i=1; i<=5; i++) {
                 const el = document.getElementById(`day-${i}`);
-                if(i === days) {
-                    el.classList.add('selected');
-                } else {
-                    el.classList.remove('selected');
-                }
+                if(i === days) el.classList.add('selected');
+                else el.classList.remove('selected');
             }
             
-            // Atualiza Mensagem Promo
             const promoEl = document.getElementById('promo-message');
             if (days === 1) promoEl.innerText = "Valor normal.";
             else if (days === 2) promoEl.innerText = "Promoção: 30% OFF no 2º dia!";
@@ -553,7 +547,7 @@
             const couponDiscount = (couponCode === 'encanto10') ? (subtotal * 0.10) : 0;
             
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
-            const quantityDiscount = subtotal * discountRate;
+            const quantityDiscount = subtotal * discountRate; // Nota: Desconto combo base nao multiplica pelos dias aqui, logica mantida simples
 
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
@@ -568,15 +562,13 @@
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
             
-            // CÁLCULO DE MULTIPLICADOR DE DIAS
             let daysMultiplier = 1;
-            if (selectedDayCount === 2) daysMultiplier = 1.7; // 2 dias = 1.7x (30% desconto no 2o dia)
+            if (selectedDayCount === 2) daysMultiplier = 1.7;
             else if (selectedDayCount === 3) daysMultiplier = 2.3;
             else if (selectedDayCount === 4) daysMultiplier = 2.8;
             else if (selectedDayCount === 5) daysMultiplier = 3.2;
             
             if (monitorCount > 0) {
-                // Monitor também multiplica pelos dias (pois trabalha todo dia)
                 monitorFee = (monitorCount * monitorHours * 30) * selectedDayCount;
             }
             
@@ -586,21 +578,17 @@
                 const itemContainer = document.createElement('div');
                 itemContainer.className = 'border-b border-gray-200 py-1.5 last:border-b-0';
                 const pricePerUnit = window.calculatePriceWithScarcity(toysInventory.find(t => t.id === item.id)); 
-                // Preço unitário ajustado pelos dias
                 const lineTotal = (item.quantity * pricePerUnit) * daysMultiplier;
                 
                 itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name} <span class="text-xs text-blue-500">(${selectedDayCount} dias)</span></div><div class="text-sm font-bold text-green-600">R$ ${lineTotal.toFixed(2).replace('.', ',')}</div>`;
                 summaryDiv.appendChild(itemContainer);
             });
             
-            // Subtotal ajustado pelos dias
             const adjustedSubtotal = subtotal * daysMultiplier;
             const adjustedQtyDiscount = adjustedSubtotal * discountRate;
             const adjustedCouponDiscount = (couponCode === 'encanto10') ? (adjustedSubtotal * 0.10) : 0;
 
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
-            
-            // Mostra subtotal com dias
             summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Itens (${selectedDayCount} diárias):</span><span>R$ ${adjustedSubtotal.toFixed(2).replace('.', ',')}</span></div>`;
             
             if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores (${selectedDayCount} dias):</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
@@ -615,40 +603,31 @@
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
             
-            // Multiplicador de dias
             let daysMultiplier = 1;
             if (selectedDayCount === 2) daysMultiplier = 1.7;
             else if (selectedDayCount === 3) daysMultiplier = 2.3;
             else if (selectedDayCount === 4) daysMultiplier = 2.8;
             else if (selectedDayCount === 5) daysMultiplier = 3.2;
 
-            // Subtotal Base ajustado pelos dias
             const adjustedSubtotal = subtotal * daysMultiplier;
-
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
             const quantityDiscount = adjustedSubtotal * discountRate;
-            
             const couponCode = document.getElementById('discount-coupon')?.value.trim().toLowerCase();
             const couponDiscount = (couponCode === 'encanto10') ? (adjustedSubtotal * 0.10) : 0; 
-            
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const insuranceChecked = document.getElementById('additional-insurance')?.checked;
-            
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
             if (monitorCount > 0) { 
-                // Monitor multiplica pelos dias também
                 monitorFee = (monitorCount * monitorHours * 30) * selectedDayCount; 
             }
-            
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
             let shippingFee = 0;
             if (neighborhood === 'Ervino') shippingFee = 25.00;
             else if (extraShippingNeighborhoods.includes(neighborhood)) shippingFee = 10.00;
-            
-            const insuranceFee = insuranceChecked ? 10.00 : 0; // Seguro é TAXA ÚNICA por aluguel
-            const timeFee = calculateDurationFee(); // Taxa de hora extra é ÚNICA por evento diário (mas vamos assumir única no total para simplificar ou multiplicar? Geralmente taxa de hora é por evento. Vamos manter fixa para não complicar, ou multiplicar. Mantendo fixa pois é taxa de setup/logística estendida)
+            const insuranceFee = insuranceChecked ? 10.00 : 0; 
+            const timeFee = calculateDurationFee(); 
             
             const finalTotal = (adjustedSubtotal - quantityDiscount - couponDiscount) + shippingFee + insuranceFee + monitorFee + timeFee;
             document.getElementById('total-price-display').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
@@ -656,7 +635,6 @@
             const actionButton = document.getElementById('action-button');
             const totalItems = window.getSelectedItemDetails().details.length;
             
-            // LÓGICA DO BOTÃO
             if (currentStep === 'checkout') {
                 actionButton.disabled = false;
                 actionButton.removeAttribute('disabled');
@@ -675,27 +653,21 @@
             }
             
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
-            
             const isBallPitSelected = details.some(item => item.id === 4 && item.quantity > 0);
             document.getElementById('rain-protection-field')?.classList.toggle('hidden', !isBallPitSelected);
         }
         
-        // --- FUNÇÕES DE FILTRO E RENDERIZAÇÃO DA LISTA DE BRINQUEDOS ---
-
-        // Função principal para renderizar a lista de brinquedos
         window.renderToysList = function() {
             const listContainer = document.getElementById('toys-list-container');
             listContainer.innerHTML = ''; 
             
             let filteredToys = [...toysInventory];
             
-            // 1. Aplicar Filtro de Idade
             const ageFilter = document.getElementById('age-filter')?.value;
             if (ageFilter && ageFilter !== 'all') {
                 filteredToys = filteredToys.filter(toy => String(toy.ageRating) === ageFilter);
             }
 
-            // 2. Aplicar Filtro de Ordem (AGORA INCLUI A ORDEM PERSONALIZADA)
             const sortFilter = document.getElementById('sort-filter')?.value;
             if (sortFilter === 'name_asc') {
                 filteredToys.sort((a, b) => a.name.localeCompare(b.name));
@@ -708,20 +680,19 @@
                     return ageA - ageB;
                 });
             } else if (sortFilter === 'most_rented') {
-                // Mapeamento de prioridade baseado no pedido do usuário
                 const priorityMap = {
-                    1: 1, 2: 1, // Camas
-                    4: 2,       // Piscina
-                    8: 3,       // Tobogã Médio
-                    9: 4,       // Futebol
-                    3: 5,       // Castelinho
-                    11: 6,      // Air Hockey
-                    10: 7,      // Pebolim
-                    7: 8,       // Escorrega Bolinhas
-                    6: 9,       // Mini Baby
-                    5: 10,      // Area Baby
-                    12: 11,     // Ping Pong
-                    13: 12      // Mesas
+                    1: 1, 2: 2, // Camas
+                    4: 3,       // Piscina
+                    8: 4,       // Tobogã Médio (inflavel)
+                    9: 5,       // Futebol
+                    3: 6,       // Castelinho
+                    11: 7,      // Air Hockey
+                    10: 8,      // Pebolim
+                    7: 9,       // Escorrega Bolinhas
+                    6: 10,       // Mini Baby
+                    5: 11,      // Area Baby
+                    12: 12,     // Ping Pong
+                    13: 13      // Mesas
                 };
                 filteredToys.sort((a, b) => {
                     const pA = priorityMap[a.id] || 99;
@@ -736,7 +707,12 @@
             }
 
             filteredToys.forEach(toy => {
+                // VERIFICA DISPONIBILIDADE NO DIA ATUAL SELECIONADO
                 const maxStock = getStockForDate(toy.id, currentSelectedDateISO);
+                // Se stock for 0 no dia de INÍCIO, nem mostra ou mostra desabilitado?
+                // O comportamento padrão é esconder ou mostrar esgotado. Vamos manter: se 0, não mostra (ou mostra desabilitado se preferir, mas o código atual retorna no inicio).
+                // Mas espere! Se a pessoa selecionou 3 dias, e no dia 1 tem, mas no dia 2 não, o `maxStock` do dia 1 é > 0.
+                // A validação de RANGE acontece ao adicionar ou mudar dias.
                 if (maxStock === 0) return; 
                 
                 const finalPrice = window.calculatePriceWithScarcity(toy);
@@ -744,7 +720,6 @@
                 let scarcityLabel = '';
                 if (toy.scarcityGroup && maxStock < (toy.scarcityGroup === 'ELASTIC' ? 3 : 2)) { scarcityLabel = `<span class="text-xs font-semibold text-green-500 block">Promoção</span>`; }
                 
-                // AGE RATING BADGE
                 const ageInfo = getAgeRatingBadge(toy.ageRating);
                 const ageBadge = `<div class="absolute bottom-1 right-1 w-5 h-5 ${ageInfo.color} text-white text-[10px] font-bold flex items-center justify-center rounded-sm shadow-sm" title="${ageInfo.title}">${ageInfo.text}</div>`;
 
@@ -786,13 +761,35 @@
             window.calculateTotal();
         }
 
-        // --- FIM FUNÇÕES DE FILTRO E RENDERIZAÇÃO ---
-
         window.updateQuantity = function(toyId, change) {
             const toy = toysInventory.find(t => t.id === toyId); if (!toy) return;
             const maxStock = getStockForDate(toy.id, currentSelectedDateISO);
             let currentQty = selectedItems[toyId] || 0; let newQty = currentQty + change;
             if (newQty < 0) newQty = 0; if (newQty > maxStock) newQty = maxStock;
+            
+            // VERIFICAÇÃO DE RANGE AQUI TAMBÉM
+            // Se estou tentando aumentar, preciso ver se tem estoque nos dias seguintes
+            if (change > 0) {
+                 // Cria um objeto temporário simulando a nova seleção
+                 const tempItems = { ...selectedItems, [toyId]: newQty };
+                 // Função helper local para validar sem alterar o estado global ainda
+                 const isValidRange = (items) => {
+                     if (selectedDayCount === 1) return true;
+                     const startDate = currentSelectedDateISO;
+                     for (let i = 1; i < selectedDayCount; i++) { // Check subsequent days
+                        const checkDate = addDays(startDate, i);
+                        const stockOnDate = getStockForDate(toy.id, checkDate);
+                        if (stockOnDate < newQty) return false;
+                     }
+                     return true;
+                 };
+                 
+                 if (!isValidRange(tempItems)) {
+                     alert(`Não é possível adicionar mais "${toy.name}" pois não há estoque suficiente para os ${selectedDayCount} dias selecionados.`);
+                     return;
+                 }
+            }
+
             if (toy.exclusiveGroup === 'LONA' && change > 0) {
                 if (currentQty === 0) {
                     const otherLonaItem = toysInventory.find(t => t.exclusiveGroup === 'LONA' && t.id !== toyId && (selectedItems[t.id] || 0) > 0);
@@ -802,29 +799,24 @@
             }
             selectedItems[toyId] = newQty;
             
-            // ATUALIZAÇÃO: Após mudar a quantidade, renderiza a lista novamente para atualizar os botões de estoque
             window.renderToysList(); 
         }
 
+        // Rest of the code remains the same...
         window.renderPowerOutletFields = function() {
             const anchor = document.getElementById('power-outlet-anchor');
             if (!anchor) return; 
-
             anchor.innerHTML = '';
-
             const { details } = window.getSelectedItemDetails();
             const powerToys = details.filter(item => {
                 const toyDef = toysInventory.find(t => t.id === item.id);
                 return toyDef && toyDef.needsPower;
             });
-
             if (powerToys.length > 0) {
                 const container = document.createElement('div');
                 container.id = 'power-outlet-fields-container';
                 container.className = 'space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200 mt-4 mb-4';
-                
                 let htmlContent = `<label class="block text-sm font-bold text-indigo-800 mb-2">Selecione a distância da tomada (em metros - máx. 20m)</label>`;
-                
                 powerToys.forEach(toy => {
                     for(let i=1; i<=toy.quantity; i++) {
                          const label = toy.quantity > 1 ? `${toy.name} (#${i})` : toy.name;
@@ -832,7 +824,6 @@
                          htmlContent += `<div><label for="${inputId}" class="block text-xs font-medium text-gray-700">${label}</label><input type="number" id="${inputId}" name="${inputId}" max="20" oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Ex: 5m"></div>`;
                     }
                 });
-                
                 container.innerHTML = htmlContent;
                 anchor.appendChild(container);
             }
@@ -845,29 +836,33 @@
             document.getElementById('selection-view').classList.add('hidden');
             document.getElementById('checkout-view').classList.add('hidden');
             if (step === 'checkout') { 
+                // VALIDAÇÃO FINAL DE RANGE AO IR PARA CHECKOUT
+                const availability = checkRangeAvailability();
+                if (!availability.valid) {
+                    alert(availability.message);
+                    // Volta para seleção
+                    document.getElementById('selection-view').classList.remove('hidden');
+                    currentStep = 'selection';
+                    return;
+                }
+
                 window.updateCheckoutSummary(); 
                 window.renderPowerOutletFields(); 
                 document.getElementById('checkout-view').classList.remove('hidden'); 
-                startScrollHint(); // INICIA ANIMAÇÃO AO ABRIR CHECKOUT
+                startScrollHint(); 
             } 
             else { 
                 document.getElementById('selection-view').classList.remove('hidden');
-                // Re-renderiza a lista para aplicar filtros ao voltar do checkout
                 window.renderToysList(); 
             }
             window.calculateTotal();
         }
 
-        // LÓGICA DE DICA DE SCROLL
         function startScrollHint() {
             const view = document.getElementById('checkout-view');
-            // Remove a classe se já existir para reiniciar
             view.classList.remove('scroll-hint-active');
-            // Força reflow
             void view.offsetWidth;
-            // Adiciona classe de animação
             view.classList.add('scroll-hint-active');
-            
             const stopHint = () => {
                 view.classList.remove('scroll-hint-active');
                 const panelContent = document.getElementById('panel-content-area');
@@ -875,7 +870,6 @@
                 panelContent.removeEventListener('mousedown', stopHint);
                 panelContent.removeEventListener('scroll', stopHint);
             };
-
             const panelContent = document.getElementById('panel-content-area');
             panelContent.addEventListener('touchstart', stopHint, { passive: true });
             panelContent.addEventListener('mousedown', stopHint);
@@ -889,31 +883,22 @@
             } else if (currentStep === 'checkout') { window.submitOrder(); }
         }
 
-        // ENVIO DO WHATSAPP SEM BLOQUEIOS
         window.submitOrder = function() {
-            // Removemos o 'return' que bloqueava o envio. Agora ele SEMPRE tenta enviar se o botão foi clicado.
-            
             const name = document.getElementById('client-name').value.trim() || '(Não informado)';
             const neighborhood = document.getElementById('client-neighborhood').value || '(Não informado)';
             const street = document.getElementById('client-street').value.trim() || '(Não informado)';
             const number = document.getElementById('client-number').value.trim() || 'S/N';
             const reference = document.getElementById('client-reference').value.trim() || '(Não informado)';
-            
-            // Horários
             const startVal = document.getElementById('event-start-time').value;
             const endVal = document.getElementById('event-end-time').value;
             const eventStartTime = startVal ? startVal + ":00" : "(Não def.)";
             const eventEndTime = endVal ? endVal + ":00" : "(Não def.)";
-
-            // Opções extras
             const insuranceChecked = document.getElementById('additional-insurance').checked;
             const deliveryDayBeforeSelect = document.getElementById('delivery-day-before').value;
             const invoiceChecked = document.getElementById('request-invoice').checked;
             const cnpj = document.getElementById('client-cnpj').value.trim();
             const rainProtection = document.getElementById('rain-protection')?.checked;
             const coupon = document.getElementById('discount-coupon').value.trim();
-
-            // Energia
             const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
             let powerDetails = "";
             for (let input of powerInputs) {
@@ -921,89 +906,57 @@
                 const val = input.value ? input.value + 'm' : '(Não inf.)';
                 powerDetails += `⚡ ${label}: ${val}\n`;
             }
-
-            // Monitores
             let monitorText = "";
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             if (document.getElementById('has-monitors').value === 'Sim' && monitorCount > 0) {
                 const monitorHours = document.getElementById('monitor-hours').value || 0;
                 monitorText = `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
             }
-
-            // Itens
             const { details } = window.getSelectedItemDetails();
             let itemsList = "";
             details.forEach(item => { itemsList += `• ${item.quantity}x ${item.name}\n`; });
-
-            // Taxas extras
             let extrasText = "";
             const timeFee = calculateDurationFee();
             if (timeFee > 0) extrasText += `🕒 Taxa Duração: R$ ${timeFee.toFixed(2)}\n`;
-
-            // Totais
             const finalTotalText = document.getElementById('total-price-display').innerText;
-
-            // Construção da Mensagem
             let msg = `*NOVO AGENDAMENTO*\n`;
             msg += `📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')} (${selectedDayCount} diárias)\n`;
             msg += `👤 Nome: ${name}\n`;
             msg += `📍 Local: ${street}, ${number} - ${neighborhood}\n`;
             msg += `🗒️ Ref: ${reference}\n`;
-            
             if (invoiceChecked) msg += `📄 CNPJ: ${cnpj || 'Não informado'}\n`;
-            
             msg += `⏰ Horário: ${eventStartTime} - ${eventEndTime}\n`;
             msg += `🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n`;
             msg += `🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
-            
             if (coupon) msg += `🎟️ Cupom: ${coupon}\n`;
-            
             const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
             if (isBallPitIncluded) msg += `🌧 Piscina Coberta: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
-            
             if (powerDetails) msg += `\n*ENERGIA:*\n${powerDetails}`;
             if (monitorText) msg += monitorText;
             if (extrasText) msg += extrasText;
-            
             msg += `\n*ITENS (${selectedDayCount} dias):*\n${itemsList}`;
             msg += `\n💰 *TOTAL: ${finalTotalText}*`;
-
-            // Envio
             const whatsappNumber = "5547992277324";
             const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
-            
             window.open(url, '_blank');
-            
-            // Reset UI
             window.closeToysPanel(); 
             window.changeStep('selection'); 
         }
-        // --- FIM SUBMIT ORDER ---
         
         window.openToysPanel = function(day, month, year) {
             currentSelectedDateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             document.getElementById('selected-date-display').innerText = `Para ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
-            
-            // Reset no painel
             document.getElementById('has-monitors').value = 'Nao'; 
             document.getElementById('delivery-day-before').value = 'Nao'; 
             document.getElementById('additional-insurance').checked = false; 
             document.getElementById('request-invoice').checked = false;
             document.getElementById('discount-coupon').value = '';
             if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
-            
-            // Reset dias
             selectDays(1);
-
-            // Limpa container de energia ao abrir painel
             const anchor = document.getElementById('power-outlet-anchor');
             if(anchor) anchor.innerHTML = '';
-
             window.toggleMonitorFields(true); window.toggleCnpjField(); window.changeStep('selection'); 
-            
-            // Renderiza a lista de brinquedos
             window.renderToysList();
-            
             document.getElementById('toys-panel').classList.add('open'); 
             document.getElementById('toys-overlay').classList.add('open'); 
             document.body.style.overflow = 'hidden';
@@ -1014,89 +967,44 @@
         window.toggleMonitorFields = function(isInitialLoad = false) { const shouldShow = document.getElementById('has-monitors').value === 'Sim'; document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow); if (shouldShow && !isInitialLoad) { window.renderMonitorHours(); } else if (!shouldShow) { document.getElementById('monitor-hours-fields').innerHTML = ''; } }
         window.toggleCnpjField = function() { const shouldShow = document.getElementById('request-invoice').checked; document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); document.getElementById('client-cnpj').required = shouldShow; }
         
-        window.onload = function() { 
-            fetchNotifications(); 
-            window.toggleMonitorFields(true); 
-            window.toggleCnpjField(); 
-            initializeFirebaseAndAuth(); 
-            loadStaticData(); 
-            // Inicializa a renderização da lista de brinquedos
-            window.renderToysList();
-        };
-
+        window.onload = function() { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); loadStaticData(); window.renderToysList(); };
         function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
-        
-        // CORREÇÃO: Função de navegação para exibir mensagem de limite
         function navigateNext() { 
             const nextMonthCheck = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 1); 
             if (nextMonthCheck.getTime() >= maxFutureDate.getTime()) { 
-                showToast(); // Mostra o toast de limite
-                nextButton.disabled = true;
+                showToast(); nextButton.disabled = true;
             } else {
                 currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); 
                 renderCalendar(); 
             }
         }
-        
-        function getDayStatus(year, month, day) { 
-            const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; 
-            return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false }; 
-        }
-        
+        function getDayStatus(year, month, day) { const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false }; }
         function renderCalendar() {
             const currentMonth = currentCalendarDate.getMonth(); const currentYear = currentCalendarDate.getFullYear();
             monthYearDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`; calendarBody.innerHTML = '';
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1); const firstDayOfNextMonth = new Date(currentYear, currentMonth + 1, 1);
-            
-            // Botões de navegação
             prevButton.disabled = firstDayOfCurrentMonth.getTime() === new Date(today.getFullYear(), today.getMonth(), 1).getTime();
-            
             const isAtMaxFuture = firstDayOfNextMonth.getTime() >= maxFutureDate.getTime(); 
             nextButton.disabled = isAtMaxFuture;
-            
-            if (isAtMaxFuture) {
-                 nextButton.onclick = showToast; 
-                 nextButton.classList.add('opacity-30');
-            } else {
-                 nextButton.onclick = navigateNext;
-                 nextButton.classList.remove('opacity-30');
-            }
-
+            if (isAtMaxFuture) { nextButton.onclick = showToast; nextButton.classList.add('opacity-30'); } else { nextButton.onclick = navigateNext; nextButton.classList.remove('opacity-30'); }
             for (let i = 0; i < firstDayOfMonth; i++) { const emptyCell = document.createElement('div'); emptyCell.className = 'dia-vazio p-2'; calendarBody.appendChild(emptyCell); }
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(currentYear, currentMonth, day); const status = getDayStatus(currentYear, currentMonth, day);
                 const cell = document.createElement('div'); 
-                
-                // Mapeamento de cores (necessário para a célula)
                 let colorClass = 'bg-gray-200';
                 if (status.color === 'bg-green-500') colorClass = 'bg-green-500';
                 else if (status.color === 'bg-amber-400') colorClass = 'bg-amber-400';
                 else if (status.color === 'bg-orange-500') colorClass = 'bg-orange-500';
                 else if (status.color === 'bg-red-500') colorClass = 'bg-red-500';
-
                 cell.className = `dia-celula rounded-lg shadow-sm relative overflow-hidden ${colorClass}`;
-                
-                if (date.getTime() < today.getTime()) { 
-                    cell.classList.add('dia-passado'); 
-                } else { 
-                    cell.classList.add('text-gray-900'); 
-                    cell.onclick = () => window.openToysPanel(day, currentMonth, currentYear); 
-                }
+                if (date.getTime() < today.getTime()) { cell.classList.add('dia-passado'); } else { cell.classList.add('text-gray-900'); cell.onclick = () => window.openToysPanel(day, currentMonth, currentYear); }
                 if (date.getTime() === today.getTime()) cell.classList.add('dia-hoje');
                 cell.innerHTML = `<div class="dia-numero">${day}</div>`; calendarBody.appendChild(cell);
             }
         }
-        
-        function navigatePrev() { 
-            if (prevButton.disabled) return; 
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1); 
-            renderCalendar(); 
-        }
-        
+        function navigatePrev() { if (prevButton.disabled) return; currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1); renderCalendar(); }
         prevButton.addEventListener('click', navigatePrev);
-
-        // ... FIREBASE/NOTIFICAÇÕES ...
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]')); let notificationsData = [];
         function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
         function getReadNotificationsCollection(uid) { return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`); }
