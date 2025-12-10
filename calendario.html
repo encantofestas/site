@@ -32,6 +32,15 @@
         #notification-content { height: 100%; display: flex; flex-direction: column; }
         /* Animação Calendar Swipe */
         .calendar-transition { transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out; }
+        
+        /* ANIMAÇÃO DE DICA DE SCROLL DO FORMULÁRIO */
+        @keyframes gentle-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        .scroll-hint-active {
+            animation: gentle-float 2.5s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -198,16 +207,16 @@
         const staticData = {
           "brinquedos": [
             { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "needsPower": false, "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX2Tga0PM2k0Z1rIWz2bIW73rW1VFIkDCYPg&s" },
-            { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "needsPower": false, "image": "https://github.com/encantofestas/site/blob/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/camam.webp" },
+            { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "needsPower": false, "image": "https://raw.githubusercontent.com/encantofestas/site/7a37b74c8c65dbab1e792c834ee21f8e904d806d/mockup1760749737810.png" },
             { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3m", "needsPower": true, "image": "" },
             { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL", "needsPower": false, "image": "" },
-            { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "", "needsPower": false, "image": "https://github.com/encantofestas/site/blob/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/areababy.webp" },
-            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "", "needsPower": true, "image": "" },
+            { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "", "needsPower": false, "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/areababy.webp" },
+            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "", "needsPower": true, "image": "https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" },
             { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "", "exclusiveGroup": "LONA", "needsPower": true, "image": "" },
             { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "needsPower": true, "image": "" },
             { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8 x 4m", "exclusiveGroup": "LONA", "needsPower": true, "image": "" },
             { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "", "needsPower": false, "image": "" },
-            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "", "needsPower": true, "image": "https://raw.github.com/encantofestas/site/blob/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" },
+            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "", "needsPower": true, "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" },
             { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "", "needsPower": false, "image": "" },
             { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "Kit", "needsPower": false, "image": "" }
           ],
@@ -229,7 +238,7 @@
         const monthYearDisplay = document.getElementById('current-month-year'); const calendarBody = document.getElementById('calendar-body'); const prevButton = document.getElementById('prev-month'); const nextButton = document.getElementById('next-month'); const toast = document.getElementById('toast-notification');
         let currentSelectedDateISO = "";
 
-        // SWIPE LOGIC START
+        // SWIPE LOGIC
         let touchStartX = 0;
         let touchEndX = 0;
         const calendarWrapper = document.getElementById('calendar-wrapper');
@@ -245,15 +254,12 @@
 
         function handleSwipe() {
             if (touchEndX < touchStartX - 50) {
-                // Swipe Left -> Next Month
                 if (!nextButton.disabled) navigateNext();
             }
             if (touchEndX > touchStartX + 50) {
-                // Swipe Right -> Prev Month
                 if (!prevButton.disabled) navigatePrev();
             }
         }
-        // SWIPE LOGIC END
 
         // Função simplificada para carregar dados estáticos
         function loadStaticData() {
@@ -538,9 +544,34 @@
                 window.updateCheckoutSummary(); 
                 window.renderPowerOutletFields(); 
                 document.getElementById('checkout-view').classList.remove('hidden'); 
+                startScrollHint(); // INICIA ANIMAÇÃO AO ABRIR CHECKOUT
             } 
             else { document.getElementById('selection-view').classList.remove('hidden'); }
             window.calculateTotal();
+        }
+
+        // LÓGICA DE DICA DE SCROLL
+        function startScrollHint() {
+            const view = document.getElementById('checkout-view');
+            // Remove a classe se já existir para reiniciar
+            view.classList.remove('scroll-hint-active');
+            // Força reflow
+            void view.offsetWidth;
+            // Adiciona classe de animação
+            view.classList.add('scroll-hint-active');
+            
+            const stopHint = () => {
+                view.classList.remove('scroll-hint-active');
+                const panelContent = document.getElementById('panel-content-area');
+                panelContent.removeEventListener('touchstart', stopHint);
+                panelContent.removeEventListener('mousedown', stopHint);
+                panelContent.removeEventListener('scroll', stopHint);
+            };
+
+            const panelContent = document.getElementById('panel-content-area');
+            panelContent.addEventListener('touchstart', stopHint, { passive: true });
+            panelContent.addEventListener('mousedown', stopHint);
+            panelContent.addEventListener('scroll', stopHint);
         }
 
         window.handleActionButton = function() {
