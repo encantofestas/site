@@ -82,10 +82,10 @@
                 <form id="checkout-form" onsubmit="event.preventDefault(); submitOrder()">
                     <div class="space-y-4">
                         <!-- Nome -->
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="client-name" required oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo (Obrigatório)</label><input type="text" id="client-name" required oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
                         
                         <!-- Bairro -->
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega (Obrigatório)</label>
                             <select id="client-neighborhood" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
                                 <option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option>
                             </select>
@@ -93,7 +93,7 @@
                         
                         <!-- Endereço -->
                         <div class="flex space-x-2">
-                            <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label><input type="text" id="client-street" required oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
+                            <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua (Obrigatório)</label><input type="text" id="client-street" required oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
                             <div class="w-24"><label class="block text-sm font-medium text-gray-700 mb-1">Nº</label><input type="number" id="client-number" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Nº"></div>
                         </div>
                         <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes da casa exemplo sobrado cinza na frente de..."></textarea></div>
@@ -390,9 +390,8 @@
             const name = document.getElementById('client-name').value.trim();
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value.trim();
-            // Ponto de Referência é visualmente opcional para o botão ativar, mas recomendado
             
-            // Requer apenas o básico para "acender" o botão
+            // AGORA SIM: Requer APENAS o básico para "acender" o botão
             if (name === "" || neighborhood === "" || street === "") {
                 return false;
             }
@@ -453,7 +452,7 @@
         
         window.updateQuantity = function(toyId, change) {
             const toy = toysInventory.find(t => t.id === toyId); if (!toy) return;
-            const maxStock = getStockForDate(toyId, currentSelectedDateISO);
+            const maxStock = getStockForDate(toy.id, currentSelectedDateISO);
             let currentQty = selectedItems[toyId] || 0; let newQty = currentQty + change;
             if (newQty < 0) newQty = 0; if (newQty > maxStock) newQty = maxStock;
             if (toy.exclusiveGroup === 'LONA' && change > 0) {
