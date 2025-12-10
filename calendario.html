@@ -389,7 +389,7 @@
             const name = document.getElementById('client-name').value.trim();
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value.trim();
-            const reference = document.getElementById('client-reference').value.trim(); // DETALHES/PONTO DE REFERÊNCIA AGORA É OBRIGATÓRIO
+            const reference = document.getElementById('client-reference').value.trim(); 
             const startTime = document.getElementById('event-start-time').value;
             const endTime = document.getElementById('event-end-time').value; 
             
@@ -439,27 +439,27 @@
             
             const isValid = validateForm();
             
-            actionButton.disabled = totalItems === 0 || (currentStep === 'checkout' && !isValid); 
-
-            if (totalItems > 0 && currentStep === 'selection') { 
-                actionButton.innerText = `Continuar Agendamento`;
+            // --- CORREÇÃO APLICADA AQUI ---
+            if (currentStep === 'checkout' && isValid) {
+                // Se for a etapa de checkout e a validação for positiva, remove disabled e pinta de azul
+                actionButton.disabled = false;
                 actionButton.classList.remove('bg-gray-400');
                 actionButton.classList.add('bg-primary');
-            } 
-            else if (currentStep === 'checkout') { 
                 actionButton.innerText = `Confirmar Reserva`; 
-                if (isValid) {
-                    actionButton.classList.remove('bg-gray-400');
-                    actionButton.classList.add('bg-primary');
-                } else {
-                    actionButton.classList.add('bg-gray-400');
-                    actionButton.classList.remove('bg-primary');
-                }
-            } 
-            else { 
-                actionButton.innerText = `Continuar Agendamento`; 
-                actionButton.classList.add('bg-gray-400'); 
+            } else if (totalItems > 0 && currentStep === 'selection') {
+                // Se for a etapa de seleção e tiver itens, ele continua para o checkout
+                actionButton.disabled = false;
+                actionButton.classList.remove('bg-gray-400');
+                actionButton.classList.add('bg-primary');
+                actionButton.innerText = `Continuar Agendamento`;
+            } else {
+                // Caso contrário (sem itens ou checkout inválido), desabilita
+                actionButton.disabled = true;
+                actionButton.classList.add('bg-gray-400');
+                actionButton.classList.remove('bg-primary');
+                if (currentStep === 'checkout') actionButton.innerText = `Confirmar Reserva`; 
             }
+            // --- FIM DA CORREÇÃO ---
             
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
             
@@ -559,7 +559,7 @@
                 const name = document.getElementById('client-name').value.trim();
                 const neighborhood = document.getElementById('client-neighborhood').value;
                 const street = document.getElementById('client-street').value.trim();
-                const reference = document.getElementById('client-reference').value.trim(); // Agora é checado
+                const reference = document.getElementById('client-reference').value.trim(); 
                 const startTime = document.getElementById('event-start-time').value;
                 const endTime = document.getElementById('event-end-time').value;
                 const invoiceChecked = document.getElementById('request-invoice').checked;
