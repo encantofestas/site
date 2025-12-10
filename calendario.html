@@ -96,13 +96,13 @@
                             <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label><input type="text" id="client-street" required oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
                             <div class="w-24"><label class="block text-sm font-medium text-gray-700 mb-1">Nº</label><input type="number" id="client-number" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Nº"></div>
                         </div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes da casa exemplo sobrado cinza na frente de..."></textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência (Obrigatório)</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes da casa exemplo sobrado cinza na frente de..."></textarea></div>
                         
                         <!-- Horários -->
                         <div class="flex flex-col">
                             <div class="flex space-x-2">
-                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Início</label><select id="event-start-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
-                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Término</label><select id="event-end-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
+                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Início (Obrigatório)</label><select id="event-start-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
+                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Término (Obrigatório)</label><select id="event-end-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
                             </div>
                             <div id="time-fee-warning" class="text-xs text-red-600 mt-1 hidden font-normal"></div>
                         </div>
@@ -191,7 +191,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        // DADOS ESTÁTICOS INSERIDOS DIRETAMENTE NO CÓDIGO (SEM FETCH DE ESTOQUE)
+        // DADOS ESTÁTICOS INSERIDOS DIRETAMENTE NO CÓDIGO
         const staticData = {
           "brinquedos": [
             { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "needsPower": false, "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX2Tga0PM2k0Z1rIWz2bIW73rW1VFIkDCYPg&s" },
@@ -389,10 +389,12 @@
             const name = document.getElementById('client-name').value.trim();
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value.trim();
+            const reference = document.getElementById('client-reference').value.trim(); // DETALHES/PONTO DE REFERÊNCIA AGORA É OBRIGATÓRIO
             const startTime = document.getElementById('event-start-time').value;
             const endTime = document.getElementById('event-end-time').value; 
             
-            if (name === "" || neighborhood === "" || street === "" || startTime === "" || endTime === "") {
+            // Verifica os campos básicos OBRIGATÓRIOS
+            if (name === "" || neighborhood === "" || street === "" || reference === "" || startTime === "" || endTime === "") {
                 return false;
             }
             
@@ -557,6 +559,7 @@
                 const name = document.getElementById('client-name').value.trim();
                 const neighborhood = document.getElementById('client-neighborhood').value;
                 const street = document.getElementById('client-street').value.trim();
+                const reference = document.getElementById('client-reference').value.trim(); // Agora é checado
                 const startTime = document.getElementById('event-start-time').value;
                 const endTime = document.getElementById('event-end-time').value;
                 const invoiceChecked = document.getElementById('request-invoice').checked;
@@ -566,6 +569,7 @@
                 if (!name) missing.push("Nome Completo");
                 if (!neighborhood) missing.push("Bairro de Entrega");
                 if (!street) missing.push("Nome da Rua");
+                if (!reference) missing.push("Ponto de Referência (Detalhes da Casa)");
                 if (!startTime) missing.push("Horário de Início");
                 if (!endTime) missing.push("Horário de Término");
 
@@ -580,8 +584,9 @@
                 if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { missing.push("CNPJ (Inválido)"); }
 
                 if (missing.length > 0) {
-                     const alertMessage = "🚨 Por favor, preencha/corrija os seguintes campos obrigatórios:\n- " + missing.join("\n- ");
+                     const alertMessage = "🚨 Por favor, preencha/corrija os seguintes campos obrigatórios para continuar:\n- " + missing.join("\n- ");
                      console.error(alertMessage); 
+                     // Usamos um alerta simulado para o usuário
                      window.alert(alertMessage.substring(0, 150) + '...');
                      return;
                 }
