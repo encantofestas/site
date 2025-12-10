@@ -30,6 +30,8 @@
         #notification-panel { z-index: 100; transition: transform 0.3s ease-out; position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; background-color: #2563EB; pointer-events: none; transform: translateX(100%); }
         #notification-panel.open { pointer-events: auto; transform: translateX(0); }
         #notification-content { height: 100%; display: flex; flex-direction: column; }
+        /* Animação Calendar Swipe */
+        .calendar-transition { transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out; }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -151,7 +153,8 @@
 
     <!-- MAIN -->
     <main class="flex-grow w-full pt-24 pb-28 md:pb-12 bg-white md:bg-gray-50 flex flex-col items-center justify-start">
-        <div class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100">
+        <!-- WRAPPER DO CALENDÁRIO COM ID PARA EVENTOS -->
+        <div id="calendar-wrapper" class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100 calendar-transition relative overflow-hidden">
             <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Para a data <span id="display-date-main">...</span></h2>
             <div class="flex justify-between items-center mb-6 px-2">
                 <button id="prev-month" class="nav-btn p-2 rounded-full text-blue-600 hover:bg-blue-50 active:bg-blue-100 disabled:opacity-30"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
@@ -225,6 +228,32 @@
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const monthYearDisplay = document.getElementById('current-month-year'); const calendarBody = document.getElementById('calendar-body'); const prevButton = document.getElementById('prev-month'); const nextButton = document.getElementById('next-month'); const toast = document.getElementById('toast-notification');
         let currentSelectedDateISO = "";
+
+        // SWIPE LOGIC START
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const calendarWrapper = document.getElementById('calendar-wrapper');
+
+        calendarWrapper.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        calendarWrapper.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, {passive: true});
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                // Swipe Left -> Next Month
+                if (!nextButton.disabled) navigateNext();
+            }
+            if (touchEndX > touchStartX + 50) {
+                // Swipe Right -> Prev Month
+                if (!prevButton.disabled) navigatePrev();
+            }
+        }
+        // SWIPE LOGIC END
 
         // Função simplificada para carregar dados estáticos
         function loadStaticData() {
@@ -521,9 +550,10 @@
             } else if (currentStep === 'checkout') { window.submitOrder(); }
         }
 
-        // --- SUBMIT ORDER REFEITO DO ZERO ---
+        // ENVIO DO WHATSAPP SEM BLOQUEIOS
         window.submitOrder = function() {
-            // Coleta de dados com fallback para "Não informado"
+            // Removemos o 'return' que bloqueava o envio. Agora ele SEMPRE tenta enviar se o botão foi clicado.
+            
             const name = document.getElementById('client-name').value.trim() || '(Não informado)';
             const neighborhood = document.getElementById('client-neighborhood').value || '(Não informado)';
             const street = document.getElementById('client-street').value.trim() || '(Não informado)';
