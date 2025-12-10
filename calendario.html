@@ -96,13 +96,13 @@
                             <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label><input type="text" id="client-street" required oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
                             <div class="w-24"><label class="block text-sm font-medium text-gray-700 mb-1">Nº</label><input type="number" id="client-number" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Nº"></div>
                         </div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência (Obrigatório)</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes da casa exemplo sobrado cinza na frente de..."></textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes da casa exemplo sobrado cinza na frente de..."></textarea></div>
                         
                         <!-- Horários -->
                         <div class="flex flex-col">
                             <div class="flex space-x-2">
-                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Início (Obrigatório)</label><select id="event-start-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
-                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Término (Obrigatório)</label><select id="event-end-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
+                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Início</label><select id="event-start-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
+                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Término</label><select id="event-end-time" required onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
                             </div>
                             <div id="time-fee-warning" class="text-xs text-red-600 mt-1 hidden font-normal"></div>
                         </div>
@@ -191,7 +191,7 @@
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
         
-        // DADOS ESTÁTICOS INSERIDOS DIRETAMENTE NO CÓDIGO
+        // DADOS ESTÁTICOS
         const staticData = {
           "brinquedos": [
             { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "needsPower": false, "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX2Tga0PM2k0Z1rIWz2bIW73rW1VFIkDCYPg&s" },
@@ -384,31 +384,18 @@
             if (insuranceFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Seguro Adicional:</span><span>R$ ${insuranceFee.toFixed(2).replace('.', ',')}</span></div>`;
         }
         
+        // FUNÇÃO DE VALIDAÇÃO (VISUAL) - Define quando o botão fica azul
         window.validateForm = function() {
             if (currentStep !== 'checkout') return true; 
             const name = document.getElementById('client-name').value.trim();
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value.trim();
-            const reference = document.getElementById('client-reference').value.trim(); 
-            const startTime = document.getElementById('event-start-time').value;
-            const endTime = document.getElementById('event-end-time').value; 
+            // Ponto de Referência é visualmente opcional para o botão ativar, mas recomendado
             
-            // Verifica os campos básicos OBRIGATÓRIOS
-            if (name === "" || neighborhood === "" || street === "" || reference === "" || startTime === "" || endTime === "") {
+            // Requer apenas o básico para "acender" o botão
+            if (name === "" || neighborhood === "" || street === "") {
                 return false;
             }
-            
-            // Verifica os campos de distância da tomada (obrigatório se o brinquedo precisar de energia)
-            const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
-            let powerInputsValid = true;
-            powerInputs.forEach(input => {
-                 if (!input.value || parseInt(input.value) > 20) { 
-                     powerInputsValid = false;
-                 }
-            });
-            
-            if (!powerInputsValid) { return false; }
-
             return true;
         }
         
@@ -439,27 +426,24 @@
             
             const isValid = validateForm();
             
-            // --- CORREÇÃO APLICADA AQUI ---
+            // LÓGICA DO BOTÃO: Se é válido (azul), ele HABILITA o clique.
             if (currentStep === 'checkout' && isValid) {
-                // Se for a etapa de checkout e a validação for positiva, remove disabled e pinta de azul
-                actionButton.disabled = false;
-                actionButton.classList.remove('bg-gray-400');
-                actionButton.classList.add('bg-primary');
+                actionButton.disabled = false; // Garante que está clicável
+                actionButton.removeAttribute('disabled');
+                actionButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                actionButton.classList.add('bg-primary', 'cursor-pointer');
                 actionButton.innerText = `Confirmar Reserva`; 
             } else if (totalItems > 0 && currentStep === 'selection') {
-                // Se for a etapa de seleção e tiver itens, ele continua para o checkout
                 actionButton.disabled = false;
                 actionButton.classList.remove('bg-gray-400');
                 actionButton.classList.add('bg-primary');
                 actionButton.innerText = `Continuar Agendamento`;
             } else {
-                // Caso contrário (sem itens ou checkout inválido), desabilita
                 actionButton.disabled = true;
-                actionButton.classList.add('bg-gray-400');
-                actionButton.classList.remove('bg-primary');
-                if (currentStep === 'checkout') actionButton.innerText = `Confirmar Reserva`; 
+                actionButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                actionButton.classList.remove('bg-primary', 'cursor-pointer');
+                if (currentStep === 'checkout') actionButton.innerText = `Preencha os dados`; 
             }
-            // --- FIM DA CORREÇÃO ---
             
             if (document.getElementById('total-summary-rows')) window.updateCheckoutSummary();
             
@@ -554,68 +538,34 @@
             } else if (currentStep === 'checkout') { window.submitOrder(); }
         }
 
+        // ENVIO DO WHATSAPP SEM BLOQUEIOS
         window.submitOrder = function() {
-            if (!validateForm()) {
-                const name = document.getElementById('client-name').value.trim();
-                const neighborhood = document.getElementById('client-neighborhood').value;
-                const street = document.getElementById('client-street').value.trim();
-                const reference = document.getElementById('client-reference').value.trim(); 
-                const startTime = document.getElementById('event-start-time').value;
-                const endTime = document.getElementById('event-end-time').value;
-                const invoiceChecked = document.getElementById('request-invoice').checked;
-                const cnpj = document.getElementById('client-cnpj').value;
-                
-                let missing = [];
-                if (!name) missing.push("Nome Completo");
-                if (!neighborhood) missing.push("Bairro de Entrega");
-                if (!street) missing.push("Nome da Rua");
-                if (!reference) missing.push("Ponto de Referência (Detalhes da Casa)");
-                if (!startTime) missing.push("Horário de Início");
-                if (!endTime) missing.push("Horário de Término");
-
-                const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
-                let powerInputsInvalid = false;
-                powerInputs.forEach(input => {
-                    const label = input.previousElementSibling.innerText;
-                    if (!input.value) { missing.push(`Distância da Tomada: ${label}`); powerInputsInvalid = true; }
-                    if (parseInt(input.value) > 20) { missing.push(`Distância da Tomada (${label}) deve ser menor que 20m.`); powerInputsInvalid = true; }
-                });
-
-                if (invoiceChecked && (!cnpj || !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj))) { missing.push("CNPJ (Inválido)"); }
-
-                if (missing.length > 0) {
-                     const alertMessage = "🚨 Por favor, preencha/corrija os seguintes campos obrigatórios para continuar:\n- " + missing.join("\n- ");
-                     console.error(alertMessage); 
-                     // Usamos um alerta simulado para o usuário
-                     window.alert(alertMessage.substring(0, 150) + '...');
-                     return;
-                }
-                return;
-            }
-
+            // Removemos o 'return' que bloqueava o envio. Agora ele SEMPRE tenta enviar se o botão foi clicado.
+            
             const name = document.getElementById('client-name').value;
             const neighborhood = document.getElementById('client-neighborhood').value;
             const street = document.getElementById('client-street').value;
             const number = document.getElementById('client-number').value || 'S/N';
-            const eventStartTime = document.getElementById('event-start-time').value;
-            const eventEndTime = document.getElementById('event-end-time').value;
+            const eventStartTime = document.getElementById('event-start-time').value || '(Não def.)';
+            const eventEndTime = document.getElementById('event-end-time').value || '(Não def.)';
             const insuranceChecked = document.getElementById('additional-insurance').checked;
             const deliveryDayBeforeSelect = document.getElementById('delivery-day-before').value;
             const invoiceChecked = document.getElementById('request-invoice').checked;
             const cnpj = document.getElementById('client-cnpj').value;
             const rainProtection = document.getElementById('rain-protection')?.checked;
             const coupon = document.getElementById('discount-coupon').value;
-            const reference = document.getElementById('client-reference').value; // Ponto de Referência
+            const reference = document.getElementById('client-reference').value || '(Não informado)'; // Ponto de Referência Opcional no envio
 
             const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
             let powerDetails = "";
             for (let input of powerInputs) {
                 const label = input.previousElementSibling.innerText;
-                powerDetails += `⚡ ${label}: ${input.value}m\n`;
+                const val = input.value ? input.value + 'm' : '(Não inf.)';
+                powerDetails += `⚡ ${label}: ${val}\n`;
             }
 
             const { details, total } = window.getSelectedItemDetails();
-            let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n🗒️ Ref: ${reference || 'N/A'}\n📄 CNPJ: ${invoiceChecked ? (cnpj || 'Não informado') : 'Não Solicitado'}\n⏰ Horário: ${eventStartTime}:00 - ${eventEndTime}:00\n🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
+            let orderSummary = `*NOVO AGENDAMENTO*\n📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')}\n👤 Nome: ${name}\n📍 Local: ${street}, ${number} - ${neighborhood}\n🗒️ Ref: ${reference}\n📄 CNPJ: ${invoiceChecked ? (cnpj || 'Não informado') : 'Não Solicitado'}\n⏰ Horário: ${eventStartTime}:00 - ${eventEndTime}:00\n🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
             if (coupon) orderSummary += `🎟️ Cupom: ${coupon}\n`;
             const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
             if (isBallPitIncluded) orderSummary += `🌧 Piscina Coberta: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
@@ -631,8 +581,11 @@
             details.forEach(item => { orderSummary += `• ${item.quantity}x ${item.name}\n`; });
             const finalTotalText = document.getElementById('total-price-display').innerText;
             orderSummary += `\n💰 *TOTAL: ${finalTotalText}*`;
+            
+            // Abre o WhatsApp direto
             window.open(`https://wa.me/5547992277324?text=${encodeURIComponent(orderSummary)}`, '_blank');
-            window.closeToysPanel(); window.changeStep('selection'); 
+            window.closeToysPanel(); 
+            window.changeStep('selection'); 
         }
         
         window.openToysPanel = function(day, month, year) {
@@ -709,7 +662,6 @@
         function updateNotificationCount(count) { const elements = document.querySelectorAll('.notification-counter'); const markAllButton = document.getElementById('mark-all-button'); if (markAllButton) { if (count > 0) { markAllButton.classList.remove('opacity-50', 'pointer-events-none'); markAllButton.innerText = "Marcar todas como lidas"; markAllButton.disabled = false; } else { markAllButton.classList.add('opacity-50', 'pointer-events-none'); markAllButton.innerText = "Nenhuma nova notificação"; markAllButton.disabled = true; } } elements.forEach(el => { if (count > 0) { el.classList.remove('hidden'); el.innerText = count > 9 ? '9+' : count; } else { el.classList.add('hidden'); } }); }
         function renderNotifications() { const panelList = document.getElementById('notification-list'); const loadingIndicator = document.getElementById('loading-notifications'); if (loadingIndicator) loadingIndicator.classList.add('hidden'); const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id))); updateNotificationCount(unreadItems.length); if (!isPanelOpen) return; panelList.innerHTML = ''; if (unreadItems.length === 0) { panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>'; return; } unreadItems.forEach(notificacao => { const li = document.createElement('li'); const bgClass = 'bg-blue-700 hover:bg-blue-800'; const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨'; const hasLink = `cursor-pointer active:scale-[0.98]`; li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`; if (notificacao.link) { li.onclick = () => window.navigateTo(notificacao.link); } const dataFormatada = isNaN(new Date(notificacao.data)) ? notificacao.data : new Date(notificacao.data).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); li.innerHTML = `<div class="flex flex-col items-center gap-2"><div class="text-4xl mb-2">${icon}</div><div class="flex-grow text-center"><h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4><p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p><span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span></div><button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 relative">Marcar como Lida</button></div>`; panelList.appendChild(li); }); }
         
-        // Mantém o fetch apenas para notificações, como solicitado
         async function fetchNotifications() { try { const response = await fetch('notificacoes.json'); if (response.ok) { notificationsData = (await response.json()).map(item => ({ ...item, id: String(item.id) })); renderNotifications(); } else { console.warn("Arquivo notificacoes.json não encontrado."); } } catch (error) { console.error("Erro ao buscar notificações:", error); } }
         async function setupNotificationListener() { if (!isAuthReady || !userId) return; unsubscribeNotifications = onSnapshot(getReadNotificationsCollection(userId), (snapshot) => { let hasChanges = false; snapshot.docs.forEach(doc => { if (!readNotificationsIds.has(doc.id)) { readNotificationsIds.add(doc.id); hasChanges = true; } }); if (hasChanges) { updateLocalCache(); renderNotifications(); } }, (error) => { console.error("Erro Firestore:", error); }); }
         
