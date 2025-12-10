@@ -262,7 +262,7 @@
                     <form onsubmit="event.preventDefault(); validateCoupon();">
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2">Nome Completo</label>
-                            <input type="text" id="coupon-name" class="shadow appearance-none border rounded-xl w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Seu nome" required>
+                            <input type="text" id="coupon-name" maxlength="70" class="shadow appearance-none border rounded-xl w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="SEU NOME" oninput="this.value = this.value.toUpperCase(); if(this.value.split(' ').length > 6) { this.value = this.value.split(' ').slice(0, 6).join(' '); }" required>
                         </div>
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2">Telefone (DDD + Número)</label>
@@ -271,11 +271,11 @@
                         <div class="mb-4 flex gap-4">
                             <div class="w-2/3">
                                 <label class="block text-gray-700 text-sm font-bold mb-2">Rua / Avenida</label>
-                                <input type="text" id="coupon-street" class="shadow appearance-none border rounded-xl w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Rua das Festas" required>
+                                <input type="text" id="coupon-street" class="shadow appearance-none border rounded-xl w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="RUA DAS FESTAS" oninput="this.value = this.value.toUpperCase()" required>
                             </div>
                             <div class="w-1/3">
                                 <label class="block text-gray-700 text-sm font-bold mb-2">Número</label>
-                                <input type="text" id="coupon-number" class="shadow appearance-none border rounded-xl w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="101" inputmode="numeric" required>
+                                <input type="text" id="coupon-number" class="shadow appearance-none border rounded-xl w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="101" inputmode="numeric" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)" required>
                             </div>
                         </div>
                         
@@ -325,10 +325,10 @@
                         <div id="copy-feedback" class="h-4 mt-1 text-xs font-bold text-green-600 opacity-0 transition-opacity">Copiado!</div>
                     </div>
 
-                    <!-- MUDANÇA: Agora chama useCoupon() -->
-                    <button onclick="useCoupon()" class="bg-primary text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition duration-200 w-full active:scale-95 uppercase tracking-wide text-sm">
-                        Usar Agora
+                    <button onclick="closeCouponModal()" class="text-gray-500 font-bold hover:text-gray-800 underline text-sm transition mt-2 w-full text-center">
+                        Voltar
                     </button>
+
                 </div>
 
             </div>
