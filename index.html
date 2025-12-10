@@ -606,12 +606,7 @@
                             const dbStreetWords = getSignificantWords(item.street);
                             const hasCommonStreetWord = inputStreetWords.some(word => dbStreetWords.includes(word));
                             if (hasCommonStreetWord) {
-                                isValid = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!isValid && item.street && item.name) {
+                    if (isValid && item.street && item.name) {
                         const dbStreetWords = getSignificantWords(item.street);
                         const dbNameWords = getSignificantWords(item.name);
                         const hasCommonStreetWord = inputStreetWords.some(word => dbStreetWords.includes(word));
@@ -628,6 +623,12 @@
                         const newCode = generateRandomCoupon();
                         document.getElementById('coupon-code-display').innerText = newCode;
                         showCouponStep('result');
+                        
+                        // VIBRAR O DISPOSITIVO QUANDO O CÓDIGO APARECE (Padrão: Vibra 100ms, Pausa 50ms, Vibra 100ms)
+                        if (navigator.vibrate) {
+                            navigator.vibrate([100, 50, 100]);
+                        }
+
                     } else {
                         document.getElementById('coupon-step-loading').classList.add('hidden');
                         document.getElementById('coupon-step-form').classList.remove('hidden');
