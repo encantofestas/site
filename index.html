@@ -121,6 +121,18 @@
         .faq-item[open] .faq-summary svg {
             transform: rotate(180deg);
         }
+
+        /* Classes para forçar 2 linhas e corte de texto no mobile */
+        .clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            height: 2.6rem; /* Altura fixa para garantir alinhamento */
+            line-height: 1.3rem;
+        }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -212,23 +224,22 @@
         </section>
 
         <!-- SEÇÃO: COMO FAZER SUA RESERVA -->
-        <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden relative">
+        <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden relative mt-10">
             <div class="flex items-center justify-center gap-2 mb-4">
                 <h2 class="text-2xl font-bold brand-font text-blue-600 text-center">Como fazer sua reserva</h2>
             </div>
 
             <!-- Container Scroll Horizontal -->
-            <!-- Removi 'snap-x snap-mandatory' daqui inicialmente para a animação JS funcionar liso -->
-            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2">
+            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2 snap-x snap-mandatory">
                 
                 <!-- Passo 1 -->
-                <a href="#faq-section" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer flex-shrink-0 snap-center">
+                <a href="#faq-section" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-blue-200">
                         🤔
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-blue-700 leading-tight">1. Tire suas dúvidas</h3>
-                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full clamp-2">Clique aqui para ver possíveis perguntas antes de começar.</p>
+                        <p class="text-xs text-gray-500 mt-1 leading-tight">Clique aqui para ver possíveis<br>perguntas antes de começar.</p>
                     </div>
                     <div class="text-blue-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -236,13 +247,13 @@
                 </a>
 
                 <!-- Passo 2 -->
-                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-yellow-300 group cursor-pointer flex-shrink-0 snap-center">
+                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-yellow-300 group cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 bg-yellow-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-yellow-200">
                         🗓️
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-yellow-700 leading-tight">2. Verificar disponibilidade</h3>
-                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full clamp-2">Clique aqui para ver as datas livres no calendário.</p>
+                        <p class="text-xs text-gray-500 mt-1 leading-tight">Clique em "Ver disponibilidade"<br>e veja as datas livres.</p>
                     </div>
                     <div class="text-yellow-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -250,24 +261,24 @@
                 </div>
 
                 <!-- Passo 3 -->
-                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-green-300 group cursor-default flex-shrink-0 snap-center">
+                <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-green-300 group cursor-default flex-shrink-0">
                     <div class="w-16 h-16 bg-green-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-green-200">
                         📝
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-green-700 leading-tight">3. Preencha o formulário</h3>
-                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full clamp-2">É simples! Ao terminar, você será redirecionado ao WhatsApp.</p>
+                        <p class="text-xs text-gray-500 mt-1 leading-tight">Ao terminar, você será redirecionado<br>ao nosso WhatsApp para confirmar.</p>
                     </div>
                 </div>
 
                 <!-- Passo 4 -->
-                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-pink-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-pink-300 group cursor-default flex-shrink-0 snap-center">
+                <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-pink-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-pink-300 group cursor-default flex-shrink-0">
                     <div class="w-16 h-16 bg-pink-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-pink-200">
                         😎
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-pink-700 leading-tight">4. Viu como é fácil?</h3>
-                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full clamp-2">Tudo isso é feito 100% pelo nosso site, rápido e seguro.</p>
+                        <p class="text-xs text-gray-500 mt-1 leading-tight">Tudo isso é feito 100% pelo nosso<br>site, rápido e seguro.</p>
                     </div>
                 </div>
 
@@ -282,13 +293,14 @@
         </section>
         
         <!-- SEÇÃO: PROMOÇÃO CUPOM FIDELIDADE (PULSANDO) -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
+        <section class="px-4 max-w-7xl mx-auto mb-10 mt-10">
             <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between text-blue-900 overflow-hidden relative promo-pulse">
                 <!-- Efeito brilho fundo -->
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-white opacity-20 blur-2xl"></div>
                 
                 <div class="text-center md:text-left mb-4 md:mb-0 relative z-10">
-                    <h3 class="font-extrabold text-2xl brand-font leading-tight text-white drop-shadow-md">Já é cliente? Ganhe 20% OFF</h3>
+                    <!-- Título do cupom com OFF removido -->
+                    <h3 class="font-extrabold text-2xl brand-font leading-tight text-white drop-shadow-md">Já é cliente? Ganhe 20%</h3>
                     <p class="text-sm font-semibold mt-1 text-yellow-50 opacity-90">Validação rápida. Desconto na hora!</p>
                 </div>
                 <button onclick="showCouponModal()" class="relative z-10 bg-white text-yellow-700 hover:bg-yellow-50 font-bold py-3 px-6 rounded-full shadow-lg transition transform active:scale-95 text-sm w-full md:w-auto border-2 border-yellow-200">
@@ -298,7 +310,7 @@
         </section>
 
         <!-- SEÇÃO: WIDGET TAGGBOX (FEED SOCIAL) -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
+        <section class="px-4 max-w-7xl mx-auto mb-10 mt-10">
             <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">O que Acham da Encanto</h2>
             <!-- Altura ajustada: 350px no mobile / 600px no desktop -->
             <div class="w-full h-[350px] md:h-[600px] rounded-2xl overflow-hidden shadow-sm border border-gray-100">
@@ -308,7 +320,7 @@
 
         <!-- SEÇÃO DO MAPA (LOCALIZAÇÃO FÍSICA) -->
         <section class="px-4 max-w-7xl mx-auto mb-10">
-            <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Onde nos Encontrar?</h2>
+            <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Localização</h2>
             
             <div class="bg-white rounded-2xl shadow-xl p-0 md:p-0 border border-gray-100 overflow-hidden">
                 
@@ -337,7 +349,7 @@
         </section>
 
         <!-- NOVO: SEÇÃO DE PERGUNTAS FREQUENTES (FAQ) -->
-        <section id="faq-section" class="px-4 max-w-7xl mx-auto mb-10">
+        <section id="faq-section" class="px-4 max-w-7xl mx-auto mb-10 mt-10">
             <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Perguntas Frequentes</h2>
             
             <div id="faq-container" class="space-y-4">
@@ -949,9 +961,9 @@
                 let animationFrameId;
                 let isUserInteracting = false;
                 let scrollDirection = 1; // 1 = direita, -1 = esquerda
-                const targetScroll = slider.clientWidth * 0.4; // 40% da largura - quanto vai para o lado
-                const duration = 2000; // Duração da ida (2 segundos)
-                const pauseDuration = 100; // Pausa rápida antes de voltar
+                const targetScroll = slider.clientWidth * 0.4; // 40% da largura
+                const duration = 2000; // 2 segundos para ir
+                const pauseDuration = 100; // 100ms de pausa entre movimentos
                 let startTime = null;
                 let state = 'forward'; // Estados: 'forward', 'pause-after-forward', 'backward', 'pause-after-backward'
                 let startScrollLeft = 0;
@@ -985,7 +997,7 @@
                         } else {
                             state = 'backward';
                             startTime = null;
-                            startScrollLeft = slider.scrollLeft;
+                            startScrollLeft = slider.scrollLeft; // Posição máxima atingida
                             animationFrameId = requestAnimationFrame(animate);
                         }
                     } else if (state === 'backward') {
@@ -1022,7 +1034,6 @@
                     if (animationFrameId) cancelAnimationFrame(animationFrameId);
                     
                     // IMPORTANTE: Adiciona o comportamento de SNAP (trava) apenas quando o usuário interage
-                    // Isso permite que a animação seja suave (sem snap) e a navegação manual seja precisa (com snap)
                     slider.classList.add('snap-x', 'snap-mandatory');
                 };
 
