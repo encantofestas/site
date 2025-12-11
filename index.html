@@ -121,6 +121,18 @@
         .faq-item[open] .faq-summary svg {
             transform: rotate(180deg);
         }
+
+        /* Classes para forçar 2 linhas e corte de texto no mobile */
+        .clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            height: 2.6rem; /* Altura fixa para garantir alinhamento */
+            line-height: 1.3rem;
+        }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -211,14 +223,13 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: COMO FAZER SUA RESERVA (MOVIMENTO SIMULADO "NUDGE") -->
+        <!-- SEÇÃO: COMO FAZER SUA RESERVA -->
         <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden relative">
             <div class="flex items-center justify-center gap-2 mb-4">
                 <h2 class="text-2xl font-bold brand-font text-blue-600 text-center">Como fazer sua reserva</h2>
             </div>
 
             <!-- Container Scroll Horizontal -->
-            <!-- Nota: Snap-x ajuda a alinhar, mas o JS vai controlar a animação inicial -->
             <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2 snap-x snap-mandatory">
                 
                 <!-- Passo 1 -->
@@ -228,7 +239,7 @@
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-blue-700 leading-tight">1. Tire suas dúvidas</h3>
-                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full">Clique aqui para ver possíveis perguntas antes de começar.</p>
+                        <p class="text-xs text-gray-500 mt-1 clamp-2">Clique aqui para ver possíveis perguntas antes de começar.</p>
                     </div>
                     <div class="text-blue-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -242,7 +253,7 @@
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-yellow-700 leading-tight">2. Verificar disponibilidade</h3>
-                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full">Clique aqui para ver as datas livres no calendário.</p>
+                        <p class="text-xs text-gray-500 mt-1 clamp-2">Clique aqui para ver as datas livres no calendário.</p>
                     </div>
                     <div class="text-yellow-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -256,7 +267,7 @@
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-green-700 leading-tight">3. Preencha o formulário</h3>
-                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full">É simples! Ao terminar, você será redirecionado ao WhatsApp.</p>
+                        <p class="text-xs text-gray-500 mt-1 clamp-2">É simples! Ao terminar, você será redirecionado ao WhatsApp.</p>
                     </div>
                 </div>
 
@@ -267,7 +278,7 @@
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-pink-700 leading-tight">4. Viu como é fácil?</h3>
-                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full">Tudo isso é feito 100% pelo nosso site, rápido e seguro.</p>
+                        <p class="text-xs text-gray-500 mt-1 clamp-2">Tudo isso é feito 100% pelo nosso site, rápido e seguro.</p>
                     </div>
                 </div>
 
@@ -327,15 +338,15 @@
             </div>
         </section>
 
-        <!-- NOVO: SEÇÃO DE PERGUNTAS FREQUENTES (FAQ) -->
+        <!-- NOVO: SEÇÃO DE PERGUNTAS FREQUENTES (FAQ - REVERTIDA ESTRUTURADA) -->
         <section id="faq-section" class="px-4 max-w-7xl mx-auto mb-10">
             <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Perguntas Frequentes</h2>
             
             <div id="faq-container" class="space-y-4">
 
-                <!-- PERGUNTAS GERAIS E DÚVIDAS -->
+                <!-- GRUPO 1: RESERVA E CANCELAMENTO -->
                 <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-primary">
-                    <h3 class="text-xl font-bold brand-font text-primary mb-3">Dúvidas Frequentes ❓</h3>
+                    <h3 class="text-xl font-bold brand-font text-primary mb-3">Reserva e Cancelamento 🗓️</h3>
                     
                     <details class="faq-item border-b pb-3 pt-2">
                         <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-primary active:scale-[0.99]">
@@ -353,24 +364,14 @@
                             <svg class="w-5 h-5 ml-2 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
                         <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
-                            <p>Apenas os 25 reais da reserva não são devolvidos, pois o brinquedo reservado poderia ter sido locado para outra pessoa. No entanto, o valor de 25 reais pode ser usado em outra locação se a nova reserva for feita em até 30 dias.</p>
-                        </div>
-                    </details>
-
-                    <details class="faq-item border-b pb-3 pt-2">
-                        <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-primary active:scale-[0.99]">
-                            <span>Vocês montam e desmontam os brinquedos?</span>
-                            <svg class="w-5 h-5 ml-2 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                        </summary>
-                        <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
-                            <p>Sim, a montagem e a desmontagem são realizadas pela equipe da Encanto Festas. O tempo médio de montagem é de 20 minutos para cama elástica e 10 minutos para infláveis.</p>
+                            <p>Apenas a taxa de reserva (R$ 25) não é devolvida, pois o brinquedo reservado poderia ter sido locado para outra pessoa. No entanto, o valor de 25 reais pode ser usado em outra locação se a nova reserva for feita em até 30 dias.</p>
                         </div>
                     </details>
                 </div>
 
-                <!-- GRUPO 2: ENTREGA E SEGURANÇA -->
+                <!-- GRUPO 2: ENTREGA E LOGÍSTICA -->
                 <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-secondary">
-                    <h3 class="text-xl font-bold brand-font text-yellow-700 mb-3">Entrega e Segurança 🛡️</h3>
+                    <h3 class="text-xl font-bold brand-font text-yellow-700 mb-3">Entrega e Logística 🚚</h3>
 
                     <details class="faq-item border-b pb-3 pt-2">
                         <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-yellow-700 active:scale-[0.99]">
@@ -378,72 +379,82 @@
                             <svg class="w-5 h-5 ml-2 text-yellow-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
                         <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
-                            <p>As entregas começam a partir das 09h30. São geralmente realizadas de 1 a 2 horas antes do evento começar. Em alguns casos, a entrega pode ser feita um dia antes, mas isso não é garantido.</p>
+                            <p>Começamos as rotas às 09h30! Normalmente entregamos de 1 a 2 horas antes da festa começar para deixar tudo perfeito. Em alguns casos especiais, podemos até levar um dia antes! 🚚💨</p>
                         </div>
                     </details>
 
                     <details class="faq-item border-b pb-3 pt-2">
                         <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-yellow-700 active:scale-[0.99]">
-                            <span>Quais bairros/cidades vocês entregam?</span>
+                            <span>E se chover no dia?</span>
                             <svg class="w-5 h-5 ml-2 text-yellow-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
                         <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
-                            <p>Atendemos todos os bairros de São Francisco do Sul, exceto Vila da Glória. Não entregamos em Araquari ou Joinville atualmente, mas há planos de expandir a base futuramente.</p>
-                        </div>
-                    </details>
-                    
-                    <details class="faq-item border-b pb-3 pt-2">
-                        <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-yellow-700 active:scale-[0.99]">
-                            <span>O brinquedo é seguro para crianças pequenas?</span>
-                            <svg class="w-5 h-5 ml-2 text-yellow-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                        </summary>
-                        <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
-                            <p>A maioria dos brinquedos não é recomendada para crianças pequenas. É recomendado o Mini Baby Inflável e a Área Baby, que são adequados para essa faixa etária.</p>
+                            <p>O valor da reserva não é devolvido em cima da hora por conta da chuva. Mas, se você cancelar com mais de 5 dias de antecedência (tempo ideal para conferir a previsão), conseguimos resolver! ☔⛈️</p>
                         </div>
                     </details>
                 </div>
 
-                <!-- GRUPO 3: FINANCEIRO E CONDIÇÕES -->
+                <!-- GRUPO 3: SEGURANÇA E PAGAMENTO -->
                 <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-green-500">
-                    <h3 class="text-xl font-bold brand-font text-green-700 mb-3">Financeiro e Condições 💰</h3>
+                    <h3 class="text-xl font-bold brand-font text-green-700 mb-3">Segurança e Pagamento 💳</h3>
                     
                     <details class="faq-item border-b pb-3 pt-2">
                         <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-green-700 active:scale-[0.99]">
-                            <span>Quais formas de pagamento são aceitas?</span>
+                            <span>O brinquedo é seguro para crianças pequenas?</span>
                             <svg class="w-5 h-5 ml-2 text-green-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
                         <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
-                            <p>Aceitamos Pix, Cartão de Crédito ou Dinheiro. Os 25 reais são pagos na reserva, e o restante é pago no dia da montagem do brinquedo, não na retirada.</p>
+                            <p>A maioria dos brinquedos não é recomendada para crianças pequenas. Sugerimos sempre o Mini Baby Inflável e a Área Baby para total segurança e diversão dos menorzinhos! 👶</p>
                         </div>
                     </details>
 
+                    <details class="faq-item border-b pb-3 pt-2">
+                        <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-green-700 active:scale-[0.99]">
+                            <span>Quais bairros/cidades vocês entregam?</span>
+                            <svg class="w-5 h-5 ml-2 text-green-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
+                            <p>Atendemos todos os bairros de **São Francisco do Sul**, exceto Vila da Glória. Não entregamos atualmente em Araquari ou Joinville, mas temos planos de expandir nossa base! 🗺️</p>
+                        </div>
+                    </details>
+                    
+                    <details class="faq-item border-b pb-3 pt-2">
+                        <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-green-700 active:scale-[0.99]">
+                            <span>Vocês montam e desmontam os brinquedos?</span>
+                            <svg class="w-5 h-5 ml-2 text-green-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
+                            <p>Sim! A montagem e a desmontagem são totalmente por conta da Encanto Festas. Levamos cerca de 20 minutos para camas elásticas e 10 minutos para infláveis. É super rápido! 💪</p>
+                        </div>
+                    </details>
+                    
                     <details class="faq-item border-b pb-3 pt-2">
                         <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-green-700 active:scale-[0.99]">
                             <span>O brinquedo vem limpo?</span>
                             <svg class="w-5 h-5 ml-2 text-green-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
                         <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
-                            <p>O brinquedo nem sempre virá totalmente limpo, mas a limpeza é feita na medida do possível, pois os itens geralmente vêm da casa de outros clientes. Podem conter avarias básicas a médias.</p>
-                        </div>
-                    </details>
-                    
-                    <details class="faq-item border-b pb-3 pt-2">
-                        <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-green-700 active:scale-[0.99]">
-                            <span>E se chover no dia?</span>
-                            <svg class="w-5 h-5 ml-2 text-green-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                        </summary>
-                        <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
-                            <p>Caso chova, o valor também não é devolvido, a menos que o cancelamento seja feito com mais de 5 dias de antecedência do evento, tempo que permite verificar a previsão do tempo com segurança.</p>
+                            <p>Fazemos o possível, mas nem sempre o brinquedo chega perfeitamente limpo, pois geralmente acabam de vir da festa de outros clientes. Podem apresentar avarias (desgaste) básicas a médias, mas a diversão é garantida! ✨</p>
                         </div>
                     </details>
 
-                    <details class="faq-item pb-3 pt-2">
+                    <details class="faq-item border-b pb-3 pt-2">
                         <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-green-700 active:scale-[0.99]">
                             <span>Vocês emitem nota fiscal?</span>
                             <svg class="w-5 h-5 ml-2 text-green-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
                         <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
-                            <p>Sim, a nota fiscal é emitida. Basta fazer o agendamento normalmente no site, onde será solicitado o CNPJ para emissão do documento.</p>
+                            <p>Sim, a Nota Fiscal é emitida! Basta fazer o agendamento normalmente pelo site; durante o processo, você poderá informar o CNPJ para a emissão correta do documento. 🧾</p>
+                        </div>
+                    </details>
+                    
+                    <details class="faq-item pb-3 pt-2">
+                        <summary class="faq-summary flex justify-between items-center cursor-pointer text-base font-semibold text-gray-700 hover:text-green-700 active:scale-[0.99]">
+                            <span>Quais formas de pagamento são aceitas?</span>
+                            <svg class="w-5 h-5 ml-2 text-green-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="faq-content text-gray-600 mt-2 pl-4 text-sm">
+                            <p>Aceitamos **Pix, Cartão de Crédito ou Dinheiro**. Lembre-se: os R$ 25 da reserva são pagos antecipadamente, e o restante do valor é pago no dia da montagem, após a entrega dos brinquedos. 💳💵</p>
                         </div>
                     </details>
                 </div>
@@ -932,37 +943,101 @@
             fetchNotifications();
             initializeFirebaseAndAuth();
             
-            // Lógica de Scroll "Nudge" (Dica de rolagem única) no Mobile
+            // Lógica de Scroll "Nudge" Infinito no Mobile (Bem Suave e Contínuo)
             const slider = document.getElementById('steps-slider');
             
             // Só ativa se estiver em mobile (ou tela pequena)
             if (window.innerWidth < 768) {
-                let nudgeTimer;
+                let animationFrameId;
+                let isUserInteracting = false;
+                let scrollDirection = 1; // 1 = direita, -1 = esquerda
+                const targetScroll = slider.clientWidth * 0.4; // 40% da largura
+                const duration = 2000; // 2 segundos para ir
+                const pauseDuration = 1000; // 1 segundo de pausa
+                let startTime = null;
+                let state = 'forward'; // 'forward', 'pause-after-forward', 'backward', 'pause-after-backward'
+                let startScrollLeft = 0;
+
+                // Função de Easing (Quadratic Ease-In-Out) para suavidade extra
+                const easeInOutQuad = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+                const animate = (currentTime) => {
+                    if (isUserInteracting) {
+                        // Se o usuário interagir, para a animação atual
+                        return; 
+                    }
+
+                    if (!startTime) startTime = currentTime;
+                    const elapsed = currentTime - startTime;
+
+                    if (state === 'forward') {
+                        const progress = Math.min(elapsed / duration, 1);
+                        const ease = easeInOutQuad(progress);
+                        slider.scrollLeft = startScrollLeft + (targetScroll * ease);
+
+                        if (progress < 1) {
+                            animationFrameId = requestAnimationFrame(animate);
+                        } else {
+                            state = 'pause-after-forward';
+                            startTime = null;
+                            animationFrameId = requestAnimationFrame(animate);
+                        }
+                    } else if (state === 'pause-after-forward') {
+                        if (elapsed < pauseDuration) {
+                            animationFrameId = requestAnimationFrame(animate);
+                        } else {
+                            state = 'backward';
+                            startTime = null;
+                            startScrollLeft = slider.scrollLeft; // Deve ser targetScroll
+                            animationFrameId = requestAnimationFrame(animate);
+                        }
+                    } else if (state === 'backward') {
+                        const progress = Math.min(elapsed / duration, 1);
+                        const ease = easeInOutQuad(progress);
+                        // Volta para 0
+                        slider.scrollLeft = startScrollLeft - (startScrollLeft * ease);
+
+                        if (progress < 1) {
+                            animationFrameId = requestAnimationFrame(animate);
+                        } else {
+                            state = 'pause-after-backward';
+                            startTime = null;
+                            animationFrameId = requestAnimationFrame(animate);
+                        }
+                    } else if (state === 'pause-after-backward') {
+                        if (elapsed < 2000) { // Pausa maior no início (2s)
+                            animationFrameId = requestAnimationFrame(animate);
+                        } else {
+                            state = 'forward';
+                            startTime = null;
+                            startScrollLeft = 0;
+                            animationFrameId = requestAnimationFrame(animate);
+                        }
+                    }
+                };
+
+                // Inicia o loop
+                animationFrameId = requestAnimationFrame(animate);
+
+                // Para a animação se o usuário interagir
+                const stopAnimation = () => {
+                    isUserInteracting = true;
+                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                };
+
+                // Opcional: Retomar se soltar (descomente se quiser)
+                /* const resumeAnimation = () => {
+                    isUserInteracting = false;
+                    startTime = null; // Reinicia o timer do estado atual
+                    animationFrameId = requestAnimationFrame(animate);
+                };
+                */
+
+                slider.addEventListener('touchstart', stopAnimation, { passive: true });
+                slider.addEventListener('mousedown', stopAnimation);
                 
-                const startNudge = () => {
-                    // Espera 2 segundos após carregar, e então dá a "espiadinha"
-                    nudgeTimer = setTimeout(() => {
-                        // Rola 40% da largura do cartão para a direita (simulando "ir")
-                        // Usamos smooth para ser suave
-                        slider.scrollTo({ left: slider.clientWidth * 0.4, behavior: 'smooth' });
-                        
-                        // Espera 1 segundo na posição "espiada" e volta
-                        setTimeout(() => {
-                            slider.scrollTo({ left: 0, behavior: 'smooth' });
-                        }, 1000);
-                    }, 2000);
-                };
-
-                startNudge();
-
-                // Para a animação se o usuário interagir (tocar/arrastar)
-                const stopNudge = () => {
-                    clearTimeout(nudgeTimer);
-                    // Não precisamos forçar nada, o navegador assume o controle do scroll
-                };
-
-                slider.addEventListener('touchstart', stopNudge, { passive: true });
-                slider.addEventListener('mousedown', stopNudge); // para teste desktop
+                // slider.addEventListener('touchend', resumeAnimation);
+                // slider.addEventListener('mouseup', resumeAnimation);
             }
         });
     </script>
