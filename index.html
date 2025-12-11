@@ -211,23 +211,24 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: COMO FAZER SUA RESERVA (MOVIMENTO VAI E VEM) -->
+        <!-- SEÇÃO: COMO FAZER SUA RESERVA (MOVIMENTO SIMULADO "NUDGE") -->
         <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden relative">
             <div class="flex items-center justify-center gap-2 mb-4">
                 <h2 class="text-2xl font-bold brand-font text-blue-600 text-center">Como fazer sua reserva</h2>
             </div>
 
             <!-- Container Scroll Horizontal -->
-            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2">
+            <!-- Nota: Snap-x ajuda a alinhar, mas o JS vai controlar a animação inicial -->
+            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2 snap-x snap-mandatory">
                 
                 <!-- Passo 1 -->
-                <a href="#faq-section" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer flex-shrink-0">
+                <a href="#faq-section" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-blue-200">
                         🤔
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-blue-700 leading-tight">1. Tire suas dúvidas</h3>
-                        <p class="text-xs text-gray-500 mt-1">Clique aqui para ver possíveis perguntas antes de começar.</p>
+                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full">Clique aqui para ver possíveis perguntas antes de começar.</p>
                     </div>
                     <div class="text-blue-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -235,13 +236,13 @@
                 </a>
 
                 <!-- Passo 2 -->
-                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-yellow-300 group cursor-pointer flex-shrink-0">
+                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-yellow-300 group cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 bg-yellow-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-yellow-200">
                         🗓️
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-yellow-700 leading-tight">2. Verificar disponibilidade</h3>
-                        <p class="text-xs text-gray-500 mt-1">Clique aqui para ver as datas livres no calendário.</p>
+                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full">Clique aqui para ver as datas livres no calendário.</p>
                     </div>
                     <div class="text-yellow-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -249,24 +250,24 @@
                 </div>
 
                 <!-- Passo 3 -->
-                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-green-300 group cursor-default flex-shrink-0">
+                <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-green-300 group cursor-default flex-shrink-0">
                     <div class="w-16 h-16 bg-green-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-green-200">
                         📝
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-green-700 leading-tight">3. Preencha o formulário</h3>
-                        <p class="text-xs text-gray-500 mt-1">É simples! Ao terminar, você será redirecionado ao WhatsApp.</p>
+                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full">É simples! Ao terminar, você será redirecionado ao WhatsApp.</p>
                     </div>
                 </div>
 
                 <!-- Passo 4 -->
-                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-pink-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-pink-300 group cursor-default flex-shrink-0">
+                <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-pink-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-pink-300 group cursor-default flex-shrink-0">
                     <div class="w-16 h-16 bg-pink-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-pink-200">
                         😎
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-pink-700 leading-tight">4. Viu como é fácil?</h3>
-                        <p class="text-xs text-gray-500 mt-1">Tudo isso é feito 100% pelo nosso site, rápido e seguro.</p>
+                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full">Tudo isso é feito 100% pelo nosso site, rápido e seguro.</p>
                     </div>
                 </div>
 
@@ -931,45 +932,37 @@
             fetchNotifications();
             initializeFirebaseAndAuth();
             
-            // Lógica de Scroll Contínuo "Vai e Vem" (Ping-Pong) no Mobile
+            // Lógica de Scroll "Nudge" (Dica de rolagem única) no Mobile
             const slider = document.getElementById('steps-slider');
             
             // Só ativa se estiver em mobile (ou tela pequena)
             if (window.innerWidth < 768) {
-                let scrollDirection = 1; // 1 = direita, -1 = esquerda
-                let scrollSpeed = 0.5; // Velocidade lenta e suave
-                let isPaused = false;
-
-                function autoScroll() {
-                    if (!isPaused && slider) {
-                        slider.scrollLeft += scrollSpeed * scrollDirection;
-
-                        // Se chegou no fim (com margem de erro de 1px), inverte
-                        if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 1) {
-                            scrollDirection = -1;
-                        }
-                        // Se chegou no início, inverte
-                        if (slider.scrollLeft <= 0) {
-                            scrollDirection = 1;
-                        }
-                    }
-                    requestAnimationFrame(autoScroll);
-                }
-
-                // Inicia a animação
-                requestAnimationFrame(autoScroll);
-
-                // Pausa na interação touch
-                slider.addEventListener('touchstart', () => { isPaused = true; });
+                let nudgeTimer;
                 
-                // Retoma após soltar (com pequeno delay para não brigar com o usuário)
-                slider.addEventListener('touchend', () => { 
-                    setTimeout(() => { isPaused = false; }, 1000); 
-                });
-                
-                // Pausa com mouse (para teste desktop responsivo)
-                slider.addEventListener('mouseenter', () => { isPaused = true; });
-                slider.addEventListener('mouseleave', () => { isPaused = false; });
+                const startNudge = () => {
+                    // Espera 2 segundos após carregar, e então dá a "espiadinha"
+                    nudgeTimer = setTimeout(() => {
+                        // Rola 40% da largura do cartão para a direita (simulando "ir")
+                        // Usamos smooth para ser suave
+                        slider.scrollTo({ left: slider.clientWidth * 0.4, behavior: 'smooth' });
+                        
+                        // Espera 1 segundo na posição "espiada" e volta
+                        setTimeout(() => {
+                            slider.scrollTo({ left: 0, behavior: 'smooth' });
+                        }, 1000);
+                    }, 2000);
+                };
+
+                startNudge();
+
+                // Para a animação se o usuário interagir (tocar/arrastar)
+                const stopNudge = () => {
+                    clearTimeout(nudgeTimer);
+                    // Não precisamos forçar nada, o navegador assume o controle do scroll
+                };
+
+                slider.addEventListener('touchstart', stopNudge, { passive: true });
+                slider.addEventListener('mousedown', stopNudge); // para teste desktop
             }
         });
     </script>
