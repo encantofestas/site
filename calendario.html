@@ -22,10 +22,14 @@
         .dia-numero { position: absolute; top: 2px; right: 4px; font-size: 0.85rem; font-weight: 600; color: rgba(0, 0, 0, 0.7); z-index: 10; }
         #toast-notification { visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translate(-50%, 20px); left: 50%; position: fixed; bottom: 6rem; width: 90%; max-width: 400px; z-index: 80; pointer-events: none; }
         #toast-notification.show { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
-        #toys-panel { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; z-index: 70; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; box-shadow: 0 -4px 25px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; display: flex; flex-direction: column; pointer-events: none; }
+        /* Painel com Overscroll Contain para evitar rolar o fundo */
+        #toys-panel { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; z-index: 70; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; box-shadow: 0 -4px 25px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; display: flex; flex-direction: column; pointer-events: none; overscroll-behavior: contain; }
         #toys-panel.open { transform: translateY(0); pointer-events: auto; }
-        #toys-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 60; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; pointer-events: none; }
+        #toys-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 60; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; pointer-events: none; touch-action: none; }
         #toys-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
+        
+        #panel-content-area { overscroll-behavior: contain; }
+
         /* CSS Painel Notificações */
         #notification-panel { z-index: 100; transition: transform 0.3s ease-out; position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; background-color: #2563EB; pointer-events: none; transform: translateX(100%); }
         #notification-panel.open { pointer-events: auto; transform: translateX(0); }
@@ -186,8 +190,8 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo <span class="text-red-500">*</span></label>
-                            <input type="text" id="client-name" oninput="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Seu nome">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Seu nome <span class="text-red-500">*</span></label>
+                            <input type="text" id="client-name" oninput="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Nome completo">
                         </div>
                     </div>
 
@@ -256,23 +260,41 @@
                     <!-- PASSO 4: Detalhes Técnicos (Piscina e Tomadas) -->
                     <div id="step-4" class="step-container space-y-4">
                         <div class="text-center text-sm text-gray-500 italic mb-2">Se não houver dados, clique em continuar.</div>
-                        <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden"><div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-6 h-6 text-red-600 border-gray-300 rounded"><label for="rain-protection" class="text-sm font-medium text-gray-700">A piscina fica totalmente coberta em caso de chuva (lona ou telhado)?</label></div></div>
+                        
+                        <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden">
+                            <div class="space-y-1">
+                                <label for="rain-protection" class="block text-sm font-medium text-gray-700 mb-1">A piscina fica totalmente coberta em caso de chuva (lona ou telhado)?</label>
+                                <select id="rain-protection" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white">
+                                    <option value="Nao" selected>Não</option>
+                                    <option value="Sim">Sim</option>
+                                </select>
+                            </div>
+                        </div>
+                        
                         <div id="power-outlet-anchor"></div>
                     </div>
 
                     <!-- PASSO 5: Pagamento e Documentação -->
                     <div id="step-5" class="step-container space-y-4">
                         <div class="space-y-2 p-3 bg-green-50 rounded-lg border border-green-200">
-                            <div class="flex items-center justify-between"><div class="flex items-center space-x-3"><input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded"><label for="additional-insurance" class="text-sm font-medium text-gray-700 select-none">Seguro Adicional (+ R$ 10,00)</label></div></div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded">
+                                    <label for="additional-insurance" class="text-sm font-medium text-gray-700 select-none">Seguro Adicional <span class="font-bold text-green-600">(+ R$ 10,00)</span></label>
+                                </div>
+                            </div>
                             <p class="text-xs text-gray-500 mt-1">Cobre danos acidentais aos brinquedos. Sem seguro, o contratante arca com custos de reparo.</p>
                         </div>
                         
                         <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200">
-                            <div class="flex items-center space-x-3">
-                                <input type="checkbox" id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-5 h-5 text-gray-600 border-gray-300 rounded">
-                                <label for="request-invoice" class="text-sm font-medium text-gray-700">Precisa de Nota Fiscal (PJ)?</label>
+                            <div class="space-y-1">
+                                <label for="request-invoice" class="block text-sm font-medium text-gray-700 mb-1">Precisa de Nota Fiscal (PJ)?</label>
+                                <select id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white">
+                                    <option value="Nao" selected>Não</option>
+                                    <option value="Sim">Sim</option>
+                                </select>
                             </div>
-                            <div id="cnpj-field" class="hidden">
+                            <div id="cnpj-field" class="hidden mt-2">
                                 <input type="text" id="client-cnpj" name="client-cnpj" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="CNPJ (00.000.000/0000-00)">
                             </div>
                         </div>
@@ -899,12 +921,12 @@
                 const container = document.createElement('div');
                 container.id = 'power-outlet-fields-container';
                 container.className = 'space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200 mb-4';
-                let htmlContent = `<label class="block text-sm font-bold text-indigo-800 mb-2">Selecione a distância da tomada (em metros - máx. 20m)</label>`;
+                let htmlContent = `<label class="block text-sm font-bold text-indigo-800 mb-2">Distância da tomada:</label>`;
                 powerToys.forEach(toy => {
                     for(let i=1; i<=toy.quantity; i++) {
                          const label = toy.quantity > 1 ? `${toy.name} (#${i})` : toy.name;
                          const inputId = `power-dist-${toy.id}-${i}`;
-                         htmlContent += `<div><label for="${inputId}" class="block text-xs font-medium text-gray-700">${label}</label><input type="number" id="${inputId}" name="${inputId}" max="20" oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Ex: 5m"></div>`;
+                         htmlContent += `<div><label for="${inputId}" class="block text-xs font-medium text-gray-700">${label} <span class="text-red-500">*</span></label><input type="number" id="${inputId}" name="${inputId}" max="20" oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Ex: 5m"></div>`;
                     }
                 });
                 container.innerHTML = htmlContent;
@@ -952,7 +974,7 @@
         window.validateCurrentStep = function() {
             if (checkoutSubStep === 1) {
                 const name = document.getElementById('client-name').value.trim();
-                if (!name) { alert("Por favor, informe seu nome completo."); return false; }
+                if (!name) { alert("Por favor, informe seu nome."); return false; }
             }
             if (checkoutSubStep === 2) {
                 const neighborhood = document.getElementById('client-neighborhood').value;
@@ -967,7 +989,19 @@
                 const end = document.getElementById('event-end-time').value;
                 if (!start || !end) { alert("Por favor, selecione o horário de início e término."); return false; }
                 if (parseInt(end) <= parseInt(start)) { alert("O horário de término deve ser após o início."); return false; }
-                // OBS: Monitores e "Dia Anterior" NÃO são validados aqui pois já possuem valor padrão "Nao".
+            }
+            if (checkoutSubStep === 4) {
+                // Validar Tomadas Obrigatórias
+                const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
+                if (powerInputs.length > 0) {
+                    for (let input of powerInputs) {
+                        if (!input.value || input.value.trim() === '') {
+                            alert("Por favor, informe a distância da tomada para todos os brinquedos que necessitam de energia.");
+                            input.focus();
+                            return false;
+                        }
+                    }
+                }
             }
             return true;
         }
@@ -1066,14 +1100,17 @@
             const eventEndTime = endVal ? endVal + ":00" : "(Não def.)";
             const insuranceChecked = document.getElementById('additional-insurance').checked;
             const deliveryDayBeforeSelect = document.getElementById('delivery-day-before').value;
-            const invoiceChecked = document.getElementById('request-invoice').checked;
+            
+            // Novos Selects
+            const invoiceChecked = document.getElementById('request-invoice').value === 'Sim';
+            const rainProtectionValue = document.getElementById('rain-protection')?.value === 'Sim';
+            
             const cnpj = document.getElementById('client-cnpj').value.trim();
-            const rainProtection = document.getElementById('rain-protection')?.checked;
             const coupon = document.getElementById('discount-coupon').value.trim();
             const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
             let powerDetails = "";
             for (let input of powerInputs) {
-                const label = input.previousElementSibling.innerText;
+                const label = input.previousElementSibling.innerText.replace('*', '').trim();
                 const val = input.value ? input.value + 'm' : '(Não inf.)';
                 powerDetails += `⚡ ${label}: ${val}\n`;
             }
@@ -1101,7 +1138,7 @@
             msg += `🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
             if (coupon) msg += `🎟️ Cupom: ${coupon}\n`;
             const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
-            if (isBallPitIncluded) msg += `🌧 Piscina Coberta: ${rainProtection ? 'SIM' : 'NÃO'}\n`;
+            if (isBallPitIncluded) msg += `🌧 Piscina Coberta: ${rainProtectionValue ? 'SIM' : 'NÃO'}\n`;
             if (powerDetails) msg += `\n*ENERGIA:*\n${powerDetails}`;
             if (monitorText) msg += monitorText;
             if (extrasText) msg += extrasText;
@@ -1120,9 +1157,12 @@
             document.getElementById('has-monitors').value = 'Nao'; 
             document.getElementById('delivery-day-before').value = 'Nao'; 
             document.getElementById('additional-insurance').checked = false; 
-            document.getElementById('request-invoice').checked = false;
+            
+            // Resetar Selects novos
+            document.getElementById('request-invoice').value = 'Nao';
+            if(document.getElementById('rain-protection')) document.getElementById('rain-protection').value = 'Nao';
+            
             document.getElementById('discount-coupon').value = '';
-            if(document.getElementById('rain-protection')) document.getElementById('rain-protection').checked = false;
             selectDays(1);
             const anchor = document.getElementById('power-outlet-anchor');
             if(anchor) anchor.innerHTML = '';
@@ -1136,7 +1176,13 @@
         window.closeToysPanel = function() { document.getElementById('toys-panel').classList.remove('open'); document.getElementById('toys-overlay').classList.remove('open'); document.body.style.overflow = ''; }
         window.renderMonitorHours = function() { const count = parseInt(document.getElementById('monitor-count').value); const hoursContainer = document.getElementById('monitor-hours-fields'); hoursContainer.innerHTML = ''; hoursContainer.innerHTML = `<div><label for="monitor-hours" class="block text-sm font-medium text-gray-700 mb-1">Horas Total</label><input type="number" id="monitor-hours" oninput="calculateTotal()" min="1" max="10" value="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500" placeholder="Horas"></div>`; }
         window.toggleMonitorFields = function(isInitialLoad = false) { const shouldShow = document.getElementById('has-monitors').value === 'Sim'; document.getElementById('monitor-options').classList.toggle('hidden', !shouldShow); if (shouldShow && !isInitialLoad) { window.renderMonitorHours(); } else if (!shouldShow) { document.getElementById('monitor-hours-fields').innerHTML = ''; } }
-        window.toggleCnpjField = function() { const shouldShow = document.getElementById('request-invoice').checked; document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); document.getElementById('client-cnpj').required = shouldShow; }
+        
+        // Atualizado para checar o valor do select em vez de checked
+        window.toggleCnpjField = function() { 
+            const shouldShow = document.getElementById('request-invoice').value === 'Sim'; 
+            document.getElementById('cnpj-field').classList.toggle('hidden', !shouldShow); 
+            document.getElementById('client-cnpj').required = shouldShow; 
+        }
         
         window.onload = function() { fetchNotifications(); window.toggleMonitorFields(true); window.toggleCnpjField(); initializeFirebaseAndAuth(); loadStaticData(); window.renderToysList(); };
         function showToast() { toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
