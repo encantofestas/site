@@ -210,7 +210,7 @@
         <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-6 md:py-8 text-center relative overflow-hidden mb-8">
             <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, #ffffff 2px, transparent 2px); background-size: 30px 30px;"></div>
             
-            <span class="bg-blue-800 text-blue-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Diversão Garantida</span>
+            <span class="bg-blue-800 text-blue-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">📍 São Francisco do Sul</span>
             
             <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-2">
                 Brinquedos que transformam <span class="text-yellow-300">sua festa</span>
@@ -230,12 +230,12 @@
             </div>
 
             <!-- Container Scroll Horizontal -->
-            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2 snap-x snap-mandatory">
+            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2">
                 
                 <!-- Passo 1 -->
                 <a href="#faq-section" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer flex-shrink-0">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-blue-200">
-                        🤔
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-blue-200 text-primary">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c0-.44-.145-.87-.432-1.205C7.544 7.424 7.157 7.202 6.75 7H5.25C4.843 7 4.456 7.202 4.162 7.625 3.869 8.048 3.75 8.56 3.75 9V17H1V8.5c0-.663.263-1.3.732-1.768C2.199 6.263 2.837 6 3.5 6H6.5M15.772 9c0-.44.145-.87.432-1.205C16.456 7.424 16.843 7.202 17.25 7H18.75c.407 0 .794.202 1.088.625C20.131 8.048 20.25 8.56 20.25 9V17h2.75V8.5c0-.663-.263-1.3-.732-1.768C21.801 6.263 21.163 6 20.5 6H17.5M10.5 12h2.5m-1.25 3V10m0 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-blue-700 leading-tight">1. Tire suas dúvidas</h3>
@@ -273,8 +273,8 @@
 
                 <!-- Passo 4 -->
                 <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-pink-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-pink-300 group cursor-default flex-shrink-0">
-                    <div class="w-16 h-16 bg-pink-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-pink-200">
-                        😎
+                    <div class="w-16 h-16 bg-pink-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-pink-200 text-pink-500">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0l-2.828-2.828a4 4 0 010-5.656 4 4 0 015.656 0l.5.5m-.5 3.5l-2 2m5-5l2 2m-2-5l-2-2"/></svg>
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-pink-700 leading-tight">4. Viu como é fácil?</h3>
@@ -285,9 +285,10 @@
             </div>
             
             <!-- Botão de Deslizar (Apenas visível no mobile) -->
-            <div class="md:hidden text-center mt-3 pointer-events-none">
-                <span class="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-4 py-1.5 rounded-full shadow animate-pulse border border-blue-200">
-                    Arraste para o lado ➡️
+            <div class="md:hidden text-center mt-2 pointer-events-none">
+                <span class="inline-flex items-center bg-blue-100 text-blue-700 text-xs font-bold px-4 py-1.5 rounded-full shadow animate-pulse border border-blue-200">
+                    Arraste para o lado 
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                 </span>
             </div>
         </section>
@@ -336,7 +337,6 @@
                         frameborder="0" 
                         style="border:0;" 
                         allowfullscreen="" 
-                        aria-hidden="false" 
                         tabindex="0">
                     </iframe>
                 </a>
