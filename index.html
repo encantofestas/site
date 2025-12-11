@@ -218,16 +218,17 @@
             </div>
 
             <!-- Container Scroll Horizontal -->
-            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2 snap-x snap-mandatory">
+            <!-- Removi 'snap-x snap-mandatory' daqui inicialmente para a animação JS funcionar liso -->
+            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2">
                 
                 <!-- Passo 1 -->
-                <a href="#faq-section" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer flex-shrink-0">
+                <a href="#faq-section" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer flex-shrink-0 snap-center">
                     <div class="w-16 h-16 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-blue-200">
                         🤔
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-blue-700 leading-tight">1. Tire suas dúvidas</h3>
-                        <p class="text-xs text-gray-500 mt-1 leading-tight">Clique aqui para ver possíveis<br>perguntas antes de começar.</p>
+                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full clamp-2">Clique aqui para ver possíveis perguntas antes de começar.</p>
                     </div>
                     <div class="text-blue-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -235,13 +236,13 @@
                 </a>
 
                 <!-- Passo 2 -->
-                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-yellow-300 group cursor-pointer flex-shrink-0">
+                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-yellow-300 group cursor-pointer flex-shrink-0 snap-center">
                     <div class="w-16 h-16 bg-yellow-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-yellow-200">
                         🗓️
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-yellow-700 leading-tight">2. Verificar disponibilidade</h3>
-                        <p class="text-xs text-gray-500 mt-1 leading-tight">Clique aqui para ver as datas<br>livres no calendário.</p>
+                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full clamp-2">Clique aqui para ver as datas livres no calendário.</p>
                     </div>
                     <div class="text-yellow-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -249,24 +250,24 @@
                 </div>
 
                 <!-- Passo 3 -->
-                <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-green-300 group cursor-default flex-shrink-0">
+                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-green-300 group cursor-default flex-shrink-0 snap-center">
                     <div class="w-16 h-16 bg-green-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-green-200">
                         📝
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-green-700 leading-tight">3. Preencha o formulário</h3>
-                        <p class="text-xs text-gray-500 mt-1 leading-tight">É simples! Ao terminar, você será<br>redirecionado ao WhatsApp.</p>
+                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full clamp-2">É simples! Ao terminar, você será redirecionado ao WhatsApp.</p>
                     </div>
                 </div>
 
                 <!-- Passo 4 -->
-                <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-pink-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-pink-300 group cursor-default flex-shrink-0">
+                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-pink-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-pink-300 group cursor-default flex-shrink-0 snap-center">
                     <div class="w-16 h-16 bg-pink-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-pink-200">
                         😎
                     </div>
                     <div class="flex-grow pr-4">
                         <h3 class="font-extrabold text-lg text-pink-700 leading-tight">4. Viu como é fácil?</h3>
-                        <p class="text-xs text-gray-500 mt-1 leading-tight">Tudo isso é feito 100% pelo<br>nosso site, rápido e seguro.</p>
+                        <p class="text-xs text-gray-500 mt-1 whitespace-normal break-words w-full clamp-2">Tudo isso é feito 100% pelo nosso site, rápido e seguro.</p>
                     </div>
                 </div>
 
@@ -275,7 +276,7 @@
             <!-- Botão de Deslizar (Apenas visível no mobile) -->
             <div class="md:hidden text-center mt-3 pointer-events-none">
                 <span class="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-4 py-1.5 rounded-full shadow animate-pulse border border-blue-200">
-                    Deslize para ver ➡️
+                    Arraste para ver mais ➡️
                 </span>
             </div>
         </section>
@@ -293,6 +294,14 @@
                 <button onclick="showCouponModal()" class="relative z-10 bg-white text-yellow-700 hover:bg-yellow-50 font-bold py-3 px-6 rounded-full shadow-lg transition transform active:scale-95 text-sm w-full md:w-auto border-2 border-yellow-200">
                     Resgatar Cupom 🎁
                 </button>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: WIDGET TAGGBOX (FEED SOCIAL) -->
+        <section class="px-4 max-w-7xl mx-auto mb-10">
+            <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">O que Acham da Encanto</h2>
+            <div class="w-full h-[600px] rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white">
+                <iframe src="https://widget.taggbox.com/310470?website=1" style="width:100%;height:100%;overflow:auto;border:none;"></iframe>
             </div>
         </section>
 
@@ -939,11 +948,11 @@
                 let animationFrameId;
                 let isUserInteracting = false;
                 let scrollDirection = 1; // 1 = direita, -1 = esquerda
-                const targetScroll = slider.clientWidth * 0.4; // 40% da largura
-                const duration = 2000; // 2 segundos para ir
-                const pauseDuration = 100; // 1 segundo de pausa
+                const targetScroll = slider.clientWidth * 0.4; // 40% da largura - quanto vai para o lado
+                const duration = 2000; // Duração da ida (2 segundos)
+                const pauseDuration = 100; // Pausa rápida antes de voltar
                 let startTime = null;
-                let state = 'forward'; // 'forward', 'pause-after-forward', 'backward', 'pause-after-backward'
+                let state = 'forward'; // Estados: 'forward', 'pause-after-forward', 'backward', 'pause-after-backward'
                 let startScrollLeft = 0;
 
                 // Função de Easing (Quadratic Ease-In-Out) para suavidade extra
@@ -951,8 +960,7 @@
 
                 const animate = (currentTime) => {
                     if (isUserInteracting) {
-                        // Se o usuário interagir, para a animação atual
-                        return; 
+                        return; // Se o usuário interagir, para a animação
                     }
 
                     if (!startTime) startTime = currentTime;
@@ -976,13 +984,13 @@
                         } else {
                             state = 'backward';
                             startTime = null;
-                            startScrollLeft = slider.scrollLeft; // Deve ser targetScroll
+                            startScrollLeft = slider.scrollLeft;
                             animationFrameId = requestAnimationFrame(animate);
                         }
                     } else if (state === 'backward') {
                         const progress = Math.min(elapsed / duration, 1);
                         const ease = easeInOutQuad(progress);
-                        // Volta para 0
+                        // Volta para a posição 0
                         slider.scrollLeft = startScrollLeft - (startScrollLeft * ease);
 
                         if (progress < 1) {
@@ -993,7 +1001,7 @@
                             animationFrameId = requestAnimationFrame(animate);
                         }
                     } else if (state === 'pause-after-backward') {
-                        if (elapsed < 2000) { // Pausa maior no início (2s)
+                        if (elapsed < 1000) { // Pausa de 1s antes de recomeçar
                             animationFrameId = requestAnimationFrame(animate);
                         } else {
                             state = 'forward';
@@ -1011,21 +1019,14 @@
                 const stopAnimation = () => {
                     isUserInteracting = true;
                     if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                    
+                    // IMPORTANTE: Adiciona o comportamento de SNAP (trava) apenas quando o usuário interage
+                    // Isso permite que a animação seja suave (sem snap) e a navegação manual seja precisa (com snap)
+                    slider.classList.add('snap-x', 'snap-mandatory');
                 };
-
-                // Opcional: Retomar se soltar (descomente se quiser)
-                /* const resumeAnimation = () => {
-                    isUserInteracting = false;
-                    startTime = null; // Reinicia o timer do estado atual
-                    animationFrameId = requestAnimationFrame(animate);
-                };
-                */
 
                 slider.addEventListener('touchstart', stopAnimation, { passive: true });
                 slider.addEventListener('mousedown', stopAnimation);
-                
-                // slider.addEventListener('touchend', resumeAnimation);
-                // slider.addEventListener('mouseup', resumeAnimation);
             }
         });
     </script>
