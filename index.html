@@ -210,6 +210,62 @@
                 <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition transform active:scale-95 text-sm">Ver disponibilidade</button>
             </div>
         </section>
+
+        <!-- SEÇÃO: COMO RESERVAR (DESIGN "TROCA" - COMPACTO HORIZONTAL) -->
+        <section class="px-4 max-w-7xl mx-auto mb-10">
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <h2 class="text-2xl font-bold brand-font text-blue-600 text-center">Como Alugar? É Vapt-Vupt! 🚀</h2>
+            </div>
+
+            <!-- Container Scroll Horizontal no Mobile / Grid no Desktop -->
+            <div class="flex md:grid md:grid-cols-3 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide px-2">
+                
+                <!-- Passo 1 -->
+                <a href="#faq-container" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-blue-200">
+                        🤔
+                    </div>
+                    <div class="flex-grow pr-4">
+                        <h3 class="font-extrabold text-lg text-blue-700 leading-tight">1. Tire suas Dúvidas</h3>
+                        <p class="text-xs text-gray-500 mt-1">Clique aqui para ver as perguntas frequentes antes de começar.</p>
+                    </div>
+                    <div class="text-blue-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </a>
+
+                <!-- Passo 2 -->
+                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-yellow-300 group cursor-pointer">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-yellow-200">
+                        🗓️
+                    </div>
+                    <div class="flex-grow pr-4">
+                        <h3 class="font-extrabold text-lg text-yellow-700 leading-tight">2. Ver Disponibilidade</h3>
+                        <p class="text-xs text-gray-500 mt-1">Veja os brinquedos livres no calendário e escolha a data.</p>
+                    </div>
+                    <div class="text-yellow-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Passo 3 -->
+                <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-green-300 group cursor-default">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-green-200">
+                        📱
+                    </div>
+                    <div class="flex-grow pr-4">
+                        <h3 class="font-extrabold text-lg text-green-700 leading-tight">3. Envie no WhatsApp</h3>
+                        <p class="text-xs text-gray-500 mt-1">Preencha o formulário e pronto! A mensagem chega 100% pronta.</p>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Indicador de arraste para mobile -->
+            <div class="md:hidden text-center mt-1">
+                <span class="text-[10px] text-gray-400 animate-pulse">Deslize para ver os passos ➡️</span>
+            </div>
+        </section>
         
         <!-- SEÇÃO: PROMOÇÃO CUPOM FIDELIDADE (PULSANDO) -->
         <section class="px-4 max-w-7xl mx-auto mb-10">
