@@ -160,8 +160,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
                 </svg>
                 <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
-                    </div>
-                </button>
+                </div>
+            </button>
         </div>
     </header>
 
@@ -211,37 +211,37 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: COMO RESERVAR (DESIGN "TROCA" - COMPACTO HORIZONTAL) -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
+        <!-- SEÇÃO: COMO FAZER SUA RESERVA (MOVIMENTO VAI E VEM) -->
+        <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden relative">
             <div class="flex items-center justify-center gap-2 mb-4">
-                <h2 class="text-2xl font-bold brand-font text-blue-600 text-center">Como Alugar? É Vapt-Vupt! 🚀</h2>
+                <h2 class="text-2xl font-bold brand-font text-blue-600 text-center">Como fazer sua reserva</h2>
             </div>
 
-            <!-- Container Scroll Horizontal no Mobile / Grid no Desktop -->
-            <div class="flex md:grid md:grid-cols-3 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide px-2">
+            <!-- Container Scroll Horizontal -->
+            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2">
                 
                 <!-- Passo 1 -->
-                <a href="#faq-container" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer">
+                <a href="#faq-section" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-blue-300 group cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-blue-200">
                         🤔
                     </div>
                     <div class="flex-grow pr-4">
-                        <h3 class="font-extrabold text-lg text-blue-700 leading-tight">1. Tire suas Dúvidas</h3>
-                        <p class="text-xs text-gray-500 mt-1">Clique aqui para ver as perguntas frequentes antes de começar.</p>
+                        <h3 class="font-extrabold text-lg text-blue-700 leading-tight">1. Tire suas dúvidas</h3>
+                        <p class="text-xs text-gray-500 mt-1">Clique aqui para ver possíveis perguntas antes de começar.</p>
                     </div>
                     <div class="text-blue-300">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </a>
 
                 <!-- Passo 2 -->
-                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-yellow-300 group cursor-pointer">
+                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-yellow-300 group cursor-pointer flex-shrink-0">
                     <div class="w-16 h-16 bg-yellow-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-yellow-200">
                         🗓️
                     </div>
                     <div class="flex-grow pr-4">
-                        <h3 class="font-extrabold text-lg text-yellow-700 leading-tight">2. Ver Disponibilidade</h3>
-                        <p class="text-xs text-gray-500 mt-1">Veja os brinquedos livres no calendário e escolha a data.</p>
+                        <h3 class="font-extrabold text-lg text-yellow-700 leading-tight">2. Verificar disponibilidade</h3>
+                        <p class="text-xs text-gray-500 mt-1">Clique aqui para ver as datas livres no calendário.</p>
                     </div>
                     <div class="text-yellow-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -249,21 +249,34 @@
                 </div>
 
                 <!-- Passo 3 -->
-                <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-green-300 group cursor-default">
+                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-green-300 group cursor-default flex-shrink-0">
                     <div class="w-16 h-16 bg-green-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-green-200">
-                        📱
+                        📝
                     </div>
                     <div class="flex-grow pr-4">
-                        <h3 class="font-extrabold text-lg text-green-700 leading-tight">3. Envie no WhatsApp</h3>
-                        <p class="text-xs text-gray-500 mt-1">Preencha o formulário e pronto! A mensagem chega 100% pronta.</p>
+                        <h3 class="font-extrabold text-lg text-green-700 leading-tight">3. Preencha o formulário</h3>
+                        <p class="text-xs text-gray-500 mt-1">É simples! Ao terminar, você será redirecionado ao WhatsApp.</p>
+                    </div>
+                </div>
+
+                <!-- Passo 4 -->
+                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-pink-100 shadow-md p-3 flex items-center gap-4 transition transform active:scale-95 hover:border-pink-300 group cursor-default flex-shrink-0">
+                    <div class="w-16 h-16 bg-pink-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-pink-200">
+                        😎
+                    </div>
+                    <div class="flex-grow pr-4">
+                        <h3 class="font-extrabold text-lg text-pink-700 leading-tight">4. Viu como é fácil?</h3>
+                        <p class="text-xs text-gray-500 mt-1">Tudo isso é feito 100% pelo nosso site, rápido e seguro.</p>
                     </div>
                 </div>
 
             </div>
             
-            <!-- Indicador de arraste para mobile -->
-            <div class="md:hidden text-center mt-1">
-                <span class="text-[10px] text-gray-400 animate-pulse">Deslize para ver os passos ➡️</span>
+            <!-- Botão de Deslizar (Apenas visível no mobile) -->
+            <div class="md:hidden text-center mt-3 pointer-events-none">
+                <span class="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-4 py-1.5 rounded-full shadow animate-pulse border border-blue-200">
+                    Deslize para ver ➡️
+                </span>
             </div>
         </section>
         
@@ -314,7 +327,7 @@
         </section>
 
         <!-- NOVO: SEÇÃO DE PERGUNTAS FREQUENTES (FAQ) -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
+        <section id="faq-section" class="px-4 max-w-7xl mx-auto mb-10">
             <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Perguntas Frequentes</h2>
             
             <div id="faq-container" class="space-y-4">
@@ -445,7 +458,6 @@
 
             </div>
         </section>
-
 
     </main>
 
@@ -918,6 +930,47 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchNotifications();
             initializeFirebaseAndAuth();
+            
+            // Lógica de Scroll Contínuo "Vai e Vem" (Ping-Pong) no Mobile
+            const slider = document.getElementById('steps-slider');
+            
+            // Só ativa se estiver em mobile (ou tela pequena)
+            if (window.innerWidth < 768) {
+                let scrollDirection = 1; // 1 = direita, -1 = esquerda
+                let scrollSpeed = 0.5; // Velocidade lenta e suave
+                let isPaused = false;
+
+                function autoScroll() {
+                    if (!isPaused && slider) {
+                        slider.scrollLeft += scrollSpeed * scrollDirection;
+
+                        // Se chegou no fim (com margem de erro de 1px), inverte
+                        if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 1) {
+                            scrollDirection = -1;
+                        }
+                        // Se chegou no início, inverte
+                        if (slider.scrollLeft <= 0) {
+                            scrollDirection = 1;
+                        }
+                    }
+                    requestAnimationFrame(autoScroll);
+                }
+
+                // Inicia a animação
+                requestAnimationFrame(autoScroll);
+
+                // Pausa na interação touch
+                slider.addEventListener('touchstart', () => { isPaused = true; });
+                
+                // Retoma após soltar (com pequeno delay para não brigar com o usuário)
+                slider.addEventListener('touchend', () => { 
+                    setTimeout(() => { isPaused = false; }, 1000); 
+                });
+                
+                // Pausa com mouse (para teste desktop responsivo)
+                slider.addEventListener('mouseenter', () => { isPaused = true; });
+                slider.addEventListener('mouseleave', () => { isPaused = false; });
+            }
         });
     </script>
 </body>
