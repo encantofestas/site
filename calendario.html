@@ -66,6 +66,32 @@
             transform: scale(1.1);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
+
+        /* Animação dos passos do formulário */
+        .step-container {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .step-container.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .step-indicator {
+            height: 4px;
+            background-color: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .step-progress {
+            height: 100%;
+            background-color: #2563EB;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -129,17 +155,24 @@
                 <div class="p-4 space-y-4" id="toys-list-container"></div>
             </div>
 
-            <!-- View 2: Checkout -->
+            <!-- View 2: Checkout (Agora com Wizard) -->
             <div id="checkout-view" class="px-5 py-4 hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-800 brand-font">Finalizar Reserva</h3>
-                    <button onclick="changeStep('selection')" class="text-blue-600 text-sm font-medium hover:text-blue-700">← Voltar</button>
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-lg font-bold text-gray-800 brand-font" id="checkout-title">Dados do Pedido</h3>
+                    <button onclick="handleBackStep()" class="text-blue-600 text-sm font-medium hover:text-blue-700">← Voltar</button>
                 </div>
-                <div class="p-4 bg-gray-50 rounded-lg shadow-inner mb-6 border border-gray-100"><h4 class="font-bold text-gray-700 mb-2">Seu Pedido:</h4><div id="checkout-summary" class="text-sm text-gray-600 space-y-2"></div></div>
-                <form id="checkout-form" onsubmit="event.preventDefault(); submitOrder()">
-                    <div class="space-y-4">
-                        
-                        <!-- NOVA ÁREA DE DIÁRIAS (HORIZONTAL E RESPONSIVA) -->
+
+                <div class="step-indicator">
+                    <div id="progress-bar" class="step-progress" style="width: 20%;"></div>
+                </div>
+                <p id="step-label" class="text-xs text-gray-500 font-semibold mb-4 text-right">Passo 1 de 5</p>
+                
+                <div class="p-4 bg-gray-50 rounded-lg shadow-inner mb-6 border border-gray-100 hidden" id="summary-container"><h4 class="font-bold text-gray-700 mb-2">Resumo do Pedido:</h4><div id="checkout-summary" class="text-sm text-gray-600 space-y-2"></div></div>
+                
+                <form id="checkout-form" onsubmit="event.preventDefault();">
+                    
+                    <!-- PASSO 1: Diárias e Nome -->
+                    <div id="step-1" class="step-container active space-y-4">
                         <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
                             <label class="block text-sm font-bold text-gray-800 mb-2">Quantas Diárias? <span class="text-xs font-normal text-blue-600 ml-1">(Promoção!)</span></label>
                             <div class="flex gap-3 overflow-x-auto pb-1" style="scrollbar-width: none; -ms-overflow-style: none;">
@@ -151,52 +184,103 @@
                             </div>
                             <p id="promo-message" class="text-xs text-blue-600 font-medium mt-2">Valor normal.</p>
                         </div>
-
-                        <!-- Nome -->
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label><input type="text" id="client-name" oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Seu nome"></div>
                         
-                        <!-- Bairro -->
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega</label>
-                            <select id="client-neighborhood" onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo <span class="text-red-500">*</span></label>
+                            <input type="text" id="client-name" oninput="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Seu nome">
+                        </div>
+                    </div>
+
+                    <!-- PASSO 2: Endereço -->
+                    <div id="step-2" class="step-container space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega <span class="text-red-500">*</span></label>
+                            <select id="client-neighborhood" onchange="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                                 <option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option>
                             </select>
                         </div>
                         
-                        <!-- Endereço -->
                         <div class="flex space-x-2">
-                            <div class="flex-grow"><label class="block text-sm font-medium text-gray-700 mb-1">Nome da Rua</label><input type="text" id="client-street" oninput="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Rua"></div>
-                            <div class="w-24"><label class="block text-sm font-medium text-gray-700 mb-1">Nº</label><input type="number" id="client-number" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Nº"></div>
+                            <div class="flex-grow">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Rua <span class="text-red-500">*</span></label>
+                                <input type="text" id="client-street" oninput="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl" placeholder="Nome da Rua">
+                            </div>
+                            <div class="w-24">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nº <span class="text-red-500">*</span></label>
+                                <input type="number" id="client-number" oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);" class="w-full px-4 py-3 border border-gray-300 rounded-xl" placeholder="Nº">
+                            </div>
                         </div>
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label><textarea id="client-reference" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Detalhes da casa exemplo sobrado cinza na frente de..."></textarea></div>
-                        
-                        <!-- Horários -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label>
+                            <textarea id="client-reference" rows="2" class="w-full px-4 py-3 border border-gray-300 rounded-xl" placeholder="Detalhes da casa (cor, muro, etc)"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- PASSO 3: Logística e Monitores -->
+                    <div id="step-3" class="step-container space-y-4">
                         <div class="flex flex-col">
                             <div class="flex space-x-2">
-                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Início</label><select id="event-start-time" onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
-                                <div class="w-1/2"><label class="block text-sm font-medium text-gray-700 mb-1">Término</label><select id="event-end-time" onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select></div>
+                                <div class="w-1/2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Início da Festa <span class="text-red-500">*</span></label>
+                                    <select id="event-start-time" onchange="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select>
+                                </div>
+                                <div class="w-1/2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Término <span class="text-red-500">*</span></label>
+                                    <select id="event-end-time" onchange="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select>
+                                </div>
                             </div>
                             <div id="time-fee-warning" class="text-xs text-red-600 mt-1 hidden font-normal"></div>
                         </div>
-                        
-                        <!-- ÂNCORA CORRIGIDA PARA OS CAMPOS DE TOMADA -->
-                        <div id="power-outlet-anchor"></div>
 
-                        <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg"><select id="delivery-day-before" onchange="calculateTotal()" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select><label class="text-sm font-medium text-gray-700">Pode levar um dia antes, pelo mesmo valor?</label></div>
-                        <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden"><div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-5 h-5 text-red-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">A piscina fica totalmente coberta em caso de chuva</label></div></div>
+                        <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                            <select id="delivery-day-before" onchange="calculateTotal()" class="w-20 px-2 py-2 border border-gray-300 rounded-lg bg-white text-sm font-bold">
+                                <option value="Nao" selected>Não</option>
+                                <option value="Sim">Sim</option>
+                            </select>
+                            <label class="text-sm font-medium text-gray-700 leading-tight">Podemos entregar/montar um dia antes?</label>
+                        </div>
+
                         <div class="space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                             <label class="block text-sm font-bold text-gray-800 mb-1">Deseja contratar monitores?</label>
-                            <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="Nao">Não</option><option value="Sim">Sim</option></select>
+                            <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
+                                <option value="Nao" selected>Não</option>
+                                <option value="Sim">Sim</option>
+                            </select>
                             <div id="monitor-options" class="space-y-3 mt-3 hidden">
                                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Quantos?</label><select id="monitor-count" onchange="renderMonitorHours(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="1">1</option><option value="2">2</option></select></div>
                                 <div id="monitor-hours-fields" class="space-y-3"></div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- PASSO 4: Detalhes Técnicos (Piscina e Tomadas) -->
+                    <div id="step-4" class="step-container space-y-4">
+                        <div class="text-center text-sm text-gray-500 italic mb-2">Se não houver dados, clique em continuar.</div>
+                        <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden"><div class="flex items-center space-x-3"><input type="checkbox" id="rain-protection" class="w-6 h-6 text-red-600 border-gray-300 rounded"><label for="rain-protection" class="text-sm font-medium text-gray-700">A piscina fica totalmente coberta em caso de chuva (lona ou telhado)?</label></div></div>
+                        <div id="power-outlet-anchor"></div>
+                    </div>
+
+                    <!-- PASSO 5: Pagamento e Documentação -->
+                    <div id="step-5" class="step-container space-y-4">
                         <div class="space-y-2 p-3 bg-green-50 rounded-lg border border-green-200">
-                            <div class="flex items-center justify-between"><div class="flex items-center space-x-3"><input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded"><label for="additional-insurance" class="text-sm font-medium text-gray-700 select-none">Seguro Adicional</label></div><span class="text-sm font-bold text-green-700">+ R$ 10,00</span></div>
-                            <p class="text-xs text-gray-500 mt-1">Ao adicionar o seguro, você não paga por danos acidentais. Sem seguro, reparos podem custar até R$ 300,00.</p>
+                            <div class="flex items-center justify-between"><div class="flex items-center space-x-3"><input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded"><label for="additional-insurance" class="text-sm font-medium text-gray-700 select-none">Seguro Adicional (+ R$ 10,00)</label></div></div>
+                            <p class="text-xs text-gray-500 mt-1">Cobre danos acidentais aos brinquedos. Sem seguro, o contratante arca com custos de reparo.</p>
                         </div>
-                        <div class="p-3 bg-purple-50 rounded-lg border border-purple-200"><label class="block text-sm font-medium text-gray-700 mb-1">Cupom de Desconto</label><div class="flex gap-2"><input type="text" id="discount-coupon" oninput="calculateTotal()" class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase" placeholder="Código"></div></div>
-                        <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200"><div class="flex items-center space-x-3"><input type="checkbox" id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-5 h-5 text-gray-600 border-gray-300 rounded"><label class="text-sm font-medium text-gray-700">Nota Fiscal (CNPJ)?</label></div><div id="cnpj-field" class="hidden"><input type="text" id="client-cnpj" name="client-cnpj" pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="00.000.000/0000-00"></div></div>
+                        
+                        <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200">
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-5 h-5 text-gray-600 border-gray-300 rounded">
+                                <label for="request-invoice" class="text-sm font-medium text-gray-700">Precisa de Nota Fiscal (PJ)?</label>
+                            </div>
+                            <div id="cnpj-field" class="hidden">
+                                <input type="text" id="client-cnpj" name="client-cnpj" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="CNPJ (00.000.000/0000-00)">
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cupom de Desconto</label>
+                            <input type="text" id="discount-coupon" oninput="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl uppercase tracking-wider font-bold text-gray-600" placeholder="CÓDIGO">
+                        </div>
                     </div>
                 </form>
             </div>
@@ -264,7 +348,7 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
-        let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', selectedItems = {};
+        let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', checkoutSubStep = 1, selectedItems = {};
         
         let selectedDayCount = 1; 
 
@@ -642,7 +726,14 @@
                 actionButton.removeAttribute('disabled');
                 actionButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
                 actionButton.classList.add('bg-primary', 'cursor-pointer');
-                actionButton.innerText = `Confirmar Reserva`; 
+                
+                // Texto do botão depende do sub-passo
+                if (checkoutSubStep < 5) {
+                    actionButton.innerText = `Continuar`;
+                } else {
+                    actionButton.innerText = `Confirmar Reserva`;
+                }
+                
             } else if (totalItems > 0 && currentStep === 'selection') {
                 actionButton.disabled = false;
                 actionButton.classList.remove('bg-gray-400');
@@ -807,7 +898,7 @@
             if (powerToys.length > 0) {
                 const container = document.createElement('div');
                 container.id = 'power-outlet-fields-container';
-                container.className = 'space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200 mt-4 mb-4';
+                container.className = 'space-y-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200 mb-4';
                 let htmlContent = `<label class="block text-sm font-bold text-indigo-800 mb-2">Selecione a distância da tomada (em metros - máx. 20m)</label>`;
                 powerToys.forEach(toy => {
                     for(let i=1; i<=toy.quantity; i++) {
@@ -822,11 +913,90 @@
             window.calculateTotal(); 
         }
 
+        window.updateWizardView = function() {
+            // Esconder todos os passos
+            for(let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`step-${i}`);
+                if (el) el.classList.remove('active');
+            }
+            
+            // Mostrar passo atual
+            const currentEl = document.getElementById(`step-${checkoutSubStep}`);
+            if(currentEl) currentEl.classList.add('active');
+            
+            // Atualizar barra de progresso e texto
+            const progress = (checkoutSubStep / 5) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('step-label').innerText = `Passo ${checkoutSubStep} de 5`;
+            
+            // Mostrar resumo apenas no último passo
+            const summaryContainer = document.getElementById('summary-container');
+            if (checkoutSubStep === 5) {
+                summaryContainer.classList.remove('hidden');
+                document.getElementById('checkout-title').innerText = "Revisão e Pagamento";
+            } else {
+                summaryContainer.classList.add('hidden');
+                if (checkoutSubStep === 1) document.getElementById('checkout-title').innerText = "Seus Dados";
+                else if (checkoutSubStep === 2) document.getElementById('checkout-title').innerText = "Endereço de Entrega";
+                else if (checkoutSubStep === 3) document.getElementById('checkout-title').innerText = "Logística da Festa";
+                else if (checkoutSubStep === 4) document.getElementById('checkout-title').innerText = "Detalhes Técnicos";
+            }
+            
+            // Rolar para o topo do painel
+            const panelContent = document.getElementById('panel-content-area'); 
+            if (panelContent) panelContent.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            window.calculateTotal(); // Atualiza texto do botão
+        }
+
+        window.validateCurrentStep = function() {
+            if (checkoutSubStep === 1) {
+                const name = document.getElementById('client-name').value.trim();
+                if (!name) { alert("Por favor, informe seu nome completo."); return false; }
+            }
+            if (checkoutSubStep === 2) {
+                const neighborhood = document.getElementById('client-neighborhood').value;
+                const street = document.getElementById('client-street').value.trim();
+                const number = document.getElementById('client-number').value.trim();
+                if (!neighborhood) { alert("Por favor, selecione o bairro."); return false; }
+                if (!street) { alert("Por favor, informe o nome da rua."); return false; }
+                if (!number) { alert("Por favor, informe o número da casa."); return false; }
+            }
+            if (checkoutSubStep === 3) {
+                const start = document.getElementById('event-start-time').value;
+                const end = document.getElementById('event-end-time').value;
+                if (!start || !end) { alert("Por favor, selecione o horário de início e término."); return false; }
+                if (parseInt(end) <= parseInt(start)) { alert("O horário de término deve ser após o início."); return false; }
+                // OBS: Monitores e "Dia Anterior" NÃO são validados aqui pois já possuem valor padrão "Nao".
+            }
+            return true;
+        }
+
+        window.handleBackStep = function() {
+            if (checkoutSubStep > 1) {
+                // Lógica para pular o passo 4 ao voltar se ele estiver vazio
+                if (checkoutSubStep === 5) {
+                    const rainField = document.getElementById('rain-protection-field');
+                    const powerAnchor = document.getElementById('power-outlet-anchor');
+                    const isStep4Empty = rainField.classList.contains('hidden') && (!powerAnchor.innerHTML || powerAnchor.innerHTML.trim() === '');
+                    if (isStep4Empty) {
+                        checkoutSubStep = 3;
+                    } else {
+                        checkoutSubStep--;
+                    }
+                } else {
+                    checkoutSubStep--;
+                }
+                updateWizardView();
+            } else {
+                window.changeStep('selection');
+            }
+        }
+
         window.changeStep = function(step) {
             currentStep = step;
             const panelContent = document.getElementById('panel-content-area'); if (panelContent) panelContent.scrollTop = 0;
-            document.getElementById('selection-view').classList.add('hidden');
-            document.getElementById('checkout-view').classList.add('hidden');
+            
             if (step === 'checkout') { 
                 const availability = checkRangeAvailability();
                 if (!availability.valid) {
@@ -835,41 +1005,53 @@
                     currentStep = 'selection';
                     return;
                 }
+                
+                document.getElementById('selection-view').classList.add('hidden');
+                document.getElementById('checkout-view').classList.remove('hidden'); 
+                
                 window.updateCheckoutSummary(); 
                 window.renderPowerOutletFields(); 
-                document.getElementById('checkout-view').classList.remove('hidden'); 
-                startScrollHint(); 
-            } 
-            else { 
+                
+                // Iniciar wizard
+                checkoutSubStep = 1;
+                updateWizardView();
+                
+            } else { 
+                document.getElementById('checkout-view').classList.add('hidden');
                 document.getElementById('selection-view').classList.remove('hidden');
                 window.renderToysList(); 
+                window.calculateTotal();
             }
-            window.calculateTotal();
-        }
-
-        function startScrollHint() {
-            const view = document.getElementById('checkout-view');
-            view.classList.remove('scroll-hint-active');
-            void view.offsetWidth;
-            view.classList.add('scroll-hint-active');
-            const stopHint = () => {
-                view.classList.remove('scroll-hint-active');
-                const panelContent = document.getElementById('panel-content-area');
-                panelContent.removeEventListener('touchstart', stopHint);
-                panelContent.removeEventListener('mousedown', stopHint);
-                panelContent.removeEventListener('scroll', stopHint);
-            };
-            const panelContent = document.getElementById('panel-content-area');
-            panelContent.addEventListener('touchstart', stopHint, { passive: true });
-            panelContent.addEventListener('mousedown', stopHint);
-            panelContent.addEventListener('scroll', stopHint);
         }
 
         window.handleActionButton = function() {
             if (currentStep === 'selection') {
                 if (window.getSelectedItemDetails().details.length === 0) { alert('Selecione pelo menos um brinquedo.'); return; }
                 window.changeStep('checkout');
-            } else if (currentStep === 'checkout') { window.submitOrder(); }
+            } else if (currentStep === 'checkout') {
+                if (!validateCurrentStep()) return;
+                
+                if (checkoutSubStep < 5) {
+                    // Lógica para pular o passo 4 se estiver vazio
+                    if (checkoutSubStep === 3) {
+                        const rainField = document.getElementById('rain-protection-field');
+                        const powerAnchor = document.getElementById('power-outlet-anchor');
+                        // Verifica se o campo de chuva está oculto E se o container de tomadas está vazio
+                        const isStep4Empty = rainField.classList.contains('hidden') && (!powerAnchor.innerHTML || powerAnchor.innerHTML.trim() === '');
+                        
+                        if (isStep4Empty) {
+                            checkoutSubStep = 5; // Pula para o 5
+                        } else {
+                            checkoutSubStep++;
+                        }
+                    } else {
+                        checkoutSubStep++;
+                    }
+                    updateWizardView();
+                } else {
+                    window.submitOrder();
+                }
+            }
         }
 
         window.submitOrder = function() {
