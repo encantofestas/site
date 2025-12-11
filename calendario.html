@@ -96,6 +96,21 @@
             width: 0%;
             transition: width 0.3s ease;
         }
+
+        /* Modal Personalizado */
+        #custom-modal-overlay {
+            position: fixed; inset: 0; background-color: rgba(0,0,0,0.6); z-index: 90;
+            opacity: 0; visibility: hidden; transition: opacity 0.2s ease;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        #custom-modal-overlay.open { opacity: 1; visibility: visible; }
+        #custom-modal {
+            background: white; border-radius: 1.5rem; width: 100%; max-width: 320px;
+            transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding: 1.5rem; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        #custom-modal-overlay.open #custom-modal { transform: scale(1); }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -120,6 +135,20 @@
     <div id="toast-notification" class="bg-gray-800/95 backdrop-blur-sm text-white px-5 py-4 rounded-xl shadow-2xl z-[60] flex items-center justify-center space-x-3 text-center border border-gray-700">
         <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         <span class="text-sm font-semibold leading-tight">Reservas permitidas apenas até 6 meses à frente.</span>
+    </div>
+
+    <!-- MODAL PERSONALIZADO -->
+    <div id="custom-modal-overlay" onclick="closeCustomModal()">
+        <div id="custom-modal" onclick="event.stopPropagation()">
+            <div class="flex flex-col items-center">
+                <div class="bg-red-100 p-3 rounded-full mb-3 text-red-500">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h4 class="text-lg font-bold text-gray-800 mb-2 brand-font">Item Indisponível</h4>
+                <p id="custom-modal-message" class="text-sm text-gray-600 mb-5 leading-relaxed"></p>
+                <button onclick="closeCustomModal()" class="bg-primary text-white w-full py-3 rounded-xl font-bold shadow-md active:scale-95 transition-transform">Entendi</button>
+            </div>
+        </div>
     </div>
 
     <!-- OVERLAY E PAINEL DE BRINQUEDOS -->
@@ -446,6 +475,15 @@
             return result.toISOString().split('T')[0];
         }
 
+        // --- NOVO: FUNÇÕES DO MODAL PERSONALIZADO ---
+        window.showErrorModal = function(message) {
+            document.getElementById('custom-modal-message').innerText = message;
+            document.getElementById('custom-modal-overlay').classList.add('open');
+        }
+        window.closeCustomModal = function() {
+            document.getElementById('custom-modal-overlay').classList.remove('open');
+        }
+
         function checkRangeAvailability() {
             if (selectedDayCount === 1) return { valid: true };
 
@@ -468,9 +506,10 @@
                     if (stockOnDate < item.qty) {
                         const dateObj = new Date(checkDate + 'T00:00:00');
                         const dateFormatted = dateObj.toLocaleDateString('pt-BR');
+                        // Mensagem amigável para o modal
                         return { 
                             valid: false, 
-                            message: `O item "${toy.name}" não possui estoque suficiente para o dia ${dateFormatted}. (Disponível: ${stockOnDate}, Solicitado: ${item.qty})` 
+                            message: `O item "${toy.name}" já está reservado para o dia ${dateFormatted}. Por favor, ajuste as datas ou a quantidade.` 
                         };
                     }
                 }
@@ -602,7 +641,8 @@
             
             const availability = checkRangeAvailability();
             if (!availability.valid) {
-                alert(`Não é possível selecionar ${days} dias para os itens atuais:\n\n${availability.message}`);
+                // USANDO O NOVO MODAL
+                window.showErrorModal(availability.message);
                 selectedDayCount = previousDays; 
                 return; 
             }
@@ -695,7 +735,8 @@
                 if (shippingFee > 0) {
                     summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa de Entrega:</span><span>R$ ${shippingFee.toFixed(2).replace('.', ',')}</span></div>`;
                 } else {
-                    summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa de Entrega:</span><span class="text-green-600 font-bold">Grátis</span></div>`;
+                    // MUDANÇA AQUI: Linha inteira verde e negrito quando grátis
+                    summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Taxa de Entrega:</span><span>Grátis</span></div>`;
                 }
             }
 
@@ -898,7 +939,14 @@
                  };
                  
                  if (!isValidRange(tempItems)) {
-                     alert(`Não é possível adicionar mais "${toy.name}" pois não há estoque suficiente para os ${selectedDayCount} dias selecionados.`);
+                     // USANDO O NOVO MODAL
+                     const dateObj = new Date(addDays(currentSelectedDateISO, 1)); // Só para exemplo, a lógica real precisaria saber o dia exato da falha
+                     // Mas aqui vamos usar uma mensagem genérica ou recalcular
+                     // Simplificando: chamo checkRangeAvailability com a quantidade proposta
+                     // Como a função isValidRange acima retorna false, sabemos que falhou.
+                     
+                     // Vou mostrar uma mensagem genérica de erro no modal, já que o usuário pediu para ser simples
+                     window.showErrorModal(`O item "${toy.name}" já está reservado em uma das datas selecionadas.`);
                      return;
                  }
             }
@@ -906,7 +954,10 @@
             if (toy.exclusiveGroup === 'LONA' && change > 0) {
                 if (currentQty === 0) {
                     const otherLonaItem = toysInventory.find(t => t.exclusiveGroup === 'LONA' && t.id !== toyId && (selectedItems[t.id] || 0) > 0);
-                    if (otherLonaItem) { alert(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado por dia. Remova o(a) ${otherLonaItem.name} antes de adicionar.`); return; }
+                    if (otherLonaItem) { 
+                        window.showErrorModal(`Atenção! Apenas um brinquedo de Lona Grande (${toy.name}) pode ser reservado por dia.`); 
+                        return; 
+                    }
                 }
                 if (newQty > 1) newQty = 1;
             }
@@ -1042,7 +1093,8 @@
             if (step === 'checkout') { 
                 const availability = checkRangeAvailability();
                 if (!availability.valid) {
-                    alert(availability.message);
+                    // USANDO O NOVO MODAL
+                    window.showErrorModal(availability.message);
                     document.getElementById('selection-view').classList.remove('hidden');
                     currentStep = 'selection';
                     return;
