@@ -294,7 +294,7 @@
         <!-- Título da Seção -->
         <div class="text-center mb-6 mt-4 fade-in">
             <h2 class="text-2xl md:text-3xl font-bold brand-font text-blue-900">Nossos Itens</h2>
-            <p class="text-sm text-gray-500">Escolha os detalhes perfeitos para sua festa</p>
+            <p class="text-sm text-gray-500">Saiba mais detalhes sobre cada um</p>
         </div>
 
         <!-- GRID DO CATÁLOGO -->
@@ -453,9 +453,11 @@
         // Função para obter o valor máximo de reparo
         function getRepairLimit(itemName) {
             const lowerName = itemName.toLowerCase();
-            if (lowerName.includes('mesa') || lowerName.includes('área baby')) {
+            // Itens com limite de R$ 100,00
+            if (lowerName.includes('mesa') || lowerName.includes('área baby') || lowerName.includes('mini baby')) {
                 return 'R$ 25,00 - R$ 100,00';
             }
+            // Demais itens (limite R$ 300,00)
             return 'R$ 25,00 - R$ 300,00';
         }
 
@@ -530,7 +532,11 @@
                 
             } catch (error) {
                 console.warn("Usando catálogo de backup.");
-                catalogData = FALLBACK_CATALOG.map(item => ({ ...item, repairLimit: getRepairLimit(item.name) }));
+                // Garantir que o Fallback tenha os dados de reparo corretos
+                catalogData = FALLBACK_CATALOG.map(item => {
+                    const name = item.name || item.nome;
+                    return { ...item, repairLimit: getRepairLimit(name) };
+                });
                 
                 // Aplicar a correção do Mini Baby no Fallback caso esteja sendo usado
                 const miniBabyFallback = catalogData.find(i => (i.name || '').toLowerCase().includes('mini baby'));
