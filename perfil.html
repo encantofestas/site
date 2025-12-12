@@ -1,1 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Perfil - Encanto Festas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'Baloo 2', cursive;
+        }
+        .min-h-screen-safe {
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        .bg-primary { background-color: #2563EB; }
+        .text-primary { color: #2563EB; }
+        .bg-secondary { background-color: #FACC15; }
+        .text-secondary { color: #CA8A04; }
+        .bg-gradient-brand {
+            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+        }
+        #bottom-nav {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(4rem + env(safe-area-inset-bottom));
+        }
+        .floating-fab {
+            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
+        }
+        
+        /* Animações de Entrada */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .slide-up { animation: slideUp 0.5s ease-out forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Estilização dos Inputs */
+        .input-group input:focus ~ label,
+        .input-group input:not(:placeholder-shown) ~ label {
+            top: -0.5rem;
+            left: 0.8rem;
+            font-size: 0.75rem;
+            color: #2563EB;
+            background-color: white;
+            padding: 0 0.25rem;
+        }
+        
+        /* Painel de Notificações */
+        #notification-panel {
+            z-index: 100;
+            transition: transform 0.3s ease-out;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            max-width: 100vw;
+            height: 100dvh;
+            background-color: #2563EB;
+        }
+        
+        #notification-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="text-gray-700 min-h-screen-safe flex flex-col bg-slate-50">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
+            
+            <!-- Logo (Link para Home) -->
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
+                    alt="Logo Encanto Festas" 
+                    class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner"
+                    onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
+                <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
+            </div>
+            
+            <!-- Menu Desktop -->
+            <div class="hidden md:flex items-center space-x-4">
+                <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
+                    </svg>
+                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
+                    </div>
+                </button>
+                <button onclick="window.location.href='perfil.html'" class="text-white bg-blue-700 px-4 py-2 rounded-lg transition text-sm font-semibold shadow-inner ring-2 ring-yellow-400">Meu Perfil</button>
+                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg transform hover:-translate-y-0.5">
+                    Agendar Agora
+                </button>
+            </div>
+
+            <!-- Menu Mobile (Apenas Notificação) -->
+            <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
+                </svg>
+                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <!-- PAINEL DE NOTIFICAÇÕES (Oculto) -->
+    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
+
+    <div id="notification-panel" class="transform translate-x-full">
+        <div id="notification-content">
+            <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10">
+                <h3 class="text-xl font-bold brand-font text-white">Notificações</h3>
+                <button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-grow overflow-y-auto relative">
+                <ul id="notification-list" class="p-4 space-y-3 pb-24"></ul>
+            </div>
+            <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+                   <button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline transition opacity-100 pointer-events-auto active:scale-95 py-1">
+                       Marcar todas como lidas
+                   </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL: SISTEMA DE LOGIN/PERFIL -->
+    <main class="flex-grow w-full pt-20 pb-28 md:pb-12 px-4 flex items-center justify-center">
+        
+        <!-- ESTADO DE CARREGAMENTO -->
+        <div id="loading-state" class="text-center p-8">
+            <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
+            <p class="text-gray-500 font-medium animate-pulse">Carregando seu perfil...</p>
+        </div>
+
+        <!-- CONTAINER DO PERFIL (LOGADO) -->
+        <div id="profile-view" class="hidden w-full max-w-md mx-auto fade-in">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden relative">
+                <!-- Capa Decorativa -->
+                <div class="h-32 bg-gradient-brand relative">
+                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                    <div class="absolute top-4 right-4 text-white opacity-80">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Foto e Informações -->
+                <div class="px-6 pb-8 relative text-center">
+                    <div class="relative -mt-16 mb-4 inline-block">
+                        <img id="user-avatar" src="" alt="Foto de Perfil" 
+                             class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover bg-gray-100">
+                        <div class="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-2 border-white shadow-sm" title="Online"></div>
+                    </div>
+                    
+                    <h2 id="user-name" class="text-2xl font-bold text-gray-800 brand-font">Carregando...</h2>
+                    <p class="text-blue-500 font-medium text-sm mt-1 mb-6">Membro VIP Encanto Festas</p>
+
+                    <!-- Stats Rápidos -->
+                    <div class="grid grid-cols-3 gap-2 mb-8 text-center border-t border-b border-gray-100 py-4">
+                        <div>
+                            <span class="block text-lg font-bold text-gray-800">0</span>
+                            <span class="text-xs text-gray-400 font-medium uppercase">Festas</span>
+                        </div>
+                        <div>
+                            <span class="block text-lg font-bold text-gray-800">0</span>
+                            <span class="text-xs text-gray-400 font-medium uppercase">Pontos</span>
+                        </div>
+                        <div>
+                            <span class="block text-lg font-bold text-gray-800">0</span>
+                            <span class="text-xs text-gray-400 font-medium uppercase">Cupons</span>
+                        </div>
+                    </div>
+
+                    <!-- Menu de Ações -->
+                    <div class="space-y-3">
+                        <button onclick="window.location.href='combos.html'" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:shadow-blue-300 transform active:scale-[0.98] transition flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            Agendar Nova Festa
+                        </button>
+                        <button onclick="handleLogout()" class="w-full bg-white text-red-500 border border-red-100 font-bold py-3 rounded-xl hover:bg-red-50 transition flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            Sair do Perfil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTAINER DE AUTH (LOGIN/CADASTRO) -->
+        <div id="auth-view" class="hidden w-full max-w-md mx-auto slide-up">
+            
+            <!-- Cabeçalho de Marketing -->
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Sua Festa Começa Aqui! 🎈</h2>
+                <p class="text-gray-500 text-sm px-8">Cadastre-se para ganhar pontos, descontos exclusivos e agendar festas em segundos.</p>
+            </div>
+
+            <!-- Card Principal -->
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+                
+                <!-- Abas -->
+                <div class="flex border-b border-gray-100">
+                    <button onclick="switchAuthTab('login')" id="tab-login" class="flex-1 py-4 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors">ENTRAR</button>
+                    <button onclick="switchAuthTab('register')" id="tab-register" class="flex-1 py-4 text-sm font-bold text-gray-400 hover:text-blue-500 transition-colors">CADASTRAR</button>
+                </div>
+
+                <div class="p-8">
+                    
+                    <!-- Formulário de LOGIN -->
+                    <form id="login-form" class="space-y-6 block" onsubmit="handleLogin(event)">
+                        <div class="input-group relative">
+                            <input type="email" id="login-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu E-mail" required>
+                            <label for="login-email" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">E-mail</label>
+                        </div>
+                        <div class="input-group relative">
+                            <input type="password" id="login-password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Sua Senha" required>
+                            <label for="login-password" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Senha</label>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <label class="flex items-center text-gray-500 gap-2 cursor-pointer">
+                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                Lembrar de mim
+                            </label>
+                            <a href="#" class="text-blue-600 font-bold hover:underline">Esqueceu?</a>
+                        </div>
+                        <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transform active:scale-[0.98] transition">
+                            Acessar Minha Conta
+                        </button>
+                    </form>
+
+                    <!-- Formulário de CADASTRO -->
+                    <form id="register-form" class="space-y-6 hidden" onsubmit="handleRegister(event)">
+                        <div class="input-group relative">
+                            <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu Nome Completo" required>
+                            <label for="reg-name" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Nome Completo</label>
+                        </div>
+                        <div class="input-group relative">
+                            <input type="email" id="reg-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu E-mail" required>
+                            <label for="reg-email" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">E-mail</label>
+                        </div>
+                        <div class="input-group relative">
+                            <input type="password" id="reg-pass" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Crie uma Senha" required>
+                            <label for="reg-pass" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Senha</label>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-secondary text-blue-900 font-bold py-3 rounded-xl shadow-lg shadow-yellow-200 hover:bg-yellow-300 transform active:scale-[0.98] transition">
+                            Criar Conta Grátis
+                        </button>
+                    </form>
+
+                    <!-- Divisor Social -->
+                    <div class="mt-8 relative flex items-center justify-center">
+                        <div class="border-t border-gray-200 w-full absolute"></div>
+                        <span class="bg-white px-4 text-xs text-gray-400 relative font-medium uppercase">Ou continue com</span>
+                    </div>
+
+                    <div class="mt-6 grid grid-cols-2 gap-4">
+                        <button class="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                            <span class="text-sm font-medium text-gray-600">Google</span>
+                        </button>
+                        <button class="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition">
+                            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-5 h-5" alt="Facebook">
+                            <span class="text-sm font-medium text-gray-600">Facebook</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            <p class="text-center text-xs text-gray-400 mt-6 max-w-xs mx-auto">
+                Ao criar uma conta, você concorda com nossos <a href="#" class="underline hover:text-blue-500">Termos de Serviço</a> e <a href="#" class="underline hover:text-blue-500">Política de Privacidade</a>.
+            </p>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM NAV -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
+        <div class="grid grid-cols-5 w-full h-full relative">
+            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
+                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="text-[10px] font-medium">Início</span>
+            </a>
+            <a href="combos.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
+                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4H8a2 2 0 00-2 2v1" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8V6a2 2 0 00-2-2h-3" />
+                </svg>
+                <span class="text-[10px] font-medium">Combos</span>
+            </a>
+            <div class="relative flex justify-center items-center h-full w-full">
+                <a href="calendario.html" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11h4m-4 4h4" opacity="0.6"/>
+                    </svg>
+                </a>
+            </div>
+            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
+                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                </svg>
+                <span class="text-[10px] font-medium">Catálogo</span>
+            </a>
+            <div class="flex flex-col items-center justify-center w-full h-full text-blue-600 cursor-default pointer-events-none">
+                <svg class="w-6 h-6 mb-1 transition" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <span class="text-[10px] font-medium">Perfil</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SCRIPT DO SISTEMA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot, 
+            writeBatch, Timestamp, setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        setLogLevel('silent');
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        let app, db, auth;
+        let userId = null;
+        let isPanelOpen = false;
+        let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
+        let notificationsData = [];
+        
+        // --- FUNÇÕES DE UI DE AUTH ---
+        
+        window.switchAuthTab = function(tab) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const tabLogin = document.getElementById('tab-login');
+            const tabRegister = document.getElementById('tab-register');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                loginForm.classList.add('block', 'fade-in');
+                registerForm.classList.add('hidden');
+                registerForm.classList.remove('block');
+                
+                tabLogin.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                tabLogin.classList.remove('text-gray-400');
+                
+                tabRegister.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                tabRegister.classList.add('text-gray-400');
+            } else {
+                loginForm.classList.add('hidden');
+                loginForm.classList.remove('block');
+                registerForm.classList.remove('hidden');
+                registerForm.classList.add('block', 'fade-in');
+                
+                tabRegister.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                tabRegister.classList.remove('text-gray-400');
+                
+                tabLogin.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                tabLogin.classList.add('text-gray-400');
+            }
+        }
+
+        // --- LÓGICA DE LOGIN/PERFIL ---
+
+        async function checkUserProfile(uid) {
+            if (!uid) return;
+            try {
+                // Referência correta seguindo a regra do Firestore
+                const profileRef = doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data');
+                const docSnap = await getDoc(profileRef);
+
+                const loadingState = document.getElementById('loading-state');
+                const authView = document.getElementById('auth-view');
+                const profileView = document.getElementById('profile-view');
+                
+                loadingState.classList.add('hidden');
+
+                if (docSnap.exists()) {
+                    // Usuário tem perfil -> MOSTRAR PERFIL
+                    const data = docSnap.data();
+                    document.getElementById('user-name').innerText = data.name || "Cliente Encantado";
+                    document.getElementById('user-avatar').src = data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${uid}&backgroundColor=b6e3f4`;
+                    
+                    authView.classList.add('hidden');
+                    profileView.classList.remove('hidden');
+                    profileView.classList.add('fade-in');
+                } else {
+                    // Usuário não tem perfil -> MOSTRAR LOGIN/CADASTRO
+                    profileView.classList.add('hidden');
+                    authView.classList.remove('hidden');
+                    authView.classList.add('slide-up');
+                }
+            } catch (error) {
+                console.error("Erro ao verificar perfil:", error);
+                document.getElementById('loading-state').innerHTML = `<p class="text-red-500">Erro ao carregar. Tente recarregar.</p>`;
+            }
+        }
+
+        window.handleRegister = async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            // Nota: Em um app real, usaríamos createUserWithEmailAndPassword. 
+            // Aqui, estamos salvando os dados no usuário anônimo atual para simular o cadastro completo.
+            
+            if (!userId) {
+                alert("Erro de conexão. Tente recarregar a página.");
+                return;
+            }
+
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "Criando sua conta...";
+            btn.disabled = true;
+
+            try {
+                const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}&backgroundColor=c0aede`;
+                
+                // SALVAR PERFIL NO FIRESTORE (Regra: users/{uid}/profile/data)
+                const profileRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+                
+                await setDoc(profileRef, {
+                    name: name,
+                    email: email,
+                    avatar: avatarUrl,
+                    createdAt: Timestamp.now(),
+                    memberSince: new Date().getFullYear()
+                });
+
+                // Sucesso! Recarregar estado
+                checkUserProfile(userId);
+
+            } catch (error) {
+                console.error("Erro ao registrar:", error);
+                alert("Não foi possível criar a conta. Tente novamente.");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            // Simulação de login visual. Como o auth é anônimo persistente, 
+            // apenas verificamos se já existe o perfil.
+            // Se o usuário já criou conta neste navegador, ele entra direto.
+            // Se não, sugerimos criar.
+            
+            const btn = e.target.querySelector('button');
+            btn.innerText = "Entrando...";
+            
+            setTimeout(() => {
+                // Verificar novamente o perfil. Se não existir, avisa.
+                const profileRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+                getDoc(profileRef).then(docSnap => {
+                    if (docSnap.exists()) {
+                        checkUserProfile(userId);
+                    } else {
+                        alert("Não encontramos um perfil para este usuário neste dispositivo. Por favor, crie uma conta na aba 'CADASTRAR'.");
+                        window.switchAuthTab('register');
+                        btn.innerText = "Acessar Minha Conta";
+                    }
+                });
+            }, 800);
+        }
+
+        window.handleLogout = async function() {
+            if (confirm("Tem certeza que deseja sair?")) {
+                // Em um app real com email/pass, faríamos signOut(auth).
+                // Aqui, para demo, vamos "esconder" o perfil deletando o documento OU apenas recarregando o anonimo?
+                // Para não perder os dados do usuário, vamos apenas recarregar a página simulando logout visual? 
+                // Melhor: signOut limpa a sessão.
+                try {
+                     // Opção: Deletar o perfil localmente para ver a tela de login de novo (apenas demo)
+                     // const profileRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+                     // await deleteDoc(profileRef);
+                     
+                     // OU apenas recarregar para limpar estado de memória se fosse SPA.
+                     // Vamos apenas recarregar a página que o Auth Anônimo manterá o ID, 
+                     // mas a experiência de "Sair" geralmente pede para limpar sessão.
+                     // Como é anônimo, signout pode gerar novo UID. Vamos testar.
+                     // await signOut(auth); // Isso vai gerar novo UID no próximo load
+                     
+                     // Para simular a UI de "Voltar ao Login" sem perder os dados (já que é demo):
+                     document.getElementById('profile-view').classList.add('hidden');
+                     document.getElementById('auth-view').classList.remove('hidden');
+                     document.getElementById('login-form').reset();
+                     window.switchAuthTab('login');
+                     
+                } catch (error) {
+                    console.error("Erro ao sair", error);
+                }
+            }
+        }
+
+        // --- MANUTENÇÃO DE NOTIFICAÇÕES (Código Antigo Mantido) ---
+        function updateLocalCache() {
+            localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
+        }
+
+        window.markSingleAsRead = async function(e, notificationId) {
+            e.stopPropagation();
+            const idStr = String(notificationId);
+            readNotificationsIds.add(idStr);
+            updateLocalCache();
+            renderNotifications();
+        }
+
+        window.navigateTo = function(url) {
+            if (url && url !== '#') { window.location.href = url; }
+        }
+
+        window.markAllAsRead = async function() {
+            notificationsData.forEach(n => readNotificationsIds.add(String(n.id)));
+            updateLocalCache();
+            renderNotifications();
+        }
+
+        function updateNotificationCount(count) {
+            const elements = document.querySelectorAll('.notification-counter');
+            const markAllButton = document.getElementById('mark-all-button');
+            if (markAllButton) {
+                if (count > 0) {
+                    markAllButton.classList.remove('opacity-0', 'pointer-events-none');
+                    markAllButton.disabled = false;
+                } else {
+                    markAllButton.classList.add('opacity-50', 'pointer-events-none');
+                    markAllButton.disabled = true;
+                }
+            }
+            elements.forEach(el => {
+                if (count > 0) {
+                    el.classList.remove('hidden');
+                    el.innerText = count > 9 ? '9+' : count;
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        function renderNotifications() {
+            const panelList = document.getElementById('notification-list');
+            const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id)));
+            updateNotificationCount(unreadItems.length);
+            if (!isPanelOpen) return;
+            
+            panelList.innerHTML = ''; 
+            if (unreadItems.length === 0) {
+                panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Nenhuma nova notificação.</li>';
+                return;
+            }
+            // ... (render logic simplificada para brevidade, mantém a visual)
+            unreadItems.forEach(notificacao => {
+                 const li = document.createElement('li');
+                 li.className = `p-5 border-b border-blue-800 bg-blue-700 rounded-xl mb-3 text-white shadow-lg`;
+                 li.innerHTML = `<h4 class="font-bold">${notificacao.titulo}</h4><p class="text-sm text-blue-200">${notificacao.mensagem}</p>`;
+                 panelList.appendChild(li);
+            });
+        }
+        
+        // Fetch Mock
+        async function fetchNotifications() {
+             notificationsData = [
+                { id: 1, titulo: "Bem-vindo!", mensagem: "Complete seu cadastro para ganhar pontos.", tipo: "alerta", data: new Date() },
+                { id: 2, titulo: "Promoção Relâmpago", mensagem: "50% OFF no Kit Festa hoje!", tipo: "promocao", data: new Date() }
+             ];
+             renderNotifications();
+        }
+
+        window.toggleNotificationPanel = function() {
+            const panel = document.getElementById('notification-panel');
+            const overlay = document.getElementById('notification-overlay');
+            isPanelOpen = !isPanelOpen;
+            if (isPanelOpen) {
+                panel.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                renderNotifications();
+            } else {
+                panel.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // --- INICIALIZAÇÃO ---
+        async function initializeFirebaseAndAuth() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Auth
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } 
+                else { await signInAnonymously(auth); }
+                
+                onAuthStateChanged(auth, (user) => {
+                    if (user) { 
+                        userId = user.uid;
+                        // Assim que logar (anonimo), verificar se tem perfil salvo no Firestore
+                        checkUserProfile(userId);
+                    } else {
+                        userId = null;
+                    }
+                });
+            } catch (e) { console.error("Erro Firebase:", e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchNotifications();
+            initializeFirebaseAndAuth();
+        });
+    </script>
+</body>
+</html>
