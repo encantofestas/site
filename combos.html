@@ -3,42 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Combos - Encanto Festas</title>
+    <title>Encanto Club - A Revolução do Recreio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         html, body {
             overflow-x: hidden;
             width: 100%;
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #F0F0F0; /* Fundo cinza claro base */
+            color: #1a1a1a;
             -webkit-tap-highlight-color: transparent;
             scroll-behavior: smooth;
         }
         h1, h2, h3, h4, .brand-font {
-            font-family: 'Baloo 2', cursive;
+            font-family: 'Archivo', sans-serif;
         }
         .min-h-screen-safe {
             min-height: 100vh;
             min-height: 100dvh;
         }
-        .bg-primary { background-color: #2563EB; }
-        .text-primary { color: #2563EB; }
-        .bg-secondary { background-color: #FACC15; }
-        .text-secondary { color: #CA8A04; }
+        .bg-primary { background-color: #3B82F6; }
+        
+        /* Notificações e Nav Inferior (Estrutura mantida) */
         #bottom-nav {
             padding-bottom: env(safe-area-inset-bottom);
             height: calc(4rem + env(safe-area-inset-bottom));
         }
-        .floating-fab {
-            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
-        }
-        
         #notification-panel {
             z-index: 100;
-            transition: transform 0.3s ease-out;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: fixed;
             top: 0;
             right: 0;
@@ -46,136 +42,447 @@
             width: 100vw;
             max-width: 100vw;
             height: 100dvh;
-            background-color: #2563EB;
+            background-color: #1a1a1a;
+            border-left: 4px solid #000;
         }
-        
-        #notification-content {
-            height: 100%;
+        #notification-content { height: 100%; display: flex; flex-direction: column; }
+        .floating-fab { box-shadow: 4px 4px 0px 0px #000; border: 2px solid #000; }
+
+        /* --- ESTILO NEOBRUTALISTA --- */
+
+        /* Caixas com Borda e Sombra Sólida */
+        .neu-box {
+            background-color: white;
+            border: 3px solid #000;
+            box-shadow: 6px 6px 0px 0px #000;
+            transition: all 0.2s ease;
+        }
+        .neu-box:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0px 0px #000;
+        }
+        .neu-box:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px #000;
+        }
+        /* Modal Específico */
+        #under-development-modal .neu-box {
+            border-color: #FACC15;
+            box-shadow: 6px 6px 0px 0px #FACC15;
+        }
+
+
+        /* Botões */
+        .neu-btn {
+            background-color: #a78bfa; /* Roxo suave */
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px 0px #000;
+            transition: all 0.1s;
+        }
+        .neu-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 6px 6px 0px 0px #000;
+        }
+        .neu-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px 0px #000;
+        }
+        .neu-btn.primary { background-color: #3B82F6; color: white; }
+        .neu-btn.secondary { background-color: #FACC15; color: black; }
+        .neu-btn.dark { background-color: #1a1a1a; color: white; }
+
+        /* Cores de Fundo de Seção */
+        .bg-pattern {
+            background-color: #e5e5f7;
+            background-image:  radial-gradient(#000000 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Toggle */
+        .toggle-switch {
+            width: 60px;
+            height: 32px;
+            background: white;
+            border: 3px solid black;
+            border-radius: 99px;
+            position: relative;
+            cursor: pointer;
+        }
+        .toggle-knob {
+            width: 20px;
+            height: 20px;
+            background: black;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 4px;
+            transition: transform 0.2s cubic-bezier(0.85, 0.05, 0.18, 1.35);
+        }
+        #price-toggle:checked + .toggle-switch .toggle-knob {
+            transform: translateX(28px);
+            background: #3B82F6;
+        }
+
+        /* Comparativo Antes/Depois */
+        .vs-badge {
+            background: #FF0000;
+            color: white;
+            font-weight: 900;
+            border: 3px solid black;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(10deg);
+            z-index: 10;
+        }
+
+        /* Tags */
+        .tag-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border: 2px solid black;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.5);
         }
     </style>
 </head>
-<body class="text-gray-700 min-h-screen-safe flex flex-col bg-slate-50">
+<body class="text-black min-h-screen-safe flex flex-col">
+
+    <!-- MODAL DE AVISO DE DESENVOLVIMENTO -->
+    <div id="under-development-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-4">
+        <div class="neu-box bg-white p-8 rounded-xl max-w-lg w-full text-center">
+            <div class="text-6xl mb-6 transform rotate-3">🚧</div>
+            <h3 class="text-3xl font-black brand-font mb-4 uppercase text-black">Em Construção!</h3>
+            <p class="text-lg font-medium text-gray-700 mb-6">
+                O <strong>Encanto Club</strong>, nosso serviço de assinatura escolar, está em fase final de desenvolvimento.
+            </p>
+            <p class="text-sm text-gray-500 mb-8">
+                Esta página é uma demonstração das incríveis soluções de lazer recorrente que em breve estarão disponíveis para a sua escola.
+            </p>
+            <button onclick="closeDevelopmentModal()" class="neu-btn dark w-full py-3 rounded-lg text-lg">
+                Entendi
+            </button>
+        </div>
+    </div>
+    <!-- FIM MODAL -->
 
     <!-- HEADER -->
-    <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 transition-all duration-300">
+    <header class="fixed top-0 left-0 right-0 w-full bg-white border-b-4 border-black z-50 h-16">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
-                    alt="Logo Encanto Festas" 
-                    class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner"
-                    onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
-                <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
+                <div class="w-10 h-10 bg-yellow-400 border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
+                    <span class="font-black text-xs">EF</span>
+                </div>
+                <span class="text-2xl font-black brand-font tracking-tighter uppercase">Encanto<span class="text-blue-600">Club</span></span>
             </div>
             
-            <div class="hidden md:flex items-center space-x-4">
-                <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
-                    </svg>
-                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
-                    </div>
-                </button>
-                <button onclick="window.location.href='perfil.html'" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg transition text-sm font-semibold">Entrar</button>
-                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg transform hover:-translate-y-0.5">
-                    Agendar Agora
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#comparativo" class="font-bold hover:underline decoration-2 underline-offset-4 decoration-blue-600">Por que Mudar?</a>
+                <a href="#planos" class="font-bold hover:underline decoration-2 underline-offset-4 decoration-blue-600">Preços</a>
+                
+                <button onclick="showDevelopmentModal()" class="neu-btn primary px-6 py-2 rounded-lg text-sm">
+                    Falar com Especialista
                 </button>
             </div>
 
-            <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
-                </svg>
-                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
-                </div>
+            <button class="md:hidden p-2 border-2 border-black rounded bg-white active:bg-gray-100" onclick="toggleNotificationPanel()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
     </header>
 
-    <!-- PAINEL DE NOTIFICAÇÕES -->
-    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
-
+    <!-- PAINEL DE NOTIFICAÇÕES (MANTIDO) -->
+    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[80] backdrop-blur-sm"></div>
     <div id="notification-panel" class="transform translate-x-full">
         <div id="notification-content">
-            <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10">
-                <h3 class="text-xl font-bold brand-font text-white">Notificações</h3>
-                <button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+            <div class="bg-yellow-400 border-b-4 border-black p-4 flex-none flex justify-between items-center z-10">
+                <h3 class="text-xl font-black brand-font text-black uppercase">Notificações</h3>
+                <button onclick="toggleNotificationPanel()" class="bg-black text-white w-8 h-8 flex items-center justify-center font-bold rounded hover:bg-gray-800">X</button>
             </div>
-            <div class="flex-grow overflow-y-auto relative">
+            <div class="flex-grow overflow-y-auto bg-white">
                 <ul id="notification-list" class="p-4 space-y-3 pb-24"></ul>
-                <div id="loading-notifications" class="p-4 text-center hidden">
-                    <div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div>
-                    <p class="text-sm text-blue-200 mt-2">Carregando...</p>
-                </div>
             </div>
-            <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
-                   <button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline transition opacity-100 pointer-events-auto active:scale-95 py-1">
+            <div class="p-4 border-t-4 border-black bg-gray-100 text-center flex-none w-full pb-8">
+                   <button id="mark-all-button" onclick="markAllAsRead()" class="neu-btn dark w-full py-3 rounded-lg text-sm">
                        Marcar todas como lidas
                    </button>
             </div>
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL (VAZIO) -->
-    <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-gray-50 flex items-center justify-center">
-        <!-- Conteúdo removido conforme solicitado -->
-        <div class="text-center p-8 opacity-50">
-            <h2 class="text-2xl font-bold brand-font text-gray-400">Página de Combos</h2>
-            <p class="text-gray-400 text-sm">Em breve novidades aqui.</p>
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow w-full pt-16 pb-20">
+        
+        <!-- HERO SECTION -->
+        <div class="bg-pattern border-b-4 border-black py-20 px-4">
+            <div class="max-w-5xl mx-auto text-center">
+                <div class="inline-block bg-black text-yellow-400 font-bold px-4 py-2 border-2 border-black mb-6 transform -rotate-2">
+                    🚀 CHEGA DE BUROCRACIA
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black uppercase leading-none mb-6">
+                    A Escola Paga <span class="bg-blue-600 text-white px-2">Fixo.</span><br>
+                    O Aluno Brinca <span class="bg-yellow-400 text-black px-2 border-2 border-black">Livre.</span>
+                </h1>
+                <p class="text-xl font-medium text-gray-800 max-w-2xl mx-auto mb-10 border-l-4 border-blue-600 pl-4 text-left md:text-center md:border-l-0 md:pl-0">
+                    O <strong>primeiro clube de assinatura de diversão</strong> para escolas. 
+                    <br class="hidden md:inline">Planejamento anual, custo mensal e zero dor de cabeça.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#planos" onclick="showDevelopmentModal()" class="neu-btn primary px-8 py-4 rounded-xl text-lg flex items-center justify-center gap-2">
+                        Ver Planos
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                    </a>
+                    <a href="#comparativo" class="neu-btn secondary px-8 py-4 rounded-xl text-lg">
+                        Entenda a Diferença
+                    </a>
+                </div>
+            </div>
         </div>
+
+        <!-- COMPARATIVO: A DOR VS A CURA -->
+        <div id="comparativo" class="max-w-6xl mx-auto px-4 py-20">
+            <h2 class="text-4xl font-black text-center mb-12 uppercase">Por que mudar para Assinatura?</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 relative">
+                <!-- VS BADGE -->
+                <div class="vs-badge hidden md:flex">VS</div>
+
+                <!-- O JEITO VELHO -->
+                <div class="neu-box bg-gray-100 p-8 rounded-2xl opacity-75 grayscale-[50%]">
+                    <h3 class="text-2xl font-black text-gray-500 mb-6 uppercase flex items-center gap-2">
+                        💀 O Jeito Antigo
+                    </h3>
+                    <ul class="space-y-4 font-bold text-gray-600">
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 text-xl">✖</span>
+                            <span>Cotação todo mês (gasta horas)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 text-xl">✖</span>
+                            <span>Aprovação financeira a cada evento</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 text-xl">✖</span>
+                            <span>Preços variam na alta temporada</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 text-xl">✖</span>
+                            <span>"Ah, esquecemos de agendar!"</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- O JEITO ENCANTO -->
+                <div class="neu-box bg-blue-50 p-8 rounded-2xl border-blue-600 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-yellow-400 border-b-2 border-l-2 border-black px-3 py-1 font-bold text-xs uppercase">Recomendado</div>
+                    <h3 class="text-2xl font-black text-blue-600 mb-6 uppercase flex items-center gap-2">
+                        ✨ O Jeito Encanto
+                    </h3>
+                    <ul class="space-y-4 font-bold text-gray-800">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm border-2 border-black flex-shrink-0">✓</span>
+                            <span>1 contrato anual, 12 meses de paz</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm border-2 border-black flex-shrink-0">✓</span>
+                            <span>Fatura automática recorrente</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm border-2 border-black flex-shrink-0">✓</span>
+                            <span>Preço travado (sem surpresa no Natal)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm border-2 border-black flex-shrink-0">✓</span>
+                            <span>Calendário garantido antecipadamente</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- GALERIA "POLAROID" -->
+        <div class="bg-yellow-400 border-y-4 border-black py-16 px-4 overflow-hidden">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-black text-center mb-10 text-black uppercase transform rotate-1">O que vem no pacote?</h2>
+                
+                <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+                    <!-- Foto 1 -->
+                    <div class="neu-box p-3 bg-white w-64 transform -rotate-3 hover:rotate-0 hover:z-10 transition duration-300">
+                        <div class="border-2 border-black h-48 overflow-hidden bg-gray-200">
+                            <img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/tobogam.webp" class="w-full h-full object-cover grayscale hover:grayscale-0 transition" alt="Tobogã">
+                        </div>
+                        <p class="font-bold text-center mt-3 font-mono">Tobogãs Gigantes</p>
+                    </div>
+
+                    <!-- Foto 2 -->
+                    <div class="neu-box p-3 bg-white w-64 transform rotate-2 hover:rotate-0 hover:z-10 transition duration-300 z-10">
+                        <div class="border-2 border-black h-48 overflow-hidden bg-gray-200">
+                            <img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp" class="w-full h-full object-cover grayscale hover:grayscale-0 transition" alt="Futebol Sabão">
+                        </div>
+                        <p class="font-bold text-center mt-3 font-mono">Futebol de Sabão</p>
+                    </div>
+
+                    <!-- Foto 3 -->
+                    <div class="neu-box p-3 bg-white w-64 transform -rotate-2 hover:rotate-0 hover:z-10 transition duration-300">
+                        <div class="border-2 border-black h-48 overflow-hidden bg-gray-200">
+                            <img src="https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/areababy.webp" class="w-full h-full object-cover grayscale hover:grayscale-0 transition" alt="Área Baby">
+                        </div>
+                        <p class="font-bold text-center mt-3 font-mono">Área Baby Segura</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLANOS DE ASSINATURA -->
+        <div id="planos" class="max-w-7xl mx-auto px-4 py-20">
+            
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black uppercase mb-6">Investimento</h2>
+                
+                <!-- Toggle -->
+                <div class="flex items-center justify-center gap-4 bg-white border-2 border-black inline-flex px-6 py-3 rounded-full shadow-[4px_4px_0px_0px_#000]">
+                    <span class="font-bold">Mensal</span>
+                    <input type="checkbox" id="price-toggle" class="hidden">
+                    <label for="price-toggle" class="toggle-switch">
+                        <div class="toggle-knob"></div>
+                    </label>
+                    <span class="font-bold">Anual <span class="bg-yellow-400 text-xs px-2 py-0.5 border border-black rounded">-15% OFF</span></span>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 items-end">
+                
+                <!-- PLANO START -->
+                <div class="neu-box p-0 rounded-xl overflow-hidden h-full flex flex-col">
+                    <div class="bg-gray-100 p-6 border-b-2 border-black">
+                        <h3 class="text-2xl font-black">START</h3>
+                        <p class="text-sm font-medium mt-1">O básico bem feito.</p>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col">
+                        <div class="mb-6">
+                            <span class="text-4xl font-black price-value" data-monthly="599" data-annual="509">R$ 599</span>
+                            <span class="font-bold text-gray-500">/mês</span>
+                        </div>
+                        <ul class="space-y-3 mb-8 text-sm font-bold flex-grow">
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-black"></div> 1 Ativação/mês</li>
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-black"></div> 3 Brinquedos</li>
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-black"></div> Duração: 2 Dias</li>
+                        </ul>
+                        <button onclick="showDevelopmentModal()" class="neu-btn dark w-full py-3 rounded-lg text-sm">Assinar Start</button>
+                    </div>
+                </div>
+
+                <!-- PLANO PRO (DESTAQUE) -->
+                <div class="neu-box p-0 rounded-xl overflow-hidden transform md:-translate-y-4 border-blue-600 relative">
+                    <div class="bg-blue-600 text-white text-center font-bold text-sm py-1 border-b-2 border-black uppercase tracking-wider">
+                        ★ Favorito das Escolas ★
+                    </div>
+                    <div class="bg-blue-50 p-6 border-b-2 border-black">
+                        <h3 class="text-3xl font-black text-blue-600">PLAY</h3>
+                        <p class="text-sm font-bold mt-1">Semana completa de diversão.</p>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col">
+                        <div class="mb-6">
+                            <span class="text-5xl font-black price-value text-blue-600" data-monthly="990" data-annual="840">R$ 990</span>
+                            <span class="font-bold text-gray-500">/mês</span>
+                        </div>
+                        <div class="bg-yellow-100 border-2 border-black p-3 mb-6 text-xs font-bold rounded">
+                            Economia de R$ 4.000/ano comparado a avulso!
+                        </div>
+                        <ul class="space-y-3 mb-8 text-sm font-bold flex-grow">
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-blue-600"></div> 1 Ativação/mês</li>
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-blue-600"></div> 4 Brinquedos (1 Grande)</li>
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-blue-600"></div> <strong>Semana Toda (Seg-Sex)</strong></li>
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-blue-600"></div> Rodízio Garantido</li>
+                        </ul>
+                        <button onclick="showDevelopmentModal()" class="neu-btn primary w-full py-4 rounded-lg text-lg">Quero o Play</button>
+                    </div>
+                </div>
+
+                <!-- PLANO VIP -->
+                <div class="neu-box p-0 rounded-xl overflow-hidden h-full flex flex-col">
+                    <div class="bg-purple-100 p-6 border-b-2 border-black">
+                        <h3 class="text-2xl font-black text-purple-700">SUPER FUN</h3>
+                        <p class="text-sm font-medium mt-1">Para quem quer impressionar.</p>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col">
+                        <div class="mb-6">
+                            <span class="text-4xl font-black price-value" data-monthly="1.600" data-annual="1.360">R$ 1.600</span>
+                            <span class="font-bold text-gray-500">/mês</span>
+                        </div>
+                        <ul class="space-y-3 mb-8 text-sm font-bold flex-grow">
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-purple-600"></div> <strong>2 Ativações</strong> (Quinzenal)</li>
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-purple-600"></div> Kit Personalizado</li>
+                            <li class="flex items-center gap-2"><div class="w-4 h-4 bg-purple-600"></div> Prioridade Agenda</li>
+                        </ul>
+                        <button onclick="showDevelopmentModal()" class="neu-btn dark w-full py-3 rounded-lg text-sm">Consultar VIP</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </main>
 
-    <!-- FOOTER DESKTOP -->
-    <footer class="bg-white border-t border-gray-200 py-8 hidden md:block">
-        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500">
-            <p>&copy; 2024 EncantoFestas Locações. Feito com diversão.</p>
+    <!-- FOOTER -->
+    <footer class="bg-black text-white border-t-4 border-black py-12 pb-32 md:pb-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-black uppercase mb-6 brand-font">Pronto para Mudar?</h2>
+            <div class="flex gap-4 justify-center mb-8">
+                <a href="#" class="font-bold hover:text-yellow-400 underline">Instagram</a>
+                <a href="#" class="font-bold hover:text-yellow-400 underline">WhatsApp</a>
+                <a href="#" class="font-bold hover:text-yellow-400 underline">Email</a>
+            </div>
+            <p class="text-gray-500 text-xs font-mono">
+                &copy; 2024 EncantoFestas Locações. Design Neobrutalista.
+            </p>
         </div>
     </footer>
 
-    <!-- BOTTOM NAV (COMBOS SELECIONADO) -->
-    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
+    <!-- BOTTOM NAV (MANTIDA) -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white border-t-4 border-black md:hidden z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
-            <!-- INÍCIO (Link Inativo) -->
-            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
-                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                <span class="text-[10px] font-medium">Início</span>
+            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-black transition group cursor-pointer border-r border-gray-100">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="text-[10px] font-bold uppercase">Início</span>
             </a>
-            
-            <!-- COMBOS (Selecionado/Ativo) -->
-            <div class="flex flex-col items-center justify-center w-full h-full text-blue-600 cursor-default pointer-events-none">
+            <div class="flex flex-col items-center justify-center w-full h-full text-blue-600 bg-blue-50 cursor-default pointer-events-none border-r border-gray-100">
                 <svg class="w-6 h-6 mb-1 transition" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="4" y="8" width="13" height="13" rx="2" stroke-width="0" /> <!-- preenchido -->
+                    <rect x="4" y="8" width="13" height="13" rx="2" stroke-width="0" />
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4H8a2 2 0 00-2 2v1" />
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8V6a2 2 0 00-2-2h-3" />
                 </svg>
-                <span class="text-[10px] font-medium">Combos</span>
+                <span class="text-[10px] font-black uppercase">Clube</span>
             </div>
-
-            <div class="relative flex justify-center items-center h-full w-full">
-                <a href="calendario.html" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10">
+            <div class="relative flex justify-center items-center h-full w-full border-r border-gray-100">
+                <a href="calendario.html" class="cursor-pointer floating-fab absolute -top-8 bg-yellow-400 text-black w-14 h-14 rounded-full flex items-center justify-center active:scale-95 transition hover:scale-105 z-10">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11h4m-4 4h4" opacity="0.6"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
                 </a>
             </div>
-            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
-                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-black transition group cursor-pointer border-r border-gray-100">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
                 </svg>
-                <span class="text-[10px] font-medium">Catálogo</span>
+                <span class="text-[10px] font-bold uppercase">Itens</span>
             </a>
-            <a href="perfil.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
+            <a href="perfil.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-black transition group cursor-pointer">
                 <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                <span class="text-[10px] font-medium">Perfil</span>
+                <span class="text-[10px] font-bold uppercase">Perfil</span>
             </a>
         </div>
     </nav>
@@ -202,14 +509,51 @@
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
         
-        function updateLocalCache() {
-            localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
+        // --- LÓGICA DO MODAL DE DESENVOLVIMENTO ---
+        window.showDevelopmentModal = function() {
+            document.getElementById('under-development-modal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        };
+
+        window.closeDevelopmentModal = function() {
+            document.getElementById('under-development-modal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        };
+
+        // Mostrar o modal automaticamente na primeira visita
+        document.addEventListener('DOMContentLoaded', () => {
+            const hasSeenModal = localStorage.getItem('encanto_dev_modal_seen');
+            if (!hasSeenModal) {
+                setTimeout(window.showDevelopmentModal, 500); // Dá um pequeno delay para a página carregar
+                localStorage.setItem('encanto_dev_modal_seen', 'true');
+            }
+        });
+
+
+        // --- LÓGICA DO TOGGLE (PREÇO) ---
+        const toggleInput = document.getElementById('price-toggle');
+        if (toggleInput) {
+            toggleInput.addEventListener('change', function() {
+                const isAnnual = this.checked;
+                const priceElements = document.querySelectorAll('.price-value');
+                
+                priceElements.forEach((el) => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(5px)';
+                    el.style.transition = 'all 0.2s ease';
+                    
+                    setTimeout(() => {
+                        el.innerText = isAnnual ? `R$ ${el.dataset.annual}` : `R$ ${el.dataset.monthly}`;
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, 200);
+                });
+            });
         }
 
-        function getReadNotificationsCollection(uid) {
-            return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
-        }
-
+        // --- CÓDIGO DE NOTIFICAÇÕES E FIREBASE (MANTIDO) ---
+        function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
+        function getReadNotificationsCollection(uid) { return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`); }
         window.markSingleAsRead = async function(e, notificationId) {
             e.stopPropagation();
             const idStr = String(notificationId);
@@ -223,19 +567,12 @@
                 } catch (error) { console.error("Erro ao salvar leitura:", error); }
             }
         }
-
-        window.navigateTo = function(url) {
-            if (url && url !== '#') { window.location.href = url; }
-        }
-
+        window.navigateTo = function(url) { if (url && url !== '#') { window.location.href = url; } }
         window.markAllAsRead = async function() {
             const batchIds = [];
             notificationsData.forEach(n => {
                 const idStr = String(n.id);
-                if (!readNotificationsIds.has(idStr)) {
-                    readNotificationsIds.add(idStr);
-                    batchIds.push(idStr);
-                }
+                if (!readNotificationsIds.has(idStr)) { readNotificationsIds.add(idStr); batchIds.push(idStr); }
             });
             updateLocalCache();
             renderNotifications();
@@ -248,14 +585,13 @@
             });
             try { await batch.commit(); } catch (error) { console.error("Erro ao marcar todas:", error); }
         }
-
         function updateNotificationCount(count) {
             const elements = document.querySelectorAll('.notification-counter');
             const markAllButton = document.getElementById('mark-all-button');
             if (markAllButton) {
                 if (count > 0) {
                     markAllButton.classList.remove('opacity-0', 'pointer-events-none', 'text-blue-300');
-                    markAllButton.classList.add('text-white', 'hover:text-blue-200');
+                    markAllButton.classList.add('bg-black', 'text-white');
                     markAllButton.innerText = "Marcar todas como lidas";
                     markAllButton.disabled = false;
                 } else {
@@ -265,77 +601,63 @@
                 }
             }
             elements.forEach(el => {
-                if (count > 0) {
-                    el.classList.remove('hidden');
-                    el.innerText = count > 9 ? '9+' : count;
-                } else {
-                    el.classList.add('hidden');
-                }
+                if (count > 0) { el.classList.remove('hidden'); el.innerText = count > 9 ? '9+' : count; } else { el.classList.add('hidden'); }
             });
         }
-
         function renderNotifications() {
             const panelList = document.getElementById('notification-list');
-            const loadingIndicator = document.getElementById('loading-notifications');
-            if (loadingIndicator) loadingIndicator.classList.add('hidden');
             const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id)));
             const unreadCount = unreadItems.length;
             updateNotificationCount(unreadCount);
             if (!isPanelOpen) return;
             panelList.innerHTML = ''; 
             if (unreadItems.length === 0) {
-                panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>';
+                panelList.innerHTML = '<li class="p-8 text-center text-gray-400 text-sm italic font-bold">Parabéns! Você leu todas as suas notificações. 🎉</li>';
                 return;
             }
             unreadItems.forEach(notificacao => {
                 const li = document.createElement('li');
-                const bgClass = 'bg-blue-700 hover:bg-blue-800';
+                const bgClass = 'bg-white border-2 border-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none shadow-[4px_4px_0px_0px_#000]';
                 const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨';
                 const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
-                li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`;
+                li.className = `p-4 transition ${bgClass} mb-3 text-black ${hasLink} transform duration-100`;
                 if (notificacao.link) { li.onclick = () => window.navigateTo(notificacao.link); }
                 const dateObj = new Date(notificacao.data);
                 const dataFormatada = isNaN(dateObj) ? notificacao.data : dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
                 li.innerHTML = `
                     <div class="flex flex-col items-center gap-2">
-                        <div class="text-4xl mb-2">${icon}</div>
+                        <div class="text-3xl mb-1">${icon}</div>
                         <div class="flex-grow text-center">
-                            <h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4>
-                            <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
-                            <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
+                            <h4 class="font-black text-lg leading-tight uppercase">${notificacao.titulo}</h4>
+                            <p class="text-sm font-medium mt-1">${notificacao.mensagem}</p>
+                            <span class="text-xs font-bold text-gray-500 block mt-2">${dataFormatada}</span>
                         </div>
-                        <button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md z-10 relative">Marcar como Lida</button>
+                        <button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-2 neu-btn secondary py-1 px-4 rounded text-xs">Marcar Lida</button>
                     </div>
                 `;
                 panelList.appendChild(li);
             });
         }
-
         async function fetchNotifications() {
             try {
                 const response = await fetch('notificacoes.json');
                 if (response.ok) {
                     const data = await response.json();
                     notificationsData = data.map(item => ({ ...item, id: String(item.id), data: item.data || new Date().toISOString(), link: item.link || '#' }));
-                } else { console.warn("notificacoes.json não encontrado."); }
-            } catch (error) { console.error("Erro ao buscar notificações:", error); } finally { renderNotifications(); }
+                }
+            } catch (error) { } finally { renderNotifications(); }
         }
-
         async function setupNotificationListener() {
             if (!isAuthReady || !userId) return;
             const readCollectionRef = getReadNotificationsCollection(userId);
             unsubscribeNotifications = onSnapshot(readCollectionRef, (snapshot) => {
                 let hasChanges = false;
                 snapshot.docs.forEach(doc => {
-                    if (!readNotificationsIds.has(doc.id)) {
-                        readNotificationsIds.add(doc.id);
-                        hasChanges = true;
-                    }
+                    if (!readNotificationsIds.has(doc.id)) { readNotificationsIds.add(doc.id); hasChanges = true; }
                 });
                 if (hasChanges) { updateLocalCache(); renderNotifications(); }
             }, (error) => { console.error("Erro Firestore:", error); });
         }
-
         window.toggleNotificationPanel = function() {
             const panel = document.getElementById('notification-panel');
             const overlay = document.getElementById('notification-overlay');
@@ -351,7 +673,6 @@
                 document.body.classList.remove('overflow-hidden');
             }
         }
-
         async function initializeFirebaseAndAuth() {
             try {
                 app = initializeApp(firebaseConfig);
@@ -361,7 +682,7 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) { userId = user.uid; isAuthReady = true; setupNotificationListener(); } else { userId = null; isAuthReady = true; if (unsubscribeNotifications) unsubscribeNotifications(); updateNotificationCount(0); }
                 });
-            } catch (e) { console.error("Erro Firebase:", e); isAuthReady = true; }
+            } catch (e) { isAuthReady = true; }
         }
         
         document.addEventListener('DOMContentLoaded', () => {
