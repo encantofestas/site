@@ -76,6 +76,39 @@
             display: flex;
             flex-direction: column;
         }
+
+        /* Estilo Específico do Catálogo */
+        .catalog-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .catalog-card:active {
+            transform: scale(0.98);
+        }
+        .catalog-image-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .catalog-image-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+            pointer-events: none;
+        }
+        
+        /* Skeleton Loading Animation */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col bg-slate-50">
@@ -144,12 +177,56 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL (REMOVIDO A PEDIDO) -->
-    <main class="flex-grow w-full pt-20 pb-28 md:pb-12 px-4 flex items-center justify-center">
-        <div class="text-center p-8 mt-16 text-gray-400">
-            <h2 class="text-xl font-semibold brand-font text-gray-600">Catálogo Encanto Festas</h2>
-            <p class="text-sm mt-2">Apenas o cabeçalho e a barra de navegação inferior foram mantidos.</p>
+    <!-- CONTEÚDO PRINCIPAL: CATÁLOGO -->
+    <main class="flex-grow w-full pt-20 pb-28 md:pb-12 px-4 max-w-7xl mx-auto">
+        
+        <!-- Título da Seção -->
+        <div class="text-center mb-6 mt-4 fade-in">
+            <h2 class="text-2xl md:text-3xl font-bold brand-font text-blue-900">Nossos Itens</h2>
+            <p class="text-sm text-gray-500">Escolha os detalhes perfeitos para sua festa</p>
         </div>
+
+        <!-- GRID DO CATÁLOGO (Conteúdo Carregado via JS) -->
+        <div id="catalog-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4 min-h-[300px]">
+            <!-- Estado de Carregamento (Skeleton) - Será removido pelo JS -->
+            <div class="catalog-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-64">
+                <div class="h-40 w-full skeleton"></div>
+                <div class="p-3 flex flex-col gap-2">
+                    <div class="h-4 w-3/4 skeleton rounded"></div>
+                    <div class="h-3 w-1/2 skeleton rounded"></div>
+                    <div class="mt-auto h-8 w-full skeleton rounded-xl"></div>
+                </div>
+            </div>
+            <div class="catalog-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-64">
+                <div class="h-40 w-full skeleton"></div>
+                <div class="p-3 flex flex-col gap-2">
+                    <div class="h-4 w-3/4 skeleton rounded"></div>
+                    <div class="h-3 w-1/2 skeleton rounded"></div>
+                    <div class="mt-auto h-8 w-full skeleton rounded-xl"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensagem de erro/vazio (Oculta por padrão) -->
+        <div id="catalog-error" class="hidden text-center py-10 text-gray-400">
+            <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p>Não foi possível carregar os itens no momento.</p>
+        </div>
+
+        <!-- Banner Promocional no final da lista -->
+        <div class="mt-8 mb-6 bg-gradient-brand rounded-2xl p-6 text-center text-white relative overflow-hidden shadow-lg slide-up" style="animation-delay: 0.7s;">
+            <div class="relative z-10">
+                <h3 class="text-xl font-bold brand-font mb-2">Não achou o que procura?</h3>
+                <p class="text-blue-100 text-sm mb-4">Temos combos completos com decoração personalizada para sua festa!</p>
+                <button onclick="window.location.href='combos.html'" class="bg-secondary text-blue-900 px-6 py-2 rounded-full font-bold shadow-md hover:bg-yellow-300 transition transform hover:scale-105">
+                    Ver Combos
+                </button>
+            </div>
+            <!-- Elementos decorativos de fundo -->
+            <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white opacity-10 rounded-full"></div>
+            <div class="absolute bottom-0 left-0 -ml-4 -mb-4 w-16 h-16 bg-yellow-400 opacity-20 rounded-full"></div>
+        </div>
+
     </main>
 
     <!-- BOTTOM NAV -->
@@ -175,10 +252,10 @@
                     </svg>
                 </a>
             </div>
-            <!-- ÍCONE ATUALIZADO: Agora é preenchido mas com os detalhes (linhas) recortados dentro -->
+            <!-- ÍCONE ATUALIZADO: Formato sólido com recortes internos (imagem e linhas) -->
             <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-blue-600 cursor-default">
                 <svg class="w-6 h-6 mb-1 transition" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                     <path fill-rule="evenodd" d="M4.5 3.75a3 3 0 00-3 3v10.5a3 3 0 003 3h15a3 3 0 003-3V6.75a3 3 0 00-3-3h-15zm4.125 3a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9zm0 3a.75.75 0 000 1.5h9a.75.75 0 000-1.5h-9z" clip-rule="evenodd" />
+                     <path fill-rule="evenodd" clip-rule="evenodd" d="M5 4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H5zm2 4a1 1 0 011-1h5a1 1 0 011 1v4a1 1 0 01-1 1H8a1 1 0 01-1-1V8zm-1 8a1 1 0 011-1h12a1 1 0 110 2H7a1 1 0 01-1-1zm10-7a1 1 0 100 2 1 1 0 000-2zm0 4a1 1 0 100 2 1 1 0 000-2z" />
                 </svg>
                 <span class="text-[10px] font-medium">Catálogo</span>
             </a>
@@ -189,8 +266,7 @@
         </div>
     </nav>
 
-    <!-- SCRIPT DO SISTEMA (SIMPLIFICADO PARA LOCALSTORAGE) -->
-    <!-- As funções de autenticação e notificações foram mantidas no script para evitar erros nas rotinas de inicialização -->
+    <!-- SCRIPT DO SISTEMA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -201,7 +277,7 @@
 
         setLogLevel('silent');
         
-        // Configurações do Firebase (mantidas para geração do ID do usuário)
+        // Configurações do Firebase
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
@@ -210,50 +286,126 @@
         let isPanelOpen = false;
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
+        let catalogData = []; // Armazena os dados do estoque
         
         // --- FUNÇÕES DE UI E MENSAGENS (MANTIDAS) ---
         
-        window.switchAuthTab = function(tab) {
-            // Funções de UI removidas da tela, mas mantidas para compatibilidade.
-        }
-        
-        function displayMessage(message, type = 'error') {
-            // Funções de UI removidas da tela, mas mantidas para compatibilidade.
-        }
+        window.switchAuthTab = function(tab) { /* Inoperante nesta página */ }
+        function displayMessage(message, type = 'error') { /* Inoperante nesta página */ }
 
-        // --- LÓGICA DE LOGIN/PERFIL (AGORA INOPERANTE NESTA PÁGINA) ---
-
+        // --- LÓGICA DE LOGIN/PERFIL ---
         async function checkUserProfile() {
-            // Lógica removida da exibição, mas mantida no script para evitar erros.
             const loadingState = document.getElementById('loading-state');
             if (loadingState) loadingState.classList.add('hidden');
         }
 
-        window.handleRegister = async function(e) { /* Inoperante nesta página */ }
+        window.handleRegister = async function(e) { /* Inoperante */ }
+        window.handleLogin = async function(e) { /* Inoperante */ }
+        window.handleLogout = async function(e) { /* Inoperante */ }
 
-        window.handleLogin = async function(e) { /* Inoperante nesta página */ }
+        // --- CATÁLOGO (NOVA LÓGICA) ---
 
-        window.handleLogout = async function(e) { /* Inoperante nesta página */ }
-
-        // --- MANUTENÇÃO DE NOTIFICAÇÕES ---
-
-        function setupNotificationListener() { /* Mantido para evitar erros */ }
-
-        function updateLocalCache() {
-            localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
+        async function fetchCatalog() {
+            const grid = document.getElementById('catalog-grid');
+            const errorMsg = document.getElementById('catalog-error');
+            
+            try {
+                // Tenta buscar o arquivo JSON
+                const response = await fetch('estoque.json');
+                
+                if (!response.ok) {
+                    throw new Error('Falha ao carregar estoque.json');
+                }
+                
+                const data = await response.json();
+                
+                // Se der tudo certo e tiver itens
+                if (Array.isArray(data) && data.length > 0) {
+                    catalogData = data;
+                    renderCatalog(catalogData);
+                } else {
+                    // Arquivo existe mas está vazio ou formato incorreto
+                    grid.innerHTML = '';
+                    errorMsg.classList.remove('hidden');
+                    errorMsg.querySelector('p').innerText = 'Nenhum item encontrado no estoque.';
+                }
+                
+            } catch (error) {
+                console.error("Erro ao carregar catálogo:", error);
+                // Fallback visual em caso de erro (exibe erro amigável)
+                grid.innerHTML = '';
+                errorMsg.classList.remove('hidden');
+            }
         }
+
+        function renderCatalog(items) {
+            const grid = document.getElementById('catalog-grid');
+            grid.innerHTML = ''; // Remove skeletons
+            
+            items.forEach((item, index) => {
+                // Define o badge se existir (ex: 'Popular', 'Novo')
+                let badgeHtml = '';
+                if (item.destaque || item.badge) {
+                    const badgeText = item.destaque || item.badge;
+                    // Cores alternadas baseadas no texto (simplificado)
+                    const isNew = badgeText.toLowerCase().includes('novo');
+                    const badgeClass = isNew 
+                        ? 'bg-secondary text-blue-900' 
+                        : 'bg-white/90 text-blue-600 border border-blue-100 backdrop-blur-sm';
+                        
+                    badgeHtml = `
+                        <div class="absolute top-2 right-2 px-2 py-1 rounded-full text-[10px] font-bold shadow-sm ${badgeClass}">
+                            ${badgeText}
+                        </div>
+                    `;
+                }
+
+                // Cria o card HTML
+                const card = document.createElement('div');
+                card.className = "catalog-card bg-white rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 overflow-hidden flex flex-col slide-up";
+                card.style.animationDelay = `${(index * 0.1) + 0.1}s`; // Stagger animation
+                
+                // Fallback de imagem caso url falhe
+                const imageUrl = item.imagem || 'https://placehold.co/400x300/e2e8f0/1e293b?text=Sem+Foto';
+
+                card.innerHTML = `
+                    <div class="catalog-image-container h-40 w-full bg-gray-100 relative">
+                        <img src="${imageUrl}" 
+                             alt="${item.nome}" 
+                             class="w-full h-full object-cover transform hover:scale-105 transition duration-500"
+                             onerror="this.onerror=null;this.src='https://placehold.co/400x300/e2e8f0/1e293b?text=Imagem+Indisponível'">
+                        ${badgeHtml}
+                    </div>
+                    <div class="p-3 flex flex-col flex-grow text-center relative z-10">
+                        <h3 class="font-bold text-gray-800 brand-font text-base leading-tight mb-1">${item.nome}</h3>
+                        <div class="flex items-center justify-center gap-1 mb-3">
+                            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                            <p class="text-xs text-gray-500 font-medium">${item.medida || item.descricao || 'Tamanho padrão'}</p>
+                        </div>
+                        <button onclick="window.location.href='calendario.html'" class="mt-auto w-full bg-secondary text-blue-900 font-bold py-2 rounded-xl text-sm hover:bg-yellow-300 transition-colors shadow-sm flex items-center justify-center gap-2 group">
+                            <span>Reservar</span>
+                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // --- MANUTENÇÃO DE NOTIFICAÇÕES (MANTIDO) ---
+
+        function setupNotificationListener() { /* Mantido */ }
+        function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
 
         window.markSingleAsRead = async function(e, notificationId) {
             e.stopPropagation();
-            const idStr = String(notificationId);
-            readNotificationsIds.add(idStr);
+            readNotificationsIds.add(String(notificationId));
             updateLocalCache();
             renderNotifications();
         }
 
-        window.navigateTo = function(url) {
-            if (url && url !== '#') { window.location.href = url; }
-        }
+        window.navigateTo = function(url) { if (url && url !== '#') window.location.href = url; }
 
         window.markAllAsRead = async function() {
             notificationsData.forEach(n => readNotificationsIds.add(String(n.id)));
@@ -264,15 +416,7 @@
         function updateNotificationCount(count) {
             const elements = document.querySelectorAll('.notification-counter');
             const markAllButton = document.getElementById('mark-all-button');
-            if (markAllButton) {
-                if (count > 0) {
-                    markAllButton.classList.remove('opacity-50', 'pointer-events-none');
-                    markAllButton.disabled = false;
-                } else {
-                    markAllButton.classList.add('opacity-50', 'pointer-events-none');
-                    markAllButton.disabled = true;
-                }
-            }
+            if (markAllButton) markAllButton.disabled = count <= 0;
             elements.forEach(el => {
                 if (count > 0) {
                     el.classList.remove('hidden');
@@ -297,16 +441,12 @@
             
             unreadItems.forEach(notificacao => {
                 const li = document.createElement('li');
-                const bgClass = 'bg-blue-700 hover:bg-blue-800';
-                
-                const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨';
-                const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
-                
                 const dateObj = new Date(notificacao.data);
                 const dataFormatada = isNaN(dateObj) ? '' : dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-
-                li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`;
-                if (notificacao.link) { li.onclick = () => window.navigateTo(notificacao.link); }
+                const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨';
+                
+                li.className = `p-5 border-b border-blue-800 transition bg-blue-700 hover:bg-blue-800 rounded-xl mb-3 text-white shadow-lg cursor-pointer transform`;
+                if (notificacao.link) li.onclick = () => window.navigateTo(notificacao.link);
                 
                 li.innerHTML = `
                     <div class="flex flex-col items-center gap-2">
@@ -326,23 +466,12 @@
         async function fetchNotifications() {
             try {
                 const response = await fetch('notificacoes.json'); 
-                if (!response.ok) {
-                    console.warn("Arquivo notificacoes.json não encontrado ou erro ao carregar. Usando lista de notificações vazia.");
-                    notificationsData = [];
-                } else {
+                if (response.ok) {
                     const data = await response.json();
-                    notificationsData = data.map(item => ({ 
-                        ...item, 
-                        id: String(item.id || crypto.randomUUID()), 
-                        data: item.data || new Date().toISOString()
-                    }));
+                    notificationsData = data.map(item => ({ ...item, id: String(item.id || crypto.randomUUID()), data: item.data || new Date().toISOString() }));
                 }
-            } catch (error) { 
-                console.error("Erro ao buscar ou processar notificações:", error);
-                notificationsData = []; 
-            } finally { 
-                renderNotifications(); 
-            }
+            } catch (error) { notificationsData = []; } 
+            finally { renderNotifications(); }
         }
 
         window.toggleNotificationPanel = function() {
@@ -370,21 +499,14 @@
                 else { await signInAnonymously(auth); }
                 
                 onAuthStateChanged(auth, (user) => {
-                    if (user) { 
-                        userId = user.uid;
-                        checkUserProfile(); // Chama o check, que agora é uma função vazia ou de limpeza de UI.
-                    } else {
-                        userId = null;
-                        checkUserProfile(); 
-                    }
+                    userId = user ? user.uid : null;
+                    checkUserProfile();
                 });
-            } catch (e) { 
-                console.error("Erro na inicialização do Firebase:", e); 
-                checkUserProfile();
-            }
+            } catch (e) { checkUserProfile(); }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            fetchCatalog(); // Busca os itens do estoque
             fetchNotifications(); 
             initializeFirebaseAndAuth();
         });
