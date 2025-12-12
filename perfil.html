@@ -215,6 +215,10 @@
                 <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Sua Festa Começa Aqui! 🎈</h2>
                 <p class="text-gray-500 text-sm px-8">Cadastre-se para ganhar pontos, descontos exclusivos e agendar festas em segundos.</p>
             </div>
+            
+            <!-- Message Box (Substitui alertas) -->
+            <div id="message-box" class="hidden p-3 mb-4 rounded-xl text-sm font-medium transition-all duration-500 opacity-0" role="alert"></div>
+
 
             <!-- Card Principal -->
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
@@ -331,17 +335,18 @@
         </div>
     </nav>
 
-    <!-- SCRIPT DO SISTEMA -->
+    <!-- SCRIPT DO SISTEMA (SIMPLIFICADO PARA LOCALSTORAGE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
-            getFirestore, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot, 
+            getFirestore, collection, doc, onSnapshot, 
             writeBatch, Timestamp, setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         setLogLevel('silent');
         
+        // Configurações do Firebase (mantidas para geração do ID do usuário)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
@@ -351,13 +356,16 @@
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
         
-        // --- FUNÇÕES DE UI DE AUTH ---
+        // --- FUNÇÕES DE UI E MENSAGENS ---
         
         window.switchAuthTab = function(tab) {
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
             const tabLogin = document.getElementById('tab-login');
             const tabRegister = document.getElementById('tab-register');
+            
+            // Limpa mensagens ao trocar de aba
+            displayMessage('', 'clear');
 
             if (tab === 'login') {
                 loginForm.classList.remove('hidden');
@@ -383,40 +391,66 @@
                 tabLogin.classList.add('text-gray-400');
             }
         }
+        
+        function displayMessage(message, type = 'error') {
+            const box = document.getElementById('message-box');
+            if (!box) return;
 
-        // --- LÓGICA DE LOGIN/PERFIL ---
+            if (type === 'clear' || !message) {
+                box.classList.add('hidden', 'opacity-0');
+                return;
+            }
 
-        async function checkUserProfile(uid) {
-            if (!uid) return;
-            try {
-                // Referência correta seguindo a regra do Firestore
-                const profileRef = doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data');
-                const docSnap = await getDoc(profileRef);
+            box.innerText = message;
+            box.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'opacity-0');
 
-                const loadingState = document.getElementById('loading-state');
-                const authView = document.getElementById('auth-view');
-                const profileView = document.getElementById('profile-view');
+            if (type === 'error') {
+                box.classList.add('bg-red-100', 'text-red-700');
+            } else if (type === 'success') {
+                box.classList.add('bg-green-100', 'text-green-700');
+            }
+
+            box.classList.remove('opacity-0');
+            setTimeout(() => {
+                box.classList.add('opacity-0');
+                setTimeout(() => box.classList.add('hidden'), 500);
+            }, 4000);
+        }
+
+        // --- LÓGICA DE LOGIN/PERFIL (USANDO LOCALSTORAGE) ---
+
+        async function checkUserProfile() {
+            // Se o userId não estiver pronto (Auth não terminou), espera ou usa um ID temporário.
+            const currentUid = userId || 'temp-user'; 
+
+            // 1. Tenta buscar o perfil no LocalStorage
+            const profileDataJSON = localStorage.getItem('encanto_user_profile');
+            
+            const loadingState = document.getElementById('loading-state');
+            const authView = document.getElementById('auth-view');
+            const profileView = document.getElementById('profile-view');
+            
+            // Sempre esconde o loading ao final da checagem
+            loadingState.classList.add('hidden');
+
+            if (profileDataJSON) {
+                // Usuário tem perfil no LocalStorage -> MOSTRAR PERFIL
+                const data = JSON.parse(profileDataJSON);
                 
-                loadingState.classList.add('hidden');
-
-                if (docSnap.exists()) {
-                    // Usuário tem perfil -> MOSTRAR PERFIL
-                    const data = docSnap.data();
-                    document.getElementById('user-name').innerText = data.name || "Cliente Encantado";
-                    document.getElementById('user-avatar').src = data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${uid}&backgroundColor=b6e3f4`;
-                    
-                    authView.classList.add('hidden');
-                    profileView.classList.remove('hidden');
-                    profileView.classList.add('fade-in');
-                } else {
-                    // Usuário não tem perfil -> MOSTRAR LOGIN/CADASTRO
-                    profileView.classList.add('hidden');
-                    authView.classList.remove('hidden');
-                    authView.classList.add('slide-up');
-                }
-            } catch (error) {
-                console.error("Erro ao verificar perfil:", error);
-                document.getElementById('loading-state').innerHTML = `<p class="text-red-500">Erro ao carregar. Tente recarregar.</p>`;
+                // Popula a interface com nome e avatar
+                document.getElementById('user-name').innerText = data.name || "Cliente Encantado";
+                // Usa o e-mail ou um ID para gerar um avatar único
+                const avatarSeed = data.email || currentUid; 
+                document.getElementById('user-avatar').src = data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
+                
+                authView.classList.add('hidden');
+                profileView.classList.remove('hidden');
+                profileView.classList.add('fade-in');
+            } else {
+                // Usuário não tem perfil -> MOSTRAR LOGIN/CADASTRO
+                profileView.classList.add('hidden');
+                authView.classList.remove('hidden');
+                authView.classList.add('slide-up');
             }
         }
 
@@ -424,39 +458,38 @@
             e.preventDefault();
             const name = document.getElementById('reg-name').value;
             const email = document.getElementById('reg-email').value;
-            // Nota: Em um app real, usaríamos createUserWithEmailAndPassword. 
-            // Aqui, estamos salvando os dados no usuário anônimo atual para simular o cadastro completo.
             
-            if (!userId) {
-                alert("Erro de conexão. Tente recarregar a página.");
+            if (!name || !email) {
+                displayMessage("Nome e E-mail são obrigatórios para o cadastro.", 'error');
                 return;
             }
 
             const btn = e.target.querySelector('button');
             const originalText = btn.innerText;
-            btn.innerText = "Criando sua conta...";
+            btn.innerText = "Criando seu perfil...";
             btn.disabled = true;
 
             try {
-                const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}&backgroundColor=c0aede`;
+                const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email.split('@')[0]}&backgroundColor=c0aede`;
                 
-                // SALVAR PERFIL NO FIRESTORE (Regra: users/{uid}/profile/data)
-                const profileRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
-                
-                await setDoc(profileRef, {
+                const profileData = {
                     name: name,
                     email: email,
                     avatar: avatarUrl,
-                    createdAt: Timestamp.now(),
                     memberSince: new Date().getFullYear()
-                });
+                };
+
+                // SALVAR PERFIL NO LOCALSTORAGE
+                localStorage.setItem('encanto_user_profile', JSON.stringify(profileData));
+                displayMessage("Cadastro realizado com sucesso! Bem-vindo(a)!", 'success');
 
                 // Sucesso! Recarregar estado
-                checkUserProfile(userId);
+                setTimeout(() => checkUserProfile(), 1000); 
 
             } catch (error) {
                 console.error("Erro ao registrar:", error);
-                alert("Não foi possível criar a conta. Tente novamente.");
+                displayMessage("Não foi possível criar o perfil. Tente novamente.", 'error');
+            } finally {
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
@@ -464,59 +497,43 @@
 
         window.handleLogin = async function(e) {
             e.preventDefault();
-            // Simulação de login visual. Como o auth é anônimo persistente, 
-            // apenas verificamos se já existe o perfil.
-            // Se o usuário já criou conta neste navegador, ele entra direto.
-            // Se não, sugerimos criar.
-            
             const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
             btn.innerText = "Entrando...";
-            
+            btn.disabled = true;
+
             setTimeout(() => {
-                // Verificar novamente o perfil. Se não existir, avisa.
-                const profileRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
-                getDoc(profileRef).then(docSnap => {
-                    if (docSnap.exists()) {
-                        checkUserProfile(userId);
-                    } else {
-                        alert("Não encontramos um perfil para este usuário neste dispositivo. Por favor, crie uma conta na aba 'CADASTRAR'.");
-                        window.switchAuthTab('register');
-                        btn.innerText = "Acessar Minha Conta";
-                    }
-                });
+                btn.innerText = originalText;
+                btn.disabled = false;
+                
+                if (localStorage.getItem('encanto_user_profile')) {
+                    // Loga se o perfil existir no LocalStorage
+                    checkUserProfile(); 
+                    displayMessage("Login realizado com sucesso.", 'success');
+                } else {
+                    displayMessage("Nenhuma conta encontrada neste dispositivo. Por favor, crie uma conta na aba 'CADASTRAR'.", 'error');
+                    window.switchAuthTab('register');
+                }
             }, 800);
         }
 
         window.handleLogout = async function() {
-            if (confirm("Tem certeza que deseja sair?")) {
-                // Em um app real com email/pass, faríamos signOut(auth).
-                // Aqui, para demo, vamos "esconder" o perfil deletando o documento OU apenas recarregando o anonimo?
-                // Para não perder os dados do usuário, vamos apenas recarregar a página simulando logout visual? 
-                // Melhor: signOut limpa a sessão.
-                try {
-                     // Opção: Deletar o perfil localmente para ver a tela de login de novo (apenas demo)
-                     // const profileRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
-                     // await deleteDoc(profileRef);
-                     
-                     // OU apenas recarregar para limpar estado de memória se fosse SPA.
-                     // Vamos apenas recarregar a página que o Auth Anônimo manterá o ID, 
-                     // mas a experiência de "Sair" geralmente pede para limpar sessão.
-                     // Como é anônimo, signout pode gerar novo UID. Vamos testar.
-                     // await signOut(auth); // Isso vai gerar novo UID no próximo load
-                     
-                     // Para simular a UI de "Voltar ao Login" sem perder os dados (já que é demo):
-                     document.getElementById('profile-view').classList.add('hidden');
-                     document.getElementById('auth-view').classList.remove('hidden');
-                     document.getElementById('login-form').reset();
-                     window.switchAuthTab('login');
-                     
-                } catch (error) {
-                    console.error("Erro ao sair", error);
-                }
-            }
+            // Limpa o perfil do LocalStorage
+            localStorage.removeItem('encanto_user_profile'); 
+            
+            // Simula a transição para a tela de login
+            document.getElementById('profile-view').classList.add('hidden');
+            document.getElementById('auth-view').classList.remove('hidden');
+            document.getElementById('login-form').reset();
+            window.switchAuthTab('login');
+            displayMessage("Você saiu da sua conta.", 'success');
         }
 
-        // --- MANUTENÇÃO DE NOTIFICAÇÕES (Código Antigo Mantido) ---
+        // --- MANUTENÇÃO DE NOTIFICAÇÕES (AGORA REAL) ---
+
+        // Função vazia pois não é mais necessário checar o Firestore para o perfil
+        function setupNotificationListener() { /* Mantido para evitar erros */ }
+
         function updateLocalCache() {
             localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
         }
@@ -572,7 +589,6 @@
                 panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Nenhuma nova notificação.</li>';
                 return;
             }
-            // ... (render logic simplificada para brevidade, mantém a visual)
             unreadItems.forEach(notificacao => {
                  const li = document.createElement('li');
                  li.className = `p-5 border-b border-blue-800 bg-blue-700 rounded-xl mb-3 text-white shadow-lg`;
@@ -581,13 +597,28 @@
             });
         }
         
-        // Fetch Mock
         async function fetchNotifications() {
-             notificationsData = [
-                { id: 1, titulo: "Bem-vindo!", mensagem: "Complete seu cadastro para ganhar pontos.", tipo: "alerta", data: new Date() },
-                { id: 2, titulo: "Promoção Relâmpago", mensagem: "50% OFF no Kit Festa hoje!", tipo: "promocao", data: new Date() }
-             ];
-             renderNotifications();
+            try {
+                // Tenta buscar as notificações do arquivo JSON (AGORA REAL)
+                const response = await fetch('notificacoes.json'); 
+                if (!response.ok) {
+                    console.warn("Arquivo notificacoes.json não encontrado ou erro ao carregar. Usando lista de notificações vazia.");
+                    notificationsData = [];
+                } else {
+                    const data = await response.json();
+                    // Garante que os IDs sejam strings e que há um ID/Data de fallback
+                    notificationsData = data.map(item => ({ 
+                        ...item, 
+                        id: String(item.id || crypto.randomUUID()), 
+                        data: item.data || new Date().toISOString()
+                    }));
+                }
+            } catch (error) { 
+                console.error("Erro ao buscar ou processar notificações:", error);
+                notificationsData = []; 
+            } finally { 
+                renderNotifications(); 
+            }
         }
 
         window.toggleNotificationPanel = function() {
@@ -608,27 +639,30 @@
         async function initializeFirebaseAndAuth() {
             try {
                 app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
                 auth = getAuth(app);
-                
-                // Auth
+                db = getFirestore(app); 
+
+                // Autenticação anônima apenas para gerar um ID de usuário único
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } 
                 else { await signInAnonymously(auth); }
                 
                 onAuthStateChanged(auth, (user) => {
                     if (user) { 
                         userId = user.uid;
-                        // Assim que logar (anonimo), verificar se tem perfil salvo no Firestore
-                        checkUserProfile(userId);
+                        checkUserProfile();
                     } else {
                         userId = null;
+                        checkUserProfile(); 
                     }
                 });
-            } catch (e) { console.error("Erro Firebase:", e); }
+            } catch (e) { 
+                console.error("Erro na inicialização do Firebase:", e); 
+                checkUserProfile();
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            fetchNotifications();
+            fetchNotifications(); // Chama a função que busca o JSON real
             initializeFirebaseAndAuth();
         });
     </script>
