@@ -286,7 +286,14 @@
         let isPanelOpen = false;
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
-        let catalogData = []; // Armazena os dados do estoque
+        let catalogData = []; 
+
+        // Dados de Fallback (Caso o JSON falhe) - ATUALIZADO PARA O NOVO FORMATO
+        const FALLBACK_CATALOG = [
+          { "id": 1, "name": "Cama Elástica Pequena", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp", "measure": "2,44m" },
+          { "id": 2, "name": "Cama Elástica Média", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camam.webp", "measure": "3,05m" },
+          { "id": 4, "name": "Piscina de Bolinhas", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp", "measure": "1,5 (descoberto) / 2m (coberto)" }
+        ];
         
         // --- FUNÇÕES DE UI E MENSAGENS (MANTIDAS) ---
         
@@ -303,51 +310,46 @@
         window.handleLogin = async function(e) { /* Inoperante */ }
         window.handleLogout = async function(e) { /* Inoperante */ }
 
-        // --- CATÁLOGO (NOVA LÓGICA) ---
+        // --- CATÁLOGO ---
 
         async function fetchCatalog() {
             const grid = document.getElementById('catalog-grid');
             const errorMsg = document.getElementById('catalog-error');
             
             try {
-                // Tenta buscar o arquivo JSON
-                const response = await fetch('estoque.json');
+                // ATUALIZADO: Agora busca de calendario.json
+                const response = await fetch('calendario.json');
                 
                 if (!response.ok) {
-                    throw new Error('Falha ao carregar estoque.json');
+                    throw new Error('Falha ao carregar calendario.json');
                 }
                 
                 const data = await response.json();
                 
-                // Se der tudo certo e tiver itens
                 if (Array.isArray(data) && data.length > 0) {
                     catalogData = data;
                     renderCatalog(catalogData);
                 } else {
-                    // Arquivo existe mas está vazio ou formato incorreto
-                    grid.innerHTML = '';
-                    errorMsg.classList.remove('hidden');
-                    errorMsg.querySelector('p').innerText = 'Nenhum item encontrado no estoque.';
+                    throw new Error('JSON vazio');
                 }
                 
             } catch (error) {
-                console.error("Erro ao carregar catálogo:", error);
-                // Fallback visual em caso de erro (exibe erro amigável)
-                grid.innerHTML = '';
-                errorMsg.classList.remove('hidden');
+                console.warn("Erro ao carregar calendario.json, usando backup:", error);
+                // Se falhar o JSON, usa o backup para não deixar a tela vazia
+                renderCatalog(FALLBACK_CATALOG);
             }
         }
 
         function renderCatalog(items) {
             const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = ''; // Remove skeletons
+            grid.innerHTML = ''; 
             
             items.forEach((item, index) => {
-                // Define o badge se existir (ex: 'Popular', 'Novo')
                 let badgeHtml = '';
-                if (item.destaque || item.badge) {
-                    const badgeText = item.destaque || item.badge;
-                    // Cores alternadas baseadas no texto (simplificado)
+                // Verifica campos antigos e novos para Destaques/Badge
+                const badgeText = item.destaque || item.badge;
+                
+                if (badgeText) {
                     const isNew = badgeText.toLowerCase().includes('novo');
                     const badgeClass = isNew 
                         ? 'bg-secondary text-blue-900' 
@@ -360,27 +362,28 @@
                     `;
                 }
 
-                // Cria o card HTML
                 const card = document.createElement('div');
                 card.className = "catalog-card bg-white rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 overflow-hidden flex flex-col slide-up";
-                card.style.animationDelay = `${(index * 0.1) + 0.1}s`; // Stagger animation
+                card.style.animationDelay = `${(index * 0.1) + 0.1}s`;
                 
-                // Fallback de imagem caso url falhe
-                const imageUrl = item.imagem || 'https://placehold.co/400x300/e2e8f0/1e293b?text=Sem+Foto';
+                // Adaptação para campos antigos (nome/imagem/medida) e novos (name/image/measure)
+                const itemName = item.name || item.nome || 'Item sem nome';
+                const itemImage = item.image || item.imagem || 'https://placehold.co/400x300/e2e8f0/1e293b?text=Sem+Foto';
+                const itemMeasure = item.measure || item.medida || item.descricao || 'Tamanho padrão';
 
                 card.innerHTML = `
                     <div class="catalog-image-container h-40 w-full bg-gray-100 relative">
-                        <img src="${imageUrl}" 
-                             alt="${item.nome}" 
+                        <img src="${itemImage}" 
+                             alt="${itemName}" 
                              class="w-full h-full object-cover transform hover:scale-105 transition duration-500"
                              onerror="this.onerror=null;this.src='https://placehold.co/400x300/e2e8f0/1e293b?text=Imagem+Indisponível'">
                         ${badgeHtml}
                     </div>
                     <div class="p-3 flex flex-col flex-grow text-center relative z-10">
-                        <h3 class="font-bold text-gray-800 brand-font text-base leading-tight mb-1">${item.nome}</h3>
+                        <h3 class="font-bold text-gray-800 brand-font text-base leading-tight mb-1">${itemName}</h3>
                         <div class="flex items-center justify-center gap-1 mb-3">
                             <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
-                            <p class="text-xs text-gray-500 font-medium">${item.medida || item.descricao || 'Tamanho padrão'}</p>
+                            <p class="text-xs text-gray-500 font-medium">${itemMeasure}</p>
                         </div>
                         <button onclick="window.location.href='calendario.html'" class="mt-auto w-full bg-secondary text-blue-900 font-bold py-2 rounded-xl text-sm hover:bg-yellow-300 transition-colors shadow-sm flex items-center justify-center gap-2 group">
                             <span>Reservar</span>
@@ -393,9 +396,9 @@
             });
         }
 
-        // --- MANUTENÇÃO DE NOTIFICAÇÕES (MANTIDO) ---
+        // --- MANUTENÇÃO DE NOTIFICAÇÕES ---
 
-        function setupNotificationListener() { /* Mantido */ }
+        function setupNotificationListener() { }
         function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
 
         window.markSingleAsRead = async function(e, notificationId) {
@@ -506,7 +509,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            fetchCatalog(); // Busca os itens do estoque
+            fetchCatalog(); 
             fetchNotifications(); 
             initializeFirebaseAndAuth();
         });
