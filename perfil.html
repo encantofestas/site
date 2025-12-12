@@ -183,7 +183,7 @@
                             <span class="text-xs text-gray-400 font-medium uppercase">Festas</span>
                         </div>
                         <div>
-                            <span class="block text-lg font-bold text-gray-800">0</span>
+                            <span class="block text-lg font-bold text-gray-800" id="user-points">0</span>
                             <span class="text-xs text-gray-400 font-medium uppercase">Pontos</span>
                         </div>
                         <div>
@@ -210,10 +210,15 @@
         <!-- CONTAINER DE AUTH (LOGIN/CADASTRO) -->
         <div id="auth-view" class="hidden w-full max-w-md mx-auto slide-up">
             
-            <!-- Cabeçalho de Marketing -->
+            <!-- Cabeçalho de Marketing MODIFICADO -->
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Sua Festa Começa Aqui! 🎈</h2>
-                <p class="text-gray-500 text-sm px-8">Cadastre-se para ganhar pontos, descontos exclusivos e agendar festas em segundos.</p>
+                <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Acesso ao Perfil (Simulado) 🔑</h2>
+                <p class="text-red-500 text-sm px-8 font-semibold">
+                    [EM CONSTRUÇÃO] Esta é uma tela de demonstração. 
+                </p>
+                <p class="text-gray-500 text-xs px-8 mt-1">
+                    Os dados salvos ficam apenas no seu navegador e **não** geram cadastro real ou pontos de fidelidade ainda.
+                </p>
             </div>
             
             <!-- Message Box (Substitui alertas) -->
@@ -443,6 +448,10 @@
                 const avatarSeed = data.email || currentUid; 
                 document.getElementById('user-avatar').src = data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
                 
+                // Atualiza os pontos se houver
+                const pointsElement = document.getElementById('user-points');
+                if(pointsElement) pointsElement.innerText = data.points || 0;
+                
                 authView.classList.add('hidden');
                 profileView.classList.remove('hidden');
                 profileView.classList.add('fade-in');
@@ -476,12 +485,13 @@
                     name: name,
                     email: email,
                     avatar: avatarUrl,
-                    memberSince: new Date().getFullYear()
+                    memberSince: new Date().getFullYear(),
+                    points: 0 // Iniciando pontos
                 };
 
                 // SALVAR PERFIL NO LOCALSTORAGE
                 localStorage.setItem('encanto_user_profile', JSON.stringify(profileData));
-                displayMessage("Cadastro realizado com sucesso! Bem-vindo(a)!", 'success');
+                displayMessage("Perfil de demonstração criado com sucesso!", 'success');
 
                 // Sucesso! Recarregar estado
                 setTimeout(() => checkUserProfile(), 1000); 
@@ -509,9 +519,9 @@
                 if (localStorage.getItem('encanto_user_profile')) {
                     // Loga se o perfil existir no LocalStorage
                     checkUserProfile(); 
-                    displayMessage("Login realizado com sucesso.", 'success');
+                    displayMessage("Login simulado realizado com sucesso.", 'success');
                 } else {
-                    displayMessage("Nenhuma conta encontrada neste dispositivo. Por favor, crie uma conta na aba 'CADASTRAR'.", 'error');
+                    displayMessage("Nenhuma conta de demonstração encontrada. Por favor, crie um perfil na aba 'CADASTRAR'.", 'error');
                     window.switchAuthTab('register');
                 }
             }, 800);
@@ -519,19 +529,19 @@
 
         window.handleLogout = async function() {
             // Limpa o perfil do LocalStorage
-            localStorage.removeItem('encanto_user_profile'); 
+            // Opcional: Se quiser manter os dados e só "deslogar" visualmente, comente a linha abaixo.
+            // localStorage.removeItem('encanto_user_profile'); 
             
             // Simula a transição para a tela de login
             document.getElementById('profile-view').classList.add('hidden');
             document.getElementById('auth-view').classList.remove('hidden');
             document.getElementById('login-form').reset();
             window.switchAuthTab('login');
-            displayMessage("Você saiu da sua conta.", 'success');
+            displayMessage("Você saiu do perfil de demonstração.", 'success');
         }
 
-        // --- MANUTENÇÃO DE NOTIFICAÇÕES (AGORA REAL) ---
+        // --- MANUTENÇÃO DE NOTIFICAÇÕES (ESTILO RESTAURADO) ---
 
-        // Função vazia pois não é mais necessário checar o Firestore para o perfil
         function setupNotificationListener() { /* Mantido para evitar erros */ }
 
         function updateLocalCache() {
@@ -586,14 +596,38 @@
             
             panelList.innerHTML = ''; 
             if (unreadItems.length === 0) {
-                panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Nenhuma nova notificação.</li>';
+                panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>';
                 return;
             }
+            
             unreadItems.forEach(notificacao => {
-                 const li = document.createElement('li');
-                 li.className = `p-5 border-b border-blue-800 bg-blue-700 rounded-xl mb-3 text-white shadow-lg`;
-                 li.innerHTML = `<h4 class="font-bold">${notificacao.titulo}</h4><p class="text-sm text-blue-200">${notificacao.mensagem}</p>`;
-                 panelList.appendChild(li);
+                const li = document.createElement('li');
+                const bgClass = 'bg-blue-700 hover:bg-blue-800';
+                
+                // RESTAURADO: Lógica de ícones baseada no tipo
+                const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨';
+                const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
+                
+                // Formatação de data
+                const dateObj = new Date(notificacao.data);
+                const dataFormatada = isNaN(dateObj) ? '' : dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+                li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`;
+                if (notificacao.link) { li.onclick = () => window.navigateTo(notificacao.link); }
+                
+                // RESTAURADO: Layout centralizado e rico
+                li.innerHTML = `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="text-4xl mb-2">${icon}</div>
+                        <div class="flex-grow text-center">
+                            <h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4>
+                            <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
+                            <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
+                        </div>
+                        <button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md z-10 relative">Marcar como Lida</button>
+                    </div>
+                `;
+                panelList.appendChild(li);
             });
         }
         
@@ -628,10 +662,12 @@
             if (isPanelOpen) {
                 panel.classList.remove('translate-x-full');
                 overlay.classList.remove('hidden');
+                // document.body.classList.add('overflow-hidden'); 
                 renderNotifications();
             } else {
                 panel.classList.add('translate-x-full');
                 overlay.classList.add('hidden');
+                // document.body.classList.remove('overflow-hidden');
             }
         }
 
