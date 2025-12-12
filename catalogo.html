@@ -262,7 +262,7 @@
                             <!-- Regras Dinâmicas Injetadas pelo JS -->
                         </ul>
                         <div class="mt-2 pt-2 border-t border-red-200 text-center font-bold">
-                            ⚠️ Taxa de Reparo (Mal Uso): <span id="modal-repair">R$ 50,00 - R$ 500,00</span>
+                            ⚠️ Taxa de Reparo (Mal Uso): <span id="modal-repair">R$ 25,00 - R$ 300,00</span>
                         </div>
                     </div>
 
@@ -408,25 +408,25 @@
         let notificationsData = [];
         let catalogData = []; 
 
-        // Dados de Fallback (CATÁLOGO COMPLETO COM DETALHES)
+        // Dados de Fallback (CATÁLOGO COMPLETO COM DETALHES) - ATUALIZADO
         const FALLBACK_CATALOG = [
-            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "2,5m", "needsPower": true, "ageRating": 6, "image": "https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp", "weightLimit": "50kg", "maxKids": "2", "waterAllowed": false, "movable": false, "badge": "Novo" },
-            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "1,50m", "needsPower": true, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp", "weightLimit": "N/A", "maxKids": "2", "waterAllowed": false, "movable": true, "badge": "Novo" },
+            { "id": 6, "name": "Mini Baby Inflável", "total_stock": 1, "price": 220, "measure": "Padrão", "needsPower": true, "ageRating": 6, "image": "https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp", "weightLimit": "50kg", "maxKids": "2", "waterAllowed": false, "movable": true, "badge": "Novo" },
+            { "id": 11, "name": "Air Hockey", "total_stock": 1, "price": 200, "measure": "Padrão", "needsPower": true, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp", "weightLimit": "N/A", "maxKids": "2", "waterAllowed": false, "movable": true, "badge": "Novo" },
             { "id": 1, "name": "Cama Elástica Pequena", "total_stock": 1, "price": 170, "measure": "2,44m", "needsPower": false, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp", "weightLimit": "120kg", "maxKids": "3", "waterAllowed": true, "movable": true, "badge": null },
             { "id": 2, "name": "Cama Elástica Média", "total_stock": 3, "price": 190, "measure": "3,05m", "scarcityGroup": "ELASTIC", "needsPower": false, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camam.webp", "weightLimit": "150kg", "maxKids": "4", "waterAllowed": true, "movable": true, "badge": null },
             { "id": 3, "name": "Castelinho Pula Pula", "total_stock": 1, "price": 210, "measure": "3m", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp", "weightLimit": "120kg", "maxKids": "3", "waterAllowed": true, "movable": true, "badge": null },
             { "id": 4, "name": "Piscina de Bolinhas", "total_stock": 2, "price": 160, "measure": "1,5 (descoberto) / 2m (coberto)", "scarcityGroup": "BALL", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp", "weightLimit": "N/A", "maxKids": "4", "waterAllowed": false, "movable": false, "badge": null },
             { "id": 5, "name": "Área Baby", "total_stock": 1, "price": 110, "measure": "Varía", "needsPower": false, "ageRating": 6, "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/areababy.webp", "weightLimit": "30kg", "maxKids": "5", "waterAllowed": true, "movable": true, "badge": null },
-            { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "4m", "exclusiveGroup": "LONA", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/escorregobol.webp", "weightLimit": "80kg", "maxKids": "3", "waterAllowed": false, "movable": "Dificuldade", "badge": null },
-            { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/tobogam.webp", "weightLimit": "100kg", "maxKids": "1 (descida)", "waterAllowed": false, "movable": "Dificuldade", "badge": null },
+            { "id": 7, "name": "Escorrega com Bolinha", "total_stock": 1, "price": 400, "measure": "Padrão", "exclusiveGroup": "LONA", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/escorregobol.webp", "weightLimit": "80kg", "maxKids": "3", "waterAllowed": false, "movable": "Dificuldade", "badge": null },
+            { "id": 8, "name": "Tobogã Médio", "total_stock": 1, "price": 400, "measure": "5 x 3m", "exclusiveGroup": "LONA", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/tobogam.webp", "weightLimit": "100kg", "maxKids": "1 (descida)", "waterAllowed": true, "movable": "Dificuldade", "badge": null },
             { "id": 9, "name": "Futebol de Sabão", "total_stock": 1, "price": 600, "measure": "8 x 4m", "exclusiveGroup": "LONA", "needsPower": true, "ageRating": 14, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp", "weightLimit": "300kg", "maxKids": "8", "waterAllowed": true, "movable": "Dificuldade", "badge": null },
             { "id": 10, "name": "Pebolim", "total_stock": 1, "price": 200, "measure": "Padrão", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pebolim.webp", "weightLimit": "N/A", "maxKids": "4", "waterAllowed": false, "movable": true, "badge": null },
             { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "Padrão Oficial", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pingpong.webp", "weightLimit": "N/A", "maxKids": "2", "waterAllowed": false, "movable": true, "badge": null },
             { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "Kit", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/mesas.webp", "weightLimit": "N/A", "maxKids": "4", "waterAllowed": true, "movable": true, "badge": null },
-            { "id": 14, "name": "Cachorrinho Inflável", "total_stock": 1, "price": 180, "measure": "2,5m", "needsPower": true, "ageRating": 8, "image": "https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/cachorrinho.webp", "weightLimit": "50kg", "maxKids": "2", "waterAllowed": false, "movable": false, "badge": null },
-            { "id": 15, "name": "Castelo com Bolinhas", "total_stock": 1, "price": 250, "measure": "2,5m x 2,5m", "needsPower": true, "ageRating": 8, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelobol.webp", "weightLimit": "70kg", "maxKids": "3", "waterAllowed": false, "movable": false, "badge": null }
+            { "id": 14, "name": "Cachorrinho Inflável", "total_stock": 1, "price": 180, "measure": "Padrão", "needsPower": true, "ageRating": 8, "image": "https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/cachorrinho.webp", "weightLimit": "50kg", "maxKids": "2", "waterAllowed": false, "movable": false, "badge": null },
+            { "id": 15, "name": "Castelo com Bolinhas", "total_stock": 1, "price": 250, "measure": "Padrão", "needsPower": true, "ageRating": 8, "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelobol.webp", "weightLimit": "70kg", "maxKids": "3", "waterAllowed": false, "movable": false, "badge": null }
         ];
-
+        
         const DISCONTINUED_ITEMS = [
             "Touro Mecânico",
             "Guerra de Cotonetes",
@@ -449,6 +449,16 @@
         window.handleLogout = async function(e) { /* Inoperante */ }
 
         // --- CATÁLOGO ---
+        
+        // Função para obter o valor máximo de reparo
+        function getRepairLimit(itemName) {
+            const lowerName = itemName.toLowerCase();
+            if (lowerName.includes('mesa') || lowerName.includes('área baby')) {
+                return 'R$ 25,00 - R$ 100,00';
+            }
+            return 'R$ 25,00 - R$ 300,00';
+        }
+
 
         async function fetchCatalog() {
             const grid = document.getElementById('catalog-grid');
@@ -469,7 +479,7 @@
                         const name = item.name || item.nome;
                         const lowerName = name ? name.toLowerCase() : '';
 
-                        // Aplicando as regras de consistência dos dados (usando os dados do JSON como base)
+                        // Aplicando as regras de consistência dos dados
                         if (lowerName.includes('cama elástica pequena')) {
                             item.weightLimit = "120kg"; item.maxKids = "3"; item.waterAllowed = true; item.movable = true;
                         } else if (lowerName.includes('cama elástica média')) {
@@ -481,20 +491,37 @@
                         } else if (lowerName.includes('área baby')) {
                             item.maxKids = "5"; item.waterAllowed = true; item.movable = true;
                         } else if (lowerName.includes('mini baby')) {
-                            item.needsPower = true; item.waterAllowed = false; item.movable = false;
+                            item.needsPower = true; item.waterAllowed = false; item.movable = true; // ATUALIZADO: pode mover com facilidade
+                            item.measure = "Padrão"; 
                         } else if (lowerName.includes('escorrega com bolinha')) {
                             item.maxKids = "3"; item.needsPower = true; item.movable = "Dificuldade";
+                            item.measure = "Padrão"; 
                         } else if (lowerName.includes('futebol de sabão')) {
                             item.weightLimit = "300kg"; item.maxKids = "8"; item.needsPower = true; item.movable = "Dificuldade";
                         } else if (lowerName.includes('pebolim')) {
                             item.maxKids = "4";
                         } else if (lowerName.includes('air hockey')) {
                             item.maxKids = "2";
+                            item.measure = "Padrão"; 
                         } else if (lowerName.includes('ping pong')) {
                             item.maxKids = "2";
                         } else if (lowerName.includes('jogos de mesa')) {
                             item.maxKids = "4"; item.waterAllowed = true;
+                        } else if (lowerName.includes('cachorrinho inflável')) {
+                            item.measure = "Padrão"; 
+                        } else if (lowerName.includes('castelo com bolinhas')) {
+                            item.measure = "Padrão"; 
                         }
+                        
+                        // Tobogã Médio pode molhar
+                        if (lowerName.includes('tobogã médio')) {
+                            item.waterAllowed = true; 
+                            item.movable = "Dificuldade";
+                        }
+
+                        // Adiciona a taxa de reparo específica para uso no modal
+                        item.repairLimit = getRepairLimit(name); 
+
                         return item;
                     });
                 } else {
@@ -503,7 +530,13 @@
                 
             } catch (error) {
                 console.warn("Usando catálogo de backup.");
-                catalogData = FALLBACK_CATALOG;
+                catalogData = FALLBACK_CATALOG.map(item => ({ ...item, repairLimit: getRepairLimit(item.name) }));
+                
+                // Aplicar a correção do Mini Baby no Fallback caso esteja sendo usado
+                const miniBabyFallback = catalogData.find(i => (i.name || '').toLowerCase().includes('mini baby'));
+                if (miniBabyFallback) {
+                    miniBabyFallback.movable = true;
+                }
             }
             
             // 1. Lógica de Ordenação: Itens "Novo" primeiro
@@ -544,7 +577,7 @@
                     '🚫 Não entrar com animais.',
                     '🚫 Não entrar com comida.'
                 ];
-            } else if (lowerName.includes('castelinho') || lowerName.includes('castelo com bolinhas')) {
+            } else if (lowerName.includes('castelinho')) {
                  // Regras para Castelinho
                 rules = [
                     '🚫 Não subir com materiais cortantes.',
@@ -563,8 +596,8 @@
                 rules = [
                     '🚫 Uso exclusivo para crianças de 6 anos ou menos.'
                 ];
-            } else if (lowerName.includes('mini baby') || lowerName.includes('cachorrinho inflável')) {
-                // Regras para Mini Baby Inflável e Cachorrinho
+            } else if (lowerName.includes('mini baby') || lowerName.includes('cachorrinho inflável') || lowerName.includes('castelo com bolinhas')) {
+                // Regras para Mini Baby Inflável, Cachorrinho e Castelo c/ Bolinhas
                 rules = [
                     '🚫 Não ir maiores de 6 anos.',
                     '🚫 Não subir com coisa cortante.',
@@ -666,6 +699,9 @@
                 movableEl.parentElement.classList.replace('bg-blue-50', 'bg-red-50');
                 movableEl.parentElement.classList.replace('text-blue-800', 'text-red-800');
             }
+            
+            // Taxa de Reparo
+            document.getElementById('modal-repair').innerText = item.repairLimit || getRepairLimit(item.name || item.nome);
 
             // --- REGRAS DE SEGURANÇA PERSONALIZADAS ---
             const safetyRules = getSafetyRules(item.name || item.nome, item.id);
