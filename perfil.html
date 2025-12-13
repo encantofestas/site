@@ -224,8 +224,11 @@
                             <label for="login-email" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">E-mail</label>
                         </div>
                         <div class="input-group relative">
-                            <input type="password" id="login-password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Sua Senha" required>
+                            <input type="password" id="login-password" class="w-full px-4 py-3 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Sua Senha" required>
                             <label for="login-password" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Senha</label>
+                            <button type="button" onclick="togglePassword('login-password')" class="absolute right-3 top-3 text-gray-400 hover:text-blue-500 focus:outline-none">
+                                <svg id="icon-login-password" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </button>
                         </div>
                         <div class="flex items-center justify-between text-xs">
                             <label class="flex items-center text-gray-500 gap-2 cursor-pointer">
@@ -249,8 +252,11 @@
                             <label for="reg-email" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">E-mail</label>
                         </div>
                         <div class="input-group relative">
-                            <input type="password" id="reg-pass" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Crie uma Senha" required>
+                            <input type="password" id="reg-pass" class="w-full px-4 py-3 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Crie uma Senha" required>
                             <label for="reg-pass" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Senha</label>
+                            <button type="button" onclick="togglePassword('reg-pass')" class="absolute right-3 top-3 text-gray-400 hover:text-blue-500 focus:outline-none">
+                                <svg id="icon-reg-pass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </button>
                         </div>
                         
                         <button type="submit" class="w-full bg-secondary text-blue-900 font-bold py-3 rounded-xl shadow-lg shadow-yellow-200 hover:bg-yellow-300 transform active:scale-[0.98] transition">
@@ -263,14 +269,10 @@
                         <span class="bg-white px-4 text-xs text-gray-400 relative font-medium uppercase">Ou continue com</span>
                     </div>
 
-                    <div class="mt-6 grid grid-cols-2 gap-4">
-                        <button class="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition">
+                    <div class="mt-6 flex justify-center">
+                        <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 border border-gray-200 py-2.5 px-6 rounded-lg hover:bg-gray-50 transition w-full">
                             <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
-                            <span class="text-sm font-medium text-gray-600">Google</span>
-                        </button>
-                        <button class="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition">
-                            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-5 h-5" alt="Facebook">
-                            <span class="text-sm font-medium text-gray-600">Facebook</span>
+                            <span class="text-sm font-medium text-gray-600">Entrar com Google</span>
                         </button>
                     </div>
 
@@ -321,7 +323,15 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut,
+            GoogleAuthProvider,
+            signInWithPopup
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, Timestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
         // ==========================================
@@ -383,6 +393,18 @@
             }
         }
         
+        window.togglePassword = function(id) {
+            const input = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+            } else {
+                input.type = "password";
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+            }
+        }
+
         function displayMessage(message, type = 'error') {
             const box = document.getElementById('message-box');
             if (!box) return;
@@ -442,6 +464,34 @@
         }
 
         // --- HANDLERS (REGISTRO E LOGIN) ---
+
+        window.handleGoogleLogin = async function() {
+            const provider = new GoogleAuthProvider();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+
+                // Verificar se o usuário já tem registro no Firestore
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    // Se não existe, criar o documento do usuário
+                    await setDoc(docRef, {
+                        name: user.displayName,
+                        email: user.email,
+                        avatar: user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}&backgroundColor=b6e3f4`,
+                        createdAt: Timestamp.now(),
+                        points: 0
+                    });
+                }
+
+                displayMessage("Login com Google realizado!", "success");
+            } catch (error) {
+                console.error("Erro no login Google:", error);
+                displayMessage("Erro ao entrar com Google.", "error");
+            }
+        }
 
         window.handleRegister = async function(e) {
             e.preventDefault();
@@ -523,6 +573,9 @@
         window.handleLogout = async function() {
             try {
                 await signOut(auth);
+                // O onAuthStateChanged irá atualizar a UI automaticamente para a tela de login
+                // e como usamos persistência local (padrão do Firebase),
+                // o signOut garante que a sessão seja encerrada.
                 displayMessage("Você saiu da conta.", 'success');
             } catch (error) {
                 console.error("Erro ao sair:", error);
@@ -651,11 +704,12 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         // 1. CARREGAMENTO OTIMISTA: Renderiza IMEDIATAMENTE com dados básicos
-                        // Isso remove a tela de "Entrando..." instantaneamente
+                        // Isso remove a tela de "Entrando..." instantaneamente e garante que
+                        // se o usuário já estiver logado (persistência), ele veja o perfil.
                         renderUserProfile({
                             name: user.displayName || "Carregando...",
                             email: user.email,
-                            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}&backgroundColor=b6e3f4`,
+                            avatar: user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}&backgroundColor=b6e3f4`,
                             points: "..."
                         });
 
