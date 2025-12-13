@@ -2,595 +2,288 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Minha Conta - Encanto Festas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Perfil - Encanto Festas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        html, body {
-            overflow-x: hidden;
-            width: 100%;
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            -webkit-tap-highlight-color: transparent;
-        }
-        h1, h2, h3, h4, .brand-font {
-            font-family: 'Baloo 2', cursive;
-        }
-        .min-h-screen-safe {
-            min-height: 100vh;
-            min-height: 100dvh;
-        }
-        .bg-primary { background-color: #2563EB; }
-        .text-primary { color: #2563EB; }
-        .bg-secondary { background-color: #FACC15; }
-        
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        .slide-up { animation: slideUp 0.5s ease-out forwards; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .input-group input:focus ~ label,
-        .input-group input:not(:placeholder-shown) ~ label {
-            top: -0.5rem;
-            left: 0.8rem;
-            font-size: 0.75rem;
-            color: #2563EB;
-            background-color: white;
-            padding: 0 0.25rem;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Inter:wght@400;600&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        h1, h2, h3 { font-family: 'Baloo 2', cursive; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="text-gray-700 min-h-screen-safe flex flex-col bg-slate-50">
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
 
-    <!-- HEADER -->
-    <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
-                    alt="Logo Encanto Festas" 
-                    class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner">
-                <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
-            </div>
-            
-            <div class="hidden md:flex items-center space-x-4">
-                <button onclick="window.location.href='perfil.html'" class="text-white bg-blue-700 px-4 py-2 rounded-lg transition text-sm font-semibold shadow-inner ring-2 ring-yellow-400">Minha Conta</button>
-                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg">Agendar Agora</button>
-            </div>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p class="text-gray-500 font-medium">Carregando perfil...</p>
+    </div>
+
+    <!-- Auth Container (Login/Register) -->
+    <div id="auth-container" class="hidden w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden fade-in">
+        <div class="bg-blue-600 p-6 text-center">
+            <h2 class="text-2xl text-white font-bold">Bem-vindo(a)!</h2>
+            <p class="text-blue-100 text-sm">Faça login para gerenciar sua conta</p>
         </div>
-    </header>
+        <div class="p-8">
+            <button onclick="handleGoogleLogin()" class="w-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
+                Entrar com Google
+            </button>
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
+                <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-gray-500">Ou use e-mail</span></div>
+            </div>
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleEmailLogin(event)" class="space-y-4">
+                <input type="email" id="email" placeholder="Seu e-mail" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="password" id="password" placeholder="Sua senha" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">Entrar</button>
+            </form>
+            <p class="text-center mt-4 text-sm text-gray-600">
+                Ainda não tem conta? <button onclick="toggleAuthMode()" class="text-blue-600 font-bold hover:underline">Cadastre-se</button>
+            </p>
+        </div>
+    </div>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-grow w-full pt-24 pb-28 md:pb-12 px-4 flex items-center justify-center">
+    <!-- Profile Container (Logged In) -->
+    <div id="profile-container" class="hidden w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden fade-in relative">
+        <div class="h-32 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
         
-        <div id="loading-state" class="text-center p-8">
-            <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
-            <p class="text-gray-500 font-medium animate-pulse">Carregando...</p>
-        </div>
+        <div class="px-6 pb-6 text-center relative">
+            <!-- Avatar Circle -->
+            <div class="relative -mt-16 mb-4 inline-block">
+                <div class="w-32 h-32 rounded-full border-4 border-white shadow-lg bg-blue-50 overflow-hidden mx-auto bg-white">
+                    <img id="user-avatar" src="" class="w-full h-full object-cover" 
+                         referrerpolicy="no-referrer"
+                         onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback&backgroundColor=b6e3f4'">
+                </div>
+                <button onclick="toggleEditModal()" class="absolute bottom-2 right-0 bg-yellow-400 text-blue-900 p-2 rounded-full shadow-md hover:bg-yellow-300 transition" title="Mudar Avatar">
+                    <i class="fas fa-pencil-alt text-sm"></i>
+                </button>
+            </div>
 
-        <!-- LOGGED IN VIEW -->
-        <div id="logged-in-view" class="hidden w-full max-w-md mx-auto fade-in text-center">
-            <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100 relative overflow-hidden">
-                <!-- Decoração de fundo -->
-                <div class="absolute top-0 left-0 w-full h-28 bg-gradient-to-br from-blue-500 to-blue-700"></div>
+            <h2 id="user-name" class="text-2xl font-bold text-gray-800">Usuário</h2>
+            <p id="user-email" class="text-gray-500 text-sm mb-6">carregando...</p>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                    <span class="block text-2xl font-bold text-blue-600">0</span>
+                    <span class="text-xs text-blue-400 uppercase font-bold">Festas</span>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-xl border border-yellow-100">
+                    <span class="block text-2xl font-bold text-yellow-600">50</span>
+                    <span class="text-xs text-yellow-500 uppercase font-bold">Pontos</span>
+                </div>
+            </div>
+
+            <button onclick="logout()" class="w-full border border-red-200 text-red-500 hover:bg-red-50 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fas fa-sign-out-alt"></i> Sair da Conta
+            </button>
+        </div>
+    </div>
+
+    <!-- Edit Avatar Modal -->
+    <div id="edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4 fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+            <div class="bg-gray-50 p-4 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-gray-700">Editar Perfil</h3>
+                <button onclick="toggleEditModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 text-center">
+                <img id="preview-avatar" src="" class="w-24 h-24 rounded-full mx-auto mb-4 bg-blue-50 border-4 border-white shadow-md object-cover"
+                     referrerpolicy="no-referrer"
+                     onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback&backgroundColor=b6e3f4'">
                 
-                <div class="relative z-10 pt-4">
-                    <div class="relative inline-block group">
-                        <!-- Imagem do Avatar -->
-                        <img id="logged-user-avatar" src="" alt="Avatar" 
-                             referrerpolicy="no-referrer"
-                             onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'"
-                             class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-xl bg-blue-50 object-cover transition transform group-hover:scale-105">
-                        
-                        <!-- Botãozinho de editar flutuante na foto -->
-                        <button onclick="openEditModal()" class="absolute bottom-4 right-0 bg-secondary text-blue-900 p-2 rounded-full shadow-lg border-2 border-white hover:bg-yellow-300 transition transform hover:scale-110">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                        </button>
-                    </div>
-
-                    <h2 class="text-2xl font-bold text-gray-800 brand-font mb-0.5 mt-2" id="logged-user-name">Usuário</h2>
-                    <p id="logged-user-email" class="text-sm text-gray-500 mb-6 font-medium">email@exemplo.com</p>
-                    
-                    <div class="space-y-3">
-                        <button onclick="openEditModal()" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center gap-2 transform active:scale-95">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            Editar Perfil & Avatar
-                        </button>
-                        
-                        <button onclick="handleLogout()" class="w-full bg-white text-red-500 border border-red-100 font-bold py-3.5 rounded-xl hover:bg-red-50 transition flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                            Sair da Conta
-                        </button>
-                    </div>
+                <p class="text-sm font-bold text-gray-600 mb-3">Escolha seu estilo:</p>
+                <div class="flex gap-3 justify-center mb-6">
+                    <button onclick="setGender('male')" id="btn-male" class="flex-1 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition">👦 Menino</button>
+                    <button onclick="setGender('female')" id="btn-female" class="flex-1 py-2 rounded-lg border-2 border-gray-200 hover:border-pink-500 hover:bg-pink-50 transition">👧 Menina</button>
                 </div>
+
+                <div class="text-left mb-4">
+                    <label class="text-xs font-bold text-gray-500 ml-1">Seu Nome</label>
+                    <input type="text" id="edit-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <button onclick="saveProfile()" id="btn-save" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
+                    Salvar Alterações
+                </button>
             </div>
         </div>
-
-        <!-- EDIT PROFILE MODAL -->
-        <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center px-4">
-            <!-- Backdrop -->
-            <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm transition-opacity" onclick="closeEditModal()"></div>
-            
-            <!-- Modal Content -->
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm relative z-10 overflow-hidden slide-up flex flex-col max-h-[90vh]">
-                <div class="bg-primary p-4 flex justify-between items-center text-white">
-                    <h3 class="font-bold text-lg brand-font flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Personalizar Avatar
-                    </h3>
-                    <button onclick="closeEditModal()" class="hover:bg-blue-600 p-1 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                </div>
-                
-                <div class="p-6 overflow-y-auto">
-                    <!-- Avatar Preview -->
-                    <div class="text-center mb-6">
-                        <div class="w-32 h-32 rounded-full border-4 border-blue-100 bg-blue-50 mx-auto shadow-inner overflow-hidden mb-3 bg-white flex items-center justify-center">
-                            <img id="edit-avatar-preview" src="" 
-                                 referrerpolicy="no-referrer"
-                                 onerror="this.src='https://ui-avatars.com/api/?name=Erro&background=red&color=white'"
-                                 class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-xs text-gray-400">Clique em "Gerar" para mudar o visual!</p>
-                    </div>
-
-                    <!-- Gender Selection -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-bold text-gray-700 mb-2 text-center">Qual estilo você prefere?</label>
-                        <div class="flex gap-3 justify-center">
-                            <button type="button" onclick="selectGender('male')" id="btn-gender-male" class="flex-1 py-2 px-3 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition flex flex-col items-center gap-1 group">
-                                <span class="text-2xl group-hover:scale-110 transition">👦</span>
-                                <span class="text-xs font-bold text-gray-600">Menino</span>
-                            </button>
-                            <button type="button" onclick="selectGender('female')" id="btn-gender-female" class="flex-1 py-2 px-3 rounded-xl border-2 border-gray-200 hover:border-pink-400 hover:bg-pink-50 transition flex flex-col items-center gap-1 group">
-                                <span class="text-2xl group-hover:scale-110 transition">👧</span>
-                                <span class="text-xs font-bold text-gray-600">Menina</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Generate Button -->
-                    <button onclick="generateNewAvatar()" class="w-full bg-secondary text-blue-900 font-bold py-3 rounded-xl shadow-md hover:bg-yellow-300 transition flex items-center justify-center gap-2 mb-4 active:scale-95">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        Gerar Novo Visual
-                    </button>
-
-                    <div class="border-t border-gray-100 my-4"></div>
-
-                    <!-- Name Edit (Optional) -->
-                    <div class="mb-4">
-                        <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">Seu Nome</label>
-                        <input type="text" id="edit-name-input" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Seu nome">
-                    </div>
-
-                    <!-- Save Actions -->
-                    <button onclick="saveProfileChanges()" id="btn-save-changes" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition">
-                        Salvar Alterações
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- AUTH VIEW (Login/Cadastro) -->
-        <div id="auth-view" class="hidden w-full max-w-md mx-auto slide-up">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Acesso ao Perfil 🔑</h2>
-                <p class="text-gray-500 text-sm px-8 mt-1">Faça login para ver sua conta.</p>
-            </div>
-            
-            <div id="message-box" class="hidden p-3 mb-4 rounded-xl text-sm font-medium transition-all duration-500 opacity-0" role="alert"></div>
-            
-            <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
-                <div class="flex border-b border-gray-100">
-                    <button onclick="switchAuthTab('login')" id="tab-login" class="flex-1 py-4 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors">ENTRAR</button>
-                    <button onclick="switchAuthTab('register')" id="tab-register" class="flex-1 py-4 text-sm font-bold text-gray-400 hover:text-blue-500 transition-colors">CADASTRAR</button>
-                </div>
-                <div class="p-8">
-                    <!-- LOGIN FORM -->
-                    <form id="login-form" class="space-y-5 block" onsubmit="handleLogin(event)">
-                        <div class="input-group relative">
-                            <input type="email" id="login-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu E-mail" required>
-                            <label for="login-email" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">E-mail</label>
-                        </div>
-                        <div class="input-group relative">
-                            <input type="password" id="login-password" class="w-full px-4 py-3 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Sua Senha" required>
-                            <label for="login-password" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Senha</label>
-                            <button type="button" onclick="togglePassword('login-password')" class="absolute right-3 top-3 text-gray-400 hover:text-blue-500 focus:outline-none"><svg id="icon-login-password" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
-                        </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <label class="flex items-center text-gray-500 gap-2 cursor-pointer"><input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Lembrar de mim</label>
-                            <a href="#" class="text-blue-600 font-bold hover:underline">Esqueceu?</a>
-                        </div>
-                        <button type="submit" id="btn-login-submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transform active:scale-[0.98] transition mt-2">Acessar Minha Conta</button>
-                    </form>
-
-                    <!-- REGISTER FORM -->
-                    <form id="register-form" class="space-y-5 hidden" onsubmit="handleRegister(event)">
-                        <div class="input-group relative">
-                            <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu Nome Completo" required>
-                            <label for="reg-name" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Nome Completo</label>
-                        </div>
-                        <div class="input-group relative">
-                            <input type="email" id="reg-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu E-mail" required>
-                            <label for="reg-email" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">E-mail</label>
-                        </div>
-                        <div class="input-group relative">
-                            <input type="password" id="reg-pass" class="w-full px-4 py-3 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Crie uma Senha" required>
-                            <label for="reg-pass" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Senha</label>
-                            <button type="button" onclick="togglePassword('reg-pass')" class="absolute right-3 top-3 text-gray-400 hover:text-blue-500 focus:outline-none"><svg id="icon-reg-pass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
-                        </div>
-                        <button type="submit" id="btn-reg-submit" class="w-full bg-secondary text-blue-900 font-bold py-3 rounded-xl shadow-lg shadow-yellow-200 hover:bg-yellow-300 transform active:scale-[0.98] transition mt-2">Criar Conta Grátis</button>
-                    </form>
-
-                    <div class="mt-8 relative flex items-center justify-center">
-                        <div class="border-t border-gray-200 w-full absolute"></div>
-                        <span class="bg-white px-4 text-xs text-gray-400 relative font-medium uppercase">Ou continue com</span>
-                    </div>
-                    <div class="mt-6 flex justify-center">
-                        <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 border border-gray-200 py-2.5 px-6 rounded-lg hover:bg-gray-50 transition w-full">
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
-                            <span class="text-sm font-medium text-gray-600">Entrar com Google</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Bottom Nav (Mobile) -->
-    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
-        <div class="grid grid-cols-5 w-full h-full relative">
-            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[10px] font-medium">Início</span></a>
-            <a href="combos.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4H8a2 2 0 00-2 2v1" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8V6a2 2 0 00-2-2h-3" /></svg><span class="text-[10px] font-medium">Combos</span></a>
-            <div class="relative flex justify-center items-center h-full w-full">
-                <a href="calendario.html" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11h4m-4 4h4" opacity="0.6"/></svg></a>
-            </div>
-            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg><span class="text-[10px] font-medium">Catálogo</span></a>
-            <div class="flex flex-col items-center justify-center w-full h-full text-blue-600 cursor-default pointer-events-none"><svg class="w-6 h-6 mb-1 transition" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg><span class="text-[10px] font-medium">Perfil</span></div>
-        </div>
-    </nav>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { 
-            getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
-            onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, signInWithCustomToken 
-        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- AUTH INIT (IMPORTANT) ---
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
+        let currentGender = 'neutral';
+        let tempAvatarUrl = '';
+
+        // --- Inicialização ---
+        async function init() {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                try { await signInWithCustomToken(auth, __initial_auth_token); } catch(e) { console.error(e); }
+            }
+
+            onAuthStateChanged(auth, async (user) => {
+                const loading = document.getElementById('loading-screen');
+                const authContainer = document.getElementById('auth-container');
+                const profileContainer = document.getElementById('profile-container');
+
+                if (user) {
+                    authContainer.classList.add('hidden');
+                    
+                    const userDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'main'));
+                    let data = userDoc.exists() ? userDoc.data() : {};
+                    
+                    // Avatar inicial seguro
+                    const avatar = data.avatar || user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}&backgroundColor=b6e3f4`;
+                    const name = data.name || user.displayName || "Usuário";
+
+                    document.getElementById('user-name').innerText = name;
+                    document.getElementById('user-email').innerText = user.email;
+                    document.getElementById('user-avatar').src = avatar;
+                    
+                    profileContainer.classList.remove('hidden');
+                } else {
+                    profileContainer.classList.add('hidden');
+                    authContainer.classList.remove('hidden');
                 }
-            } catch (error) {
-                console.error("Erro na inicialização da autenticação:", error);
-            }
-        }
-        initAuth();
-
-        // Variables for editing
-        let currentEditGender = null; // 'male' or 'female'
-        let currentNewAvatarUrl = "";
-
-        // --- UI Logic ---
-        window.switchAuthTab = function(tab) {
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            const tabLogin = document.getElementById('tab-login');
-            const tabRegister = document.getElementById('tab-register');
-            
-            displayMessage('', 'clear');
-
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden'); loginForm.classList.add('block', 'fade-in');
-                registerForm.classList.add('hidden'); registerForm.classList.remove('block');
-                tabLogin.classList.add('text-blue-600', 'border-b-2', 'border-blue-600'); tabLogin.classList.remove('text-gray-400');
-                tabRegister.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600'); tabRegister.classList.add('text-gray-400');
-            } else {
-                loginForm.classList.add('hidden'); loginForm.classList.remove('block');
-                registerForm.classList.remove('hidden'); registerForm.classList.add('block', 'fade-in');
-                tabRegister.classList.add('text-blue-600', 'border-b-2', 'border-blue-600'); tabRegister.classList.remove('text-gray-400');
-                tabLogin.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600'); tabLogin.classList.add('text-gray-400');
-            }
+                
+                loading.classList.add('hidden');
+            });
         }
 
-        window.togglePassword = function(id) {
-            const input = document.getElementById(id);
-            input.type = input.type === "password" ? "text" : "password";
-        }
+        window.handleGoogleLogin = async () => {
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+            } catch (error) { alert("Erro no login Google: " + error.message); }
+        };
 
-        function displayMessage(message, type = 'error') {
-            const box = document.getElementById('message-box');
-            if (!box) return;
-            if (type === 'clear' || !message) { box.classList.add('hidden', 'opacity-0'); return; }
-            box.innerText = message;
-            box.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'opacity-0');
-            if (type === 'error') { box.classList.add('bg-red-100', 'text-red-700'); } else if (type === 'success') { box.classList.add('bg-green-100', 'text-green-700'); }
-            box.classList.remove('opacity-0');
-            setTimeout(() => { box.classList.add('opacity-0'); setTimeout(() => box.classList.add('hidden'), 500); }, 4000);
-        }
+        window.handleEmailLogin = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } catch (loginError) {
+                    if (loginError.code === 'auth/invalid-credential' || loginError.code === 'auth/user-not-found') {
+                        if(confirm("Conta não encontrada. Deseja criar uma nova com estes dados?")) {
+                            await createUserWithEmailAndPassword(auth, email, password);
+                        }
+                    } else { throw loginError; }
+                }
+            } catch (error) { alert("Erro: " + error.message); }
+        };
 
-        // --- HELPER PARA CAMINHO FIRESTORE ---
-        function getUserProfileDocRef(userId) {
-            return doc(db, 'artifacts', appId, 'users', userId, 'profile', 'main');
-        }
+        window.logout = () => signOut(auth);
 
-        // --- EDIT MODAL LOGIC ---
-        window.openEditModal = function() {
+        window.toggleEditModal = () => {
             const modal = document.getElementById('edit-modal');
+            const isHidden = modal.classList.contains('hidden');
+            
+            if (isHidden) {
+                const currentSrc = document.getElementById('user-avatar').src;
+                const currentName = document.getElementById('user-name').innerText;
+                
+                document.getElementById('edit-name').value = currentName;
+                document.getElementById('preview-avatar').src = currentSrc;
+                tempAvatarUrl = currentSrc;
+                currentGender = null; 
+                
+                document.getElementById('btn-male').className = "flex-1 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition";
+                document.getElementById('btn-female').className = "flex-1 py-2 rounded-lg border-2 border-gray-200 hover:border-pink-500 hover:bg-pink-50 transition";
+                
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        };
+
+        // --- Correção Crítica da URL do DiceBear ---
+        window.setGender = (gender) => {
+            currentGender = gender;
             const user = auth.currentUser;
-            if(!user) return;
+            const seed = user.uid + Date.now(); 
+            let url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
 
-            document.getElementById('edit-name-input').value = user.displayName || "";
-            document.getElementById('edit-avatar-preview').src = user.photoURL || "";
-            currentNewAvatarUrl = user.photoURL || "";
-            
-            currentEditGender = null;
-            updateGenderUI();
+            if (gender === 'male') {
+                // Nomes EXATOS aceitos pela API v7 (nada de "shortHair" genérico)
+                const maleStyles = ["shortHairDreads01", "shortHairDreads02", "shortHairFrizzle", "shortHairShaggyMullet", "shortHairShortCurly", "shortHairShortFlat", "shortHairShortRound", "shortHairShortWaved", "shortHairSides", "shortHairTheCaesar", "shortHairTheCaesarSidePart"];
+                
+                // Constrói query string repetindo o parametro top[]
+                maleStyles.forEach(style => {
+                    url += `&top[]=${style}`;
+                });
+                url += "&facialHairProbability=50";
 
-            modal.classList.remove('hidden');
-        }
+                document.getElementById('btn-male').classList.add('border-blue-600', 'bg-blue-100');
+                document.getElementById('btn-female').classList.remove('border-pink-600', 'bg-pink-100');
+            } else {
+                // Nomes EXATOS aceitos pela API v7
+                const femaleStyles = ["longHairBigHair", "longHairBob", "longHairBun", "longHairCurly", "longHairCurvy", "longHairDreads", "longHairFrida", "longHairFro", "longHairFroBand", "longHairNotTooLong", "longHairShavedSides", "longHairMiaWallace", "longHairStraight", "longHairStraight2", "longHairStraightStrand"];
+                
+                femaleStyles.forEach(style => {
+                    url += `&top[]=${style}`;
+                });
+                url += "&facialHairProbability=0";
 
-        window.closeEditModal = function() {
-            document.getElementById('edit-modal').classList.add('hidden');
-        }
-
-        window.selectGender = function(gender) {
-            currentEditGender = gender;
-            updateGenderUI();
-            generateNewAvatar(); 
-        }
-
-        function updateGenderUI() {
-            const btnMale = document.getElementById('btn-gender-male');
-            const btnFemale = document.getElementById('btn-gender-female');
-            
-            btnMale.classList.remove('border-blue-500', 'bg-blue-100', 'ring-2', 'ring-blue-300');
-            btnFemale.classList.remove('border-pink-500', 'bg-pink-100', 'ring-2', 'ring-pink-300');
-
-            if (currentEditGender === 'male') {
-                btnMale.classList.add('border-blue-500', 'bg-blue-100', 'ring-2', 'ring-blue-300');
-            } else if (currentEditGender === 'female') {
-                btnFemale.classList.add('border-pink-500', 'bg-pink-100', 'ring-2', 'ring-pink-300');
+                document.getElementById('btn-female').classList.add('border-pink-600', 'bg-pink-100');
+                document.getElementById('btn-male').classList.remove('border-blue-600', 'bg-blue-100');
             }
-        }
 
-        window.generateNewAvatar = function() {
-            const seed = Math.random().toString(36).substring(7);
-            const baseUrl = "https://api.dicebear.com/7.x/avataaars/svg";
-            
-            // Usamos URLSearchParams para garantir que os parâmetros sejam codificados corretamente
-            // Importante: A API 7.x aceita arrays como chave repetida (ex: top[]=...) ou 
-            // como valores separados por vírgula em alguns clientes.
-            // Para garantir: Vamos usar a construção manual segura para DiceBear 7.x que é muito tolerante.
-            
-            let params = `seed=${seed}&backgroundColor=b6e3f4`;
+            tempAvatarUrl = url;
+            document.getElementById('preview-avatar').src = url;
+        };
 
-            if (currentEditGender === 'male') {
-                // Lista explícita de estilos curtos suportados pela v7
-                const styles = "shortHairDreads01,shortHairDreads02,shortHairFrizzle,shortHairShaggyMullet,shortHairShortCurly,shortHairShortFlat,shortHairShortRound,shortHairShortWaved,shortHairSides,shortHairTheCaesar,shortHairTheCaesarSidePart";
-                params += `&top[]=${styles.replaceAll(',', '&top[]=')}`; // Hack para garantir array se necessário, ou usar direto
-                // Mas DiceBear v7 geralmente aceita top=val1,val2 se não usar [].
-                // Vamos simplificar: usar apenas estilos garantidos.
-                // Melhor abordagem para v7: top[]=val1&top[]=val2
-                
-                const styleArray = ["shortHairDreads01", "shortHairDreads02", "shortHairFrizzle", "shortHairShaggyMullet", "shortHairShortCurly", "shortHairShortFlat", "shortHairShortRound", "shortHairShortWaved", "shortHairSides", "shortHairTheCaesar", "shortHairTheCaesarSidePart"];
-                styleArray.forEach(s => params += `&top[]=${s}`);
-                
-                params += `&facialHairProbability=50`;
-            } else if (currentEditGender === 'female') {
-                const styleArray = ["longHairBigHair", "longHairBob", "longHairBun", "longHairCurly", "longHairCurvy", "longHairDreads", "longHairFrida", "longHairFro", "longHairFroBand", "longHairNotTooLong", "longHairShavedSides", "longHairMiaWallace", "longHairStraight", "longHairStraight2", "longHairStraightStrand"];
-                styleArray.forEach(s => params += `&top[]=${s}`);
-                
-                params += `&facialHairProbability=0`;
-            }
-            
-            const finalUrl = `${baseUrl}?${params}`;
-            
-            currentNewAvatarUrl = finalUrl;
-            document.getElementById('edit-avatar-preview').src = finalUrl;
-        }
-
-        window.saveProfileChanges = async function() {
-            const btn = document.getElementById('btn-save-changes');
-            const originalText = btn.innerText;
+        window.saveProfile = async () => {
+            const btn = document.getElementById('btn-save');
             btn.innerText = "Salvando...";
             btn.disabled = true;
 
             try {
                 const user = auth.currentUser;
-                const newName = document.getElementById('edit-name-input').value;
-                
-                await updateProfile(user, {
-                    displayName: newName,
-                    photoURL: currentNewAvatarUrl
-                });
+                const newName = document.getElementById('edit-name').value;
 
-                const docRef = getUserProfileDocRef(user.uid);
-                
-                await setDoc(docRef, {
+                await updateProfile(user, { displayName: newName, photoURL: tempAvatarUrl });
+
+                const userRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'main');
+                await setDoc(userRef, {
                     name: newName,
-                    avatar: currentNewAvatarUrl,
-                    updatedAt: Timestamp.now()
-                }, { merge: true });
-
-                document.getElementById('logged-user-name').innerText = newName;
-                document.getElementById('logged-user-avatar').src = currentNewAvatarUrl;
-
-                closeEditModal();
-                alert("Perfil atualizado com sucesso!");
-
-            } catch (error) {
-                console.error("Error updating profile:", error);
-                alert("Erro ao salvar perfil: " + error.message);
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        // --- AUTH Handlers ---
-        window.handleGoogleLogin = async function() {
-            const provider = new GoogleAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                
-                const docRef = getUserProfileDocRef(user.uid);
-                
-                await setDoc(docRef, {
-                    name: user.displayName,
+                    avatar: tempAvatarUrl,
                     email: user.email,
-                    lastLogin: Timestamp.now()
+                    updatedAt: new Date().toISOString()
                 }, { merge: true });
 
-                displayMessage("Login realizado com sucesso!", "success");
+                document.getElementById('user-name').innerText = newName;
+                document.getElementById('user-avatar').src = tempAvatarUrl;
+                
+                window.toggleEditModal();
+
             } catch (error) {
-                console.error("Erro Google:", error);
-                displayMessage("Erro ao entrar com Google.", "error");
-            }
-        }
-
-        window.handleRegister = async function(e) {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-
-            if (!name || !email || !pass) { displayMessage("Preencha todos os campos.", 'error'); return; }
-            if (pass.length < 6) { displayMessage("A senha deve ter pelo menos 6 caracteres.", 'error'); return; }
-
-            const btn = document.getElementById('btn-reg-submit');
-            const originalText = btn.innerText;
-            btn.innerText = "Criando conta...";
-            btn.disabled = true;
-
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                const user = userCredential.user;
-                
-                const seed = user.uid;
-                const newAvatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
-
-                await updateProfile(user, { displayName: name, photoURL: newAvatarUrl });
-                
-                const docRef = getUserProfileDocRef(user.uid);
-                
-                await setDoc(docRef, {
-                    name: name,
-                    email: email,
-                    avatar: newAvatarUrl, 
-                    createdAt: Timestamp.now(),
-                    points: 50
-                });
-                displayMessage("Conta criada com sucesso!", 'success');
-            } catch (error) {
-                console.error("Erro:", error);
-                let msg = "Erro ao criar conta.";
-                if (error.code === 'auth/email-already-in-use') msg = "Este e-mail já está em uso.";
-                displayMessage(msg, 'error');
-                btn.innerText = originalText;
+                console.error(error);
+                alert("Erro ao salvar: " + error.message);
+            } finally {
+                btn.innerText = "Salvar Alterações";
                 btn.disabled = false;
             }
-        }
+        };
 
-        window.handleLogin = async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-password').value;
-            const btn = document.getElementById('btn-login-submit');
-            const originalText = btn.innerText;
-            btn.innerText = "Entrando...";
-            btn.disabled = true;
-
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-                displayMessage("Login realizado!", 'success');
-            } catch (error) {
-                console.error("Erro:", error);
-                displayMessage("E-mail ou senha inválidos.", 'error');
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        window.handleLogout = async function() {
-            try { await signOut(auth); displayMessage("Você saiu da conta.", 'success'); } 
-            catch (error) { console.error("Erro sair:", error); }
-        }
-
-        // --- AUTH STATE MONITOR ---
-        // Força a exibição da tela de login se demorar muito para verificar a autenticação
-        const forceLoginTimeout = setTimeout(() => {
-            const loadState = document.getElementById('loading-state');
-            if (loadState && !loadState.classList.contains('hidden')) {
-                console.log("Auth timeout reached, forcing login view");
-                loadState.classList.add('hidden');
-                document.getElementById('auth-view').classList.remove('hidden');
-            }
-        }, 2500); // 2.5 segundos de tolerância
-
-        onAuthStateChanged(auth, async (user) => {
-            clearTimeout(forceLoginTimeout); // Cancela o timeout se o Firebase responder
-            
-            const loadingState = document.getElementById('loading-state');
-            const authView = document.getElementById('auth-view');
-            const loggedInView = document.getElementById('logged-in-view');
-            
-            loadingState.classList.add('hidden');
-
-            if (user) {
-                let avatarUrl = user.photoURL;
-                let userName = user.displayName;
-
-                try {
-                    const docRef = getUserProfileDocRef(user.uid);
-                    const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        if (data.avatar) avatarUrl = data.avatar;
-                        if (data.name) userName = data.name;
-                    }
-                } catch(e) {
-                    // Ignora erros de leitura inicial
-                }
-
-                if (!avatarUrl) {
-                    avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}&backgroundColor=b6e3f4`;
-                }
-                
-                const imgElement = document.getElementById('logged-user-avatar');
-                if (imgElement.src !== avatarUrl) {
-                     imgElement.src = avatarUrl;
-                }
-                
-                document.getElementById('logged-user-name').innerText = userName || "Usuário";
-                document.getElementById('logged-user-email').innerText = user.email;
-                
-                authView.classList.add('hidden');
-                loggedInView.classList.remove('hidden');
-            } else {
-                // Reset Forms
-                const loginBtn = document.getElementById('btn-login-submit');
-                if (loginBtn) { loginBtn.innerText = "Acessar Minha Conta"; loginBtn.disabled = false; }
-                const regBtn = document.getElementById('btn-reg-submit');
-                if (regBtn) { regBtn.innerText = "Criar Conta Grátis"; regBtn.disabled = false; }
-                
-                loggedInView.classList.add('hidden');
-                authView.classList.remove('hidden');
-            }
-        });
+        init();
     </script>
 </body>
 </html>
