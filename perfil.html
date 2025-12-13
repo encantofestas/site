@@ -142,11 +142,13 @@
 
     <main class="flex-grow w-full pt-20 pb-28 md:pb-12 px-4 flex items-center justify-center">
         
+        <!-- ESTADO DE CARREGAMENTO -->
         <div id="loading-state" class="text-center p-8">
             <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
             <p class="text-gray-500 font-medium animate-pulse">Conectando ao sistema...</p>
         </div>
 
+        <!-- CONTAINER DO PERFIL (LOGADO) -->
         <div id="profile-view" class="hidden w-full max-w-md mx-auto fade-in">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden relative">
                 <div class="h-32 bg-gradient-brand relative">
@@ -172,7 +174,7 @@
                             <span class="text-xs text-gray-400 font-medium uppercase">Festas</span>
                         </div>
                         <div>
-                            <span class="block text-lg font-bold text-gray-800" id="user-points">0</span>
+                            <span class="block text-lg font-bold text-gray-800" id="user-points">...</span>
                             <span class="text-xs text-gray-400 font-medium uppercase">Pontos</span>
                         </div>
                         <div>
@@ -195,6 +197,7 @@
             </div>
         </div>
 
+        <!-- CONTAINER DE AUTH (LOGIN/CADASTRO) -->
         <div id="auth-view" class="hidden w-full max-w-md mx-auto slide-up">
             
             <div class="text-center mb-8">
@@ -324,7 +327,6 @@
         // ==========================================
         // CONFIGURAÇÃO REAL DO FIREBASE
         // ==========================================
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyBmwK8KwklpVfPEalJfOfjCB6OSFsidz6Q",
             authDomain: "encanto-festas-8c123.firebaseapp.com",
@@ -406,7 +408,7 @@
             }, 4000);
         }
 
-        // --- LÓGICA DE LOGIN/PERFIL (COM FIREBASE) ---
+        // --- LÓGICA DE LOGIN/PERFIL (COM OTIMIZAÇÃO OTIMISTA) ---
 
         function renderUserProfile(userData) {
             const loadingState = document.getElementById('loading-state');
@@ -473,7 +475,7 @@
                     email: email,
                     avatar: avatarUrl,
                     createdAt: Timestamp.now(),
-                    points: 0 // Iniciando pontos
+                    points: 0
                 };
 
                 // Salvando dados do perfil na coleção 'users' com o UID do usuário
@@ -646,24 +648,24 @@
         async function initializeFirebaseAndAuth() {
             try {
                 // Monitora se o usuário entrou ou saiu
-                onAuthStateChanged(auth, async (user) => {
+                onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        // Usuário logado: Busca dados no Firestore
-                        try {
-                            // Usando a coleção "users"
-                            const docRef = doc(db, "users", user.uid);
-                            const docSnap = await getDoc(docRef);
-                            
+                        // 1. CARREGAMENTO OTIMISTA: Renderiza IMEDIATAMENTE com dados básicos
+                        // Isso remove a tela de "Entrando..." instantaneamente
+                        renderUserProfile({
+                            name: user.displayName || "Carregando...",
+                            email: user.email,
+                            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}&backgroundColor=b6e3f4`,
+                            points: "..."
+                        });
+
+                        // 2. Busca dados completos em segundo plano
+                        const docRef = doc(db, "users", user.uid);
+                        getDoc(docRef).then(docSnap => {
                             if (docSnap.exists()) {
-                                renderUserProfile(docSnap.data());
-                            } else {
-                                // Se o usuário está no Auth mas não no Firestore (raro)
-                                renderUserProfile({ name: user.email, email: user.email });
+                                renderUserProfile(docSnap.data()); // Atualiza suavemente quando chegar
                             }
-                        } catch(e) {
-                            console.error("Erro ao buscar dados:", e);
-                            renderLoginScreen();
-                        }
+                        }).catch(e => console.error("Erro background:", e));
                     } else {
                         // Usuário não logado: Mostra Login
                         renderLoginScreen();
