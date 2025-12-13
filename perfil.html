@@ -316,27 +316,15 @@
     </nav>
 
     <script type="module">
-        // Atualizado para v12.6.0
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            onAuthStateChanged, 
-            signOut 
-        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            Timestamp 
-        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, Timestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
         // ==========================================
         // CONFIGURAÇÃO REAL DO FIREBASE
         // ==========================================
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyBmwK8KwklpVfPEalJfOfjCB6OSFsidz6Q",
             authDomain: "encanto-festas-8c123.firebaseapp.com",
@@ -348,7 +336,12 @@
         };
         // ==========================================
 
-        let app, db, auth;
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
         let isPanelOpen = false;
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
@@ -652,12 +645,6 @@
         // --- INICIALIZAÇÃO ---
         async function initializeFirebaseAndAuth() {
             try {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                // Inicializa Analytics conforme solicitado
-                getAnalytics(app); 
-
                 // Monitora se o usuário entrou ou saiu
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
