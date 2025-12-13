@@ -69,7 +69,6 @@
         <div id="loading-state" class="text-center p-8">
             <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
             <p class="text-gray-500 font-medium animate-pulse">Carregando...</p>
-            <p id="error-message-load" class="text-red-500 text-xs mt-2 hidden">Demorou muito? Tente recarregar.</p>
         </div>
 
         <!-- LOGGED IN VIEW -->
@@ -77,16 +76,13 @@
             <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100 relative overflow-hidden">
                 <!-- Decoração de fundo -->
                 <div class="absolute top-0 left-0 w-full h-28 bg-gradient-to-br from-blue-500 to-blue-700"></div>
-                <div class="absolute top-4 right-4 text-white opacity-20">
-                    <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>
-                </div>
                 
                 <div class="relative z-10 pt-4">
                     <div class="relative inline-block group">
                         <!-- Imagem do Avatar -->
                         <img id="logged-user-avatar" src="" alt="Avatar" 
                              referrerpolicy="no-referrer"
-                             onerror="this.src='https://ui-avatars.com/api/?name=U&background=random'"
+                             onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'"
                              class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-xl bg-blue-50 object-cover transition transform group-hover:scale-105">
                         
                         <!-- Botãozinho de editar flutuante na foto -->
@@ -99,7 +95,6 @@
                     <p id="logged-user-email" class="text-sm text-gray-500 mb-6 font-medium">email@exemplo.com</p>
                     
                     <div class="space-y-3">
-                        <!-- Botão de Editar Perfil -->
                         <button onclick="openEditModal()" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center gap-2 transform active:scale-95">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                             Editar Perfil & Avatar
@@ -258,12 +253,12 @@
     </nav>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { 
             getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
             onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, signInWithCustomToken 
-        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp, collection } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp, collection } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -373,29 +368,38 @@
 
         window.generateNewAvatar = function() {
             const seed = Math.random().toString(36).substring(7);
-            const baseUrl = "https://api.dicebear.com/9.x/avataaars/svg";
+            const baseUrl = "https://api.dicebear.com/7.x/avataaars/svg";
             
-            let styles = [];
-            let facialHairProb = 0;
+            // Usamos URLSearchParams para garantir que os parâmetros sejam codificados corretamente
+            // Importante: A API 7.x aceita arrays como chave repetida (ex: top[]=...) ou 
+            // como valores separados por vírgula em alguns clientes.
+            // Para garantir: Vamos usar a construção manual segura para DiceBear 7.x que é muito tolerante.
+            
+            let params = `seed=${seed}&backgroundColor=b6e3f4`;
 
             if (currentEditGender === 'male') {
-                styles = ["shortHairDreads01", "shortHairDreads02", "shortHairFrizzle", "shortHairShaggyMullet", "shortHairShortCurly", "shortHairShortFlat", "shortHairShortRound", "shortHairShortWaved", "shortHairSides", "shortHairTheCaesar", "shortHairTheCaesarSidePart"];
-                facialHairProb = 50;
+                // Lista explícita de estilos curtos suportados pela v7
+                const styles = "shortHairDreads01,shortHairDreads02,shortHairFrizzle,shortHairShaggyMullet,shortHairShortCurly,shortHairShortFlat,shortHairShortRound,shortHairShortWaved,shortHairSides,shortHairTheCaesar,shortHairTheCaesarSidePart";
+                params += `&top[]=${styles.replaceAll(',', '&top[]=')}`; // Hack para garantir array se necessário, ou usar direto
+                // Mas DiceBear v7 geralmente aceita top=val1,val2 se não usar [].
+                // Vamos simplificar: usar apenas estilos garantidos.
+                // Melhor abordagem para v7: top[]=val1&top[]=val2
+                
+                const styleArray = ["shortHairDreads01", "shortHairDreads02", "shortHairFrizzle", "shortHairShaggyMullet", "shortHairShortCurly", "shortHairShortFlat", "shortHairShortRound", "shortHairShortWaved", "shortHairSides", "shortHairTheCaesar", "shortHairTheCaesarSidePart"];
+                styleArray.forEach(s => params += `&top[]=${s}`);
+                
+                params += `&facialHairProbability=50`;
             } else if (currentEditGender === 'female') {
-                styles = ["longHairBigHair", "longHairBob", "longHairBun", "longHairCurly", "longHairCurvy", "longHairDreads", "longHairFrida", "longHairFro", "longHairFroBand", "longHairNotTooLong", "longHairShavedSides", "longHairMiaWallace", "longHairStraight", "longHairStraight2", "longHairStraightStrand"];
-                facialHairProb = 0;
-            }
-
-            let url = `${baseUrl}?seed=${seed}&backgroundColor=b6e3f4`;
-            
-            if (styles.length > 0) {
-                url += `&top=${styles.join(',')}`;
+                const styleArray = ["longHairBigHair", "longHairBob", "longHairBun", "longHairCurly", "longHairCurvy", "longHairDreads", "longHairFrida", "longHairFro", "longHairFroBand", "longHairNotTooLong", "longHairShavedSides", "longHairMiaWallace", "longHairStraight", "longHairStraight2", "longHairStraightStrand"];
+                styleArray.forEach(s => params += `&top[]=${s}`);
+                
+                params += `&facialHairProbability=0`;
             }
             
-            url += `&facialHairProbability=${facialHairProb}`;
-
-            currentNewAvatarUrl = url;
-            document.getElementById('edit-avatar-preview').src = url;
+            const finalUrl = `${baseUrl}?${params}`;
+            
+            currentNewAvatarUrl = finalUrl;
+            document.getElementById('edit-avatar-preview').src = finalUrl;
         }
 
         window.saveProfileChanges = async function() {
@@ -477,7 +481,7 @@
                 const user = userCredential.user;
                 
                 const seed = user.uid;
-                const newAvatarUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
+                const newAvatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
 
                 await updateProfile(user, { displayName: name, photoURL: newAvatarUrl });
                 
@@ -527,19 +531,24 @@
         }
 
         // --- AUTH STATE MONITOR ---
+        // Força a exibição da tela de login se demorar muito para verificar a autenticação
+        const forceLoginTimeout = setTimeout(() => {
+            const loadState = document.getElementById('loading-state');
+            if (loadState && !loadState.classList.contains('hidden')) {
+                console.log("Auth timeout reached, forcing login view");
+                loadState.classList.add('hidden');
+                document.getElementById('auth-view').classList.remove('hidden');
+            }
+        }, 2500); // 2.5 segundos de tolerância
+
         onAuthStateChanged(auth, async (user) => {
+            clearTimeout(forceLoginTimeout); // Cancela o timeout se o Firebase responder
+            
             const loadingState = document.getElementById('loading-state');
             const authView = document.getElementById('auth-view');
             const loggedInView = document.getElementById('logged-in-view');
             
-            // TIMEOUT FALLBACK
-            setTimeout(() => {
-                const loadState = document.getElementById('loading-state');
-                const err = document.getElementById('error-message-load');
-                if (loadState && !loadState.classList.contains('hidden')) {
-                    if (err) err.classList.remove('hidden');
-                }
-            }, 5000);
+            loadingState.classList.add('hidden');
 
             if (user) {
                 let avatarUrl = user.photoURL;
@@ -554,11 +563,11 @@
                         if (data.name) userName = data.name;
                     }
                 } catch(e) {
-                    console.log("Perfil ainda não criado no DB, usando dados do Auth");
+                    // Ignora erros de leitura inicial
                 }
 
                 if (!avatarUrl) {
-                    avatarUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=${user.uid}&backgroundColor=b6e3f4`;
+                    avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}&backgroundColor=b6e3f4`;
                 }
                 
                 const imgElement = document.getElementById('logged-user-avatar');
@@ -569,18 +578,15 @@
                 document.getElementById('logged-user-name').innerText = userName || "Usuário";
                 document.getElementById('logged-user-email').innerText = user.email;
                 
-                // FORCE HIDE LOADING
-                loadingState.classList.add('hidden');
                 authView.classList.add('hidden');
                 loggedInView.classList.remove('hidden');
             } else {
+                // Reset Forms
                 const loginBtn = document.getElementById('btn-login-submit');
                 if (loginBtn) { loginBtn.innerText = "Acessar Minha Conta"; loginBtn.disabled = false; }
                 const regBtn = document.getElementById('btn-reg-submit');
                 if (regBtn) { regBtn.innerText = "Criar Conta Grátis"; regBtn.disabled = false; }
                 
-                // FORCE HIDE LOADING
-                loadingState.classList.add('hidden');
                 loggedInView.classList.add('hidden');
                 authView.classList.remove('hidden');
             }
