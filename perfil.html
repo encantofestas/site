@@ -316,32 +316,35 @@
     </nav>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // Atualizado para v12.6.0
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
         import { 
             getAuth, 
             createUserWithEmailAndPassword, 
             signInWithEmailAndPassword, 
             onAuthStateChanged, 
             signOut 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
         import { 
             getFirestore, 
             doc, 
             getDoc, 
             setDoc, 
             Timestamp 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
         // ==========================================
-        // CONFIGURAÇÃO DO FIREBASE (PASSO 2: COLE SUAS CHAVES AQUI)
+        // CONFIGURAÇÃO REAL DO FIREBASE
         // ==========================================
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY_AQUI",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_ID",
-            appId: "SEU_APP_ID"
+            apiKey: "AIzaSyBmwK8KwklpVfPEalJfOfjCB6OSFsidz6Q",
+            authDomain: "encanto-festas-8c123.firebaseapp.com",
+            projectId: "encanto-festas-8c123",
+            storageBucket: "encanto-festas-8c123.firebasestorage.app",
+            messagingSenderId: "371905779100",
+            appId: "1:371905779100:web:48e5d1ba0820547177a459",
+            measurementId: "G-WD1MC40GL4"
         };
         // ==========================================
 
@@ -470,16 +473,17 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
 
-                // 2. Salvar dados extras no Firestore
+                // 2. Salvar dados extras no Firestore (Coleção 'users')
                 const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email.split('@')[0]}&backgroundColor=c0aede`;
                 const userDocData = {
                     name: name,
                     email: email,
                     avatar: avatarUrl,
                     createdAt: Timestamp.now(),
-                    points: 0
+                    points: 0 // Iniciando pontos
                 };
 
+                // Salvando dados do perfil na coleção 'users' com o UID do usuário
                 await setDoc(doc(db, "users", user.uid), userDocData);
 
                 displayMessage("Conta criada com sucesso!", 'success');
@@ -586,8 +590,10 @@
             unreadItems.forEach(notificacao => {
                 const li = document.createElement('li');
                 const bgClass = 'bg-blue-700 hover:bg-blue-800';
+                
                 const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨';
                 const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
+                
                 const dateObj = new Date(notificacao.data);
                 const dataFormatada = isNaN(dateObj) ? '' : dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
@@ -646,31 +652,30 @@
         // --- INICIALIZAÇÃO ---
         async function initializeFirebaseAndAuth() {
             try {
-                if (firebaseConfig.apiKey === "SUA_API_KEY_AQUI") {
-                   console.warn("⚠️ ATENÇÃO: Você ainda não configurou as chaves do Firebase.");
-                   return;
-                }
-
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
-                db = getFirestore(app); 
+                db = getFirestore(app);
+                // Inicializa Analytics conforme solicitado
+                getAnalytics(app); 
 
                 // Monitora se o usuário entrou ou saiu
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         // Usuário logado: Busca dados no Firestore
                         try {
+                            // Usando a coleção "users"
                             const docRef = doc(db, "users", user.uid);
                             const docSnap = await getDoc(docRef);
                             
                             if (docSnap.exists()) {
                                 renderUserProfile(docSnap.data());
                             } else {
-                                // Fallback se o user existe no Auth mas não no Firestore
+                                // Se o usuário está no Auth mas não no Firestore (raro)
                                 renderUserProfile({ name: user.email, email: user.email });
                             }
                         } catch(e) {
                             console.error("Erro ao buscar dados:", e);
+                            renderLoginScreen();
                         }
                     } else {
                         // Usuário não logado: Mostra Login
@@ -679,6 +684,7 @@
                 });
             } catch (e) { 
                 console.error("Erro na inicialização:", e); 
+                renderLoginScreen();
             }
         }
 
