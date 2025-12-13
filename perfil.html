@@ -69,6 +69,7 @@
         <div id="loading-state" class="text-center p-8">
             <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
             <p class="text-gray-500 font-medium animate-pulse">Carregando...</p>
+            <p id="error-message-load" class="text-red-500 text-xs mt-2 hidden">Demorou muito? Tente recarregar.</p>
         </div>
 
         <!-- LOGGED IN VIEW -->
@@ -257,12 +258,12 @@
     </nav>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { 
             getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
-            onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile 
-        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp, collection } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+            onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, signInWithCustomToken 
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp, collection } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -270,6 +271,18 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // --- AUTH INIT (IMPORTANT) ---
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                }
+            } catch (error) {
+                console.error("Erro na inicialização da autenticação:", error);
+            }
+        }
+        initAuth();
 
         // Variables for editing
         let currentEditGender = null; // 'male' or 'female'
@@ -314,10 +327,7 @@
         }
 
         // --- HELPER PARA CAMINHO FIRESTORE ---
-        // IMPORTANTE: Usa o caminho permitido: artifacts/{appId}/users/{userId}/profile/main
         function getUserProfileDocRef(userId) {
-            // Estrutura: Coleção 'artifacts' -> Doc 'appId' -> Coleção 'users' -> Doc 'userId' -> Coleção 'profile' -> Doc 'main'
-            // Isso garante que estamos dentro de uma subcoleção do usuário, onde temos permissão.
             return doc(db, 'artifacts', appId, 'users', userId, 'profile', 'main');
         }
 
@@ -327,12 +337,10 @@
             const user = auth.currentUser;
             if(!user) return;
 
-            // Load current data
             document.getElementById('edit-name-input').value = user.displayName || "";
             document.getElementById('edit-avatar-preview').src = user.photoURL || "";
             currentNewAvatarUrl = user.photoURL || "";
             
-            // Reset gender selection
             currentEditGender = null;
             updateGenderUI();
 
@@ -346,14 +354,13 @@
         window.selectGender = function(gender) {
             currentEditGender = gender;
             updateGenderUI();
-            generateNewAvatar(); // Auto generate on selection
+            generateNewAvatar(); 
         }
 
         function updateGenderUI() {
             const btnMale = document.getElementById('btn-gender-male');
             const btnFemale = document.getElementById('btn-gender-female');
             
-            // Reset styles
             btnMale.classList.remove('border-blue-500', 'bg-blue-100', 'ring-2', 'ring-blue-300');
             btnFemale.classList.remove('border-pink-500', 'bg-pink-100', 'ring-2', 'ring-pink-300');
 
@@ -368,11 +375,6 @@
             const seed = Math.random().toString(36).substring(7);
             const baseUrl = "https://api.dicebear.com/9.x/avataaars/svg";
             
-            // CORREÇÃO CRÍTICA PARA TELA PRETA:
-            // A API espera que arrays sejam passados como strings separadas por vírgula na mesma chave.
-            // Ex: top=curto,longo (CORRETO) vs top[]=curto&top[]=longo (ERRADO para URL direta simples em alguns clientes)
-            // Vamos construir manualmente a string de parâmetros para garantir compatibilidade total.
-
             let styles = [];
             let facialHairProb = 0;
 
@@ -387,7 +389,6 @@
             let url = `${baseUrl}?seed=${seed}&backgroundColor=b6e3f4`;
             
             if (styles.length > 0) {
-                // Junta os estilos com vírgula
                 url += `&top=${styles.join(',')}`;
             }
             
@@ -412,17 +413,14 @@
                     photoURL: currentNewAvatarUrl
                 });
 
-                // CORREÇÃO DE PERMISSÃO: Usando o caminho permitido 'artifacts/...'
                 const docRef = getUserProfileDocRef(user.uid);
                 
-                // Usamos setDoc com merge para garantir escrita mesmo se não existir
                 await setDoc(docRef, {
                     name: newName,
                     avatar: currentNewAvatarUrl,
                     updatedAt: Timestamp.now()
                 }, { merge: true });
 
-                // Update UI immediately
                 document.getElementById('logged-user-name').innerText = newName;
                 document.getElementById('logged-user-avatar').src = currentNewAvatarUrl;
 
@@ -445,7 +443,6 @@
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 
-                // CORREÇÃO: Caminho seguro
                 const docRef = getUserProfileDocRef(user.uid);
                 
                 await setDoc(docRef, {
@@ -484,7 +481,6 @@
 
                 await updateProfile(user, { displayName: name, photoURL: newAvatarUrl });
                 
-                // CORREÇÃO: Caminho seguro e garantido
                 const docRef = getUserProfileDocRef(user.uid);
                 
                 await setDoc(docRef, {
@@ -536,10 +532,16 @@
             const authView = document.getElementById('auth-view');
             const loggedInView = document.getElementById('logged-in-view');
             
-            loadingState.classList.add('hidden');
+            // TIMEOUT FALLBACK
+            setTimeout(() => {
+                const loadState = document.getElementById('loading-state');
+                const err = document.getElementById('error-message-load');
+                if (loadState && !loadState.classList.contains('hidden')) {
+                    if (err) err.classList.remove('hidden');
+                }
+            }, 5000);
 
             if (user) {
-                // Tenta pegar avatar do Firestore primeiro (mais atualizado), senão do Auth, senão gera
                 let avatarUrl = user.photoURL;
                 let userName = user.displayName;
 
@@ -555,7 +557,6 @@
                     console.log("Perfil ainda não criado no DB, usando dados do Auth");
                 }
 
-                // Fallback final
                 if (!avatarUrl) {
                     avatarUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=${user.uid}&backgroundColor=b6e3f4`;
                 }
@@ -568,15 +569,18 @@
                 document.getElementById('logged-user-name').innerText = userName || "Usuário";
                 document.getElementById('logged-user-email').innerText = user.email;
                 
+                // FORCE HIDE LOADING
+                loadingState.classList.add('hidden');
                 authView.classList.add('hidden');
                 loggedInView.classList.remove('hidden');
             } else {
-                // Reset Forms
                 const loginBtn = document.getElementById('btn-login-submit');
                 if (loginBtn) { loginBtn.innerText = "Acessar Minha Conta"; loginBtn.disabled = false; }
                 const regBtn = document.getElementById('btn-reg-submit');
                 if (regBtn) { regBtn.innerText = "Criar Conta Grátis"; regBtn.disabled = false; }
                 
+                // FORCE HIDE LOADING
+                loadingState.classList.add('hidden');
                 loggedInView.classList.add('hidden');
                 authView.classList.remove('hidden');
             }
