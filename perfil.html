@@ -85,7 +85,7 @@
                         <!-- Imagem do Avatar -->
                         <img id="logged-user-avatar" src="" alt="Avatar" 
                              referrerpolicy="no-referrer"
-                             onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'"
+                             onerror="this.src='https://ui-avatars.com/api/?name=U&background=random'"
                              class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-xl bg-blue-50 object-cover transition transform group-hover:scale-105">
                         
                         <!-- Botãozinho de editar flutuante na foto -->
@@ -262,16 +262,10 @@
             getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
             onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile 
         } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp, collection } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBmwK8KwklpVfPEalJfOfjCB6OSFsidz6Q",
-            authDomain: "encanto-festas-8c123.firebaseapp.com",
-            projectId: "encanto-festas-8c123",
-            storageBucket: "encanto-festas-8c123.firebasestorage.app",
-            messagingSenderId: "371905779100",
-            appId: "1:371905779100:web:48e5d1ba0820547177a459"
-        };
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -319,6 +313,14 @@
             setTimeout(() => { box.classList.add('opacity-0'); setTimeout(() => box.classList.add('hidden'), 500); }, 4000);
         }
 
+        // --- HELPER PARA CAMINHO FIRESTORE ---
+        // IMPORTANTE: Usa o caminho permitido: artifacts/{appId}/users/{userId}/profile/main
+        function getUserProfileDocRef(userId) {
+            // Estrutura: Coleção 'artifacts' -> Doc 'appId' -> Coleção 'users' -> Doc 'userId' -> Coleção 'profile' -> Doc 'main'
+            // Isso garante que estamos dentro de uma subcoleção do usuário, onde temos permissão.
+            return doc(db, 'artifacts', appId, 'users', userId, 'profile', 'main');
+        }
+
         // --- EDIT MODAL LOGIC ---
         window.openEditModal = function() {
             const modal = document.getElementById('edit-modal');
@@ -363,32 +365,36 @@
         }
 
         window.generateNewAvatar = function() {
-            // CORREÇÃO: Usando a URL correta com Arrays e Versão 9.x
             const seed = Math.random().toString(36).substring(7);
             const baseUrl = "https://api.dicebear.com/9.x/avataaars/svg";
             
-            // Usamos URLSearchParams para garantir que os arrays sejam formatados corretamente
-            const params = new URLSearchParams();
-            params.append("seed", seed);
-            params.append("backgroundColor", "b6e3f4");
+            // CORREÇÃO CRÍTICA PARA TELA PRETA:
+            // A API espera que arrays sejam passados como strings separadas por vírgula na mesma chave.
+            // Ex: top=curto,longo (CORRETO) vs top[]=curto&top[]=longo (ERRADO para URL direta simples em alguns clientes)
+            // Vamos construir manualmente a string de parâmetros para garantir compatibilidade total.
+
+            let styles = [];
+            let facialHairProb = 0;
 
             if (currentEditGender === 'male') {
-                // Adicionamos cada estilo de cabelo individualmente com a chave 'top[]'
-                const maleStyles = ["shortHairDreads01", "shortHairDreads02", "shortHairFrizzle", "shortHairShaggyMullet", "shortHairShortCurly", "shortHairShortFlat", "shortHairShortRound", "shortHairShortWaved", "shortHairSides", "shortHairTheCaesar", "shortHairTheCaesarSidePart"];
-                maleStyles.forEach(style => params.append("top[]", style));
-                params.append("facialHairProbability", "50");
+                styles = ["shortHairDreads01", "shortHairDreads02", "shortHairFrizzle", "shortHairShaggyMullet", "shortHairShortCurly", "shortHairShortFlat", "shortHairShortRound", "shortHairShortWaved", "shortHairSides", "shortHairTheCaesar", "shortHairTheCaesarSidePart"];
+                facialHairProb = 50;
             } else if (currentEditGender === 'female') {
-                const femaleStyles = ["longHairBigHair", "longHairBob", "longHairBun", "longHairCurly", "longHairCurvy", "longHairDreads", "longHairFrida", "longHairFro", "longHairFroBand", "longHairNotTooLong", "longHairShavedSides", "longHairMiaWallace", "longHairStraight", "longHairStraight2", "longHairStraightStrand"];
-                femaleStyles.forEach(style => params.append("top[]", style));
-                params.append("facialHairProbability", "0");
+                styles = ["longHairBigHair", "longHairBob", "longHairBun", "longHairCurly", "longHairCurvy", "longHairDreads", "longHairFrida", "longHairFro", "longHairFroBand", "longHairNotTooLong", "longHairShavedSides", "longHairMiaWallace", "longHairStraight", "longHairStraight2", "longHairStraightStrand"];
+                facialHairProb = 0;
+            }
+
+            let url = `${baseUrl}?seed=${seed}&backgroundColor=b6e3f4`;
+            
+            if (styles.length > 0) {
+                // Junta os estilos com vírgula
+                url += `&top=${styles.join(',')}`;
             }
             
-            // A API URLSearchParams codifica caracteres especiais, o que é seguro.
-            // O DiceBear aceita top[]=...&top[]=...
-            const finalUrl = `${baseUrl}?${params.toString()}`;
-            
-            currentNewAvatarUrl = finalUrl;
-            document.getElementById('edit-avatar-preview').src = finalUrl;
+            url += `&facialHairProbability=${facialHairProb}`;
+
+            currentNewAvatarUrl = url;
+            document.getElementById('edit-avatar-preview').src = url;
         }
 
         window.saveProfileChanges = async function() {
@@ -406,12 +412,14 @@
                     photoURL: currentNewAvatarUrl
                 });
 
-                // CORREÇÃO: Usando setDoc com merge: true para garantir que funciona 
-                // mesmo se o documento não existir ainda.
-                const docRef = doc(db, "users", user.uid);
+                // CORREÇÃO DE PERMISSÃO: Usando o caminho permitido 'artifacts/...'
+                const docRef = getUserProfileDocRef(user.uid);
+                
+                // Usamos setDoc com merge para garantir escrita mesmo se não existir
                 await setDoc(docRef, {
                     name: newName,
-                    avatar: currentNewAvatarUrl
+                    avatar: currentNewAvatarUrl,
+                    updatedAt: Timestamp.now()
                 }, { merge: true });
 
                 // Update UI immediately
@@ -436,13 +444,14 @@
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-                const docRef = doc(db, "users", user.uid);
                 
-                // Usar setDoc com merge aqui também previne erros se a internet cair no meio
+                // CORREÇÃO: Caminho seguro
+                const docRef = getUserProfileDocRef(user.uid);
+                
                 await setDoc(docRef, {
                     name: user.displayName,
                     email: user.email,
-                    lastLogin: Timestamp.now() // Atualiza último login
+                    lastLogin: Timestamp.now()
                 }, { merge: true });
 
                 displayMessage("Login realizado com sucesso!", "success");
@@ -475,8 +484,10 @@
 
                 await updateProfile(user, { displayName: name, photoURL: newAvatarUrl });
                 
-                // SetDoc garante criação
-                await setDoc(doc(db, "users", user.uid), {
+                // CORREÇÃO: Caminho seguro e garantido
+                const docRef = getUserProfileDocRef(user.uid);
+                
+                await setDoc(docRef, {
                     name: name,
                     email: email,
                     avatar: newAvatarUrl, 
@@ -520,7 +531,7 @@
         }
 
         // --- AUTH STATE MONITOR ---
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             const loadingState = document.getElementById('loading-state');
             const authView = document.getElementById('auth-view');
             const loggedInView = document.getElementById('logged-in-view');
@@ -528,22 +539,39 @@
             loadingState.classList.add('hidden');
 
             if (user) {
-                const seed = user.uid;
-                // Fallback robusto se photoURL estiver vazio ou quebrado
-                const avatarUrl = user.photoURL || `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
+                // Tenta pegar avatar do Firestore primeiro (mais atualizado), senão do Auth, senão gera
+                let avatarUrl = user.photoURL;
+                let userName = user.displayName;
+
+                try {
+                    const docRef = getUserProfileDocRef(user.uid);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data.avatar) avatarUrl = data.avatar;
+                        if (data.name) userName = data.name;
+                    }
+                } catch(e) {
+                    console.log("Perfil ainda não criado no DB, usando dados do Auth");
+                }
+
+                // Fallback final
+                if (!avatarUrl) {
+                    avatarUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=${user.uid}&backgroundColor=b6e3f4`;
+                }
                 
                 const imgElement = document.getElementById('logged-user-avatar');
-                // Evita reload desnecessário se a imagem for a mesma
                 if (imgElement.src !== avatarUrl) {
                      imgElement.src = avatarUrl;
                 }
                 
-                document.getElementById('logged-user-name').innerText = user.displayName || "Usuário";
+                document.getElementById('logged-user-name').innerText = userName || "Usuário";
                 document.getElementById('logged-user-email').innerText = user.email;
                 
                 authView.classList.add('hidden');
                 loggedInView.classList.remove('hidden');
             } else {
+                // Reset Forms
                 const loginBtn = document.getElementById('btn-login-submit');
                 if (loginBtn) { loginBtn.innerText = "Acessar Minha Conta"; loginBtn.disabled = false; }
                 const regBtn = document.getElementById('btn-reg-submit');
@@ -556,3 +584,5 @@
     </script>
 </body>
 </html>
+
+
