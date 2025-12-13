@@ -129,7 +129,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
                 </svg>
                 <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
-                </div>
+                    </div>
             </button>
         </div>
     </header>
@@ -255,7 +255,7 @@
                     <!-- DASHBOARD GRID -->
                     <div class="grid grid-cols-3 gap-3 mb-6 px-2">
                         <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100">
-                            <span class="block text-xl font-bold text-blue-700">0</span>
+                            <span class="block text-xl font-bold text-blue-700" id="user-parties">0</span>
                             <span class="text-[10px] text-blue-400 font-bold uppercase tracking-wide">Festas</span>
                         </div>
                         <div class="bg-yellow-50 p-3 rounded-2xl border border-yellow-100">
@@ -263,7 +263,7 @@
                             <span class="text-[10px] text-yellow-500 font-bold uppercase tracking-wide">Pontos</span>
                         </div>
                         <div class="bg-purple-50 p-3 rounded-2xl border border-purple-100">
-                            <span class="block text-xl font-bold text-purple-600">0</span>
+                            <span class="block text-xl font-bold text-purple-600" id="user-coupons">0</span>
                             <span class="text-[10px] text-purple-400 font-bold uppercase tracking-wide">Cupons</span>
                         </div>
                     </div>
@@ -465,6 +465,11 @@
         let currentGender = "neutral";
         
         function saveUserCache(uid, data) {
+            // Adiciona a data de criação do Auth (que já está no formato certo para cache)
+            const userData = auth.currentUser;
+            if (userData && !data.createdAt) {
+                data.createdAt = userData.metadata.creationTime;
+            }
             localStorage.setItem(`encanto_user_cache_${uid}`, JSON.stringify(data));
         }
 
@@ -484,7 +489,6 @@
             editName.value = currentName === "Carregando..." ? "" : currentName;
             editPreview.src = currentAvatar;
             
-            // Tenta extrair a seed se for um avatar DiceBear para manter a consistência
             if (currentAvatar.includes('dicebear')) {
                 currentAvatarSeed = currentAvatar.split('seed=')[1]?.split('&')[0] || Math.random().toString(36).substring(7);
             } else {
@@ -508,27 +512,23 @@
         }
 
         window.generateNewAvatar = function() {
-            // Estilo "Adventurer" é divertido e vibrante para festas
-            // Estilo "Micah" é clean e moderno
-            // Vamos usar Adventurer pois tem muitas variações legais
             const baseStyle = "adventurer"; 
             const randomSeed = Math.random().toString(36).substring(7);
             let finalSeed = randomSeed;
             
-            // Adiciona prefixo para tentar enviesar o estilo (alguns estilos suportam, outros é só seed)
             if (currentGender === 'male') finalSeed = "male_" + randomSeed;
             if (currentGender === 'female') finalSeed = "female_" + randomSeed;
 
             const newUrl = `https://api.dicebear.com/7.x/${baseStyle}/svg?seed=${finalSeed}&backgroundColor=b6e3f4`;
             
             document.getElementById('edit-avatar-preview').src = newUrl;
-            newAvatarBase64 = newUrl; // Usamos a URL como "base64" logicamente aqui para salvar
+            newAvatarBase64 = newUrl; 
         }
 
         window.handleAvatarFile = function(event) {
             const file = event.target.files[0];
             if (file) {
-                if (file.size > 200000) { // Limit 200KB
+                if (file.size > 200000) { 
                     alert("A imagem é muito grande! Tente uma menor que 200KB.");
                     return;
                 }
@@ -553,24 +553,23 @@
                 const user = auth.currentUser;
                 if (!user) throw new Error("Usuário não autenticado");
 
-                // 1. Update Auth Profile
                 await updateProfile(user, { displayName: newName, photoURL: newAvatarBase64 || user.photoURL });
 
-                // 2. Prepare Firestore Data
                 const updateData = { name: newName };
                 if (newAvatarBase64) {
                     updateData.avatar = newAvatarBase64;
                 }
 
-                // 3. Update Firestore
                 const docRef = doc(db, "users", user.uid);
                 await updateDoc(docRef, updateData);
 
-                // 4. Update Cache & UI
+                // --- CORREÇÃO: Limpa o newAvatarBase64 e garante a atualização do cache antes do reset do botão.
                 const cached = getUserCache(user.uid) || {};
                 const newData = { ...cached, ...updateData };
                 saveUserCache(user.uid, newData);
                 renderUserProfile(newData);
+                newAvatarBase64 = null; // Zera a imagem temporária
+                // --- FIM CORREÇÃO ---
 
                 closeSettings();
                 displayMessage("Perfil atualizado com sucesso!", "success");
@@ -660,17 +659,20 @@
             document.getElementById('user-name').innerText = userData.name || "Cliente Encantado";
             const avatarSeed = userData.email || "default"; 
             
-            // Se o avatar for uma URL salva ou gerada, usa ela. Se não, gera o padrão novo (Adventurer)
             const defaultAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
             document.getElementById('user-avatar').src = userData.avatar || defaultAvatar;
             
-            // Gamificação: Pontos e Nível
             const points = userData.points !== undefined ? userData.points : 0;
             const pointsElement = document.getElementById('user-points');
             if(pointsElement) pointsElement.innerText = points;
             document.getElementById('current-points-display').innerText = points;
 
-            // Lógica Simples de Nível
+            const partiesElement = document.getElementById('user-parties');
+            if(partiesElement) partiesElement.innerText = userData.parties || 0;
+
+            const couponsElement = document.getElementById('user-coupons');
+            if(couponsElement) couponsElement.innerText = userData.coupons || 0;
+
             let levelName = "Festeiro Iniciante";
             let progress = (points / 500) * 100;
             if (points > 100) levelName = "Festeiro Animado";
@@ -680,10 +682,10 @@
             document.getElementById('level-name').innerText = levelName;
             document.getElementById('xp-bar').style.width = `${progress}%`;
             
-            // Renderizar Data de Criação
             const dateElem = document.getElementById('user-since');
             if (userData.createdAt) {
                 let dateStr;
+                // Converte Firestore Timestamp ou Auth metadata para Date
                 if (userData.createdAt.seconds) {
                     dateStr = new Date(userData.createdAt.seconds * 1000).toLocaleDateString('pt-BR');
                 } else if (userData.createdAt) {
@@ -737,10 +739,11 @@
                     userData = {
                         name: user.displayName,
                         email: user.email,
-                        // Novo estilo padrão
                         avatar: user.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.email}&backgroundColor=b6e3f4`,
                         createdAt: Timestamp.now(),
-                        points: 50 // Bônus de boas-vindas
+                        points: 50,
+                        parties: 0,
+                        coupons: 0
                     };
                     await setDoc(docRef, userData);
                 } else {
@@ -789,7 +792,6 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
 
-                // Novo estilo padrão Adventurer
                 const defaultAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${email.split('@')[0]}&backgroundColor=b6e3f4`;
 
                 await updateProfile(user, { displayName: name, photoURL: defaultAvatar });
@@ -799,7 +801,9 @@
                     email: email,
                     avatar: defaultAvatar,
                     createdAt: Timestamp.now(),
-                    points: 50 // Começa com pontos!
+                    points: 50,
+                    parties: 0,
+                    coupons: 0
                 };
 
                 await setDoc(doc(db, "users", user.uid), userDocData);
@@ -968,13 +972,13 @@
                     if (user) {
                         const cachedData = getUserCache(user.uid);
                         
-                        // Fallback mais inteligente usando Auth Data (instantâneo)
                         const fallbackData = {
                             name: user.displayName || "Carregando...",
                             email: user.email,
-                            // Fallback com estilo Adventurer
                             avatar: user.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.email}&backgroundColor=b6e3f4`,
                             points: 0,
+                            parties: 0,
+                            coupons: 0,
                             createdAt: user.metadata.creationTime 
                         };
 
