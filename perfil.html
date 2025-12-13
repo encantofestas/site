@@ -88,7 +88,7 @@
                              onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'"
                              class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-xl bg-blue-50 object-cover transition transform group-hover:scale-105">
                         
-                        <!-- Botãozinho de editar flutuante na foto (Opcional, mas bonito) -->
+                        <!-- Botãozinho de editar flutuante na foto -->
                         <button onclick="openEditModal()" class="absolute bottom-4 right-0 bg-secondary text-blue-900 p-2 rounded-full shadow-lg border-2 border-white hover:bg-yellow-300 transition transform hover:scale-110">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                         </button>
@@ -363,15 +363,15 @@
             const seed = Math.random().toString(36).substring(7);
             let url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
 
-            // Gender filtering logic
+            // Corrected Gender filtering logic with standard parameter names for API 7.x
             if (currentEditGender === 'male') {
-                // Short hair types, higher probability of facial hair
-                url += `&top[]=shortHair,shortFlat,shortRound,shortWaved,caesar,caesarSidePart,dreads01,dreads02,frizzle,shaggyMullet,shaggy,shortCurly,shortWeave`;
+                // Using correct DiceBear 7.x/Avataaars enum values for short hair (comma separated, NO brackets)
+                url += `&top=shortHairDreads01,shortHairDreads02,shortHairFrizzle,shortHairShaggyMullet,shortHairShortCurly,shortHairShortFlat,shortHairShortRound,shortHairShortWaved,shortHairSides,shortHairTheCaesar,shortHairTheCaesarSidePart`;
                 // 50% chance of beard/stubble
                 url += `&facialHairProbability=50`; 
             } else if (currentEditGender === 'female') {
-                // Long hair types
-                url += `&top[]=longHair,longCurvy,longStraight,longStraight2,bigHair,bob,bun,curly,curvy,straight01,straight02,straightStrand`;
+                // Using correct DiceBear 7.x/Avataaars enum values for long hair
+                url += `&top=longHairBigHair,longHairBob,longHairBun,longHairCurly,longHairCurvy,longHairDreads,longHairFrida,longHairFro,longHairFroBand,longHairNotTooLong,longHairShavedSides,longHairMiaWallace,longHairStraight,longHairStraight2,longHairStraightStrand`;
                 // No beard
                 url += `&facialHairProbability=0`;
             }
@@ -379,6 +379,9 @@
 
             url += `&backgroundColor=b6e3f4`; // Consistent background
             
+            // Add timestamp to prevent browser caching if seeds are similar (rare, but robust)
+            url += `&t=${Date.now()}`;
+
             currentNewAvatarUrl = url;
             document.getElementById('edit-avatar-preview').src = url;
         }
