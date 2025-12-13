@@ -465,7 +465,6 @@
         let currentGender = "neutral";
         
         function saveUserCache(uid, data) {
-            // Adiciona a data de criação do Auth (que já está no formato certo para cache)
             const userData = auth.currentUser;
             if (userData && !data.createdAt) {
                 data.createdAt = userData.metadata.creationTime;
@@ -545,7 +544,8 @@
             e.preventDefault();
             const newName = document.getElementById('edit-name').value;
             const btn = document.getElementById('btn-save-profile');
-            const originalText = btn.innerHTML;
+            
+            const originalText = "<span>Salvar Perfil</span>"; 
             btn.innerText = "Salvando...";
             btn.disabled = true;
 
@@ -553,30 +553,39 @@
                 const user = auth.currentUser;
                 if (!user) throw new Error("Usuário não autenticado");
 
+                // 1. Atualiza Auth
                 await updateProfile(user, { displayName: newName, photoURL: newAvatarBase64 || user.photoURL });
 
+                // 2. Prepara dados
                 const updateData = { name: newName };
                 if (newAvatarBase64) {
                     updateData.avatar = newAvatarBase64;
                 }
 
+                // 3. Atualiza Firestore
                 const docRef = doc(db, "users", user.uid);
                 await updateDoc(docRef, updateData);
 
-                // --- CORREÇÃO: Limpa o newAvatarBase64 e garante a atualização do cache antes do reset do botão.
+                // 4. Cache
                 const cached = getUserCache(user.uid) || {};
                 const newData = { ...cached, ...updateData };
                 saveUserCache(user.uid, newData);
+                
+                // 5. Atualiza UI visualmente na hora (feedback instantâneo)
                 renderUserProfile(newData);
-                newAvatarBase64 = null; // Zera a imagem temporária
-                // --- FIM CORREÇÃO ---
+                newAvatarBase64 = null; 
 
                 closeSettings();
-                displayMessage("Perfil atualizado com sucesso!", "success");
+                displayMessage("Perfil atualizado! Atualizando página...", "success");
+                
+                // 6. Recarrega a página conforme solicitado
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+
             } catch (error) {
                 console.error("Erro ao atualizar perfil:", error);
                 displayMessage("Erro ao salvar alterações.", "error");
-            } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
@@ -685,7 +694,6 @@
             const dateElem = document.getElementById('user-since');
             if (userData.createdAt) {
                 let dateStr;
-                // Converte Firestore Timestamp ou Auth metadata para Date
                 if (userData.createdAt.seconds) {
                     dateStr = new Date(userData.createdAt.seconds * 1000).toLocaleDateString('pt-BR');
                 } else if (userData.createdAt) {
@@ -972,9 +980,11 @@
                     if (user) {
                         const cachedData = getUserCache(user.uid);
                         
+                        // Fallback mais inteligente usando Auth Data (instantâneo)
                         const fallbackData = {
                             name: user.displayName || "Carregando...",
                             email: user.email,
+                            // Fallback com estilo Adventurer
                             avatar: user.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.email}&backgroundColor=b6e3f4`,
                             points: 0,
                             parties: 0,
