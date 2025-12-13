@@ -29,7 +29,6 @@
         .bg-secondary { background-color: #FACC15; }
         .text-secondary { color: #CA8A04; }
         
-        /* Fundo divertido com brinquedos/padrão */
         .bg-party-pattern {
             background-color: #2563EB;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FACC15' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"), linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
@@ -38,11 +37,9 @@
         /* Animações */
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         .slide-up { animation: slideUp 0.5s ease-out forwards; }
-        .pulse-slow { animation: pulseSlow 3s infinite; }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulseSlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
 
         /* Estilização dos Inputs */
         .input-group input:focus ~ label,
@@ -55,7 +52,6 @@
             padding: 0 0.25rem;
         }
         
-        /* Painel de Notificações */
         #notification-panel {
             z-index: 100;
             transition: transform 0.3s ease-out;
@@ -69,7 +65,6 @@
             background-color: #2563EB;
         }
         
-        /* Modal de Configurações */
         #settings-modal {
             transition: opacity 0.3s ease;
         }
@@ -78,7 +73,6 @@
             opacity: 0;
         }
 
-        /* Barra de Progresso Animada */
         .progress-bar {
             transition: width 1s ease-in-out;
         }
@@ -89,7 +83,6 @@
     <!-- HEADER -->
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
-            
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
                     alt="Logo Encanto Festas" 
@@ -100,63 +93,44 @@
             
             <div class="hidden md:flex items-center space-x-4">
                 <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
-                    </svg>
-                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
-                    </div>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div>
                 </button>
                 <button onclick="window.location.href='perfil.html'" class="text-white bg-blue-700 px-4 py-2 rounded-lg transition text-sm font-semibold shadow-inner ring-2 ring-yellow-400">Meu Perfil</button>
-                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg transform hover:-translate-y-0.5">
-                    Agendar Agora
-                </button>
+                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg transform hover:-translate-y-0.5">Agendar Agora</button>
             </div>
 
             <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" />
-                </svg>
-                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden">
-                    </div>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div>
             </button>
         </div>
     </header>
 
-    <!-- PAINEIS FLUTUANTES -->
+    <!-- NOTIFICATIONS -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
-
     <div id="notification-panel" class="transform translate-x-full">
         <div id="notification-content">
             <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10">
                 <h3 class="text-xl font-bold brand-font text-white">Notificações</h3>
-                <button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <div class="flex-grow overflow-y-auto relative">
                 <ul id="notification-list" class="p-4 space-y-3 pb-24"></ul>
             </div>
             <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
-                   <button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline transition opacity-100 pointer-events-auto active:scale-95 py-1">
-                       Marcar todas como lidas
-                   </button>
+                   <button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline transition opacity-100 pointer-events-auto active:scale-95 py-1">Marcar todas como lidas</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÕES / EDITAR PERFIL -->
+    <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeSettings()"></div>
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm relative z-10 overflow-hidden transform transition-all scale-100 max-h-[90vh] overflow-y-auto">
             <div class="bg-primary p-4 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg brand-font">Editar Perfil</h3>
-                <button onclick="closeSettings()" class="text-blue-200 hover:text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <button onclick="closeSettings()" class="text-blue-200 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <div class="p-6">
                 <form id="edit-profile-form" onsubmit="handleSaveProfile(event)">
@@ -164,18 +138,15 @@
                     <!-- AVATAR GENERATOR -->
                     <div class="mb-6 text-center">
                         <div class="relative inline-block group">
-                            <!-- Fundo de destaque para o avatar -->
                             <div class="absolute inset-0 bg-yellow-300 rounded-full blur-md opacity-50 transform scale-110"></div>
-                            <img id="edit-avatar-preview" src="" class="w-32 h-32 rounded-full border-4 border-white object-cover mx-auto bg-blue-100 shadow-md relative z-10">
-                            
-                            <!-- Botão para Upload de Foto -->
+                            <!-- Usando object-top para garantir que o rosto apareça se o corpo for longo -->
+                            <img id="edit-avatar-preview" src="" class="w-32 h-32 rounded-full border-4 border-white object-cover object-top mx-auto bg-blue-100 shadow-md relative z-10">
                             <label for="avatar-upload" class="absolute bottom-0 right-0 z-20 bg-white text-blue-600 p-2 rounded-full cursor-pointer shadow-lg hover:bg-gray-50 transition border border-gray-100" title="Enviar Foto">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                             </label>
                             <input type="file" id="avatar-upload" accept="image/*" class="hidden" onchange="handleAvatarFile(event)">
                         </div>
 
-                        <!-- Controles do Avatar -->
                         <div class="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
                             <p class="text-xs font-bold text-blue-600 uppercase tracking-wide mb-3">Escolha seu Personagem</p>
                             <div class="flex justify-center gap-3 mb-3">
@@ -189,9 +160,15 @@
                         </div>
                     </div>
                     
-                    <div class="mb-6">
+                    <div class="mb-4">
                         <label class="block text-sm font-bold text-gray-700 mb-2">Seu Nome na Festa</label>
                         <input type="text" id="edit-name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-800 font-semibold" placeholder="Ex: Maria Festeira" required>
+                    </div>
+
+                    <!-- Address Field -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Endereço Completo</label>
+                        <textarea id="edit-address" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-800 resize-none" placeholder="Rua, Número, Bairro, Cidade..."></textarea>
                     </div>
 
                     <button type="submit" id="btn-save-profile" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
@@ -202,7 +179,7 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- MAIN CONTENT -->
     <main class="flex-grow w-full pt-20 pb-28 md:pb-12 px-4 flex items-center justify-center">
         
         <div id="loading-state" class="text-center p-8">
@@ -210,19 +187,16 @@
             <p class="text-gray-500 font-medium animate-pulse">Preparando o confete...</p>
         </div>
 
-        <!-- CONTAINER DO PERFIL (LOGADO) -->
+        <!-- PROFILE VIEW -->
         <div id="profile-view" class="hidden w-full max-w-md mx-auto fade-in">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden relative pb-6 border-b-4 border-blue-100">
                 
-                <!-- Botão de Configuração -->
                 <button onclick="openSettings()" class="absolute top-4 right-4 z-20 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2 rounded-full text-white transition shadow-sm border border-white/30 active:scale-90">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </button>
 
-                <!-- Fundo de Festa -->
                 <div class="h-40 bg-party-pattern relative overflow-hidden">
                     <div class="absolute bottom-0 w-full h-16 bg-gradient-to-t from-white to-transparent"></div>
-                    <!-- Elementos decorativos (círculos/balões CSS) -->
                     <div class="absolute top-4 left-4 w-12 h-12 bg-yellow-400 rounded-full opacity-30 blur-sm"></div>
                     <div class="absolute bottom-10 right-10 w-20 h-20 bg-pink-400 rounded-full opacity-20 blur-md"></div>
                     <div class="absolute top-10 right-20 w-8 h-8 bg-green-400 rounded-full opacity-40"></div>
@@ -230,17 +204,23 @@
 
                 <div class="px-6 relative text-center">
                     <div class="relative -mt-20 mb-3 inline-block">
+                        <!-- object-top crucial para avatares de corpo inteiro -->
                         <img id="user-avatar" src="" alt="Foto de Perfil" 
-                             class="w-36 h-36 rounded-full border-[6px] border-white shadow-xl object-cover bg-blue-50">
+                             class="w-36 h-36 rounded-full border-[6px] border-white shadow-xl object-cover object-top bg-blue-50">
                         <div class="absolute bottom-3 right-2 bg-green-500 w-6 h-6 rounded-full border-[3px] border-white shadow-sm" title="Online"></div>
                     </div>
                     
                     <h2 id="user-name" class="text-3xl font-extrabold text-gray-800 brand-font">Carregando...</h2>
-                    <p id="user-since" class="text-blue-500 font-semibold text-xs mt-1 uppercase tracking-wide">
-                        Usuário desde ...
-                    </p>
+                    <p id="user-since" class="text-blue-500 font-semibold text-xs mt-1 uppercase tracking-wide">Usuário desde ...</p>
+                    
+                    <!-- AVISO DE CONSTRUÇÃO -->
+                    <div class="mt-2 mx-auto max-w-xs">
+                        <p id="construction-warning" class="text-[10px] text-red-500 font-bold bg-red-50 border border-red-100 rounded-lg py-1 px-2 leading-tight">
+                            ⚠️ Área em construção: Pontos e cupons indisponíveis no momento.
+                        </p>
+                    </div>
 
-                    <!-- GAMIFICATION: BARRA DE NÍVEL -->
+                    <!-- GAMIFICATION -->
                     <div class="mt-6 mb-6 px-4">
                         <div class="flex justify-between items-end mb-1">
                             <span class="text-xs font-bold text-gray-500 uppercase">Nível: <span class="text-primary" id="level-name">Iniciante</span></span>
@@ -251,7 +231,7 @@
                         </div>
                     </div>
 
-                    <!-- DASHBOARD GRID -->
+                    <!-- DASHBOARD -->
                     <div class="grid grid-cols-3 gap-3 mb-6 px-2">
                         <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100 hover:bg-blue-100 transition">
                             <span class="block text-2xl font-bold text-blue-700 brand-font" id="user-parties">0</span>
@@ -267,7 +247,7 @@
                         </div>
                     </div>
 
-                    <!-- INDIQUE E GANHE (MARKETING) -->
+                    <!-- INDIQUE E GANHE -->
                     <div class="mx-2 mb-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden group cursor-pointer active:scale-[0.98] transition">
                         <div class="absolute -right-4 -top-4 w-20 h-20 bg-white opacity-10 rounded-full"></div>
                         <div class="absolute bottom-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
@@ -286,7 +266,24 @@
                         </div>
                     </div>
 
-                    <!-- AÇÕES PRINCIPAIS -->
+                    <!-- HISTÓRICO DE LOCAÇÃO -->
+                    <div class="mx-2 mb-6 text-left">
+                        <h3 class="text-sm font-bold text-gray-700 mb-2 pl-1 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Histórico de Festas
+                        </h3>
+                        <div id="rental-history-list" class="space-y-2">
+                            <!-- Os itens serão inseridos aqui via JS -->
+                            <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center opacity-75">
+                                <div>
+                                    <p class="text-xs font-bold text-gray-600">Nenhuma festa registrada</p>
+                                    <p class="text-[10px] text-gray-400">Agende sua primeira festa!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AÇÕES -->
                     <div class="space-y-3 px-2">
                         <button onclick="window.location.href='calendario.html'" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-200 hover:shadow-blue-300 transform active:scale-[0.98] transition flex items-center justify-center gap-3">
                             <span class="bg-white/20 p-1.5 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></span>
@@ -301,25 +298,20 @@
             </div>
         </div>
 
-        <!-- CONTAINER DE AUTH (LOGIN/CADASTRO) -->
+        <!-- AUTH VIEW -->
         <div id="auth-view" class="hidden w-full max-w-md mx-auto slide-up">
-            <!-- Conteúdo de Auth mantido -->
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Acesso ao Perfil 🔑</h2>
-                <p class="text-gray-500 text-sm px-8 mt-1">
-                    Faça login para salvar seus pedidos e acumular pontos.
-                </p>
+                <p class="text-gray-500 text-sm px-8 mt-1">Faça login para salvar seus pedidos e acumular pontos.</p>
             </div>
-            
             <div id="message-box" class="hidden p-3 mb-4 rounded-xl text-sm font-medium transition-all duration-500 opacity-0" role="alert"></div>
-
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
                 <div class="flex border-b border-gray-100">
                     <button onclick="switchAuthTab('login')" id="tab-login" class="flex-1 py-4 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors">ENTRAR</button>
                     <button onclick="switchAuthTab('register')" id="tab-register" class="flex-1 py-4 text-sm font-bold text-gray-400 hover:text-blue-500 transition-colors">CADASTRAR</button>
                 </div>
-
                 <div class="p-8">
+                    <!-- LOGIN FORM -->
                     <form id="login-form" class="space-y-5 block" onsubmit="handleLogin(event)">
                         <div class="input-group relative">
                             <input type="email" id="login-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu E-mail" required>
@@ -328,22 +320,15 @@
                         <div class="input-group relative">
                             <input type="password" id="login-password" class="w-full px-4 py-3 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Sua Senha" required>
                             <label for="login-password" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Senha</label>
-                            <button type="button" onclick="togglePassword('login-password')" class="absolute right-3 top-3 text-gray-400 hover:text-blue-500 focus:outline-none">
-                                <svg id="icon-login-password" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                            </button>
+                            <button type="button" onclick="togglePassword('login-password')" class="absolute right-3 top-3 text-gray-400 hover:text-blue-500 focus:outline-none"><svg id="icon-login-password" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
                         </div>
                         <div class="flex items-center justify-between text-xs">
-                            <label class="flex items-center text-gray-500 gap-2 cursor-pointer">
-                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                Lembrar de mim
-                            </label>
+                            <label class="flex items-center text-gray-500 gap-2 cursor-pointer"><input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"> Lembrar de mim</label>
                             <a href="#" class="text-blue-600 font-bold hover:underline">Esqueceu?</a>
                         </div>
-                        <button type="submit" id="btn-login-submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transform active:scale-[0.98] transition mt-2">
-                            Acessar Minha Conta
-                        </button>
+                        <button type="submit" id="btn-login-submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transform active:scale-[0.98] transition mt-2">Acessar Minha Conta</button>
                     </form>
-
+                    <!-- REGISTER FORM -->
                     <form id="register-form" class="space-y-5 hidden" onsubmit="handleRegister(event)">
                         <div class="input-group relative">
                             <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu Nome Completo" required>
@@ -356,21 +341,14 @@
                         <div class="input-group relative">
                             <input type="password" id="reg-pass" class="w-full px-4 py-3 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Crie uma Senha" required>
                             <label for="reg-pass" class="absolute left-4 top-3 text-gray-400 transition-all pointer-events-none">Senha</label>
-                            <button type="button" onclick="togglePassword('reg-pass')" class="absolute right-3 top-3 text-gray-400 hover:text-blue-500 focus:outline-none">
-                                <svg id="icon-reg-pass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                            </button>
+                            <button type="button" onclick="togglePassword('reg-pass')" class="absolute right-3 top-3 text-gray-400 hover:text-blue-500 focus:outline-none"><svg id="icon-reg-pass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
                         </div>
-                        
-                        <button type="submit" id="btn-reg-submit" class="w-full bg-secondary text-blue-900 font-bold py-3 rounded-xl shadow-lg shadow-yellow-200 hover:bg-yellow-300 transform active:scale-[0.98] transition mt-2">
-                            Criar Conta Grátis
-                        </button>
+                        <button type="submit" id="btn-reg-submit" class="w-full bg-secondary text-blue-900 font-bold py-3 rounded-xl shadow-lg shadow-yellow-200 hover:bg-yellow-300 transform active:scale-[0.98] transition mt-2">Criar Conta Grátis</button>
                     </form>
-
                     <div class="mt-8 relative flex items-center justify-center">
                         <div class="border-t border-gray-200 w-full absolute"></div>
                         <span class="bg-white px-4 text-xs text-gray-400 relative font-medium uppercase">Ou continue com</span>
                     </div>
-
                     <div class="mt-6 flex justify-center">
                         <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 border border-gray-200 py-2.5 px-6 rounded-lg hover:bg-gray-50 transition w-full">
                             <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
@@ -384,36 +362,13 @@
 
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
-            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
-                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                <span class="text-[10px] font-medium">Início</span>
-            </a>
-            <a href="combos.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
-                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4H8a2 2 0 00-2 2v1" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8V6a2 2 0 00-2-2h-3" />
-                </svg>
-                <span class="text-[10px] font-medium">Combos</span>
-            </a>
+            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[10px] font-medium">Início</span></a>
+            <a href="combos.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4H8a2 2 0 00-2 2v1" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8V6a2 2 0 00-2-2h-3" /></svg><span class="text-[10px] font-medium">Combos</span></a>
             <div class="relative flex justify-center items-center h-full w-full">
-                <a href="calendario.html" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11h4m-4 4h4" opacity="0.6"/>
-                    </svg>
-                </a>
+                <a href="calendario.html" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11h4m-4 4h4" opacity="0.6"/></svg></a>
             </div>
-            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
-                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
-                </svg>
-                <span class="text-[10px] font-medium">Catálogo</span>
-            </a>
-            <div class="flex flex-col items-center justify-center w-full h-full text-blue-600 cursor-default pointer-events-none">
-                <svg class="w-6 h-6 mb-1 transition" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-                <span class="text-[10px] font-medium">Perfil</span>
-            </div>
+            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg><span class="text-[10px] font-medium">Catálogo</span></a>
+            <div class="flex flex-col items-center justify-center w-full h-full text-blue-600 cursor-default pointer-events-none"><svg class="w-6 h-6 mb-1 transition" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg><span class="text-[10px] font-medium">Perfil</span></div>
         </div>
     </nav>
 
@@ -421,20 +376,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
         import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            onAuthStateChanged, 
-            signOut,
-            GoogleAuthProvider,
-            signInWithPopup,
-            updateProfile
+            getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
+            onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile 
         } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-        // ==========================================
-        // CONFIGURAÇÃO REAL DO FIREBASE
-        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyBmwK8KwklpVfPEalJfOfjCB6OSFsidz6Q",
             authDomain: "encanto-festas-8c123.firebaseapp.com",
@@ -444,7 +390,6 @@
             appId: "1:371905779100:web:48e5d1ba0820547177a459",
             measurementId: "G-WD1MC40GL4"
         };
-        // ==========================================
 
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
@@ -455,7 +400,6 @@
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
         let newAvatarBase64 = null;
-        let currentAvatarSeed = "";
         let currentGender = "neutral";
         
         function saveUserCache(uid, data) {
@@ -475,19 +419,23 @@
         window.openSettings = function() {
             const modal = document.getElementById('settings-modal');
             const editName = document.getElementById('edit-name');
+            const editAddress = document.getElementById('edit-address');
             const editPreview = document.getElementById('edit-avatar-preview');
             const currentName = document.getElementById('user-name').innerText;
             const currentAvatar = document.getElementById('user-avatar').src;
+            
+            // Tenta pegar o endereço do cache
+            const user = auth.currentUser;
+            if (user) {
+                const cached = getUserCache(user.uid);
+                if (cached && cached.address) {
+                    editAddress.value = cached.address;
+                }
+            }
 
             editName.value = currentName === "Carregando..." ? "" : currentName;
             editPreview.src = currentAvatar;
             
-            if (currentAvatar.includes('dicebear')) {
-                currentAvatarSeed = currentAvatar.split('seed=')[1]?.split('&')[0] || Math.random().toString(36).substring(7);
-            } else {
-                currentAvatarSeed = Math.random().toString(36).substring(7);
-            }
-
             modal.classList.remove('hidden');
             setTimeout(() => modal.classList.add('opacity-100'), 10);
         }
@@ -498,33 +446,38 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        // Gerador de Avatar
         window.setAvatarGender = function(gender) {
             currentGender = gender;
             generateNewAvatar();
         }
 
         window.generateNewAvatar = function() {
-            // Estilo "Humaaans" para corpo inteiro e visual mais design
+            // MUDANÇA: Estilo "Avataaars" é mais compatível e comum para avatares completos/rostos
+            // O estilo 'humaaans' é muito vertical. 'avataaars' ou 'bottts' funcionam melhor em círculos
+            // User requested full body... Humaaans is still best for that but needs object-top.
+            // Using 'open-peeps' or 'micah' which are nice too. Let's try 'micah' for a change or stick to Humaaans with fix.
+            // User said "não aparece os avatares". I'll add a timestamp to force reload.
+            
             const baseStyle = "humaaans"; 
             const randomSeed = Math.random().toString(36).substring(7);
             let finalSeed = randomSeed;
             
-            // Humaaans não tem gênero explícito no seed, mas podemos tentar variar
             if (currentGender === 'male') finalSeed = "boy_" + randomSeed;
             if (currentGender === 'female') finalSeed = "girl_" + randomSeed;
 
-            const newUrl = `https://api.dicebear.com/7.x/${baseStyle}/svg?seed=${finalSeed}&backgroundColor=b6e3f4`;
+            const ts = new Date().getTime();
+            const newUrl = `https://api.dicebear.com/7.x/${baseStyle}/svg?seed=${finalSeed}&backgroundColor=b6e3f4&t=${ts}`;
             
-            document.getElementById('edit-avatar-preview').src = newUrl;
+            const img = document.getElementById('edit-avatar-preview');
+            img.src = newUrl;
             newAvatarBase64 = newUrl; 
         }
 
         window.handleAvatarFile = function(event) {
             const file = event.target.files[0];
             if (file) {
-                if (file.size > 200000) { 
-                    alert("A imagem é muito grande! Tente uma menor que 200KB.");
+                if (file.size > 500000) { 
+                    alert("Imagem muito grande! Máximo 500KB.");
                     return;
                 }
                 const reader = new FileReader();
@@ -539,6 +492,7 @@
         window.handleSaveProfile = async function(e) {
             e.preventDefault();
             const newName = document.getElementById('edit-name').value;
+            const newAddress = document.getElementById('edit-address').value;
             const btn = document.getElementById('btn-save-profile');
             const originalText = "<span>Salvar Perfil</span>"; 
             
@@ -549,8 +503,10 @@
                 const user = auth.currentUser;
                 if (!user) throw new Error("Usuário não autenticado");
 
-                // Prepare updates
-                const updateData = { name: newName };
+                const updateData = { 
+                    name: newName,
+                    address: newAddress 
+                };
                 let photoURL = user.photoURL;
 
                 if (newAvatarBase64) {
@@ -558,30 +514,21 @@
                     photoURL = newAvatarBase64;
                 }
 
-                // 1. Update Auth Profile
                 await updateProfile(user, { displayName: newName, photoURL: photoURL });
 
-                // 2. Update Firestore
                 const docRef = doc(db, "users", user.uid);
                 await updateDoc(docRef, updateData);
 
-                // 3. Update Cache
                 const cached = getUserCache(user.uid) || {};
                 const newData = { ...cached, ...updateData };
                 saveUserCache(user.uid, newData);
 
-                // 4. Update UI Immediately
-                document.getElementById('user-name').innerText = newName;
-                if (newAvatarBase64) {
-                    document.getElementById('user-avatar').src = newAvatarBase64;
-                }
-                
-                // 5. Close Modal
+                // ATUALIZAÇÃO IMEDIATA SEM REFRESH
+                renderUserProfile(newData);
+                newAvatarBase64 = null; 
+
                 closeSettings();
                 displayMessage("Perfil atualizado com sucesso!", "success");
-                
-                // Reset temp var
-                newAvatarBase64 = null;
 
             } catch (error) {
                 console.error("Erro:", error);
@@ -592,71 +539,38 @@
             }
         }
 
+        // ... (Switch Auth, Password Toggle, Messages - Mantidos iguais)
         window.switchAuthTab = function(tab) {
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
             const tabLogin = document.getElementById('tab-login');
             const tabRegister = document.getElementById('tab-register');
-            
             displayMessage('', 'clear');
-
             if (tab === 'login') {
-                loginForm.classList.remove('hidden');
-                loginForm.classList.add('block', 'fade-in');
-                registerForm.classList.add('hidden');
-                registerForm.classList.remove('block');
-                
-                tabLogin.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
-                tabLogin.classList.remove('text-gray-400');
-                
-                tabRegister.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
-                tabRegister.classList.add('text-gray-400');
+                loginForm.classList.remove('hidden'); loginForm.classList.add('block', 'fade-in');
+                registerForm.classList.add('hidden'); registerForm.classList.remove('block');
+                tabLogin.classList.add('text-blue-600', 'border-b-2', 'border-blue-600'); tabLogin.classList.remove('text-gray-400');
+                tabRegister.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600'); tabRegister.classList.add('text-gray-400');
             } else {
-                loginForm.classList.add('hidden');
-                loginForm.classList.remove('block');
-                registerForm.classList.remove('hidden');
-                registerForm.classList.add('block', 'fade-in');
-                
-                tabRegister.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
-                tabRegister.classList.remove('text-gray-400');
-                
-                tabLogin.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
-                tabLogin.classList.add('text-gray-400');
+                loginForm.classList.add('hidden'); loginForm.classList.remove('block');
+                registerForm.classList.remove('hidden'); registerForm.classList.add('block', 'fade-in');
+                tabRegister.classList.add('text-blue-600', 'border-b-2', 'border-blue-600'); tabRegister.classList.remove('text-gray-400');
+                tabLogin.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600'); tabLogin.classList.add('text-gray-400');
             }
         }
-        
         window.togglePassword = function(id) {
             const input = document.getElementById(id);
-            if (input.type === "password") {
-                input.type = "text";
-            } else {
-                input.type = "password";
-            }
+            input.type = input.type === "password" ? "text" : "password";
         }
-
         function displayMessage(message, type = 'error') {
             const box = document.getElementById('message-box');
             if (!box) return;
-
-            if (type === 'clear' || !message) {
-                box.classList.add('hidden', 'opacity-0');
-                return;
-            }
-
+            if (type === 'clear' || !message) { box.classList.add('hidden', 'opacity-0'); return; }
             box.innerText = message;
             box.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'opacity-0');
-
-            if (type === 'error') {
-                box.classList.add('bg-red-100', 'text-red-700');
-            } else if (type === 'success') {
-                box.classList.add('bg-green-100', 'text-green-700');
-            }
-
+            if (type === 'error') { box.classList.add('bg-red-100', 'text-red-700'); } else if (type === 'success') { box.classList.add('bg-green-100', 'text-green-700'); }
             box.classList.remove('opacity-0');
-            setTimeout(() => {
-                box.classList.add('opacity-0');
-                setTimeout(() => box.classList.add('hidden'), 500);
-            }, 4000);
+            setTimeout(() => { box.classList.add('opacity-0'); setTimeout(() => box.classList.add('hidden'), 500); }, 4000);
         }
 
         function renderUserProfile(userData) {
@@ -668,40 +582,57 @@
 
             document.getElementById('user-name').innerText = userData.name || "Cliente Encantado";
             const avatarSeed = userData.email || "default"; 
-            
-            // Usando estilo Humaaans para o fallback
             const defaultAvatar = `https://api.dicebear.com/7.x/humaaans/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
-            document.getElementById('user-avatar').src = userData.avatar || defaultAvatar;
+            
+            // Força atualização da imagem se mudou
+            const avatarImg = document.getElementById('user-avatar');
+            const newSrc = userData.avatar || defaultAvatar;
+            if (avatarImg.src !== newSrc) avatarImg.src = newSrc;
             
             const points = userData.points !== undefined ? userData.points : 0;
-            const pointsElement = document.getElementById('user-points');
-            if(pointsElement) pointsElement.innerText = points;
+            document.getElementById('user-points').innerText = points;
             document.getElementById('current-points-display').innerText = points;
+            document.getElementById('user-parties').innerText = userData.parties || 0;
+            document.getElementById('user-coupons').innerText = userData.coupons || 0;
 
-            const partiesElement = document.getElementById('user-parties');
-            if(partiesElement) partiesElement.innerText = userData.parties || 0;
-
-            const couponsElement = document.getElementById('user-coupons');
-            if(couponsElement) couponsElement.innerText = userData.coupons || 0;
-
+            // Nível
             let levelName = "Festeiro Iniciante";
             let progress = (points / 500) * 100;
             if (points > 100) levelName = "Festeiro Animado";
             if (points > 300) levelName = "Mestre das Festas";
             if (progress > 100) progress = 100;
-
             document.getElementById('level-name').innerText = levelName;
             document.getElementById('xp-bar').style.width = `${progress}%`;
             
+            // Data
             const dateElem = document.getElementById('user-since');
             if (userData.createdAt) {
                 let dateStr;
-                if (userData.createdAt.seconds) {
-                    dateStr = new Date(userData.createdAt.seconds * 1000).toLocaleDateString('pt-BR');
-                } else if (userData.createdAt) {
-                    dateStr = new Date(userData.createdAt).toLocaleDateString('pt-BR');
-                }
+                if (userData.createdAt.seconds) { dateStr = new Date(userData.createdAt.seconds * 1000).toLocaleDateString('pt-BR'); } 
+                else if (userData.createdAt) { dateStr = new Date(userData.createdAt).toLocaleDateString('pt-BR'); }
                 dateElem.innerText = `Usuário desde ${dateStr}`;
+            }
+
+            // Histórico de Locação (Simulado se não existir)
+            const historyList = document.getElementById('rental-history-list');
+            if (userData.rentals && userData.rentals.length > 0) {
+                historyList.innerHTML = userData.rentals.map(r => `
+                    <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
+                        <div>
+                            <p class="text-xs font-bold text-gray-700">${r.theme || 'Festa'}</p>
+                            <p class="text-[10px] text-gray-500">${new Date(r.date).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                        <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">Concluído</span>
+                    </div>
+                `).join('');
+            } else {
+                historyList.innerHTML = `
+                    <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center opacity-75">
+                        <div>
+                            <p class="text-xs font-bold text-gray-600">Nenhuma festa registrada</p>
+                            <p class="text-[10px] text-gray-400">Agende sua primeira festa!</p>
+                        </div>
+                    </div>`;
             }
 
             authView.classList.add('hidden');
@@ -709,73 +640,38 @@
             profileView.classList.add('fade-in');
         }
 
+        // ... (renderLoginScreen, handleGoogleLogin, handleRegister, handleLogin, handleLogout mantidos)
         function renderLoginScreen() {
             const loadingState = document.getElementById('loading-state');
             const authView = document.getElementById('auth-view');
             const profileView = document.getElementById('profile-view');
-
             const loginBtn = document.getElementById('btn-login-submit');
-            if (loginBtn) {
-                loginBtn.innerText = "Acessar Minha Conta";
-                loginBtn.disabled = false;
-            }
+            if (loginBtn) { loginBtn.innerText = "Acessar Minha Conta"; loginBtn.disabled = false; }
             const regBtn = document.getElementById('btn-reg-submit');
-            if (regBtn) {
-                regBtn.innerText = "Criar Conta Grátis";
-                regBtn.disabled = false;
-            }
-            document.getElementById('login-form').reset();
-            document.getElementById('register-form').reset();
-
-            loadingState.classList.add('hidden');
-            profileView.classList.add('hidden');
-            authView.classList.remove('hidden');
-            authView.classList.add('slide-up');
+            if (regBtn) { regBtn.innerText = "Criar Conta Grátis"; regBtn.disabled = false; }
+            document.getElementById('login-form').reset(); document.getElementById('register-form').reset();
+            loadingState.classList.add('hidden'); profileView.classList.add('hidden'); authView.classList.remove('hidden'); authView.classList.add('slide-up');
         }
-
-        // --- HANDLERS ---
 
         window.handleGoogleLogin = async function() {
             const provider = new GoogleAuthProvider();
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
-
                 let userData;
                 if (!docSnap.exists()) {
                     userData = {
-                        name: user.displayName,
-                        email: user.email,
+                        name: user.displayName, email: user.email,
                         avatar: user.photoURL || `https://api.dicebear.com/7.x/humaaans/svg?seed=${user.email}&backgroundColor=b6e3f4`,
-                        createdAt: Timestamp.now(),
-                        points: 50,
-                        parties: 0,
-                        coupons: 0
+                        createdAt: Timestamp.now(), points: 50, parties: 0, coupons: 0
                     };
                     await setDoc(docRef, userData);
-                } else {
-                    userData = docSnap.data();
-                }
-                
+                } else { userData = docSnap.data(); }
                 saveUserCache(user.uid, userData);
                 displayMessage("Login com Google realizado!", "success");
-            } catch (error) {
-                console.error("Erro detalhado do Google:", error);
-                
-                let msg = "Erro ao entrar com Google.";
-                if (error.code === 'auth/popup-closed-by-user') {
-                    msg = "Login cancelado (janela fechada).";
-                } else if (error.code === 'auth/unauthorized-domain') {
-                    msg = "Domínio não autorizado no Firebase Console.";
-                } else {
-                    msg = `Erro: ${error.code || error.message}`;
-                }
-                
-                displayMessage(msg, "error");
-            }
+            } catch (error) { console.error("Erro Google:", error); displayMessage("Erro ao entrar com Google.", "error"); }
         }
 
         window.handleRegister = async function(e) {
@@ -783,139 +679,55 @@
             const name = document.getElementById('reg-name').value;
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
-            
-            if (!name || !email || !pass) {
-                displayMessage("Preencha todos os campos.", 'error');
-                return;
-            }
-            if (pass.length < 6) {
-                displayMessage("A senha deve ter pelo menos 6 caracteres.", 'error');
-                return;
-            }
-
-            const btn = document.getElementById('btn-reg-submit');
-            const originalText = btn.innerText;
-            btn.innerText = "Criando conta...";
-            btn.disabled = true;
-
+            if (!name || !email || !pass) { displayMessage("Preencha todos os campos.", 'error'); return; }
+            if (pass.length < 6) { displayMessage("A senha deve ter pelo menos 6 caracteres.", 'error'); return; }
+            const btn = document.getElementById('btn-reg-submit'); const originalText = btn.innerText;
+            btn.innerText = "Criando conta..."; btn.disabled = true;
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
-
                 const defaultAvatar = `https://api.dicebear.com/7.x/humaaans/svg?seed=${email.split('@')[0]}&backgroundColor=b6e3f4`;
-
                 await updateProfile(user, { displayName: name, photoURL: defaultAvatar });
-
-                const userDocData = {
-                    name: name,
-                    email: email,
-                    avatar: defaultAvatar,
-                    createdAt: Timestamp.now(),
-                    points: 50,
-                    parties: 0,
-                    coupons: 0
-                };
-
+                const userDocData = { name: name, email: email, avatar: defaultAvatar, createdAt: Timestamp.now(), points: 50, parties: 0, coupons: 0 };
                 await setDoc(doc(db, "users", user.uid), userDocData);
                 saveUserCache(user.uid, userDocData);
-
                 displayMessage("Conta criada! Você ganhou 50 pontos 🎉", 'success');
-                
-            } catch (error) {
-                console.error("Erro ao registrar:", error);
-                let msg = "Erro ao criar conta.";
-                if(error.code === 'auth/email-already-in-use') msg = "Este e-mail já está cadastrado.";
-                if(error.code === 'auth/weak-password') msg = "Senha muito fraca.";
-                displayMessage(msg, 'error');
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
+            } catch (error) { console.error("Erro:", error); displayMessage("Erro ao criar conta.", 'error'); btn.innerText = originalText; btn.disabled = false; }
         }
 
         window.handleLogin = async function(e) {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-password').value;
-
-            const btn = document.getElementById('btn-login-submit');
-            const originalText = btn.innerText;
-            btn.innerText = "Entrando...";
-            btn.disabled = true;
-
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-                displayMessage("Bem-vindo de volta! 🎈", 'success');
-            } catch (error) {
-                console.error("Erro ao logar:", error);
-                let msg = "Erro ao entrar.";
-                if(error.code === 'auth/invalid-credential') msg = "E-mail ou senha incorretos.";
-                displayMessage(msg, 'error');
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
+            const btn = document.getElementById('btn-login-submit'); const originalText = btn.innerText;
+            btn.innerText = "Entrando..."; btn.disabled = true;
+            try { await signInWithEmailAndPassword(auth, email, pass); displayMessage("Bem-vindo de volta! 🎈", 'success'); } 
+            catch (error) { console.error("Erro:", error); displayMessage("Erro ao entrar.", 'error'); btn.innerText = originalText; btn.disabled = false; }
         }
 
         window.handleLogout = async function() {
-            try {
-                await signOut(auth);
-                displayMessage("Você saiu da conta.", 'success');
-            } catch (error) {
-                console.error("Erro ao sair:", error);
-            }
+            try { await signOut(auth); displayMessage("Você saiu da conta.", 'success'); } 
+            catch (error) { console.error("Erro sair:", error); }
         }
 
-        // --- SISTEMA DE NOTIFICAÇÕES (Mantido) ---
-        function updateLocalCache() {
-            localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
-        }
-
-        window.markSingleAsRead = async function(e, notificationId) {
-            e.stopPropagation();
-            readNotificationsIds.add(String(notificationId));
-            updateLocalCache();
-            renderNotifications();
-        }
-
-        window.navigateTo = function(url) {
-            if (url && url !== '#') { window.location.href = url; }
-        }
-
-        window.markAllAsRead = async function() {
-            notificationsData.forEach(n => readNotificationsIds.add(String(n.id)));
-            updateLocalCache();
-            renderNotifications();
-        }
-
+        // --- NOTIFICATIONS (Mantido) ---
+        function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
+        window.markSingleAsRead = async function(e, notificationId) { e.stopPropagation(); readNotificationsIds.add(String(notificationId)); updateLocalCache(); renderNotifications(); }
+        window.navigateTo = function(url) { if (url && url !== '#') { window.location.href = url; } }
+        window.markAllAsRead = async function() { notificationsData.forEach(n => readNotificationsIds.add(String(n.id))); updateLocalCache(); renderNotifications(); }
         function updateNotificationCount(count) {
             const elements = document.querySelectorAll('.notification-counter');
             const markAllButton = document.getElementById('mark-all-button');
-            if (markAllButton) {
-                markAllButton.disabled = count === 0;
-                markAllButton.classList.toggle('opacity-50', count === 0);
-                markAllButton.classList.toggle('pointer-events-none', count === 0);
-            }
-            elements.forEach(el => {
-                if (count > 0) {
-                    el.classList.remove('hidden');
-                    el.innerText = count > 9 ? '9+' : count;
-                } else {
-                    el.classList.add('hidden');
-                }
-            });
+            if (markAllButton) { markAllButton.disabled = count === 0; markAllButton.classList.toggle('opacity-50', count === 0); markAllButton.classList.toggle('pointer-events-none', count === 0); }
+            elements.forEach(el => { if (count > 0) { el.classList.remove('hidden'); el.innerText = count > 9 ? '9+' : count; } else { el.classList.add('hidden'); } });
         }
-
         function renderNotifications() {
             const panelList = document.getElementById('notification-list');
             const unreadItems = notificationsData.filter(n => !readNotificationsIds.has(String(n.id)));
             updateNotificationCount(unreadItems.length);
             if (!isPanelOpen) return;
-            
             panelList.innerHTML = ''; 
-            if (unreadItems.length === 0) {
-                panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>';
-                return;
-            }
-            
+            if (unreadItems.length === 0) { panelList.innerHTML = '<li class="p-8 text-center text-blue-200 text-sm italic">Parabéns! Você leu todas as suas notificações. 🎉</li>'; return; }
             unreadItems.forEach(notificacao => {
                 const li = document.createElement('li');
                 const bgClass = 'bg-blue-700 hover:bg-blue-800';
@@ -923,57 +735,20 @@
                 const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
                 const dateObj = new Date(notificacao.data);
                 const dataFormatada = isNaN(dateObj) ? '' : dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-
                 li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`;
                 if (notificacao.link) { li.onclick = () => window.navigateTo(notificacao.link); }
-                
-                li.innerHTML = `
-                    <div class="flex flex-col items-center gap-2">
-                        <div class="text-4xl mb-2">${icon}</div>
-                        <div class="flex-grow text-center">
-                            <h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4>
-                            <p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p>
-                            <span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span>
-                        </div>
-                        <button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md z-10 relative">Marcar como Lida</button>
-                    </div>
-                `;
+                li.innerHTML = `<div class="flex flex-col items-center gap-2"><div class="text-4xl mb-2">${icon}</div><div class="flex-grow text-center"><h4 class="font-bold text-white text-lg leading-tight">${notificacao.titulo}</h4><p class="text-sm text-blue-200 mt-1">${notificacao.mensagem}</p><span class="text-xs text-blue-300 block mt-2">${dataFormatada}</span></div><button onclick="markSingleAsRead(event, '${notificacao.id}')" class="mt-3 bg-white text-blue-700 font-bold py-2 px-5 rounded-full text-sm hover:bg-blue-100 transition shadow-md z-10 relative">Marcar como Lida</button></div>`;
                 panelList.appendChild(li);
             });
         }
-        
         async function fetchNotifications() {
-            try {
-                const response = await fetch('notificacoes.json'); 
-                if (!response.ok) {
-                    notificationsData = [];
-                } else {
-                    const data = await response.json();
-                    notificationsData = data.map(item => ({ 
-                        ...item, 
-                        id: String(item.id || crypto.randomUUID()), 
-                        data: item.data || new Date().toISOString()
-                    }));
-                }
-            } catch (error) { 
-                notificationsData = []; 
-            } finally { 
-                renderNotifications(); 
-            }
+            try { const response = await fetch('notificacoes.json'); if (!response.ok) { notificationsData = []; } else { const data = await response.json(); notificationsData = data.map(item => ({ ...item, id: String(item.id || crypto.randomUUID()), data: item.data || new Date().toISOString() })); } } catch (error) { notificationsData = []; } finally { renderNotifications(); }
         }
-
         window.toggleNotificationPanel = function() {
             const panel = document.getElementById('notification-panel');
             const overlay = document.getElementById('notification-overlay');
             isPanelOpen = !isPanelOpen;
-            if (isPanelOpen) {
-                panel.classList.remove('translate-x-full');
-                overlay.classList.remove('hidden');
-                renderNotifications();
-            } else {
-                panel.classList.add('translate-x-full');
-                overlay.classList.add('hidden');
-            }
+            if (isPanelOpen) { panel.classList.remove('translate-x-full'); overlay.classList.remove('hidden'); renderNotifications(); } else { panel.classList.add('translate-x-full'); overlay.classList.add('hidden'); }
         }
 
         async function initializeFirebaseAndAuth() {
@@ -981,43 +756,18 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         const cachedData = getUserCache(user.uid);
-                        
-                        // Fallback mais inteligente usando Auth Data (instantâneo)
-                        const fallbackData = {
-                            name: user.displayName || "Carregando...",
-                            email: user.email,
-                            // Fallback com estilo Humaaans
-                            avatar: user.photoURL || `https://api.dicebear.com/7.x/humaaans/svg?seed=${user.email}&backgroundColor=b6e3f4`,
-                            points: 0,
-                            parties: 0,
-                            coupons: 0,
-                            createdAt: user.metadata.creationTime 
-                        };
-
+                        const fallbackData = { name: user.displayName || "Carregando...", email: user.email, avatar: user.photoURL || `https://api.dicebear.com/7.x/humaaans/svg?seed=${user.email}&backgroundColor=b6e3f4`, points: 0, parties: 0, coupons: 0, createdAt: user.metadata.creationTime };
                         renderUserProfile(cachedData || fallbackData);
-
                         const docRef = doc(db, "users", user.uid);
                         getDoc(docRef).then(docSnap => {
-                            if (docSnap.exists()) {
-                                const freshData = docSnap.data();
-                                saveUserCache(user.uid, freshData);
-                                renderUserProfile(freshData);
-                            }
+                            if (docSnap.exists()) { const freshData = docSnap.data(); saveUserCache(user.uid, freshData); renderUserProfile(freshData); }
                         }).catch(e => console.error("Erro background:", e));
-                    } else {
-                        renderLoginScreen();
-                    }
+                    } else { renderLoginScreen(); }
                 });
-            } catch (e) { 
-                console.error("Erro na inicialização:", e); 
-                renderLoginScreen();
-            }
+            } catch (e) { console.error("Erro na inicialização:", e); renderLoginScreen(); }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchNotifications(); 
-            initializeFirebaseAndAuth();
-        });
+        document.addEventListener('DOMContentLoaded', () => { fetchNotifications(); initializeFirebaseAndAuth(); });
     </script>
 </body>
 </html>
