@@ -39,7 +39,7 @@
             box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
         }
         
-        /* Animações de Entrada */
+        /* Animações */
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         .slide-up { animation: slideUp 0.5s ease-out forwards; }
         
@@ -71,15 +71,19 @@
             background-color: #2563EB;
         }
         
-        #notification-content {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+        /* Modal de Configurações */
+        #settings-modal {
+            transition: opacity 0.3s ease;
+        }
+        #settings-modal.hidden {
+            pointer-events: none;
+            opacity: 0;
         }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col bg-slate-50">
 
+    <!-- HEADER -->
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             
@@ -119,6 +123,7 @@
         </div>
     </header>
 
+    <!-- PAINEIS FLUTUANTES -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
 
     <div id="notification-panel" class="transform translate-x-full">
@@ -140,9 +145,45 @@
         </div>
     </div>
 
+    <!-- MODAL DE CONFIGURAÇÕES / EDITAR PERFIL -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeSettings()"></div>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm relative z-10 overflow-hidden transform transition-all scale-100">
+            <div class="bg-primary p-4 flex justify-between items-center">
+                <h3 class="text-white font-bold text-lg brand-font">Editar Perfil</h3>
+                <button onclick="closeSettings()" class="text-blue-200 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="edit-profile-form" onsubmit="handleSaveProfile(event)">
+                    <div class="mb-4 text-center">
+                        <div class="relative inline-block">
+                            <img id="edit-avatar-preview" src="" class="w-24 h-24 rounded-full border-4 border-blue-100 object-cover mx-auto bg-gray-100">
+                            <label for="avatar-upload" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer shadow-lg hover:bg-blue-700 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </label>
+                            <input type="file" id="avatar-upload" accept="image/*" class="hidden" onchange="handleAvatarFile(event)">
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">Toque na câmera para alterar</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nome de Exibição</label>
+                        <input type="text" id="edit-name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                    </div>
+
+                    <button type="submit" id="btn-save-profile" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition">
+                        Salvar Alterações
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-grow w-full pt-20 pb-28 md:pb-12 px-4 flex items-center justify-center">
         
-        <!-- ESTADO DE CARREGAMENTO -->
         <div id="loading-state" class="text-center p-8">
             <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
             <p class="text-gray-500 font-medium animate-pulse">Conectando ao sistema...</p>
@@ -151,11 +192,14 @@
         <!-- CONTAINER DO PERFIL (LOGADO) -->
         <div id="profile-view" class="hidden w-full max-w-md mx-auto fade-in">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden relative">
+                
+                <!-- Botão de Configuração (Engrenagem) -->
+                <button onclick="openSettings()" class="absolute top-4 right-4 z-20 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2 rounded-full text-white transition shadow-sm">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+
                 <div class="h-32 bg-gradient-brand relative">
                     <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                    <div class="absolute top-4 right-4 text-white opacity-80">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    </div>
                 </div>
 
                 <div class="px-6 pb-8 relative text-center">
@@ -166,7 +210,11 @@
                     </div>
                     
                     <h2 id="user-name" class="text-2xl font-bold text-gray-800 brand-font">Carregando...</h2>
-                    <p class="text-blue-500 font-medium text-sm mt-1 mb-6">Membro VIP Encanto Festas</p>
+                    
+                    <!-- Data de Usuário Modificada -->
+                    <p id="user-since" class="text-blue-500 font-medium text-xs mt-1 mb-6 uppercase tracking-wide">
+                        Usuário desde ...
+                    </p>
 
                     <div class="grid grid-cols-3 gap-2 mb-8 text-center border-t border-b border-gray-100 py-4">
                         <div>
@@ -218,6 +266,7 @@
 
                 <div class="p-8">
                     
+                    <!-- Login Form -->
                     <form id="login-form" class="space-y-6 block" onsubmit="handleLogin(event)">
                         <div class="input-group relative">
                             <input type="email" id="login-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu E-mail" required>
@@ -242,6 +291,7 @@
                         </button>
                     </form>
 
+                    <!-- Register Form -->
                     <form id="register-form" class="space-y-6 hidden" onsubmit="handleRegister(event)">
                         <div class="input-group relative">
                             <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu Nome Completo" required>
@@ -330,9 +380,10 @@
             onAuthStateChanged, 
             signOut,
             GoogleAuthProvider,
-            signInWithPopup
+            signInWithPopup,
+            updateProfile
         } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, Timestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
         // ==========================================
         // CONFIGURAÇÃO REAL DO FIREBASE
@@ -356,6 +407,7 @@
         let isPanelOpen = false;
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
+        let newAvatarBase64 = null;
         
         function saveUserCache(uid, data) {
             localStorage.setItem(`encanto_user_cache_${uid}`, JSON.stringify(data));
@@ -364,6 +416,85 @@
         function getUserCache(uid) {
             const cached = localStorage.getItem(`encanto_user_cache_${uid}`);
             return cached ? JSON.parse(cached) : null;
+        }
+
+        // --- UI FUNCTIONS ---
+        window.openSettings = function() {
+            const modal = document.getElementById('settings-modal');
+            const editName = document.getElementById('edit-name');
+            const editPreview = document.getElementById('edit-avatar-preview');
+            const currentName = document.getElementById('user-name').innerText;
+            const currentAvatar = document.getElementById('user-avatar').src;
+
+            editName.value = currentName === "Carregando..." ? "" : currentName;
+            editPreview.src = currentAvatar;
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+        }
+
+        window.closeSettings = function() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        window.handleAvatarFile = function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 100000) { // Limit 100KB for base64 safety
+                    alert("A imagem é muito grande! Tente uma menor que 100KB.");
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    newAvatarBase64 = e.target.result;
+                    document.getElementById('edit-avatar-preview').src = newAvatarBase64;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        window.handleSaveProfile = async function(e) {
+            e.preventDefault();
+            const newName = document.getElementById('edit-name').value;
+            const btn = document.getElementById('btn-save-profile');
+            const originalText = btn.innerText;
+            btn.innerText = "Salvando...";
+            btn.disabled = true;
+
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error("Usuário não autenticado");
+
+                // 1. Update Auth Profile (Fastest for Name)
+                await updateProfile(user, { displayName: newName });
+
+                // 2. Prepare Firestore Data
+                const updateData = { name: newName };
+                if (newAvatarBase64) {
+                    updateData.avatar = newAvatarBase64;
+                }
+
+                // 3. Update Firestore
+                const docRef = doc(db, "users", user.uid);
+                await updateDoc(docRef, updateData);
+
+                // 4. Update Cache & UI
+                const cached = getUserCache(user.uid) || {};
+                const newData = { ...cached, ...updateData };
+                saveUserCache(user.uid, newData);
+                renderUserProfile(newData);
+
+                closeSettings();
+                displayMessage("Perfil atualizado com sucesso!", "success");
+            } catch (error) {
+                console.error("Erro ao atualizar perfil:", error);
+                displayMessage("Erro ao salvar alterações.", "error");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         }
 
         window.switchAuthTab = function(tab) {
@@ -401,13 +532,10 @@
         
         window.togglePassword = function(id) {
             const input = document.getElementById(id);
-            const icon = document.getElementById('icon-' + id);
             if (input.type === "password") {
                 input.type = "text";
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
             } else {
                 input.type = "password";
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
             }
         }
 
@@ -450,6 +578,20 @@
             const pointsElement = document.getElementById('user-points');
             if(pointsElement) pointsElement.innerText = userData.points !== undefined ? userData.points : 0;
             
+            // Renderizar Data de Criação
+            const dateElem = document.getElementById('user-since');
+            if (userData.createdAt) {
+                let dateStr;
+                if (userData.createdAt.seconds) {
+                    // Firestore Timestamp
+                    dateStr = new Date(userData.createdAt.seconds * 1000).toLocaleDateString('pt-BR');
+                } else if (userData.createdAt) {
+                    // Auth metadata (string/number)
+                    dateStr = new Date(userData.createdAt).toLocaleDateString('pt-BR');
+                }
+                dateElem.innerText = `Usuário desde ${dateStr}`;
+            }
+
             authView.classList.add('hidden');
             profileView.classList.remove('hidden');
             profileView.classList.add('fade-in');
@@ -478,6 +620,8 @@
             authView.classList.remove('hidden');
             authView.classList.add('slide-up');
         }
+
+        // --- HANDLERS ---
 
         window.handleGoogleLogin = async function() {
             const provider = new GoogleAuthProvider();
@@ -510,14 +654,8 @@
                 let msg = "Erro ao entrar com Google.";
                 if (error.code === 'auth/popup-closed-by-user') {
                     msg = "Login cancelado (janela fechada).";
-                } else if (error.code === 'auth/cancelled-popup-request') {
-                    msg = "Apenas uma janela de login pode ser aberta.";
-                } else if (error.code === 'auth/popup-blocked') {
-                    msg = "Popup bloqueado pelo navegador.";
                 } else if (error.code === 'auth/unauthorized-domain') {
                     msg = "Domínio não autorizado no Firebase Console.";
-                } else if (error.code === 'auth/operation-not-allowed') {
-                    msg = "Login Google não ativado no Firebase.";
                 } else {
                     msg = `Erro: ${error.code || error.message}`;
                 }
@@ -550,6 +688,9 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
 
+                // 1. ATUALIZA O PERFIL DE AUTENTICAÇÃO IMEDIATAMENTE (CRUCIAL PARA VELOCIDADE)
+                await updateProfile(user, { displayName: name });
+
                 const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email.split('@')[0]}&backgroundColor=c0aede`;
                 const userDocData = {
                     name: name,
@@ -560,7 +701,6 @@
                 };
 
                 await setDoc(doc(db, "users", user.uid), userDocData);
-                
                 saveUserCache(user.uid, userDocData);
 
                 displayMessage("Conta criada com sucesso!", 'success');
@@ -593,7 +733,6 @@
                 console.error("Erro ao logar:", error);
                 let msg = "Erro ao entrar.";
                 if(error.code === 'auth/invalid-credential') msg = "E-mail ou senha incorretos.";
-                if(error.code === 'auth/user-not-found') msg = "Usuário não encontrado.";
                 displayMessage(msg, 'error');
                 btn.innerText = originalText;
                 btn.disabled = false;
@@ -609,6 +748,7 @@
             }
         }
 
+        // --- SISTEMA DE NOTIFICAÇÕES (Mantido) ---
         function updateLocalCache() {
             localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
         }
@@ -726,13 +866,16 @@
                     if (user) {
                         const cachedData = getUserCache(user.uid);
                         
+                        // Fallback mais inteligente usando Auth Data (instantâneo)
                         const fallbackData = {
                             name: user.displayName || "Carregando...",
                             email: user.email,
                             avatar: user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}&backgroundColor=b6e3f4`,
-                            points: 0
+                            points: 0,
+                            createdAt: user.metadata.creationTime // Pega a data direto do Auth
                         };
 
+                        // Renderiza IMEDIATAMENTE (sem esperar Firestore)
                         renderUserProfile(cachedData || fallbackData);
 
                         const docRef = doc(db, "users", user.uid);
@@ -740,7 +883,7 @@
                             if (docSnap.exists()) {
                                 const freshData = docSnap.data();
                                 saveUserCache(user.uid, freshData);
-                                renderUserProfile(freshData);
+                                renderUserProfile(freshData); // Atualiza com dados oficiais
                             }
                         }).catch(e => console.error("Erro background:", e));
                     } else {
