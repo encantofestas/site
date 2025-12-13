@@ -28,21 +28,13 @@
         .text-primary { color: #2563EB; }
         .bg-secondary { background-color: #FACC15; }
         .text-secondary { color: #CA8A04; }
-        .bg-gradient-brand {
-            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
-        }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-        }
-        #bottom-nav {
-            padding-bottom: env(safe-area-inset-bottom);
-            height: calc(4rem + env(safe-area-inset-bottom));
-        }
-        .floating-fab {
-            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
-        }
         
+        /* Fundo divertido com brinquedos/padrão */
+        .bg-party-pattern {
+            background-color: #2563EB;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FACC15' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"), linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+        }
+
         /* Animações */
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         .slide-up { animation: slideUp 0.5s ease-out forwards; }
@@ -172,35 +164,37 @@
                     <!-- AVATAR GENERATOR -->
                     <div class="mb-6 text-center">
                         <div class="relative inline-block group">
-                            <img id="edit-avatar-preview" src="" class="w-32 h-32 rounded-full border-4 border-blue-100 object-cover mx-auto bg-gray-50 shadow-md">
+                            <!-- Fundo de destaque para o avatar -->
+                            <div class="absolute inset-0 bg-yellow-300 rounded-full blur-md opacity-50 transform scale-110"></div>
+                            <img id="edit-avatar-preview" src="" class="w-32 h-32 rounded-full border-4 border-white object-cover mx-auto bg-blue-100 shadow-md relative z-10">
                             
                             <!-- Botão para Upload de Foto -->
-                            <label for="avatar-upload" class="absolute bottom-0 right-0 bg-white text-blue-600 p-2 rounded-full cursor-pointer shadow-lg hover:bg-gray-50 transition border border-gray-100" title="Enviar Foto">
+                            <label for="avatar-upload" class="absolute bottom-0 right-0 z-20 bg-white text-blue-600 p-2 rounded-full cursor-pointer shadow-lg hover:bg-gray-50 transition border border-gray-100" title="Enviar Foto">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                             </label>
                             <input type="file" id="avatar-upload" accept="image/*" class="hidden" onchange="handleAvatarFile(event)">
                         </div>
 
                         <!-- Controles do Avatar -->
-                        <div class="mt-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Gerar Avatar Divertido</p>
-                            <div class="flex justify-center gap-2 mb-2">
-                                <button type="button" onclick="setAvatarGender('male')" class="px-3 py-1 text-xs font-bold rounded-full border border-blue-200 text-blue-600 hover:bg-blue-50 focus:ring-2 focus:ring-blue-300">👦 Masc.</button>
-                                <button type="button" onclick="setAvatarGender('female')" class="px-3 py-1 text-xs font-bold rounded-full border border-pink-200 text-pink-600 hover:bg-pink-50 focus:ring-2 focus:ring-pink-300">👧 Fem.</button>
+                        <div class="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <p class="text-xs font-bold text-blue-600 uppercase tracking-wide mb-3">Escolha seu Personagem</p>
+                            <div class="flex justify-center gap-3 mb-3">
+                                <button type="button" onclick="setAvatarGender('male')" class="px-4 py-1.5 text-xs font-bold rounded-full border border-blue-300 text-blue-700 bg-white hover:bg-blue-100 focus:ring-2 focus:ring-blue-400 transition">👦 Menino</button>
+                                <button type="button" onclick="setAvatarGender('female')" class="px-4 py-1.5 text-xs font-bold rounded-full border border-pink-300 text-pink-700 bg-white hover:bg-pink-100 focus:ring-2 focus:ring-pink-400 transition">👧 Menina</button>
                             </div>
-                            <button type="button" onclick="generateNewAvatar()" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-sm font-bold py-2 rounded-lg shadow hover:opacity-90 transition active:scale-95">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                Sortear Novo Avatar
+                            <button type="button" onclick="generateNewAvatar()" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold py-2.5 rounded-lg shadow hover:opacity-90 transition active:scale-95">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Sortear Novo Personagem
                             </button>
                         </div>
                     </div>
                     
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Seu Nome na Festa</label>
-                        <input type="text" id="edit-name" class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50" placeholder="Ex: Maria Festeira" required>
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Seu Nome na Festa</label>
+                        <input type="text" id="edit-name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-800 font-semibold" placeholder="Ex: Maria Festeira" required>
                     </div>
 
-                    <button type="submit" id="btn-save-profile" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                    <button type="submit" id="btn-save-profile" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
                         <span>Salvar Perfil</span>
                     </button>
                 </form>
@@ -218,25 +212,30 @@
 
         <!-- CONTAINER DO PERFIL (LOGADO) -->
         <div id="profile-view" class="hidden w-full max-w-md mx-auto fade-in">
-            <div class="bg-white rounded-3xl shadow-xl overflow-hidden relative pb-6">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden relative pb-6 border-b-4 border-blue-100">
                 
                 <!-- Botão de Configuração -->
-                <button onclick="openSettings()" class="absolute top-4 right-4 z-20 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2 rounded-full text-white transition shadow-sm border border-white/30">
+                <button onclick="openSettings()" class="absolute top-4 right-4 z-20 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2 rounded-full text-white transition shadow-sm border border-white/30 active:scale-90">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </button>
 
-                <div class="h-32 bg-gradient-brand relative">
-                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                <!-- Fundo de Festa -->
+                <div class="h-40 bg-party-pattern relative overflow-hidden">
+                    <div class="absolute bottom-0 w-full h-16 bg-gradient-to-t from-white to-transparent"></div>
+                    <!-- Elementos decorativos (círculos/balões CSS) -->
+                    <div class="absolute top-4 left-4 w-12 h-12 bg-yellow-400 rounded-full opacity-30 blur-sm"></div>
+                    <div class="absolute bottom-10 right-10 w-20 h-20 bg-pink-400 rounded-full opacity-20 blur-md"></div>
+                    <div class="absolute top-10 right-20 w-8 h-8 bg-green-400 rounded-full opacity-40"></div>
                 </div>
 
                 <div class="px-6 relative text-center">
-                    <div class="relative -mt-16 mb-3 inline-block">
+                    <div class="relative -mt-20 mb-3 inline-block">
                         <img id="user-avatar" src="" alt="Foto de Perfil" 
-                             class="w-32 h-32 rounded-full border-[5px] border-white shadow-xl object-cover bg-blue-50">
-                        <div class="absolute bottom-2 right-1 bg-green-500 w-5 h-5 rounded-full border-2 border-white shadow-sm" title="Online"></div>
+                             class="w-36 h-36 rounded-full border-[6px] border-white shadow-xl object-cover bg-blue-50">
+                        <div class="absolute bottom-3 right-2 bg-green-500 w-6 h-6 rounded-full border-[3px] border-white shadow-sm" title="Online"></div>
                     </div>
                     
-                    <h2 id="user-name" class="text-2xl font-extrabold text-gray-800 brand-font">Carregando...</h2>
+                    <h2 id="user-name" class="text-3xl font-extrabold text-gray-800 brand-font">Carregando...</h2>
                     <p id="user-since" class="text-blue-500 font-semibold text-xs mt-1 uppercase tracking-wide">
                         Usuário desde ...
                     </p>
@@ -247,36 +246,40 @@
                             <span class="text-xs font-bold text-gray-500 uppercase">Nível: <span class="text-primary" id="level-name">Iniciante</span></span>
                             <span class="text-xs font-bold text-primary"><span id="current-points-display">0</span>/500 XP</span>
                         </div>
-                        <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden shadow-inner">
+                        <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden shadow-inner border border-gray-200">
                             <div id="xp-bar" class="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full progress-bar shadow-sm" style="width: 0%"></div>
                         </div>
                     </div>
 
                     <!-- DASHBOARD GRID -->
                     <div class="grid grid-cols-3 gap-3 mb-6 px-2">
-                        <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100">
-                            <span class="block text-xl font-bold text-blue-700" id="user-parties">0</span>
-                            <span class="text-[10px] text-blue-400 font-bold uppercase tracking-wide">Festas</span>
+                        <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100 hover:bg-blue-100 transition">
+                            <span class="block text-2xl font-bold text-blue-700 brand-font" id="user-parties">0</span>
+                            <span class="text-[10px] text-blue-500 font-bold uppercase tracking-wide">Festas</span>
                         </div>
-                        <div class="bg-yellow-50 p-3 rounded-2xl border border-yellow-100">
-                            <span class="block text-xl font-bold text-yellow-600" id="user-points">0</span>
+                        <div class="bg-yellow-50 p-3 rounded-2xl border border-yellow-100 hover:bg-yellow-100 transition">
+                            <span class="block text-2xl font-bold text-yellow-600 brand-font" id="user-points">0</span>
                             <span class="text-[10px] text-yellow-500 font-bold uppercase tracking-wide">Pontos</span>
                         </div>
-                        <div class="bg-purple-50 p-3 rounded-2xl border border-purple-100">
-                            <span class="block text-xl font-bold text-purple-600" id="user-coupons">0</span>
-                            <span class="text-[10px] text-purple-400 font-bold uppercase tracking-wide">Cupons</span>
+                        <div class="bg-purple-50 p-3 rounded-2xl border border-purple-100 hover:bg-purple-100 transition">
+                            <span class="block text-2xl font-bold text-purple-600 brand-font" id="user-coupons">0</span>
+                            <span class="text-[10px] text-purple-500 font-bold uppercase tracking-wide">Cupons</span>
                         </div>
                     </div>
 
                     <!-- INDIQUE E GANHE (MARKETING) -->
                     <div class="mx-2 mb-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden group cursor-pointer active:scale-[0.98] transition">
                         <div class="absolute -right-4 -top-4 w-20 h-20 bg-white opacity-10 rounded-full"></div>
+                        <div class="absolute bottom-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
                         <div class="relative z-10 flex items-center justify-between">
                             <div class="text-left">
-                                <p class="font-bold text-sm text-yellow-200 uppercase">Indique Amigos</p>
-                                <p class="text-xs opacity-90 mt-0.5">Ganhe 50 pontos por cadastro!</p>
+                                <p class="font-bold text-sm text-yellow-200 uppercase flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                                    Indique Amigos
+                                </p>
+                                <p class="text-xs opacity-90 mt-0.5 font-medium">Ganhe 50 pontos por cadastro!</p>
                             </div>
-                            <div class="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/30 flex gap-2 items-center">
+                            <div class="bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/30 flex gap-2 items-center shadow-sm hover:bg-white/30 transition">
                                 <span class="font-mono font-bold tracking-widest text-sm">FESTA10</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                             </div>
@@ -286,7 +289,7 @@
                     <!-- AÇÕES PRINCIPAIS -->
                     <div class="space-y-3 px-2">
                         <button onclick="window.location.href='calendario.html'" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-200 hover:shadow-blue-300 transform active:scale-[0.98] transition flex items-center justify-center gap-3">
-                            <span class="bg-white/20 p-1 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></span>
+                            <span class="bg-white/20 p-1.5 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></span>
                             Agendar Nova Festa
                         </button>
                         <button onclick="handleLogout()" class="w-full bg-white text-red-500 border border-red-100 font-bold py-3.5 rounded-xl hover:bg-red-50 transition flex items-center justify-center gap-2">
@@ -300,7 +303,7 @@
 
         <!-- CONTAINER DE AUTH (LOGIN/CADASTRO) -->
         <div id="auth-view" class="hidden w-full max-w-md mx-auto slide-up">
-            
+            <!-- Conteúdo de Auth mantido -->
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Acesso ao Perfil 🔑</h2>
                 <p class="text-gray-500 text-sm px-8 mt-1">
@@ -311,15 +314,12 @@
             <div id="message-box" class="hidden p-3 mb-4 rounded-xl text-sm font-medium transition-all duration-500 opacity-0" role="alert"></div>
 
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
-                
                 <div class="flex border-b border-gray-100">
                     <button onclick="switchAuthTab('login')" id="tab-login" class="flex-1 py-4 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors">ENTRAR</button>
                     <button onclick="switchAuthTab('register')" id="tab-register" class="flex-1 py-4 text-sm font-bold text-gray-400 hover:text-blue-500 transition-colors">CADASTRAR</button>
                 </div>
 
                 <div class="p-8">
-                    
-                    <!-- Login Form -->
                     <form id="login-form" class="space-y-5 block" onsubmit="handleLogin(event)">
                         <div class="input-group relative">
                             <input type="email" id="login-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu E-mail" required>
@@ -344,7 +344,6 @@
                         </button>
                     </form>
 
-                    <!-- Register Form -->
                     <form id="register-form" class="space-y-5 hidden" onsubmit="handleRegister(event)">
                         <div class="input-group relative">
                             <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu Nome Completo" required>
@@ -378,14 +377,9 @@
                             <span class="text-sm font-medium text-gray-600">Entrar com Google</span>
                         </button>
                     </div>
-
                 </div>
             </div>
-            <p class="text-center text-xs text-gray-400 mt-6 max-w-xs mx-auto">
-                Ao criar uma conta, você concorda com nossos <a href="#" class="underline hover:text-blue-500">Termos de Serviço</a> e <a href="#" class="underline hover:text-blue-500">Política de Privacidade</a>.
-            </p>
         </div>
-
     </main>
 
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
@@ -511,12 +505,14 @@
         }
 
         window.generateNewAvatar = function() {
-            const baseStyle = "adventurer"; 
+            // Estilo "Humaaans" para corpo inteiro e visual mais design
+            const baseStyle = "humaaans"; 
             const randomSeed = Math.random().toString(36).substring(7);
             let finalSeed = randomSeed;
             
-            if (currentGender === 'male') finalSeed = "male_" + randomSeed;
-            if (currentGender === 'female') finalSeed = "female_" + randomSeed;
+            // Humaaans não tem gênero explícito no seed, mas podemos tentar variar
+            if (currentGender === 'male') finalSeed = "boy_" + randomSeed;
+            if (currentGender === 'female') finalSeed = "girl_" + randomSeed;
 
             const newUrl = `https://api.dicebear.com/7.x/${baseStyle}/svg?seed=${finalSeed}&backgroundColor=b6e3f4`;
             
@@ -544,8 +540,8 @@
             e.preventDefault();
             const newName = document.getElementById('edit-name').value;
             const btn = document.getElementById('btn-save-profile');
-            
             const originalText = "<span>Salvar Perfil</span>"; 
+            
             btn.innerText = "Salvando...";
             btn.disabled = true;
 
@@ -553,39 +549,44 @@
                 const user = auth.currentUser;
                 if (!user) throw new Error("Usuário não autenticado");
 
-                // 1. Atualiza Auth
-                await updateProfile(user, { displayName: newName, photoURL: newAvatarBase64 || user.photoURL });
-
-                // 2. Prepara dados
+                // Prepare updates
                 const updateData = { name: newName };
+                let photoURL = user.photoURL;
+
                 if (newAvatarBase64) {
                     updateData.avatar = newAvatarBase64;
+                    photoURL = newAvatarBase64;
                 }
 
-                // 3. Atualiza Firestore
+                // 1. Update Auth Profile
+                await updateProfile(user, { displayName: newName, photoURL: photoURL });
+
+                // 2. Update Firestore
                 const docRef = doc(db, "users", user.uid);
                 await updateDoc(docRef, updateData);
 
-                // 4. Cache
+                // 3. Update Cache
                 const cached = getUserCache(user.uid) || {};
                 const newData = { ...cached, ...updateData };
                 saveUserCache(user.uid, newData);
-                
-                // 5. Atualiza UI visualmente na hora (feedback instantâneo)
-                renderUserProfile(newData);
-                newAvatarBase64 = null; 
 
-                closeSettings();
-                displayMessage("Perfil atualizado! Atualizando página...", "success");
+                // 4. Update UI Immediately
+                document.getElementById('user-name').innerText = newName;
+                if (newAvatarBase64) {
+                    document.getElementById('user-avatar').src = newAvatarBase64;
+                }
                 
-                // 6. Recarrega a página conforme solicitado
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+                // 5. Close Modal
+                closeSettings();
+                displayMessage("Perfil atualizado com sucesso!", "success");
+                
+                // Reset temp var
+                newAvatarBase64 = null;
 
             } catch (error) {
-                console.error("Erro ao atualizar perfil:", error);
-                displayMessage("Erro ao salvar alterações.", "error");
+                console.error("Erro:", error);
+                displayMessage("Erro ao salvar.", "error");
+            } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
@@ -668,7 +669,8 @@
             document.getElementById('user-name').innerText = userData.name || "Cliente Encantado";
             const avatarSeed = userData.email || "default"; 
             
-            const defaultAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
+            // Usando estilo Humaaans para o fallback
+            const defaultAvatar = `https://api.dicebear.com/7.x/humaaans/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
             document.getElementById('user-avatar').src = userData.avatar || defaultAvatar;
             
             const points = userData.points !== undefined ? userData.points : 0;
@@ -747,7 +749,7 @@
                     userData = {
                         name: user.displayName,
                         email: user.email,
-                        avatar: user.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.email}&backgroundColor=b6e3f4`,
+                        avatar: user.photoURL || `https://api.dicebear.com/7.x/humaaans/svg?seed=${user.email}&backgroundColor=b6e3f4`,
                         createdAt: Timestamp.now(),
                         points: 50,
                         parties: 0,
@@ -800,7 +802,7 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
 
-                const defaultAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${email.split('@')[0]}&backgroundColor=b6e3f4`;
+                const defaultAvatar = `https://api.dicebear.com/7.x/humaaans/svg?seed=${email.split('@')[0]}&backgroundColor=b6e3f4`;
 
                 await updateProfile(user, { displayName: name, photoURL: defaultAvatar });
 
@@ -984,8 +986,8 @@
                         const fallbackData = {
                             name: user.displayName || "Carregando...",
                             email: user.email,
-                            // Fallback com estilo Adventurer
-                            avatar: user.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.email}&backgroundColor=b6e3f4`,
+                            // Fallback com estilo Humaaans
+                            avatar: user.photoURL || `https://api.dicebear.com/7.x/humaaans/svg?seed=${user.email}&backgroundColor=b6e3f4`,
                             points: 0,
                             parties: 0,
                             coupons: 0,
