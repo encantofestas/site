@@ -76,6 +76,13 @@
         .progress-bar {
             transition: width 1s ease-in-out;
         }
+
+        /* Estilo para remover setas do input number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col bg-slate-50">
@@ -127,19 +134,18 @@
     <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeSettings()"></div>
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm relative z-10 overflow-hidden transform transition-all scale-100 max-h-[90vh] overflow-y-auto">
-            <div class="bg-primary p-4 flex justify-between items-center">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm relative z-10 overflow-hidden transform transition-all scale-100 max-h-[90vh] flex flex-col">
+            <div class="bg-primary p-4 flex justify-between items-center flex-none">
                 <h3 class="text-white font-bold text-lg brand-font">Editar Perfil</h3>
                 <button onclick="closeSettings()" class="text-blue-200 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            <div class="p-6">
+            <div class="p-6 overflow-y-auto custom-scrollbar">
                 <form id="edit-profile-form" onsubmit="handleSaveProfile(event)">
                     
                     <!-- AVATAR GENERATOR -->
                     <div class="mb-6 text-center">
                         <div class="relative inline-block group">
                             <div class="absolute inset-0 bg-yellow-300 rounded-full blur-md opacity-50 transform scale-110"></div>
-                            <!-- Usando object-top para garantir que o rosto apareça se o corpo for longo -->
                             <img id="edit-avatar-preview" src="" class="w-32 h-32 rounded-full border-4 border-white object-cover object-top mx-auto bg-blue-100 shadow-md relative z-10">
                             <label for="avatar-upload" class="absolute bottom-0 right-0 z-20 bg-white text-blue-600 p-2 rounded-full cursor-pointer shadow-lg hover:bg-gray-50 transition border border-gray-100" title="Enviar Foto">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
@@ -165,10 +171,94 @@
                         <input type="text" id="edit-name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-800 font-semibold" placeholder="Ex: Maria Festeira" required>
                     </div>
 
-                    <!-- Address Field -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Endereço Completo</label>
-                        <textarea id="edit-address" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-800 resize-none" placeholder="Rua, Número, Bairro, Cidade..."></textarea>
+                    <!-- Address Field (ATUALIZADO) -->
+                    <div class="mb-6 space-y-3">
+                        <h4 class="text-sm font-bold text-gray-700 border-b border-gray-100 pb-1 mb-2">Endereço de Entrega</h4>
+                        
+                        <!-- CEP e Rua -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="col-span-1">
+                                <label class="text-xs text-gray-500 font-medium ml-1">CEP</label>
+                                <input type="text" id="edit-cep" placeholder="00000-000" maxlength="9" oninput="mascaraCEP(this)"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="text-xs text-gray-500 font-medium ml-1">Rua / Logradouro</label>
+                                <input type="text" id="edit-rua" placeholder="Nome da rua" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Número e Checkbox -->
+                        <div class="grid grid-cols-2 gap-3 items-end">
+                            <div>
+                                <label class="text-xs text-gray-500 font-medium ml-1">Número</label>
+                                <input type="text" id="edit-numero" placeholder="1234" maxlength="4" inputmode="numeric" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div class="pb-2">
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                    <input type="checkbox" id="edit-semNumero" onchange="toggleNumero(this)" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                    <span class="ml-2 text-xs text-gray-600">Sem número (S/N)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Bairro e Complemento -->
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-gray-500 font-medium ml-1">Bairro (SFS)</label>
+                                <div class="relative">
+                                    <select id="edit-bairro" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                                        <option value="" disabled selected>Selecione...</option>
+                                        <option value="Acaraí">Acaraí</option>
+                                        <option value="Água Branca">Água Branca</option>
+                                        <option value="Capri">Capri</option>
+                                        <option value="Centro - Sfs">Centro - Sfs</option>
+                                        <option value="Centro Histórico">Centro Histórico</option>
+                                        <option value="Enseada">Enseada</option>
+                                        <option value="Ervino">Ervino</option>
+                                        <option value="Iperoba">Iperoba</option>
+                                        <option value="Itaguaçu">Itaguaçu</option>
+                                        <option value="Laranjeiras">Laranjeiras</option>
+                                        <option value="Majorca">Majorca</option>
+                                        <option value="Miranda">Miranda</option>
+                                        <option value="Morro Grande">Morro Grande</option>
+                                        <option value="Paulas">Paulas</option>
+                                        <option value="Praia Grande">Praia Grande</option>
+                                        <option value="Reta">Reta</option>
+                                        <option value="Ribeira">Ribeira</option>
+                                        <option value="Rocio Grande">Rocio Grande</option>
+                                        <option value="Rocio Pequeno">Rocio Pequeno</option>
+                                        <option value="Sandra Regina">Sandra Regina</option>
+                                        <option value="Tapera">Tapera</option>
+                                        <option value="Ubatuba">Ubatuba</option>
+                                        <option value="Vila da Glória">Vila da Glória</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 font-medium ml-1">Complemento (Opcional)</label>
+                                <input type="text" id="edit-complemento" placeholder="Apto, Bloco..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Cidade e UF (Fixo) -->
+                        <div class="grid grid-cols-4 gap-3">
+                            <div class="col-span-3">
+                                <label class="text-xs text-gray-400 font-medium ml-1">Cidade</label>
+                                <input type="text" value="São Francisco do Sul" disabled class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500">
+                            </div>
+                            <div class="col-span-1">
+                                <label class="text-xs text-gray-400 font-medium ml-1">UF</label>
+                                <input type="text" value="SC" disabled class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 text-center">
+                            </div>
+                        </div>
                     </div>
 
                     <button type="submit" id="btn-save-profile" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
@@ -415,26 +505,97 @@
             return cached ? JSON.parse(cached) : null;
         }
 
+        // --- ADDRESS HELPERS ---
+        window.mascaraCEP = function(input) {
+            let value = input.value.replace(/\D/g, "");
+            if (value.length > 5) {
+                value = value.substring(0, 5) + "-" + value.substring(5, 8);
+            }
+            input.value = value;
+        }
+
+        window.toggleNumero = function(checkbox) {
+            const inputNumero = document.getElementById('edit-numero');
+            if (checkbox.checked) {
+                inputNumero.value = '';        
+                inputNumero.disabled = true;   
+                inputNumero.placeholder = 'S/N'; 
+                inputNumero.required = false;  
+                inputNumero.classList.add('bg-gray-100', 'text-gray-400');
+            } else {
+                inputNumero.disabled = false;  
+                inputNumero.placeholder = '1234';
+                inputNumero.required = true;   
+                inputNumero.classList.remove('bg-gray-100', 'text-gray-400');
+                inputNumero.focus();
+            }
+        }
+        
+        // Input validation for numbers only (attached dynamically or via HTML oninput)
+        document.addEventListener('input', function(e) {
+            if (e.target.id === 'edit-numero') {
+                let valor = e.target.value.replace(/\D/g, '');
+                if (e.target.value !== valor) e.target.value = valor;
+            }
+        });
+
         // --- UI FUNCTIONS ---
         window.openSettings = function() {
             const modal = document.getElementById('settings-modal');
             const editName = document.getElementById('edit-name');
-            const editAddress = document.getElementById('edit-address');
             const editPreview = document.getElementById('edit-avatar-preview');
             const currentName = document.getElementById('user-name').innerText;
             const currentAvatar = document.getElementById('user-avatar').src;
             
-            // Tenta pegar o endereço do cache
+            // Campos de endereço
+            const cep = document.getElementById('edit-cep');
+            const rua = document.getElementById('edit-rua');
+            const numero = document.getElementById('edit-numero');
+            const semNumero = document.getElementById('edit-semNumero');
+            const bairro = document.getElementById('edit-bairro');
+            const complemento = document.getElementById('edit-complemento');
+
+            editName.value = currentName === "Carregando..." ? "" : currentName;
+            editPreview.src = currentAvatar;
+
+            // Preenche endereço do cache
             const user = auth.currentUser;
             if (user) {
                 const cached = getUserCache(user.uid);
                 if (cached && cached.address) {
-                    editAddress.value = cached.address;
+                    if (typeof cached.address === 'object') {
+                        // Novo formato (Objeto)
+                        cep.value = cached.address.cep || '';
+                        rua.value = cached.address.rua || '';
+                        bairro.value = cached.address.bairro || '';
+                        complemento.value = cached.address.complemento || '';
+                        
+                        if (cached.address.numero === 'S/N') {
+                            semNumero.checked = true;
+                            toggleNumero(semNumero);
+                        } else {
+                            semNumero.checked = false;
+                            toggleNumero(semNumero);
+                            numero.value = cached.address.numero || '';
+                        }
+                    } else {
+                        // Formato antigo (String simples) - Tenta colocar tudo na rua
+                        rua.value = cached.address;
+                        cep.value = '';
+                        numero.value = '';
+                        bairro.value = '';
+                        complemento.value = '';
+                        semNumero.checked = false;
+                        toggleNumero(semNumero);
+                    }
+                } else {
+                    // Limpa tudo
+                    cep.value = ''; rua.value = ''; numero.value = ''; 
+                    bairro.value = ''; complemento.value = '';
+                    semNumero.checked = false;
+                    toggleNumero(semNumero);
                 }
             }
-
-            editName.value = currentName === "Carregando..." ? "" : currentName;
-            editPreview.src = currentAvatar;
             
             modal.classList.remove('hidden');
             setTimeout(() => modal.classList.add('opacity-100'), 10);
@@ -452,12 +613,6 @@
         }
 
         window.generateNewAvatar = function() {
-            // MUDANÇA: Estilo "Avataaars" é mais compatível e comum para avatares completos/rostos
-            // O estilo 'humaaans' é muito vertical. 'avataaars' ou 'bottts' funcionam melhor em círculos
-            // User requested full body... Humaaans is still best for that but needs object-top.
-            // Using 'open-peeps' or 'micah' which are nice too. Let's try 'micah' for a change or stick to Humaaans with fix.
-            // User said "não aparece os avatares". I'll add a timestamp to force reload.
-            
             const baseStyle = "humaaans"; 
             const randomSeed = Math.random().toString(36).substring(7);
             let finalSeed = randomSeed;
@@ -492,7 +647,18 @@
         window.handleSaveProfile = async function(e) {
             e.preventDefault();
             const newName = document.getElementById('edit-name').value;
-            const newAddress = document.getElementById('edit-address').value;
+            
+            // Coleta dados do endereço
+            const addressObj = {
+                cep: document.getElementById('edit-cep').value,
+                rua: document.getElementById('edit-rua').value,
+                numero: document.getElementById('edit-semNumero').checked ? 'S/N' : document.getElementById('edit-numero').value,
+                bairro: document.getElementById('edit-bairro').value,
+                complemento: document.getElementById('edit-complemento').value,
+                cidade: 'São Francisco do Sul',
+                uf: 'SC'
+            };
+
             const btn = document.getElementById('btn-save-profile');
             const originalText = "<span>Salvar Perfil</span>"; 
             
@@ -505,7 +671,7 @@
 
                 const updateData = { 
                     name: newName,
-                    address: newAddress 
+                    address: addressObj // Salva o objeto completo
                 };
                 let photoURL = user.photoURL;
 
@@ -523,7 +689,6 @@
                 const newData = { ...cached, ...updateData };
                 saveUserCache(user.uid, newData);
 
-                // ATUALIZAÇÃO IMEDIATA SEM REFRESH
                 renderUserProfile(newData);
                 newAvatarBase64 = null; 
 
@@ -584,7 +749,6 @@
             const avatarSeed = userData.email || "default"; 
             const defaultAvatar = `https://api.dicebear.com/7.x/humaaans/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
             
-            // Força atualização da imagem se mudou
             const avatarImg = document.getElementById('user-avatar');
             const newSrc = userData.avatar || defaultAvatar;
             if (avatarImg.src !== newSrc) avatarImg.src = newSrc;
@@ -595,7 +759,6 @@
             document.getElementById('user-parties').innerText = userData.parties || 0;
             document.getElementById('user-coupons').innerText = userData.coupons || 0;
 
-            // Nível
             let levelName = "Festeiro Iniciante";
             let progress = (points / 500) * 100;
             if (points > 100) levelName = "Festeiro Animado";
@@ -604,7 +767,6 @@
             document.getElementById('level-name').innerText = levelName;
             document.getElementById('xp-bar').style.width = `${progress}%`;
             
-            // Data
             const dateElem = document.getElementById('user-since');
             if (userData.createdAt) {
                 let dateStr;
@@ -613,7 +775,6 @@
                 dateElem.innerText = `Usuário desde ${dateStr}`;
             }
 
-            // Histórico de Locação (Simulado se não existir)
             const historyList = document.getElementById('rental-history-list');
             if (userData.rentals && userData.rentals.length > 0) {
                 historyList.innerHTML = userData.rentals.map(r => `
