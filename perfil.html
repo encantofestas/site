@@ -184,7 +184,7 @@
                     </div>
 
                     <div class="space-y-3">
-                        <button onclick="window.location.href='combos.html'" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:shadow-blue-300 transform active:scale-[0.98] transition flex items-center justify-center gap-2">
+                        <button onclick="window.location.href='calendario.html'" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:shadow-blue-300 transform active:scale-[0.98] transition flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             Agendar Nova Festa
                         </button>
@@ -237,7 +237,7 @@
                             </label>
                             <a href="#" class="text-blue-600 font-bold hover:underline">Esqueceu?</a>
                         </div>
-                        <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transform active:scale-[0.98] transition">
+                        <button type="submit" id="btn-login-submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transform active:scale-[0.98] transition">
                             Acessar Minha Conta
                         </button>
                     </form>
@@ -259,7 +259,7 @@
                             </button>
                         </div>
                         
-                        <button type="submit" class="w-full bg-secondary text-blue-900 font-bold py-3 rounded-xl shadow-lg shadow-yellow-200 hover:bg-yellow-300 transform active:scale-[0.98] transition">
+                        <button type="submit" id="btn-reg-submit" class="w-full bg-secondary text-blue-900 font-bold py-3 rounded-xl shadow-lg shadow-yellow-200 hover:bg-yellow-300 transform active:scale-[0.98] transition">
                             Criar Conta Grátis
                         </button>
                     </form>
@@ -348,7 +348,6 @@
         };
         // ==========================================
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
@@ -358,6 +357,16 @@
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
         
+        // --- GERENCIAMENTO DE CACHE LOCAL (NOVO) ---
+        function saveUserCache(uid, data) {
+            localStorage.setItem(`encanto_user_cache_${uid}`, JSON.stringify(data));
+        }
+
+        function getUserCache(uid) {
+            const cached = localStorage.getItem(`encanto_user_cache_${uid}`);
+            return cached ? JSON.parse(cached) : null;
+        }
+
         // --- FUNÇÕES DE UI E MENSAGENS ---
         
         window.switchAuthTab = function(tab) {
@@ -430,7 +439,7 @@
             }, 4000);
         }
 
-        // --- LÓGICA DE LOGIN/PERFIL (COM OTIMIZAÇÃO OTIMISTA) ---
+        // --- LÓGICA DE LOGIN/PERFIL (COM CACHE) ---
 
         function renderUserProfile(userData) {
             const loadingState = document.getElementById('loading-state');
@@ -439,13 +448,12 @@
             
             loadingState.classList.add('hidden');
 
-            // Popula a interface
             document.getElementById('user-name').innerText = userData.name || "Cliente Encantado";
             const avatarSeed = userData.email || "default"; 
             document.getElementById('user-avatar').src = userData.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
             
             const pointsElement = document.getElementById('user-points');
-            if(pointsElement) pointsElement.innerText = userData.points || 0;
+            if(pointsElement) pointsElement.innerText = userData.points !== undefined ? userData.points : 0;
             
             authView.classList.add('hidden');
             profileView.classList.remove('hidden');
@@ -456,6 +464,22 @@
             const loadingState = document.getElementById('loading-state');
             const authView = document.getElementById('auth-view');
             const profileView = document.getElementById('profile-view');
+
+            // --- CORREÇÃO IMPORTANTE: Resetar estado dos botões ao fazer logout ---
+            const loginBtn = document.getElementById('btn-login-submit');
+            if (loginBtn) {
+                loginBtn.innerText = "Acessar Minha Conta";
+                loginBtn.disabled = false;
+            }
+            const regBtn = document.getElementById('btn-reg-submit');
+            if (regBtn) {
+                regBtn.innerText = "Criar Conta Grátis";
+                regBtn.disabled = false;
+            }
+            // Resetar forms para limpar senhas
+            document.getElementById('login-form').reset();
+            document.getElementById('register-form').reset();
+            // ----------------------------------------------------------------------
 
             loadingState.classList.add('hidden');
             profileView.classList.add('hidden');
@@ -471,21 +495,26 @@
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
-                // Verificar se o usuário já tem registro no Firestore
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
 
+                let userData;
                 if (!docSnap.exists()) {
-                    // Se não existe, criar o documento do usuário
-                    await setDoc(docRef, {
+                    userData = {
                         name: user.displayName,
                         email: user.email,
                         avatar: user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}&backgroundColor=b6e3f4`,
                         createdAt: Timestamp.now(),
                         points: 0
-                    });
+                    };
+                    await setDoc(docRef, userData);
+                } else {
+                    userData = docSnap.data();
                 }
-
+                
+                // Salvar cache imediatamente após login
+                saveUserCache(user.uid, userData);
+                
                 displayMessage("Login com Google realizado!", "success");
             } catch (error) {
                 console.error("Erro no login Google:", error);
@@ -508,17 +537,15 @@
                 return;
             }
 
-            const btn = e.target.querySelector('button');
+            const btn = document.getElementById('btn-reg-submit');
             const originalText = btn.innerText;
             btn.innerText = "Criando conta...";
             btn.disabled = true;
 
             try {
-                // 1. Criar usuário no Firebase Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
 
-                // 2. Salvar dados extras no Firestore (Coleção 'users')
                 const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email.split('@')[0]}&backgroundColor=c0aede`;
                 const userDocData = {
                     name: name,
@@ -528,11 +555,12 @@
                     points: 0
                 };
 
-                // Salvando dados do perfil na coleção 'users' com o UID do usuário
                 await setDoc(doc(db, "users", user.uid), userDocData);
+                
+                // Salvar cache
+                saveUserCache(user.uid, userDocData);
 
                 displayMessage("Conta criada com sucesso!", 'success');
-                // O onAuthStateChanged vai lidar com o redirecionamento
                 
             } catch (error) {
                 console.error("Erro ao registrar:", error);
@@ -550,7 +578,7 @@
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-password').value;
 
-            const btn = e.target.querySelector('button');
+            const btn = document.getElementById('btn-login-submit');
             const originalText = btn.innerText;
             btn.innerText = "Entrando...";
             btn.disabled = true;
@@ -558,7 +586,6 @@
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
                 displayMessage("Login realizado com sucesso!", 'success');
-                // O onAuthStateChanged vai lidar com o redirecionamento
             } catch (error) {
                 console.error("Erro ao logar:", error);
                 let msg = "Erro ao entrar.";
@@ -573,16 +600,13 @@
         window.handleLogout = async function() {
             try {
                 await signOut(auth);
-                // O onAuthStateChanged irá atualizar a UI automaticamente para a tela de login
-                // e como usamos persistência local (padrão do Firebase),
-                // o signOut garante que a sessão seja encerrada.
                 displayMessage("Você saiu da conta.", 'success');
             } catch (error) {
                 console.error("Erro ao sair:", error);
             }
         }
 
-        // --- SISTEMA DE NOTIFICAÇÕES (Mantido igual) ---
+        // --- SISTEMA DE NOTIFICAÇÕES ---
 
         function updateLocalCache() {
             localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
@@ -638,10 +662,8 @@
             unreadItems.forEach(notificacao => {
                 const li = document.createElement('li');
                 const bgClass = 'bg-blue-700 hover:bg-blue-800';
-                
                 const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨';
                 const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
-                
                 const dateObj = new Date(notificacao.data);
                 const dataFormatada = isNaN(dateObj) ? '' : dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
@@ -700,28 +722,32 @@
         // --- INICIALIZAÇÃO ---
         async function initializeFirebaseAndAuth() {
             try {
-                // Monitora se o usuário entrou ou saiu
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        // 1. CARREGAMENTO OTIMISTA: Renderiza IMEDIATAMENTE com dados básicos
-                        // Isso remove a tela de "Entrando..." instantaneamente e garante que
-                        // se o usuário já estiver logado (persistência), ele veja o perfil.
-                        renderUserProfile({
+                        // 1. CARREGAMENTO IMEDIATO VIA CACHE LOCAL
+                        const cachedData = getUserCache(user.uid);
+                        
+                        // Dados base para fallback (caso não tenha cache ou fetch falhe)
+                        const fallbackData = {
                             name: user.displayName || "Carregando...",
                             email: user.email,
                             avatar: user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}&backgroundColor=b6e3f4`,
-                            points: "..."
-                        });
+                            points: 0
+                        };
 
-                        // 2. Busca dados completos em segundo plano
+                        // Renderiza IMEDIATAMENTE com o que tiver (Cache > Auth > Fallback)
+                        renderUserProfile(cachedData || fallbackData);
+
+                        // 2. ATUALIZAÇÃO SILENCIOSA (Busca no Firestore)
                         const docRef = doc(db, "users", user.uid);
                         getDoc(docRef).then(docSnap => {
                             if (docSnap.exists()) {
-                                renderUserProfile(docSnap.data()); // Atualiza suavemente quando chegar
+                                const freshData = docSnap.data();
+                                saveUserCache(user.uid, freshData); // Atualiza cache
+                                renderUserProfile(freshData); // Atualiza tela se mudou algo
                             }
                         }).catch(e => console.error("Erro background:", e));
                     } else {
-                        // Usuário não logado: Mostra Login
                         renderLoginScreen();
                     }
                 });
