@@ -80,11 +80,9 @@
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col bg-slate-50">
 
-    <!-- HEADER -->
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             
-            <!-- Logo (Link para Home) -->
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
                     alt="Logo Encanto Festas" 
@@ -93,7 +91,6 @@
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
             
-            <!-- Menu Desktop -->
             <div class="hidden md:flex items-center space-x-4">
                 <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -110,7 +107,6 @@
                 </button>
             </div>
 
-            <!-- Menu Mobile (Apenas Notificação) -->
             <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" />
@@ -123,7 +119,6 @@
         </div>
     </header>
 
-    <!-- PAINEL DE NOTIFICAÇÕES (Oculto) -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
 
     <div id="notification-panel" class="transform translate-x-full">
@@ -145,19 +140,15 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL: SISTEMA DE LOGIN/PERFIL -->
     <main class="flex-grow w-full pt-20 pb-28 md:pb-12 px-4 flex items-center justify-center">
         
-        <!-- ESTADO DE CARREGAMENTO -->
         <div id="loading-state" class="text-center p-8">
             <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
-            <p class="text-gray-500 font-medium animate-pulse">Carregando seu perfil...</p>
+            <p class="text-gray-500 font-medium animate-pulse">Conectando ao sistema...</p>
         </div>
 
-        <!-- CONTAINER DO PERFIL (LOGADO) -->
         <div id="profile-view" class="hidden w-full max-w-md mx-auto fade-in">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden relative">
-                <!-- Capa Decorativa -->
                 <div class="h-32 bg-gradient-brand relative">
                     <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                     <div class="absolute top-4 right-4 text-white opacity-80">
@@ -165,7 +156,6 @@
                     </div>
                 </div>
 
-                <!-- Foto e Informações -->
                 <div class="px-6 pb-8 relative text-center">
                     <div class="relative -mt-16 mb-4 inline-block">
                         <img id="user-avatar" src="" alt="Foto de Perfil" 
@@ -176,7 +166,6 @@
                     <h2 id="user-name" class="text-2xl font-bold text-gray-800 brand-font">Carregando...</h2>
                     <p class="text-blue-500 font-medium text-sm mt-1 mb-6">Membro VIP Encanto Festas</p>
 
-                    <!-- Stats Rápidos -->
                     <div class="grid grid-cols-3 gap-2 mb-8 text-center border-t border-b border-gray-100 py-4">
                         <div>
                             <span class="block text-lg font-bold text-gray-800">0</span>
@@ -192,7 +181,6 @@
                         </div>
                     </div>
 
-                    <!-- Menu de Ações -->
                     <div class="space-y-3">
                         <button onclick="window.location.href='combos.html'" class="w-full bg-primary text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 hover:shadow-blue-300 transform active:scale-[0.98] transition flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -207,28 +195,19 @@
             </div>
         </div>
 
-        <!-- CONTAINER DE AUTH (LOGIN/CADASTRO) -->
         <div id="auth-view" class="hidden w-full max-w-md mx-auto slide-up">
             
-            <!-- Cabeçalho de Marketing MODIFICADO -->
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Acesso ao Perfil (Simulado) 🔑</h2>
-                <p class="text-red-500 text-sm px-8 font-semibold">
-                    [EM CONSTRUÇÃO] Esta é uma tela de demonstração. 
-                </p>
-                <p class="text-gray-500 text-xs px-8 mt-1">
-                    Os dados salvos ficam apenas no seu navegador e **não** geram cadastro real ou pontos de fidelidade ainda.
+                <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Acesso ao Perfil 🔑</h2>
+                <p class="text-gray-500 text-sm px-8 mt-1">
+                    Faça login para salvar seus pedidos e acumular pontos.
                 </p>
             </div>
             
-            <!-- Message Box (Substitui alertas) -->
             <div id="message-box" class="hidden p-3 mb-4 rounded-xl text-sm font-medium transition-all duration-500 opacity-0" role="alert"></div>
 
-
-            <!-- Card Principal -->
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
                 
-                <!-- Abas -->
                 <div class="flex border-b border-gray-100">
                     <button onclick="switchAuthTab('login')" id="tab-login" class="flex-1 py-4 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors">ENTRAR</button>
                     <button onclick="switchAuthTab('register')" id="tab-register" class="flex-1 py-4 text-sm font-bold text-gray-400 hover:text-blue-500 transition-colors">CADASTRAR</button>
@@ -236,7 +215,6 @@
 
                 <div class="p-8">
                     
-                    <!-- Formulário de LOGIN -->
                     <form id="login-form" class="space-y-6 block" onsubmit="handleLogin(event)">
                         <div class="input-group relative">
                             <input type="email" id="login-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu E-mail" required>
@@ -258,7 +236,6 @@
                         </button>
                     </form>
 
-                    <!-- Formulário de CADASTRO -->
                     <form id="register-form" class="space-y-6 hidden" onsubmit="handleRegister(event)">
                         <div class="input-group relative">
                             <input type="text" id="reg-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition placeholder-transparent" placeholder="Seu Nome Completo" required>
@@ -278,7 +255,6 @@
                         </button>
                     </form>
 
-                    <!-- Divisor Social -->
                     <div class="mt-8 relative flex items-center justify-center">
                         <div class="border-t border-gray-200 w-full absolute"></div>
                         <span class="bg-white px-4 text-xs text-gray-400 relative font-medium uppercase">Ou continue com</span>
@@ -304,7 +280,6 @@
 
     </main>
 
-    <!-- BOTTOM NAV -->
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
             <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
@@ -340,23 +315,37 @@
         </div>
     </nav>
 
-    <!-- SCRIPT DO SISTEMA (SIMPLIFICADO PARA LOCALSTORAGE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
-            getFirestore, collection, doc, onSnapshot, 
-            writeBatch, Timestamp, setLogLevel
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            Timestamp 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        setLogLevel('silent');
-        
-        // Configurações do Firebase (mantidas para geração do ID do usuário)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        // ==========================================
+        // CONFIGURAÇÃO DO FIREBASE (PASSO 2: COLE SUAS CHAVES AQUI)
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY_AQUI",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_ID",
+            appId: "SEU_APP_ID"
+        };
+        // ==========================================
 
         let app, db, auth;
-        let userId = null;
         let isPanelOpen = false;
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
@@ -369,7 +358,6 @@
             const tabLogin = document.getElementById('tab-login');
             const tabRegister = document.getElementById('tab-register');
             
-            // Limpa mensagens ao trocar de aba
             displayMessage('', 'clear');
 
             if (tab === 'login') {
@@ -422,84 +410,87 @@
             }, 4000);
         }
 
-        // --- LÓGICA DE LOGIN/PERFIL (USANDO LOCALSTORAGE) ---
+        // --- LÓGICA DE LOGIN/PERFIL (COM FIREBASE) ---
 
-        async function checkUserProfile() {
-            // Se o userId não estiver pronto (Auth não terminou), espera ou usa um ID temporário.
-            const currentUid = userId || 'temp-user'; 
-
-            // 1. Tenta buscar o perfil no LocalStorage
-            const profileDataJSON = localStorage.getItem('encanto_user_profile');
-            
+        function renderUserProfile(userData) {
             const loadingState = document.getElementById('loading-state');
             const authView = document.getElementById('auth-view');
             const profileView = document.getElementById('profile-view');
             
-            // Sempre esconde o loading ao final da checagem
             loadingState.classList.add('hidden');
 
-            if (profileDataJSON) {
-                // Usuário tem perfil no LocalStorage -> MOSTRAR PERFIL
-                const data = JSON.parse(profileDataJSON);
-                
-                // Popula a interface com nome e avatar
-                document.getElementById('user-name').innerText = data.name || "Cliente Encantado";
-                // Usa o e-mail ou um ID para gerar um avatar único
-                const avatarSeed = data.email || currentUid; 
-                document.getElementById('user-avatar').src = data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
-                
-                // Atualiza os pontos se houver
-                const pointsElement = document.getElementById('user-points');
-                if(pointsElement) pointsElement.innerText = data.points || 0;
-                
-                authView.classList.add('hidden');
-                profileView.classList.remove('hidden');
-                profileView.classList.add('fade-in');
-            } else {
-                // Usuário não tem perfil -> MOSTRAR LOGIN/CADASTRO
-                profileView.classList.add('hidden');
-                authView.classList.remove('hidden');
-                authView.classList.add('slide-up');
-            }
+            // Popula a interface
+            document.getElementById('user-name').innerText = userData.name || "Cliente Encantado";
+            const avatarSeed = userData.email || "default"; 
+            document.getElementById('user-avatar').src = userData.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}&backgroundColor=b6e3f4`;
+            
+            const pointsElement = document.getElementById('user-points');
+            if(pointsElement) pointsElement.innerText = userData.points || 0;
+            
+            authView.classList.add('hidden');
+            profileView.classList.remove('hidden');
+            profileView.classList.add('fade-in');
         }
+
+        function renderLoginScreen() {
+            const loadingState = document.getElementById('loading-state');
+            const authView = document.getElementById('auth-view');
+            const profileView = document.getElementById('profile-view');
+
+            loadingState.classList.add('hidden');
+            profileView.classList.add('hidden');
+            authView.classList.remove('hidden');
+            authView.classList.add('slide-up');
+        }
+
+        // --- HANDLERS (REGISTRO E LOGIN) ---
 
         window.handleRegister = async function(e) {
             e.preventDefault();
             const name = document.getElementById('reg-name').value;
             const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
             
-            if (!name || !email) {
-                displayMessage("Nome e E-mail são obrigatórios para o cadastro.", 'error');
+            if (!name || !email || !pass) {
+                displayMessage("Preencha todos os campos.", 'error');
+                return;
+            }
+            if (pass.length < 6) {
+                displayMessage("A senha deve ter pelo menos 6 caracteres.", 'error');
                 return;
             }
 
             const btn = e.target.querySelector('button');
             const originalText = btn.innerText;
-            btn.innerText = "Criando seu perfil...";
+            btn.innerText = "Criando conta...";
             btn.disabled = true;
 
             try {
+                // 1. Criar usuário no Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                const user = userCredential.user;
+
+                // 2. Salvar dados extras no Firestore
                 const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email.split('@')[0]}&backgroundColor=c0aede`;
-                
-                const profileData = {
+                const userDocData = {
                     name: name,
                     email: email,
                     avatar: avatarUrl,
-                    memberSince: new Date().getFullYear(),
-                    points: 0 // Iniciando pontos
+                    createdAt: Timestamp.now(),
+                    points: 0
                 };
 
-                // SALVAR PERFIL NO LOCALSTORAGE
-                localStorage.setItem('encanto_user_profile', JSON.stringify(profileData));
-                displayMessage("Perfil de demonstração criado com sucesso!", 'success');
+                await setDoc(doc(db, "users", user.uid), userDocData);
 
-                // Sucesso! Recarregar estado
-                setTimeout(() => checkUserProfile(), 1000); 
-
+                displayMessage("Conta criada com sucesso!", 'success');
+                // O onAuthStateChanged vai lidar com o redirecionamento
+                
             } catch (error) {
                 console.error("Erro ao registrar:", error);
-                displayMessage("Não foi possível criar o perfil. Tente novamente.", 'error');
-            } finally {
+                let msg = "Erro ao criar conta.";
+                if(error.code === 'auth/email-already-in-use') msg = "Este e-mail já está cadastrado.";
+                if(error.code === 'auth/weak-password') msg = "Senha muito fraca.";
+                displayMessage(msg, 'error');
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
@@ -507,42 +498,39 @@
 
         window.handleLogin = async function(e) {
             e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+
             const btn = e.target.querySelector('button');
             const originalText = btn.innerText;
             btn.innerText = "Entrando...";
             btn.disabled = true;
 
-            setTimeout(() => {
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                displayMessage("Login realizado com sucesso!", 'success');
+                // O onAuthStateChanged vai lidar com o redirecionamento
+            } catch (error) {
+                console.error("Erro ao logar:", error);
+                let msg = "Erro ao entrar.";
+                if(error.code === 'auth/invalid-credential') msg = "E-mail ou senha incorretos.";
+                if(error.code === 'auth/user-not-found') msg = "Usuário não encontrado.";
+                displayMessage(msg, 'error');
                 btn.innerText = originalText;
                 btn.disabled = false;
-                
-                if (localStorage.getItem('encanto_user_profile')) {
-                    // Loga se o perfil existir no LocalStorage
-                    checkUserProfile(); 
-                    displayMessage("Login simulado realizado com sucesso.", 'success');
-                } else {
-                    displayMessage("Nenhuma conta de demonstração encontrada. Por favor, crie um perfil na aba 'CADASTRAR'.", 'error');
-                    window.switchAuthTab('register');
-                }
-            }, 800);
+            }
         }
 
         window.handleLogout = async function() {
-            // Limpa o perfil do LocalStorage
-            // Opcional: Se quiser manter os dados e só "deslogar" visualmente, comente a linha abaixo.
-            // localStorage.removeItem('encanto_user_profile'); 
-            
-            // Simula a transição para a tela de login
-            document.getElementById('profile-view').classList.add('hidden');
-            document.getElementById('auth-view').classList.remove('hidden');
-            document.getElementById('login-form').reset();
-            window.switchAuthTab('login');
-            displayMessage("Você saiu do perfil de demonstração.", 'success');
+            try {
+                await signOut(auth);
+                displayMessage("Você saiu da conta.", 'success');
+            } catch (error) {
+                console.error("Erro ao sair:", error);
+            }
         }
 
-        // --- MANUTENÇÃO DE NOTIFICAÇÕES (ESTILO RESTAURADO) ---
-
-        function setupNotificationListener() { /* Mantido para evitar erros */ }
+        // --- SISTEMA DE NOTIFICAÇÕES (Mantido igual) ---
 
         function updateLocalCache() {
             localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
@@ -550,8 +538,7 @@
 
         window.markSingleAsRead = async function(e, notificationId) {
             e.stopPropagation();
-            const idStr = String(notificationId);
-            readNotificationsIds.add(idStr);
+            readNotificationsIds.add(String(notificationId));
             updateLocalCache();
             renderNotifications();
         }
@@ -570,13 +557,9 @@
             const elements = document.querySelectorAll('.notification-counter');
             const markAllButton = document.getElementById('mark-all-button');
             if (markAllButton) {
-                if (count > 0) {
-                    markAllButton.classList.remove('opacity-0', 'pointer-events-none');
-                    markAllButton.disabled = false;
-                } else {
-                    markAllButton.classList.add('opacity-50', 'pointer-events-none');
-                    markAllButton.disabled = true;
-                }
+                markAllButton.disabled = count === 0;
+                markAllButton.classList.toggle('opacity-50', count === 0);
+                markAllButton.classList.toggle('pointer-events-none', count === 0);
             }
             elements.forEach(el => {
                 if (count > 0) {
@@ -603,19 +586,14 @@
             unreadItems.forEach(notificacao => {
                 const li = document.createElement('li');
                 const bgClass = 'bg-blue-700 hover:bg-blue-800';
-                
-                // RESTAURADO: Lógica de ícones baseada no tipo
                 const icon = notificacao.tipo === 'promocao' ? '🎁' : notificacao.tipo === 'alerta' ? '🚨' : '✨';
                 const hasLink = notificacao.link ? `cursor-pointer active:scale-[0.98]` : `cursor-default`;
-                
-                // Formatação de data
                 const dateObj = new Date(notificacao.data);
                 const dataFormatada = isNaN(dateObj) ? '' : dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
                 li.className = `p-5 border-b border-blue-800 transition ${bgClass} rounded-xl mb-3 text-white shadow-lg ${hasLink} transform`;
                 if (notificacao.link) { li.onclick = () => window.navigateTo(notificacao.link); }
                 
-                // RESTAURADO: Layout centralizado e rico
                 li.innerHTML = `
                     <div class="flex flex-col items-center gap-2">
                         <div class="text-4xl mb-2">${icon}</div>
@@ -633,14 +611,11 @@
         
         async function fetchNotifications() {
             try {
-                // Tenta buscar as notificações do arquivo JSON (AGORA REAL)
                 const response = await fetch('notificacoes.json'); 
                 if (!response.ok) {
-                    console.warn("Arquivo notificacoes.json não encontrado ou erro ao carregar. Usando lista de notificações vazia.");
                     notificationsData = [];
                 } else {
                     const data = await response.json();
-                    // Garante que os IDs sejam strings e que há um ID/Data de fallback
                     notificationsData = data.map(item => ({ 
                         ...item, 
                         id: String(item.id || crypto.randomUUID()), 
@@ -648,7 +623,6 @@
                     }));
                 }
             } catch (error) { 
-                console.error("Erro ao buscar ou processar notificações:", error);
                 notificationsData = []; 
             } finally { 
                 renderNotifications(); 
@@ -662,43 +636,54 @@
             if (isPanelOpen) {
                 panel.classList.remove('translate-x-full');
                 overlay.classList.remove('hidden');
-                // document.body.classList.add('overflow-hidden'); 
                 renderNotifications();
             } else {
                 panel.classList.add('translate-x-full');
                 overlay.classList.add('hidden');
-                // document.body.classList.remove('overflow-hidden');
             }
         }
 
         // --- INICIALIZAÇÃO ---
         async function initializeFirebaseAndAuth() {
             try {
+                if (firebaseConfig.apiKey === "SUA_API_KEY_AQUI") {
+                   console.warn("⚠️ ATENÇÃO: Você ainda não configurou as chaves do Firebase.");
+                   return;
+                }
+
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app); 
 
-                // Autenticação anônima apenas para gerar um ID de usuário único
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } 
-                else { await signInAnonymously(auth); }
-                
-                onAuthStateChanged(auth, (user) => {
-                    if (user) { 
-                        userId = user.uid;
-                        checkUserProfile();
+                // Monitora se o usuário entrou ou saiu
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        // Usuário logado: Busca dados no Firestore
+                        try {
+                            const docRef = doc(db, "users", user.uid);
+                            const docSnap = await getDoc(docRef);
+                            
+                            if (docSnap.exists()) {
+                                renderUserProfile(docSnap.data());
+                            } else {
+                                // Fallback se o user existe no Auth mas não no Firestore
+                                renderUserProfile({ name: user.email, email: user.email });
+                            }
+                        } catch(e) {
+                            console.error("Erro ao buscar dados:", e);
+                        }
                     } else {
-                        userId = null;
-                        checkUserProfile(); 
+                        // Usuário não logado: Mostra Login
+                        renderLoginScreen();
                     }
                 });
             } catch (e) { 
-                console.error("Erro na inicialização do Firebase:", e); 
-                checkUserProfile();
+                console.error("Erro na inicialização:", e); 
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            fetchNotifications(); // Chama a função que busca o JSON real
+            fetchNotifications(); 
             initializeFirebaseAndAuth();
         });
     </script>
