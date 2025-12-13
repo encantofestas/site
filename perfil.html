@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Entrar - Encanto Festas</title>
+    <title>Minha Conta - Encanto Festas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +33,6 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Estilização dos Inputs */
         .input-group input:focus ~ label,
         .input-group input:not(:placeholder-shown) ~ label {
             top: -0.5rem;
@@ -43,9 +42,6 @@
             background-color: white;
             padding: 0 0.25rem;
         }
-        
-        /* Notificações simplificadas (sem painel lateral, apenas badge se necessário) */
-        #notification-panel { display: none; }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col bg-slate-50">
@@ -60,7 +56,6 @@
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
             
-            <!-- Desktop Nav -->
             <div class="hidden md:flex items-center space-x-4">
                 <button onclick="window.location.href='perfil.html'" class="text-white bg-blue-700 px-4 py-2 rounded-lg transition text-sm font-semibold shadow-inner ring-2 ring-yellow-400">Minha Conta</button>
                 <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg">Agendar Agora</button>
@@ -76,20 +71,36 @@
             <p class="text-gray-500 font-medium animate-pulse">Carregando...</p>
         </div>
 
-        <!-- LOGGED IN VIEW (Minimalista) -->
+        <!-- LOGGED IN VIEW (Com Avatar Gerado) -->
         <div id="logged-in-view" class="hidden w-full max-w-md mx-auto fade-in text-center">
-            <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-                <div class="w-24 h-24 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl">
-                    👤
-                </div>
-                <h2 class="text-2xl font-bold text-gray-800 brand-font mb-2">Bem-vindo(a)!</h2>
-                <p id="logged-user-name" class="text-lg font-semibold text-blue-600">Usuário</p>
-                <p id="logged-user-email" class="text-sm text-gray-500 mb-8">email@exemplo.com</p>
+            <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100 relative overflow-hidden">
+                <!-- Decoração de fundo -->
+                <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-blue-500 to-blue-600"></div>
                 
-                <button onclick="handleLogout()" class="w-full bg-red-50 text-red-500 border border-red-100 font-bold py-3 rounded-xl hover:bg-red-100 transition flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                    Sair da Conta
-                </button>
+                <div class="relative z-10">
+                    <div class="relative inline-block">
+                        <!-- Imagem do Avatar -->
+                        <img id="logged-user-avatar" src="" alt="Avatar" 
+                             class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-lg bg-blue-50 object-cover">
+                        <!-- Indicador Online -->
+                        <div class="absolute bottom-5 right-2 w-5 h-5 bg-green-500 border-2 border-white rounded-full" title="Online"></div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-gray-800 brand-font mb-1 mt-2">Olá, <span id="logged-user-name">Usuário</span>!</h2>
+                    <p id="logged-user-email" class="text-sm text-gray-500 mb-6 bg-gray-50 inline-block px-3 py-1 rounded-full border border-gray-100">email@exemplo.com</p>
+                    
+                    <div class="space-y-3">
+                        <button class="w-full bg-blue-50 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-100 transition flex items-center justify-center gap-2 cursor-not-allowed opacity-60" title="Em breve">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            Editar Dados (Em breve)
+                        </button>
+                        
+                        <button onclick="handleLogout()" class="w-full bg-white text-red-500 border border-red-100 font-bold py-3 rounded-xl hover:bg-red-50 transition flex items-center justify-center gap-2 shadow-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            Sair da Conta
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -97,7 +108,7 @@
         <div id="auth-view" class="hidden w-full max-w-md mx-auto slide-up">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold brand-font text-blue-900 mb-2">Acesso ao Perfil 🔑</h2>
-                <p class="text-gray-500 text-sm px-8 mt-1">Faça login para continuar.</p>
+                <p class="text-gray-500 text-sm px-8 mt-1">Faça login para ver sua conta.</p>
             </div>
             
             <div id="message-box" class="hidden p-3 mb-4 rounded-xl text-sm font-medium transition-all duration-500 opacity-0" role="alert"></div>
@@ -159,6 +170,7 @@
         </div>
     </main>
 
+    <!-- Bottom Nav (Mobile) -->
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
             <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[10px] font-medium">Início</span></a>
@@ -246,8 +258,6 @@
             }
 
             box.classList.remove('opacity-0');
-
-            // Auto-hide após 4 segundos
             setTimeout(() => {
                 box.classList.add('opacity-0');
                 setTimeout(() => box.classList.add('hidden'), 500);
@@ -260,8 +270,6 @@
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-                
-                // Cria documento no Firestore se não existir
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
                 
@@ -286,14 +294,8 @@
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
 
-            if (!name || !email || !pass) {
-                displayMessage("Preencha todos os campos.", 'error');
-                return;
-            }
-            if (pass.length < 6) {
-                displayMessage("A senha deve ter pelo menos 6 caracteres.", 'error');
-                return;
-            }
+            if (!name || !email || !pass) { displayMessage("Preencha todos os campos.", 'error'); return; }
+            if (pass.length < 6) { displayMessage("A senha deve ter pelo menos 6 caracteres.", 'error'); return; }
 
             const btn = document.getElementById('btn-reg-submit');
             const originalText = btn.innerText;
@@ -303,17 +305,13 @@
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCredential.user;
-
                 await updateProfile(user, { displayName: name });
-                
-                // Inicializa documento básico do usuário
                 await setDoc(doc(db, "users", user.uid), {
                     name: name,
                     email: email,
                     createdAt: Timestamp.now(),
                     points: 50
                 });
-
                 displayMessage("Conta criada com sucesso!", 'success');
             } catch (error) {
                 console.error("Erro:", error);
@@ -329,7 +327,6 @@
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-password').value;
-
             const btn = document.getElementById('btn-login-submit');
             const originalText = btn.innerText;
             btn.innerText = "Entrando...";
@@ -347,12 +344,8 @@
         }
 
         window.handleLogout = async function() {
-            try {
-                await signOut(auth);
-                displayMessage("Você saiu da conta.", 'success');
-            } catch (error) {
-                console.error("Erro sair:", error);
-            }
+            try { await signOut(auth); displayMessage("Você saiu da conta.", 'success'); } 
+            catch (error) { console.error("Erro sair:", error); }
         }
 
         // --- AUTH STATE MONITOR ---
@@ -364,15 +357,18 @@
             loadingState.classList.add('hidden');
 
             if (user) {
-                // Usuário logado: Mostra painel simples
+                // Configurações do Avatar Gerado
+                const seed = user.uid; // Usa o UID como semente para ser único por usuário
+                // Estilo 'avataaars' é ótimo para fotos de perfil
+                const avatarUrl = user.photoURL || `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
+                
+                document.getElementById('logged-user-avatar').src = avatarUrl;
                 document.getElementById('logged-user-name').innerText = user.displayName || "Usuário";
                 document.getElementById('logged-user-email').innerText = user.email;
                 
                 authView.classList.add('hidden');
                 loggedInView.classList.remove('hidden');
             } else {
-                // Usuário deslogado: Mostra formulários
-                // Reset botões
                 const loginBtn = document.getElementById('btn-login-submit');
                 if (loginBtn) { loginBtn.innerText = "Acessar Minha Conta"; loginBtn.disabled = false; }
                 const regBtn = document.getElementById('btn-reg-submit');
