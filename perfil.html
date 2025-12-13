@@ -131,8 +131,11 @@
                 <div class="p-6 overflow-y-auto">
                     <!-- Avatar Preview -->
                     <div class="text-center mb-6">
-                        <div class="w-32 h-32 rounded-full border-4 border-blue-100 bg-blue-50 mx-auto shadow-inner overflow-hidden mb-3">
-                            <img id="edit-avatar-preview" src="" class="w-full h-full object-cover">
+                        <div class="w-32 h-32 rounded-full border-4 border-blue-100 bg-blue-50 mx-auto shadow-inner overflow-hidden mb-3 bg-white flex items-center justify-center">
+                            <img id="edit-avatar-preview" src="" 
+                                 referrerpolicy="no-referrer"
+                                 onerror="this.src='https://ui-avatars.com/api/?name=Erro&background=red&color=white'"
+                                 class="w-full h-full object-cover">
                         </div>
                         <p class="text-xs text-gray-400">Clique em "Gerar" para mudar o visual!</p>
                     </div>
@@ -360,30 +363,32 @@
         }
 
         window.generateNewAvatar = function() {
+            // CORREÇÃO: Usando a URL correta com Arrays e Versão 9.x
             const seed = Math.random().toString(36).substring(7);
-            let url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
-
-            // Corrected Gender filtering logic with standard parameter names for API 7.x
-            if (currentEditGender === 'male') {
-                // Using correct DiceBear 7.x/Avataaars enum values for short hair (comma separated, NO brackets)
-                url += `&top=shortHairDreads01,shortHairDreads02,shortHairFrizzle,shortHairShaggyMullet,shortHairShortCurly,shortHairShortFlat,shortHairShortRound,shortHairShortWaved,shortHairSides,shortHairTheCaesar,shortHairTheCaesarSidePart`;
-                // 50% chance of beard/stubble
-                url += `&facialHairProbability=50`; 
-            } else if (currentEditGender === 'female') {
-                // Using correct DiceBear 7.x/Avataaars enum values for long hair
-                url += `&top=longHairBigHair,longHairBob,longHairBun,longHairCurly,longHairCurvy,longHairDreads,longHairFrida,longHairFro,longHairFroBand,longHairNotTooLong,longHairShavedSides,longHairMiaWallace,longHairStraight,longHairStraight2,longHairStraightStrand`;
-                // No beard
-                url += `&facialHairProbability=0`;
-            }
-            // If no gender selected, it remains random/neutral
-
-            url += `&backgroundColor=b6e3f4`; // Consistent background
+            const baseUrl = "https://api.dicebear.com/9.x/avataaars/svg";
             
-            // Add timestamp to prevent browser caching if seeds are similar (rare, but robust)
-            url += `&t=${Date.now()}`;
+            // Usamos URLSearchParams para garantir que os arrays sejam formatados corretamente
+            const params = new URLSearchParams();
+            params.append("seed", seed);
+            params.append("backgroundColor", "b6e3f4");
 
-            currentNewAvatarUrl = url;
-            document.getElementById('edit-avatar-preview').src = url;
+            if (currentEditGender === 'male') {
+                // Adicionamos cada estilo de cabelo individualmente com a chave 'top[]'
+                const maleStyles = ["shortHairDreads01", "shortHairDreads02", "shortHairFrizzle", "shortHairShaggyMullet", "shortHairShortCurly", "shortHairShortFlat", "shortHairShortRound", "shortHairShortWaved", "shortHairSides", "shortHairTheCaesar", "shortHairTheCaesarSidePart"];
+                maleStyles.forEach(style => params.append("top[]", style));
+                params.append("facialHairProbability", "50");
+            } else if (currentEditGender === 'female') {
+                const femaleStyles = ["longHairBigHair", "longHairBob", "longHairBun", "longHairCurly", "longHairCurvy", "longHairDreads", "longHairFrida", "longHairFro", "longHairFroBand", "longHairNotTooLong", "longHairShavedSides", "longHairMiaWallace", "longHairStraight", "longHairStraight2", "longHairStraightStrand"];
+                femaleStyles.forEach(style => params.append("top[]", style));
+                params.append("facialHairProbability", "0");
+            }
+            
+            // A API URLSearchParams codifica caracteres especiais, o que é seguro.
+            // O DiceBear aceita top[]=...&top[]=...
+            const finalUrl = `${baseUrl}?${params.toString()}`;
+            
+            currentNewAvatarUrl = finalUrl;
+            document.getElementById('edit-avatar-preview').src = finalUrl;
         }
 
         window.saveProfileChanges = async function() {
@@ -401,23 +406,24 @@
                     photoURL: currentNewAvatarUrl
                 });
 
-                // Update Firestore as well
+                // CORREÇÃO: Usando setDoc com merge: true para garantir que funciona 
+                // mesmo se o documento não existir ainda.
                 const docRef = doc(db, "users", user.uid);
-                await updateDoc(docRef, {
+                await setDoc(docRef, {
                     name: newName,
                     avatar: currentNewAvatarUrl
-                });
+                }, { merge: true });
 
                 // Update UI immediately
                 document.getElementById('logged-user-name').innerText = newName;
                 document.getElementById('logged-user-avatar').src = currentNewAvatarUrl;
 
                 closeEditModal();
-                alert("Perfil atualizado com sucesso!"); // Simple feedback
+                alert("Perfil atualizado com sucesso!");
 
             } catch (error) {
                 console.error("Error updating profile:", error);
-                alert("Erro ao salvar perfil.");
+                alert("Erro ao salvar perfil: " + error.message);
             } finally {
                 btn.innerText = originalText;
                 btn.disabled = false;
@@ -431,16 +437,14 @@
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 const docRef = doc(db, "users", user.uid);
-                const docSnap = await getDoc(docRef);
                 
-                if (!docSnap.exists()) {
-                    await setDoc(docRef, {
-                        name: user.displayName,
-                        email: user.email,
-                        createdAt: Timestamp.now(),
-                        points: 50
-                    });
-                }
+                // Usar setDoc com merge aqui também previne erros se a internet cair no meio
+                await setDoc(docRef, {
+                    name: user.displayName,
+                    email: user.email,
+                    lastLogin: Timestamp.now() // Atualiza último login
+                }, { merge: true });
+
                 displayMessage("Login realizado com sucesso!", "success");
             } catch (error) {
                 console.error("Erro Google:", error);
@@ -467,9 +471,11 @@
                 const user = userCredential.user;
                 
                 const seed = user.uid;
-                const newAvatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
+                const newAvatarUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
 
                 await updateProfile(user, { displayName: name, photoURL: newAvatarUrl });
+                
+                // SetDoc garante criação
                 await setDoc(doc(db, "users", user.uid), {
                     name: name,
                     email: email,
@@ -523,9 +529,11 @@
 
             if (user) {
                 const seed = user.uid;
-                const avatarUrl = user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
+                // Fallback robusto se photoURL estiver vazio ou quebrado
+                const avatarUrl = user.photoURL || `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
                 
                 const imgElement = document.getElementById('logged-user-avatar');
+                // Evita reload desnecessário se a imagem for a mesma
                 if (imgElement.src !== avatarUrl) {
                      imgElement.src = avatarUrl;
                 }
