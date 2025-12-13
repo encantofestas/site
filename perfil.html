@@ -357,7 +357,6 @@
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'));
         let notificationsData = [];
         
-        // --- GERENCIAMENTO DE CACHE LOCAL (NOVO) ---
         function saveUserCache(uid, data) {
             localStorage.setItem(`encanto_user_cache_${uid}`, JSON.stringify(data));
         }
@@ -367,8 +366,6 @@
             return cached ? JSON.parse(cached) : null;
         }
 
-        // --- FUNÇÕES DE UI E MENSAGENS ---
-        
         window.switchAuthTab = function(tab) {
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
@@ -439,8 +436,6 @@
             }, 4000);
         }
 
-        // --- LÓGICA DE LOGIN/PERFIL (COM CACHE) ---
-
         function renderUserProfile(userData) {
             const loadingState = document.getElementById('loading-state');
             const authView = document.getElementById('auth-view');
@@ -465,7 +460,6 @@
             const authView = document.getElementById('auth-view');
             const profileView = document.getElementById('profile-view');
 
-            // --- CORREÇÃO IMPORTANTE: Resetar estado dos botões ao fazer logout ---
             const loginBtn = document.getElementById('btn-login-submit');
             if (loginBtn) {
                 loginBtn.innerText = "Acessar Minha Conta";
@@ -476,18 +470,14 @@
                 regBtn.innerText = "Criar Conta Grátis";
                 regBtn.disabled = false;
             }
-            // Resetar forms para limpar senhas
             document.getElementById('login-form').reset();
             document.getElementById('register-form').reset();
-            // ----------------------------------------------------------------------
 
             loadingState.classList.add('hidden');
             profileView.classList.add('hidden');
             authView.classList.remove('hidden');
             authView.classList.add('slide-up');
         }
-
-        // --- HANDLERS (REGISTRO E LOGIN) ---
 
         window.handleGoogleLogin = async function() {
             const provider = new GoogleAuthProvider();
@@ -512,13 +502,27 @@
                     userData = docSnap.data();
                 }
                 
-                // Salvar cache imediatamente após login
                 saveUserCache(user.uid, userData);
-                
                 displayMessage("Login com Google realizado!", "success");
             } catch (error) {
-                console.error("Erro no login Google:", error);
-                displayMessage("Erro ao entrar com Google.", "error");
+                console.error("Erro detalhado do Google:", error);
+                
+                let msg = "Erro ao entrar com Google.";
+                if (error.code === 'auth/popup-closed-by-user') {
+                    msg = "Login cancelado (janela fechada).";
+                } else if (error.code === 'auth/cancelled-popup-request') {
+                    msg = "Apenas uma janela de login pode ser aberta.";
+                } else if (error.code === 'auth/popup-blocked') {
+                    msg = "Popup bloqueado pelo navegador.";
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    msg = "Domínio não autorizado no Firebase Console.";
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    msg = "Login Google não ativado no Firebase.";
+                } else {
+                    msg = `Erro: ${error.code || error.message}`;
+                }
+                
+                displayMessage(msg, "error");
             }
         }
 
@@ -557,7 +561,6 @@
 
                 await setDoc(doc(db, "users", user.uid), userDocData);
                 
-                // Salvar cache
                 saveUserCache(user.uid, userDocData);
 
                 displayMessage("Conta criada com sucesso!", 'success');
@@ -605,8 +608,6 @@
                 console.error("Erro ao sair:", error);
             }
         }
-
-        // --- SISTEMA DE NOTIFICAÇÕES ---
 
         function updateLocalCache() {
             localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds)));
@@ -719,15 +720,12 @@
             }
         }
 
-        // --- INICIALIZAÇÃO ---
         async function initializeFirebaseAndAuth() {
             try {
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        // 1. CARREGAMENTO IMEDIATO VIA CACHE LOCAL
                         const cachedData = getUserCache(user.uid);
                         
-                        // Dados base para fallback (caso não tenha cache ou fetch falhe)
                         const fallbackData = {
                             name: user.displayName || "Carregando...",
                             email: user.email,
@@ -735,16 +733,14 @@
                             points: 0
                         };
 
-                        // Renderiza IMEDIATAMENTE com o que tiver (Cache > Auth > Fallback)
                         renderUserProfile(cachedData || fallbackData);
 
-                        // 2. ATUALIZAÇÃO SILENCIOSA (Busca no Firestore)
                         const docRef = doc(db, "users", user.uid);
                         getDoc(docRef).then(docSnap => {
                             if (docSnap.exists()) {
                                 const freshData = docSnap.data();
-                                saveUserCache(user.uid, freshData); // Atualiza cache
-                                renderUserProfile(freshData); // Atualiza tela se mudou algo
+                                saveUserCache(user.uid, freshData);
+                                renderUserProfile(freshData);
                             }
                         }).catch(e => console.error("Erro background:", e));
                     } else {
