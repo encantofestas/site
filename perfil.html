@@ -26,11 +26,10 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <!-- Componente Principal (Avatar + Nome + Email) -->
+    <!-- Componente Principal (Tela 1: Avatar + Nome + Email) -->
     <div class="flex flex-col items-center">
         
         <!-- Container do Avatar e do Ícone de Edição -->
-        <!-- Adicionei 'cursor-pointer' e onclick para abrir o modal ao clicar na foto também -->
         <div 
             class="relative w-32 h-32 group mb-3 cursor-pointer"
             onclick="openModal()"
@@ -40,7 +39,7 @@
             <img 
                 id="avatarImage"
                 src="" 
-                alt="" 
+                alt="Avatar do Usuário" 
                 class="w-full h-full rounded-full object-cover shadow-lg bg-indigo-50 transition-opacity duration-300 opacity-0"
             >
 
@@ -58,14 +57,22 @@
         </div>
         
         <!-- Nome do Usuário -->
-        <p class="text-xl font-semibold text-gray-800">Usuário Teste</p>
+        <p class="text-xl font-semibold text-gray-800" id="userNameDisplay">Carregando...</p>
         
         <!-- Email do Usuário -->
-        <p class="text-sm text-gray-500">usuario.teste@exemplo.com</p>
+        <p class="text-sm text-gray-500" id="userEmailDisplay">carregando@exemplo.com</p>
+        
+        <!-- Botão Editar Perfil (Abre a Tela 3) -->
+        <button 
+            onclick="openProfileEditModal()" 
+            class="mt-4 px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg hover:bg-indigo-600 transition duration-150 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+            Editar Perfil
+        </button>
 
     </div>
 
-    <!-- Modal Principal (Escolher Gênero ou Upload) -->
+    <!-- Modal Principal (Tela 2: Escolher Gênero ou Upload) -->
     <div id="imageModal" class="fixed inset-0 z-40 bg-black bg-opacity-75 hidden items-center justify-center p-4 transition-opacity duration-300 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl p-6 relative max-w-lg w-full transform transition-all scale-100">
             <h2 class="text-xl font-semibold mb-6 text-gray-800 text-center">Alterar Foto de Perfil</h2>
@@ -90,10 +97,6 @@
 
             <!-- Visualização da Imagem no Modal -->
             <div class="flex justify-center mb-8">
-                <!-- 
-                     Ao clicar aqui, também abre o seletor de arquivos.
-                     Adicionei 'cursor-pointer' e o evento onclick.
-                -->
                 <div 
                     class="relative p-1 rounded-full border-4 border-indigo-100 shadow-xl group cursor-pointer"
                     onclick="document.getElementById('photoUploadInput').click();"
@@ -101,7 +104,7 @@
                     <img 
                         id="modalAvatarImage"
                         src="" 
-                        alt="" 
+                        alt="Visualização do Avatar" 
                         class="w-48 h-48 rounded-full object-cover bg-indigo-50 opacity-0 transition-opacity duration-300"
                     >
                     
@@ -127,12 +130,74 @@
         </div>
     </div>
 
-    <!-- Modal de Recorte (Cropper) - Invisível até selecionar uma foto -->
+    <!-- Modal de Edição de Perfil (Tela 3: NOVO) -->
+    <div id="profileEditModal" class="fixed inset-0 z-40 bg-black bg-opacity-75 hidden items-center justify-center p-4 transition-opacity duration-300 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl p-6 relative max-w-lg w-full transform transition-all scale-100">
+            <h2 class="text-xl font-semibold mb-6 text-gray-800 text-center">Editar Informações do Perfil</h2>
+            
+            <!-- Conteúdo de Edição de Perfil (Exemplo) -->
+            <div class="space-y-4">
+                <div>
+                    <label for="editName" class="block text-sm font-medium text-gray-700">Nome:</label>
+                    <input type="text" id="editName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
+                </div>
+                <div>
+                    <label for="editEmail" class="block text-sm font-medium text-gray-700">Email:</label>
+                    <input type="email" id="editEmail" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-gray-100" disabled>
+                    <p class="text-xs text-gray-500 mt-1">O email não pode ser alterado aqui.</p>
+                </div>
+
+                <hr class="border-gray-200 mt-6 mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Endereço (Opcional)</h3>
+
+                <!-- Campo Bairro (Select) -->
+                <div>
+                    <label for="editNeighborhood" class="block text-sm font-medium text-gray-700">Bairro:</label>
+                    <select id="editNeighborhood" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
+                        <option value="">Selecione o Bairro</option>
+                        <option value="Centro">Centro</option>
+                        <option value="Jardim America">Jardim América</option>
+                        <option value="Vila Nova">Vila Nova</option>
+                        <option value="Outro">Outro Bairro</option>
+                    </select>
+                </div>
+                
+                <!-- Campo Rua -->
+                <div>
+                    <label for="editStreet" class="block text-sm font-medium text-gray-700">Rua/Avenida:</label>
+                    <input type="text" id="editStreet" placeholder="Ex: Rua das Flores" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
+                </div>
+
+                <!-- Campo Número -->
+                <div>
+                    <label for="editHouseNumber" class="block text-sm font-medium text-gray-700">Número da Casa:</label>
+                    <input type="text" id="editHouseNumber" placeholder="Ex: 123 ou S/N" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-8 pt-4 border-t border-gray-100">
+                <button 
+                    onclick="closeProfileEditModal()" 
+                    class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    onclick="saveProfileChanges()" 
+                    class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition shadow-lg flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recorte (Tela 4: Cropper) - Invisível até selecionar uma foto -->
     <div id="cropperModal" class="fixed inset-0 z-50 bg-black bg-opacity-90 hidden items-center justify-center p-4 backdrop-blur-md">
         <div class="bg-white rounded-xl shadow-2xl p-4 w-full max-w-2xl flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-800">Ajustar Foto (1:1)</h3>
-                <button onclick="closeCropper()" class="text-gray-500 hover:text-gray-700">
+                <button onclick="closeCropper()" class="text-gray-500 hover:text-gray-700 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -164,13 +229,20 @@
     <input type="file" id="photoUploadInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
     
     <script>
-        // --- CONFIGURAÇÕES E ESTADOS ---
+        // --- ESTADOS DO PERFIL (MOCK DATA) ---
+        let currentUserName = 'Usuário Teste';
+        let currentUserEmail = 'usuario.teste@exemplo.com';
+        let currentNeighborhood = 'Vila Nova'; // Valor inicial para o Bairro
+        let currentStreet = 'Rua Principal da Cidade'; // Valor inicial para a Rua
+        let currentHouseNumber = '100A'; // Valor inicial para o Número
+        
+        // --- CONFIGURAÇÕES DO AVATAR ---
         const BASE_URL = "https://api.dicebear.com/9.x/avataaars/svg";
         const COMMON_PARAMS = "scale=110&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9";
         
         let currentAvatarType = 'male'; 
         let loadTimeout = null;
-        let cropper = null; // Instância do Cropper.js
+        let cropper = null; 
 
         const MALE_HAIR_STYLES = ["shortFlat", "shortRound", "shortWaved", "theCaesar", "theCaesarSidePart", "sides", "shortDreads1", "shortDreads2", "shortFrizzle", "shortCurly"];
         const FEMALE_HAIR_STYLES = ["longButNotTooLong", "bob", "bun", "curly", "curvy", "straight1", "straight2", "straightStrand", "frida", "miaWallace", "bigHair", "shavedSides", "fro", "froBand"];
@@ -198,25 +270,21 @@
             highlightButton('female');
         }
 
-        // --- ATUALIZAÇÃO VISUAL ---
+        // --- ATUALIZAÇÃO VISUAL E ESTADO ---
         function updateAvatars(url) {
             const imgMain = document.getElementById('avatarImage');
             const imgModal = document.getElementById('modalAvatarImage');
 
             if (loadTimeout) clearTimeout(loadTimeout);
-
-            // Timeout de segurança
             loadTimeout = setTimeout(() => {
                 console.warn("Demora no carregamento, tentando regerar...");
                 if (currentAvatarType === 'male') generateMale();
                 else if (currentAvatarType === 'female') generateFemale();
             }, 4000);
 
-            // Hide
             imgMain.classList.remove('opacity-100'); imgMain.classList.add('opacity-0');
             imgModal.classList.remove('opacity-100'); imgModal.classList.add('opacity-0');
 
-            // Set URL
             imgMain.src = url;
             imgModal.src = url;
 
@@ -237,7 +305,6 @@
 
             imgMain.onerror = () => {
                 if (loadTimeout) clearTimeout(loadTimeout);
-                // Pequeno delay para retry
                 setTimeout(() => {
                     if (currentAvatarType === 'male') generateMale();
                     else if (currentAvatarType === 'female') generateFemale();
@@ -260,25 +327,22 @@
             });
         }
 
-        // --- LÓGICA DE UPLOAD E RECORTE (CROPPER) ---
+        // --- LÓGICA DE UPLOAD E RECORTE (CROPPER - Tela 4) ---
 
-        // 1. Usuário selecionou arquivo
         function handleFileSelect(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const reader = new FileReader();
 
                 reader.onload = function(e) {
-                    // Abre o modal de recorte com a imagem carregada
-                    openCropperModal(e.target.result);
-                    // Reseta o input para permitir selecionar a mesma foto se cancelar
+                    closeModal(); // Fecha a Tela 2
+                    openCropperModal(e.target.result); // Abre a Tela 4
                     input.value = ''; 
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // 2. Abre Modal de Recorte
         function openCropperModal(imageSrc) {
             const modal = document.getElementById('cropperModal');
             const imageElement = document.getElementById('imageToCrop');
@@ -287,28 +351,23 @@
             modal.classList.add('flex');
             imageElement.src = imageSrc;
 
-            // Destroi cropper anterior se existir
             if (cropper) {
                 cropper.destroy();
             }
 
-            // Inicializa Cropper
             cropper = new Cropper(imageElement, {
-                aspectRatio: 1, // Força quadrado 1:1
-                viewMode: 1,    // Restringe o crop box dentro da imagem
+                aspectRatio: 1, 
+                viewMode: 1,    
                 dragMode: 'move',
                 autoCropArea: 1,
                 responsive: true,
-                background: false, // Remove grid de fundo padrão
+                background: false,
             });
         }
 
-        // 3. Executa o Recorte
         function cropImage() {
             if (!cropper) return;
 
-            // Obtém o canvas recortado
-            // max-width/height limitam para não criar imagens gigantescas, mas mantendo qualidade
             const canvas = cropper.getCroppedCanvas({
                 width: 512,
                 height: 512,
@@ -316,12 +375,10 @@
                 imageSmoothingQuality: 'high',
             });
 
-            // Converte para URL e atualiza avatar
-            const croppedUrl = canvas.toDataURL('image/jpeg', 0.9); // JPEG qualidade 90%
+            const croppedUrl = canvas.toDataURL('image/jpeg', 0.9);
             
             updateAvatars(croppedUrl);
             
-            // Atualiza UI
             currentAvatarType = 'custom';
             document.querySelectorAll('.gender-button').forEach(btn => {
                 btn.classList.remove('bg-indigo-600', 'text-white', 'bg-pink-600');
@@ -331,7 +388,6 @@
             closeCropper();
         }
 
-        // 4. Fecha Modal de Recorte
         function closeCropper() {
             const modal = document.getElementById('cropperModal');
             modal.classList.add('hidden');
@@ -343,14 +399,13 @@
             }
         }
 
-        // --- MODAL PRINCIPAL ---
+        // --- MODAL PRINCIPAL (Tela 2) ---
         function openModal() {
             const modal = document.getElementById('imageModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             
             const mainSrc = document.getElementById('avatarImage').src;
-            // Se já temos uma imagem carregada, garante que o modal a mostre
             if (mainSrc && document.getElementById('avatarImage').complete) {
                 const modalImg = document.getElementById('modalAvatarImage');
                 modalImg.src = mainSrc;
@@ -365,13 +420,69 @@
             modal.classList.remove('flex');
         }
 
-        // Fecha ao clicar fora
+        // --- MODAL DE EDIÇÃO DE PERFIL (Tela 3) ---
+        function openProfileEditModal() {
+            const modal = document.getElementById('profileEditModal');
+            
+            // Carrega dados atuais do estado JS para os campos de edição
+            document.getElementById('editName').value = currentUserName;
+            document.getElementById('editEmail').value = currentUserEmail;
+            
+            // NOVO: Carrega dados do endereço
+            document.getElementById('editNeighborhood').value = currentNeighborhood;
+            document.getElementById('editStreet').value = currentStreet;
+            document.getElementById('editHouseNumber').value = currentHouseNumber;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeProfileEditModal() {
+            const modal = document.getElementById('profileEditModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function saveProfileChanges() {
+            const newName = document.getElementById('editName').value;
+            
+            // NOVO: Coleta dados do endereço (mesmo que vazios)
+            const newNeighborhood = document.getElementById('editNeighborhood').value;
+            const newStreet = document.getElementById('editStreet').value;
+            const newHouseNumber = document.getElementById('editHouseNumber').value;
+
+            // Atualiza o estado JS (Simulando o salvamento)
+            currentUserName = newName;
+            currentNeighborhood = newNeighborhood;
+            currentStreet = newStreet;
+            currentHouseNumber = newHouseNumber;
+            
+            // Atualiza a Tela 1 (a principal) com o novo nome
+            document.getElementById('userNameDisplay').textContent = newName;
+            
+            closeProfileEditModal();
+            
+            console.log("Perfil atualizado! Novos Dados Salvos:");
+            console.log(`Nome: ${currentUserName}`);
+            console.log(`Endereço - Bairro: ${currentNeighborhood || 'Não preenchido'}, Rua: ${currentStreet || 'Não preenchida'}, Número: ${currentHouseNumber || 'Não preenchido'}`);
+        }
+        
+        // --- FECHAMENTO E INICIALIZAÇÃO ---
+
+        // Fecha modals ao clicar fora
         document.getElementById('imageModal').addEventListener('click', (e) => {
             if (e.target.id === 'imageModal') closeModal();
         });
+        
+        document.getElementById('profileEditModal').addEventListener('click', (e) => {
+            if (e.target.id === 'profileEditModal') closeProfileEditModal();
+        });
 
-        // --- INICIALIZAÇÃO ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa displays da Tela 1 com o estado inicial
+            document.getElementById('userNameDisplay').textContent = currentUserName;
+            document.getElementById('userEmailDisplay').textContent = currentUserEmail;
+
             generateMale();
         });
 
