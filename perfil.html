@@ -34,25 +34,21 @@
     <!-- CARD PRINCIPAL -->
     <main class="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/50 relative flex flex-col h-[85vh] md:h-[800px]">
         
-        <!-- 
-           TOPO DECORATIVO - DESIGN DE LOCAÇÃO DE BRINQUEDOS 
-           Substituído o gradiente simples por uma imagem temática com overlay
-        -->
+        <!-- Topo Decorativo -->
         <div class="h-36 w-full absolute top-0 left-0 z-0 shrink-0 overflow-hidden">
-            <!-- Imagem de fundo (Confetes/Festa/Brinquedos Abstratos) -->
             <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1470&auto=format&fit=crop" 
                  class="w-full h-full object-cover opacity-90" 
                  alt="Fundo Festa">
-            <!-- Gradiente de sobreposição para suavizar -->
             <div class="absolute inset-0 bg-gradient-to-b from-indigo-900/30 to-white"></div>
         </div>
 
-        <!-- Seção Superior (Perfil + Status) -->
+        <!-- Seção Superior -->
         <div class="relative z-10 flex flex-col items-center pt-12 px-6 pb-2 shrink-0">
             
             <!-- Avatar -->
             <div class="relative group cursor-pointer" onclick="openModal()">
                 <div class="w-32 h-32 rounded-full p-1 bg-white shadow-xl relative">
+                    <!-- Loading (Spinner) -->
                     <div id="mainAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/10 hidden">
                         <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     </div>
@@ -63,7 +59,7 @@
                 </button>
             </div>
             
-            <!-- Nome e Email -->
+            <!-- Info -->
             <div class="text-center mt-3 mb-4">
                 <h1 class="text-xl font-bold text-gray-800 leading-tight" id="userNameDisplay">Carregando...</h1>
                 <p class="text-xs text-gray-500 font-medium" id="userEmailDisplay">...</p>
@@ -89,27 +85,18 @@
 
             <!-- STATS -->
             <div class="w-full flex items-center justify-between bg-gray-50 rounded-2xl p-3 border border-gray-100 shadow-sm">
-                
-                <!-- Festas -->
                 <div class="flex-1 flex flex-col items-center">
                     <span class="text-lg font-bold text-indigo-600 leading-none" id="partyCountDisplay">0</span>
                     <span class="text-[9px] font-bold text-gray-400 uppercase mt-1">Festas</span>
                 </div>
-                
                 <div class="w-px h-6 bg-gray-200"></div>
-                
-                <!-- PONTOS (ROXO) -->
                 <div class="flex-1 flex flex-col items-center">
                     <span class="text-lg font-bold text-purple-600 leading-none" id="userPointsDisplay">0</span>
                     <span class="text-[9px] font-bold text-gray-400 uppercase mt-1">Pontos</span>
                 </div>
-                
                 <div class="w-px h-6 bg-gray-200"></div>
-                
-                <!-- SALDO (VERDE) -->
                 <div class="flex-1 flex flex-col items-center">
                     <span class="text-lg font-bold text-green-600 leading-none" id="userBalanceDisplay">0,00</span>
-                    <!-- Ícone agora ao lado do nome Saldo -->
                     <div class="flex items-center gap-1 mt-1">
                         <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                         <span class="text-[9px] font-bold text-gray-400 uppercase">Saldo</span>
@@ -121,7 +108,6 @@
 
         <!-- SEÇÃO DE HISTÓRICO -->
         <div class="flex-1 flex flex-col overflow-hidden bg-white mt-2 border-t border-gray-100 w-full">
-            
             <div class="px-6 py-3 flex justify-between items-center bg-white z-10 shadow-sm">
                 <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Histórico de Locações</h3>
                 <button onclick="openFilterModal()" class="text-xs font-semibold text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition flex items-center gap-1 active:bg-indigo-100">
@@ -129,11 +115,7 @@
                     Filtro <span id="filterCountBadge" class="hidden bg-indigo-600 text-white text-[9px] px-1 rounded-full"></span>
                 </button>
             </div>
-
-            <div class="flex-1 overflow-y-auto px-5 pb-6 history-scroll space-y-2" id="historyList">
-                <!-- JS preenche -->
-            </div>
-            
+            <div class="flex-1 overflow-y-auto px-5 pb-6 history-scroll space-y-2" id="historyList"></div>
             <div class="h-4 bg-gradient-to-t from-white to-transparent pointer-events-none absolute bottom-0 w-full"></div>
         </div>
 
@@ -146,12 +128,10 @@
                 <h2 class="text-xl font-bold text-gray-800">Filtrar Histórico</h2>
                 <button onclick="closeFilterModal()" class="text-gray-400 hover:text-gray-600 p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            
             <div class="space-y-4">
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Por Bairro</h3>
                 <div id="filterOptionsContainer" class="space-y-2 max-h-48 overflow-y-auto"></div>
             </div>
-
             <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100">
                 <button onclick="resetFilters()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition">Limpar</button>
                 <button onclick="applyFilters()" class="flex-1 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">Aplicar</button>
@@ -160,79 +140,46 @@
     </div>
 
     <!-- TELA 2: MODAL DE FOTO -->
-    <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter"><div class="text-center mb-6"><h2 class="text-xl font-bold text-gray-800">Alterar Foto</h2><p class="text-sm text-gray-500">Escolha um avatar ou envie sua foto</p></div><div class="flex justify-center mb-8"><div class="relative w-40 h-40 rounded-full p-1 border-2 border-dashed border-indigo-200 hover:border-indigo-400 cursor-pointer group" onclick="document.getElementById('photoUploadInput').click()"><img id="modalAvatarImage" src="" class="w-full h-full rounded-full object-cover"><div class="absolute inset-0 rounded-full flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold uppercase"><span>Enviar Foto</span></div></div></div><div class="grid grid-cols-2 gap-3 mb-6"><button onclick="generateMale()" class="gender-button py-3 rounded-xl bg-gray-100 text-sm font-semibold hover:bg-gray-200" data-type="male">Masculino</button><button onclick="generateFemale()" class="gender-button py-3 rounded-xl bg-gray-100 text-sm font-semibold hover:bg-gray-200" data-type="female">Feminino</button></div><div class="flex justify-end border-t pt-4"><button onclick="closeModal()" class="px-6 py-2 bg-gray-800 text-white rounded-xl font-medium">Concluir</button></div></div></div>
+    <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter relative overflow-hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Alterar Foto</h2>
+                <p class="text-sm text-gray-500">Escolha um avatar ou envie sua foto</p>
+            </div>
+            <div class="flex justify-center mb-8">
+                <div class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-indigo-200 hover:border-indigo-400 cursor-pointer group" onclick="document.getElementById('photoUploadInput').click()">
+                    
+                    <!-- Loading (Spinner) -->
+                    <div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden">
+                        <svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </div>
 
-    <!-- TELA 3: MODAL EDITAR (ATUALIZADO COM WHATSAPP E SEM NÚMERO) -->
+                    <img id="modalAvatarImage" src="" class="w-full h-full rounded-full object-cover bg-gray-50">
+                    <div class="absolute inset-0 rounded-full flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold uppercase"><span>Enviar Foto</span></div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <button onclick="generateMale()" class="gender-button py-3 rounded-xl bg-gray-100 text-sm font-semibold hover:bg-gray-200 active:bg-indigo-100 active:text-indigo-700 transition-colors" data-type="male">Masculino</button>
+                <button onclick="generateFemale()" class="gender-button py-3 rounded-xl bg-gray-100 text-sm font-semibold hover:bg-gray-200 active:bg-pink-100 active:text-pink-700 transition-colors" data-type="female">Feminino</button>
+            </div>
+            <div class="flex justify-end border-t pt-4"><button onclick="closeModal()" class="px-6 py-2 bg-gray-800 text-white rounded-xl font-medium">Concluir</button></div>
+        </div>
+    </div>
+
+    <!-- TELA 3: MODAL EDITAR -->
     <div id="profileEditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter max-h-[90vh] overflow-y-auto">
-            
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-lg font-bold">Editar Perfil</h2>
-                <button onclick="closeProfileEditModal()" class="text-gray-400 hover:text-gray-600">✕</button>
-            </div>
-            
+            <div class="flex justify-between items-center mb-6"><h2 class="text-lg font-bold">Editar Perfil</h2><button onclick="closeProfileEditModal()" class="text-gray-400 hover:text-gray-600">✕</button></div>
             <div class="space-y-5">
-                <!-- Nome -->
-                <div class="space-y-1">
-                    <label for="editName" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label>
-                    <input type="text" id="editName" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Seu nome">
-                </div>
-
-                <!-- WhatsApp -->
-                <div class="space-y-1">
-                    <label for="editPhone" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">WhatsApp / Telefone</label>
-                    <input type="tel" id="editPhone" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="(xx) xxxxx-xxxx" maxlength="15" oninput="formatPhone(this)">
-                </div>
-
-                <!-- Email -->
-                <div class="space-y-1">
-                    <label for="editEmail" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Email</label>
-                    <div class="relative">
-                        <input type="email" id="editEmail" class="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 text-gray-500 cursor-not-allowed" disabled>
-                        <svg class="w-5 h-5 text-gray-400 absolute right-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    </div>
-                </div>
-
+                <div class="space-y-1"><label for="editName" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label><input type="text" id="editName" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Seu nome"></div>
+                <div class="space-y-1"><label for="editPhone" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">WhatsApp / Telefone</label><input type="tel" id="editPhone" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="(xx) xxxxx-xxxx" maxlength="15" oninput="formatPhone(this)"></div>
+                <div class="space-y-1"><label for="editEmail" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Email</label><div class="relative"><input type="email" id="editEmail" class="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 text-gray-500 cursor-not-allowed" disabled><svg class="w-5 h-5 text-gray-400 absolute right-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div></div>
                 <div class="py-2"><div class="h-px bg-gray-100"></div></div>
                 <h3 class="text-sm font-bold text-indigo-600 uppercase tracking-wide">Endereço</h3>
-                
-                <div class="space-y-1">
-                    <label for="editNeighborhood" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label>
-                    <div class="relative">
-                        <select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none">
-                            <option value="">Selecione...</option>
-                            <option value="Centro">Centro</option>
-                            <option value="Jardim America">Jardim América</option>
-                            <option value="Vila Nova">Vila Nova</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="col-span-2 space-y-1">
-                        <label for="editStreet" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Rua</label>
-                        <input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Nome da rua">
-                    </div>
-                    
-                    <!-- Campo Número com Opção Sem Número -->
-                    <div class="space-y-1">
-                        <label for="editHouseNumber" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nº</label>
-                        <div class="relative">
-                            <input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="123">
-                        </div>
-                        <div class="flex items-center mt-1.5 ml-1">
-                            <input type="checkbox" id="noNumberCheckbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" onchange="toggleHouseNumber()">
-                            <label for="noNumberCheckbox" class="ml-1.5 text-xs text-gray-500 font-medium cursor-pointer">Sem número (S/N)</label>
-                        </div>
-                    </div>
-                </div>
+                <div class="space-y-1"><label for="editNeighborhood" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label><div class="relative"><select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none"><option value="">Selecione...</option><option value="Centro">Centro</option><option value="Jardim America">Jardim América</option><option value="Vila Nova">Vila Nova</option><option value="Outro">Outro</option></select><div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div></div></div>
+                <div class="grid grid-cols-3 gap-3"><div class="col-span-2 space-y-1"><label for="editStreet" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Rua</label><input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Nome da rua"></div><div class="space-y-1"><label for="editHouseNumber" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nº</label><div class="relative"><input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="123"></div><div class="flex items-center mt-1.5 ml-1"><input type="checkbox" id="noNumberCheckbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" onchange="toggleHouseNumber()"><label for="noNumberCheckbox" class="ml-1.5 text-xs text-gray-500 font-medium cursor-pointer">Sem número (S/N)</label></div></div></div>
             </div>
-
-            <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100">
-                <button onclick="closeProfileEditModal()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition active:scale-[0.98]">Cancelar</button>
-                <button onclick="saveProfileChanges()" class="flex-1 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-[0.98]">Salvar Alterações</button>
-            </div>
+            <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100"><button onclick="closeProfileEditModal()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition active:scale-[0.98]">Cancelar</button><button onclick="saveProfileChanges()" class="flex-1 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-[0.98]">Salvar Alterações</button></div>
         </div>
     </div>
 
@@ -263,12 +210,10 @@
 
         let activeFilter = 'Todos';
 
-        // --- FUNÇÕES ---
         const formatBRL = val => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
         const getRandom = arr => arr[Math.floor(Math.random() * arr.length)];
         const getSeed = () => Math.random().toString(36).substring(2);
 
-        // Máscara de Telefone
         function formatPhone(input) {
             let v = input.value.replace(/\D/g,'');
             v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); 
@@ -276,7 +221,6 @@
             input.value = v;
         }
 
-        // Lógica Sem Número (S/N)
         function toggleHouseNumber() {
             const checkbox = document.getElementById('noNumberCheckbox');
             const input = document.getElementById('editHouseNumber');
@@ -298,32 +242,13 @@
         function renderHistory() {
             const list = document.getElementById('historyList');
             list.innerHTML = '';
-            
             const filteredData = activeFilter === 'Todos' ? historyData : historyData.filter(item => item.neighborhood === activeFilter);
-
-            if (filteredData.length === 0) {
-                list.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Nenhum histórico encontrado.</div>';
-                return;
-            }
-
+            if (filteredData.length === 0) { list.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Nenhum histórico encontrado.</div>'; return; }
             filteredData.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center p-3 bg-gray-50 hover:bg-indigo-50 rounded-xl transition cursor-default border border-gray-100';
-                
-                const discountTag = item.discount > 0 
-                    ? `<div class="flex items-center justify-end mt-1"><span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> Economizou R$ ${formatBRL(item.discount)}</span></div>` 
-                    : '';
-
-                div.innerHTML = `
-                    <div>
-                        <p class="text-[10px] text-gray-400 font-bold mb-0.5">${item.date}</p>
-                        <p class="text-sm font-bold text-gray-700">${item.neighborhood}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-gray-800">R$ ${formatBRL(item.value)}</p>
-                        ${discountTag}
-                    </div>
-                `;
+                const discountTag = item.discount > 0 ? `<div class="flex items-center justify-end mt-1"><span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> Economizou R$ ${formatBRL(item.discount)}</span></div>` : '';
+                div.innerHTML = `<div><p class="text-[10px] text-gray-400 font-bold mb-0.5">${item.date}</p><p class="text-sm font-bold text-gray-700">${item.neighborhood}</p></div><div class="text-right"><p class="text-sm font-bold text-gray-800">R$ ${formatBRL(item.value)}</p>${discountTag}</div>`;
                 list.appendChild(div);
             });
         }
@@ -332,7 +257,6 @@
             const container = document.getElementById('filterOptionsContainer');
             container.innerHTML = '';
             const neighborhoods = ['Todos', ...new Set(historyData.map(item => item.neighborhood))];
-
             neighborhoods.forEach(bairro => {
                 const label = document.createElement('label');
                 label.className = 'flex items-center p-3 border border-gray-100 rounded-xl cursor-pointer hover:bg-gray-50 transition';
@@ -349,15 +273,12 @@
                 activeFilter = selected.value;
                 renderHistory();
                 const badge = document.getElementById('filterCountBadge');
-                if (activeFilter !== 'Todos') { badge.textContent = '1'; badge.classList.remove('hidden'); } 
-                else { badge.classList.add('hidden'); }
+                if (activeFilter !== 'Todos') { badge.textContent = '1'; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
             }
             toggleModal('filterModal', false);
         }
 
-        function resetFilters() {
-            activeFilter = 'Todos'; renderHistory(); document.getElementById('filterCountBadge').classList.add('hidden'); toggleModal('filterModal', false);
-        }
+        function resetFilters() { activeFilter = 'Todos'; renderHistory(); document.getElementById('filterCountBadge').classList.add('hidden'); toggleModal('filterModal', false); }
         function closeFilterModal() { toggleModal('filterModal', false); }
 
         function initUI() {
@@ -369,33 +290,61 @@
             document.getElementById('xpDisplay').textContent = `${userData.stats.points} / 2000 XP`;
             setTimeout(() => document.getElementById('xpBarFill').style.width = '62.5%', 300);
             renderHistory();
-            generateMale();
+            generateAvatar('male'); // Inicia com masculino
         }
 
         const BASE_URL = "https://api.dicebear.com/9.x/avataaars/svg";
         const STYLES = { male: ["shortFlat", "shortRound", "theCaesar", "shortWaved"], female: ["longButNotTooLong", "bob", "longCurly", "straight1"] };
         let appState = { cropper: null, type: 'male' };
 
-        function generateAvatar(type) {
-            if(type) appState.type = type;
+        // === LÓGICA DE RETRY AUTOMÁTICO ===
+        function generateAvatar(type, retryCount = 0) {
+            if(retryCount > 3) {
+                console.error("Falha ao gerar avatar após várias tentativas.");
+                return; // Evita loop infinito
+            }
+
+            if(type) {
+                appState.type = type;
+                updateButtons(type);
+            }
+            
             const seed = getSeed();
             const hair = getRandom(STYLES[appState.type]);
             const beard = appState.type === 'male' ? 30 : 0;
             const url = `${BASE_URL}?seed=${seed}&top=${hair}&facialHairProbability=${beard}&accessoriesProbability=0&scale=110&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9`;
-            updateImages(url);
-            updateButtons(appState.type);
+            
+            // Ativa o loading UI imediatamente
+            const l1 = document.getElementById('mainAvatarLoader');
+            const l2 = document.getElementById('modalAvatarLoader');
+            l1.classList.remove('hidden');
+            l2.classList.remove('hidden');
+
+            const tmp = new Image();
+            tmp.src = url;
+            
+            tmp.onload = () => { 
+                // Sucesso: Atualiza imagens
+                document.getElementById('avatarImage').src = url;
+                document.getElementById('modalAvatarImage').src = url;
+                l1.classList.add('hidden');
+                l2.classList.add('hidden');
+            };
+            
+            tmp.onerror = () => { 
+                // Erro: Tenta de novo automaticamente
+                console.warn(`Erro ao carregar avatar (Tentativa ${retryCount + 1}). Retentando...`);
+                generateAvatar(appState.type, retryCount + 1);
+            };
         }
+
         function generateMale() { generateAvatar('male'); }
         function generateFemale() { generateAvatar('female'); }
 
+        // Mantido para compatibilidade com Cropper (que já retorna imagem válida)
         function updateImages(url) {
-            const m1 = document.getElementById('avatarImage');
-            const m2 = document.getElementById('modalAvatarImage');
-            const l1 = document.getElementById('mainAvatarLoader');
-            l1.classList.remove('hidden');
-            const tmp = new Image(); tmp.src = url;
-            tmp.onload = () => { m1.src = url; m2.src = url; l1.classList.add('hidden'); };
-            tmp.onerror = () => { l1.classList.add('hidden'); };
+            document.getElementById('avatarImage').src = url;
+            document.getElementById('modalAvatarImage').src = url;
         }
 
         function updateButtons(type) {
@@ -419,22 +368,11 @@
             document.getElementById('editPhone').value = userData.phone; 
             document.getElementById('editNeighborhood').value = userData.address.neighborhood;
             document.getElementById('editStreet').value = userData.address.street;
-            
-            // Lógica para inicializar checkbox se for S/N
             const numVal = userData.address.number;
             const numInput = document.getElementById('editHouseNumber');
             const check = document.getElementById('noNumberCheckbox');
-            
-            if (numVal === 'S/N') {
-                numInput.value = 'S/N';
-                check.checked = true;
-                toggleHouseNumber(); // Aplica estilos
-            } else {
-                numInput.value = numVal;
-                check.checked = false;
-                toggleHouseNumber(); // Reseta
-            }
-            
+            if (numVal === 'S/N') { numInput.value = 'S/N'; check.checked = true; toggleHouseNumber(); } 
+            else { numInput.value = numVal; check.checked = false; toggleHouseNumber(); }
             toggleModal('profileEditModal', true); 
         }
         function closeProfileEditModal() { toggleModal('profileEditModal', false); }
@@ -444,7 +382,6 @@
             userData.address.neighborhood = document.getElementById('editNeighborhood').value;
             userData.address.street = document.getElementById('editStreet').value;
             userData.address.number = document.getElementById('editHouseNumber').value;
-            
             document.getElementById('userNameDisplay').textContent = userData.name;
             console.log("Perfil Salvo:", userData);
             closeProfileEditModal();
@@ -468,7 +405,10 @@
         function closeCropper() { toggleModal('cropperModal', false); }
         function cropImage() {
             if(!appState.cropper) return;
-            updateImages(appState.cropper.getCroppedCanvas({width:512,height:512}).toDataURL());
+            // Base64 sempre carrega, então podemos setar direto
+            const url = appState.cropper.getCroppedCanvas({width:512,height:512}).toDataURL();
+            document.getElementById('avatarImage').src = url;
+            document.getElementById('modalAvatarImage').src = url;
             closeCropper();
         }
 
