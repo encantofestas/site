@@ -132,16 +132,22 @@
             <div class="w-full mb-8">
                 <div class="flex justify-between items-end mb-2"><div class="flex items-center gap-1.5"><span id="userLevelBadge" class="px-2.5 py-0.5 bg-blue-600 text-white text-[10px] font-bold uppercase rounded-md tracking-wider shadow-sm">Nível 1</span></div><span class="text-xs font-bold text-gray-500" id="xpDisplay">0 / 500 XP</span></div>
                 <div class="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden shadow-inner relative">
-                    <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-blue-500 to-purple-600 w-0 rounded-full relative overflow-hidden shadow-sm flex items-center"><div class="absolute inset-0 w-full h-full animated-stripes"></div></div>
-                </div>
+                <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-blue-500 to-purple-600 w-0 rounded-full relative overflow-hidden shadow-sm flex items-center"><div class="absolute inset-0 w-full h-full animated-stripes"></div></div>
             </div>
+        </div>
 
-            <div class="w-full grid grid-cols-3 gap-0 py-6 border-b border-gray-100 mb-6 relative z-20">
-                <button onclick="this.querySelector('svg').classList.add('animate-spin'); setTimeout(() => this.querySelector('svg').classList.remove('animate-spin'), 1000); window.location.reload();" class="absolute top-1 right-0 p-1 text-gray-300 hover:text-blue-500 transition-colors" title="Atualizar Dados">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                </button>
+        <!-- Stats (FLAT DESIGN - Sem box) -->
+        <div class="w-full grid grid-cols-3 gap-0 py-6 border-b border-gray-100 mb-6 relative z-20">
+            <!-- Ícone Atualizar (Círculo Cinza Escuro com Ícone Branco) -->
+            <button onclick="this.querySelector('svg').classList.add('animate-spin'); setTimeout(() => this.querySelector('svg').classList.remove('animate-spin'), 1000); window.location.reload();" class="absolute top-1 right-1 p-1.5 bg-gray-800 text-white rounded-full shadow-sm hover:bg-gray-700 transition-colors" title="Atualizar Dados">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
 
-                <div class="flex flex-col items-center border-r border-gray-100">
+            <div class="flex flex-col items-center border-r border-gray-100">
+                <span class="text-2xl font-black text-blue-600 leading-none" id="partyCountDisplay">0</span>
+                <span class="text-[10px] font-bold text-gray-400 uppercase mt-1 tracking-wide">Festas</span>
+            </div>
+            <div class="flex flex-col items-center border-r border-gray-100">
                     <span class="text-2xl font-black text-blue-600 leading-none" id="partyCountDisplay">0</span>
                     <span class="text-[10px] font-bold text-gray-400 uppercase mt-1 tracking-wide">Festas</span>
                 </div>
