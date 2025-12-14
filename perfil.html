@@ -27,6 +27,26 @@
         .history-scroll::-webkit-scrollbar-track { background: transparent; }
         .history-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         .history-scroll::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+
+        /* NOVA ANIMAÇÃO DA BARRA DE PROGRESSO */
+        @keyframes moveStripes {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 20px; }
+        }
+        .animated-stripes {
+            background-image: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.25) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.25) 50%,
+                rgba(255, 255, 255, 0.25) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 20px 20px;
+            animation: moveStripes 1s linear infinite;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -35,20 +55,24 @@
     <main class="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/50 relative flex flex-col h-[85vh] md:h-[800px]">
         
         <!-- Topo Decorativo -->
-        <div class="h-36 w-full absolute top-0 left-0 z-0 shrink-0 overflow-hidden">
+        <div class="h-36 w-full absolute top-0 left-0 z-0 shrink-0 overflow-hidden group">
             <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1470&auto=format&fit=crop" 
-                 class="w-full h-full object-cover opacity-90" 
+                 class="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" 
                  alt="Fundo Festa">
             <div class="absolute inset-0 bg-gradient-to-b from-indigo-900/30 to-white"></div>
         </div>
 
+        <!-- ÍCONE DE GIFT (Z-50 para ficar clicável) -->
+        <button onclick="openRewardsModal()" class="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-white hover:text-indigo-600 transition-all duration-300 shadow-lg border border-white/30 z-50 animate-pulse hover:animate-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+        </button>
+
         <!-- Seção Superior -->
-        <div class="relative z-10 flex flex-col items-center pt-12 px-6 pb-2 shrink-0">
+        <div class="relative z-10 flex flex-col items-center pt-12 px-6 pb-2 shrink-0 pointer-events-none">
             
             <!-- Avatar -->
-            <div class="relative group cursor-pointer" onclick="openModal()">
+            <div class="relative group cursor-pointer pointer-events-auto" onclick="openModal()">
                 <div class="w-32 h-32 rounded-full p-1 bg-white shadow-xl relative">
-                    <!-- Loading (Spinner) -->
                     <div id="mainAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/10 hidden">
                         <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     </div>
@@ -60,31 +84,35 @@
             </div>
             
             <!-- Info -->
-            <div class="text-center mt-3 mb-4">
+            <div class="text-center mt-3 mb-4 pointer-events-auto">
                 <h1 class="text-xl font-bold text-gray-800 leading-tight" id="userNameDisplay">Carregando...</h1>
                 <p class="text-xs text-gray-500 font-medium" id="userEmailDisplay">...</p>
             </div>
 
             <!-- Botão Editar -->
-            <button onclick="openProfileEditModal()" class="w-full py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-4 shadow-sm">
+            <button onclick="openProfileEditModal()" class="w-full py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-4 shadow-sm pointer-events-auto">
                 Editar Perfil
             </button>
             
-            <!-- Barra de Nível -->
-            <div class="w-full mb-3 px-1">
+            <!-- Barra de Nível (ANIMADA) -->
+            <div class="w-full mb-3 px-1 pointer-events-auto">
                 <div class="flex justify-between items-end mb-1.5">
                     <div class="flex items-center gap-1.5">
                         <span class="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-bold uppercase rounded tracking-wider">Nível 1</span>
                     </div>
                     <span class="text-[10px] font-bold text-gray-400" id="xpDisplay">0 / 2000 XP</span>
                 </div>
-                <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                    <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-0 rounded-full"></div>
+                <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden shadow-inner">
+                    <!-- Adicionado relative e overflow-hidden para conter a animação -->
+                    <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-0 rounded-full relative overflow-hidden shadow-sm">
+                        <!-- Nova div com a animação de listras -->
+                        <div class="absolute inset-0 w-full h-full animated-stripes"></div>
+                    </div>
                 </div>
             </div>
 
             <!-- STATS -->
-            <div class="w-full flex items-center justify-between bg-gray-50 rounded-2xl p-3 border border-gray-100 shadow-sm">
+            <div class="w-full flex items-center justify-between bg-gray-50 rounded-2xl p-3 border border-gray-100 shadow-sm pointer-events-auto">
                 <div class="flex-1 flex flex-col items-center">
                     <span class="text-lg font-bold text-indigo-600 leading-none" id="partyCountDisplay">0</span>
                     <span class="text-[9px] font-bold text-gray-400 uppercase mt-1">Festas</span>
@@ -107,7 +135,7 @@
         </div>
 
         <!-- SEÇÃO DE HISTÓRICO -->
-        <div class="flex-1 flex flex-col overflow-hidden bg-white mt-2 border-t border-gray-100 w-full">
+        <div class="flex-1 flex flex-col overflow-hidden bg-white mt-2 border-t border-gray-100 w-full pointer-events-auto">
             <div class="px-6 py-3 flex justify-between items-center bg-white z-10 shadow-sm">
                 <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Histórico de Locações</h3>
                 <button onclick="openFilterModal()" class="text-xs font-semibold text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition flex items-center gap-1 active:bg-indigo-100">
@@ -120,6 +148,58 @@
         </div>
 
     </main>
+
+    <!-- TELA 6: MODAL DE RECOMPENSAS (GIFT) -->
+    <div id="rewardsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm modal-enter overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-6 bg-gradient-to-r from-purple-600 to-indigo-600 relative shrink-0">
+                <button onclick="closeRewardsModal()" class="absolute top-4 right-4 text-white/80 hover:text-white bg-white/10 p-1 rounded-full hover:bg-white/20 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-white text-lg font-bold">Loja de Pontos</h2>
+                        <p class="text-white/80 text-xs">Troque seus pontos por benefícios</p>
+                    </div>
+                </div>
+                <div class="mt-4 bg-white/10 rounded-xl p-3 flex justify-between items-center backdrop-blur-sm border border-white/10">
+                    <span class="text-white/90 text-sm font-medium">Seus Pontos:</span>
+                    <span class="text-white text-xl font-bold" id="modalUserPoints">0</span>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 history-scroll">
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3">
+                    <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center shrink-0 text-green-600 text-2xl font-bold">R$</div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div><h3 class="font-bold text-gray-800 text-sm">Vale Desconto R$ 15</h3><p class="text-[10px] text-gray-500 line-clamp-1">Válido para qualquer brinquedo</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">500 XP</span><button onclick="redeemReward(500)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Resgatar</button></div>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3">
+                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center shrink-0"><svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div><h3 class="font-bold text-gray-800 text-sm">Frete Grátis</h3><p class="text-[10px] text-gray-500 line-clamp-1">Entrega e retirada sem custo</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">800 XP</span><button onclick="redeemReward(800)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Resgatar</button></div>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3">
+                    <div class="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center shrink-0"><svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div><h3 class="font-bold text-gray-800 text-sm">Diária Extra</h3><p class="text-[10px] text-gray-500 line-clamp-1">+24 horas de diversão</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">1000 XP</span><button onclick="redeemReward(1000)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Resgatar</button></div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 shadow-sm flex gap-3 opacity-70 grayscale">
+                    <div class="w-16 h-16 bg-pink-100 rounded-lg flex items-center justify-center shrink-0"><svg class="w-8 h-8 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg></div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div><h3 class="font-bold text-gray-600 text-sm">Brinquedo Surpresa</h3><p class="text-[10px] text-gray-400 line-clamp-1">Um item extra no pedido</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-gray-500">2500 XP</span><button disabled class="bg-gray-300 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold cursor-not-allowed">Falta XP</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- TELA 5: MODAL DE FILTRO -->
     <div id="filterModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
@@ -149,7 +229,6 @@
             <div class="flex justify-center mb-8">
                 <div class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-indigo-200 hover:border-indigo-400 cursor-pointer group" onclick="document.getElementById('photoUploadInput').click()">
                     
-                    <!-- Loading (Spinner) -->
                     <div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden">
                         <svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     </div>
@@ -281,6 +360,25 @@
         function resetFilters() { activeFilter = 'Todos'; renderHistory(); document.getElementById('filterCountBadge').classList.add('hidden'); toggleModal('filterModal', false); }
         function closeFilterModal() { toggleModal('filterModal', false); }
 
+        // --- REWARDS LOGIC ---
+        function openRewardsModal() {
+            document.getElementById('modalUserPoints').textContent = userData.stats.points;
+            toggleModal('rewardsModal', true);
+        }
+        function closeRewardsModal() { toggleModal('rewardsModal', false); }
+        function redeemReward(cost) {
+            if(userData.stats.points >= cost) {
+                if(confirm(`Deseja trocar ${cost} pontos por este item?`)) {
+                    userData.stats.points -= cost;
+                    initUI(); // update main UI
+                    document.getElementById('modalUserPoints').textContent = userData.stats.points; // update modal UI
+                    alert("Resgate realizado com sucesso!");
+                }
+            } else {
+                alert("Pontos insuficientes!");
+            }
+        }
+
         function initUI() {
             document.getElementById('userNameDisplay').textContent = userData.name;
             document.getElementById('userEmailDisplay').textContent = userData.email;
@@ -290,7 +388,7 @@
             document.getElementById('xpDisplay').textContent = `${userData.stats.points} / 2000 XP`;
             setTimeout(() => document.getElementById('xpBarFill').style.width = '62.5%', 300);
             renderHistory();
-            generateAvatar('male'); // Inicia com masculino
+            generateAvatar('male'); 
         }
 
         const BASE_URL = "https://api.dicebear.com/9.x/avataaars/svg";
@@ -301,7 +399,7 @@
         function generateAvatar(type, retryCount = 0) {
             if(retryCount > 3) {
                 console.error("Falha ao gerar avatar após várias tentativas.");
-                return; // Evita loop infinito
+                return; 
             }
 
             if(type) {
@@ -314,7 +412,7 @@
             const beard = appState.type === 'male' ? 30 : 0;
             const url = `${BASE_URL}?seed=${seed}&top=${hair}&facialHairProbability=${beard}&accessoriesProbability=0&scale=110&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9`;
             
-            // Ativa o loading UI imediatamente
+            // ATIVA LOADING
             const l1 = document.getElementById('mainAvatarLoader');
             const l2 = document.getElementById('modalAvatarLoader');
             l1.classList.remove('hidden');
@@ -324,7 +422,6 @@
             tmp.src = url;
             
             tmp.onload = () => { 
-                // Sucesso: Atualiza imagens
                 document.getElementById('avatarImage').src = url;
                 document.getElementById('modalAvatarImage').src = url;
                 l1.classList.add('hidden');
@@ -332,7 +429,6 @@
             };
             
             tmp.onerror = () => { 
-                // Erro: Tenta de novo automaticamente
                 console.warn(`Erro ao carregar avatar (Tentativa ${retryCount + 1}). Retentando...`);
                 generateAvatar(appState.type, retryCount + 1);
             };
@@ -341,7 +437,6 @@
         function generateMale() { generateAvatar('male'); }
         function generateFemale() { generateAvatar('female'); }
 
-        // Mantido para compatibilidade com Cropper (que já retorna imagem válida)
         function updateImages(url) {
             document.getElementById('avatarImage').src = url;
             document.getElementById('modalAvatarImage').src = url;
@@ -383,7 +478,6 @@
             userData.address.street = document.getElementById('editStreet').value;
             userData.address.number = document.getElementById('editHouseNumber').value;
             document.getElementById('userNameDisplay').textContent = userData.name;
-            console.log("Perfil Salvo:", userData);
             closeProfileEditModal();
         }
 
@@ -405,14 +499,13 @@
         function closeCropper() { toggleModal('cropperModal', false); }
         function cropImage() {
             if(!appState.cropper) return;
-            // Base64 sempre carrega, então podemos setar direto
             const url = appState.cropper.getCroppedCanvas({width:512,height:512}).toDataURL();
             document.getElementById('avatarImage').src = url;
             document.getElementById('modalAvatarImage').src = url;
             closeCropper();
         }
 
-        ['imageModal','profileEditModal', 'filterModal'].forEach(id => document.getElementById(id).onclick = e => { if(e.target.id===id) toggleModal(id,false) });
+        ['imageModal','profileEditModal', 'filterModal', 'rewardsModal'].forEach(id => document.getElementById(id).onclick = e => { if(e.target.id===id) toggleModal(id,false) });
         document.addEventListener('DOMContentLoaded', initUI);
 
     </script>
