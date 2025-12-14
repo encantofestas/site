@@ -206,9 +206,18 @@
     <!-- TELA 5: MODAL DE FILTRO -->
     <div id="filterModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
         <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm modal-enter relative">
-            <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-gray-800">Filtrar Histórico</h2><button onclick="closeFilterModal()" class="text-gray-400 hover:text-gray-600 p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
-            <div class="space-y-4"><h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Por Bairro</h3><div id="filterOptionsContainer" class="space-y-2 max-h-48 overflow-y-auto"></div></div>
-            <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100"><button onclick="resetFilters()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition">Limpar</button><button onclick="applyFilters()" class="flex-1 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">Aplicar</button></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Filtrar Histórico</h2>
+                <button onclick="closeFilterModal()" class="text-gray-400 hover:text-gray-600 p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="space-y-4">
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Por Bairro</h3>
+                <div id="filterOptionsContainer" class="space-y-2 max-h-48 overflow-y-auto"></div>
+            </div>
+            <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100">
+                <button onclick="resetFilters()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition">Limpar</button>
+                <button onclick="applyFilters()" class="flex-1 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">Aplicar</button>
+            </div>
         </div>
     </div>
 
@@ -221,7 +230,11 @@
             </div>
             <div class="flex justify-center mb-8">
                 <div class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-indigo-200 hover:border-indigo-400 cursor-pointer group" onclick="document.getElementById('photoUploadInput').click()">
-                    <div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden"><svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                    
+                    <div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden">
+                        <svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </div>
+
                     <img id="modalAvatarImage" src="" class="w-full h-full rounded-full object-cover bg-gray-50">
                     <div class="absolute inset-0 rounded-full flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold uppercase"><span>Enviar Foto</span></div>
                 </div>
@@ -254,29 +267,14 @@
     <!-- TELA 4: CROPPER (NOVO DESIGN DARK) -->
     <div id="cropperModal" class="fixed inset-0 z-[60] bg-zinc-900 hidden flex-col justify-center p-0 md:p-6 transition-opacity duration-300">
         <div class="w-full max-w-2xl mx-auto flex flex-col h-full md:h-auto md:max-h-[90vh] bg-zinc-900 rounded-2xl overflow-hidden relative">
-            
-            <!-- Header -->
             <div class="flex justify-between items-center p-4 z-10 bg-zinc-900">
                 <h3 class="text-lg font-bold text-white tracking-wide">Ajustar Foto</h3>
-                <button onclick="closeCropper()" class="text-zinc-400 hover:text-white transition p-2 rounded-full hover:bg-zinc-800">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <button onclick="closeCropper()" class="text-zinc-400 hover:text-white transition p-2 rounded-full hover:bg-zinc-800"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-
-            <!-- Área da Imagem -->
-            <div class="flex-1 bg-black relative flex items-center justify-center overflow-hidden">
-                <img id="imageToCrop" class="max-w-full max-h-full block" alt="Foto para recortar">
-            </div>
-
-            <!-- Footer de Ação -->
+            <div class="flex-1 bg-black relative flex items-center justify-center overflow-hidden"><img id="imageToCrop" class="max-w-full max-h-full block" alt="Foto para recortar"></div>
             <div class="p-6 bg-zinc-900 flex justify-between items-center gap-4 border-t border-zinc-800">
-                <button onclick="closeCropper()" class="flex-1 px-6 py-3.5 rounded-xl font-semibold text-zinc-300 border border-zinc-700 hover:bg-zinc-800 hover:text-white transition active:scale-95">
-                    Cancelar
-                </button>
-                <button onclick="cropImage()" class="flex-1 px-6 py-3.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-900/20 transition active:scale-95 flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    Salvar Foto
-                </button>
+                <button onclick="closeCropper()" class="flex-1 px-6 py-3.5 rounded-xl font-semibold text-zinc-300 border border-zinc-700 hover:bg-zinc-800 hover:text-white transition active:scale-95">Cancelar</button>
+                <button onclick="cropImage()" class="flex-1 px-6 py-3.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-900/20 transition active:scale-95 flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Salvar Foto</button>
             </div>
         </div>
     </div>
@@ -424,7 +422,10 @@
 
         function generateAvatar(type, retryCount = 0) {
             if(retryCount > 3) { console.error("Falha ao gerar avatar."); return; }
-            if(type) { appState.type = type; updateButtons(type); }
+            if(type) { 
+                appState.type = type; 
+                updateButtons(type); // ATUALIZA BOTÕES
+            }
             
             const seed = getSeed();
             const hair = getRandom(STYLES[appState.type]);
@@ -455,29 +456,38 @@
         function generateMale() { generateAvatar('male'); }
         function generateFemale() { generateAvatar('female'); }
 
+        // --- BUTTONS LOGIC (UPDATED) ---
         function updateButtons(type) {
             const maleBtn = document.querySelector('button[data-type="male"]');
             const femaleBtn = document.querySelector('button[data-type="female"]');
 
             if (type === 'male') {
-                maleBtn.innerHTML = 'Gerar Outro';
+                maleBtn.innerHTML = 'Gerar Outra';
                 femaleBtn.innerHTML = 'Feminino';
                 
                 maleBtn.className = "gender-button py-3 rounded-xl bg-indigo-600 text-white shadow-lg text-sm font-semibold transition-colors";
                 femaleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors";
             } else if (type === 'female') {
                 maleBtn.innerHTML = 'Masculino';
-                femaleBtn.innerHTML = 'Gerar Outro';
+                femaleBtn.innerHTML = 'Gerar Outra';
                 
                 femaleBtn.className = "gender-button py-3 rounded-xl bg-pink-500 text-white shadow-lg text-sm font-semibold transition-colors";
                 maleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors";
-            } else {
-                // Estado neutro ou customizado (reset)
-                maleBtn.innerHTML = 'Masculino';
-                femaleBtn.innerHTML = 'Feminino';
-                maleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors";
-                femaleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors";
             }
+        }
+
+        function resetGenderButtons() {
+            const maleBtn = document.querySelector('button[data-type="male"]');
+            const femaleBtn = document.querySelector('button[data-type="female"]');
+            
+            // Texto Padrão
+            maleBtn.innerHTML = 'Masculino';
+            femaleBtn.innerHTML = 'Feminino';
+            
+            // Estilo Neutro
+            const neutralClass = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors";
+            maleBtn.className = neutralClass;
+            femaleBtn.className = neutralClass;
         }
 
         const toggleModal = (id, show) => {
@@ -485,7 +495,17 @@
             if(show) { el.classList.remove('hidden'); el.classList.add('flex'); }
             else { el.classList.add('hidden'); el.classList.remove('flex'); }
         }
-        function openModal() { toggleModal('imageModal', true); }
+        function openModal() { 
+            // Reset botões ao abrir
+            resetGenderButtons(); 
+            
+            // Sincroniza imagem
+            const mainSrc = document.getElementById('avatarImage').src;
+            if (mainSrc) document.getElementById('modalAvatarImage').src = mainSrc;
+            
+            toggleModal('imageModal', true); 
+        }
+        
         function closeModal() { toggleModal('imageModal', false); }
         function openProfileEditModal() { 
             document.getElementById('editName').value = userData.name;
@@ -524,7 +544,8 @@
             if(appState.cropper) appState.cropper.destroy();
             
             // Reset gender buttons text when opening custom crop
-            updateButtons(null);
+            updateButtons(null); // This might cause error if passing null to updateButtons without check inside function, but resetGenderButtons handles most cases.
+                                // Actually, openModal calls resetGenderButtons anyway.
 
             setTimeout(() => {
                 appState.cropper = new Cropper(document.getElementById('imageToCrop'), { 
