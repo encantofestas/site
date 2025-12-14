@@ -326,7 +326,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        // ADICIONEI 'collection' e 'addDoc' NAS IMPORTAÇÕES
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot, increment, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBmwK8KwklpVfPEalJfOfjCB6OSFsidz6Q",
@@ -546,6 +547,9 @@
                     onConfirm: async () => {
                         try {
                             const userRef = doc(db, "users", currentUser.uid);
+                            // Referência para a nova coleção "resgates" (Isso cria a aba no Firebase)
+                            const redemptionsRef = collection(db, "resgates");
+
                             let newBalance = userData.stats.balance;
                             
                             // Lógica para adicionar saldo se for um vale compras
@@ -553,20 +557,29 @@
                             if (type === 'balance_50') newBalance += 50.00;
                             if (type === 'balance_100') newBalance += 100.00;
 
+                            // 1. Atualiza os pontos e saldo do usuário
                             await updateDoc(userRef, { 
                                 "stats.points": points - cost, 
-                                "stats.balance": newBalance,
-                                // Salva o histórico do que foi resgatado
-                                redemptions: arrayUnion({
-                                    item: title,
-                                    cost: cost,
-                                    date: new Date().toLocaleString('pt-BR'),
-                                    status: "Pendente"
-                                })
+                                "stats.balance": newBalance
                             });
+
+                            // 2. CRIA O REGISTRO NA NOVA ABA "resgates" PARA VOCÊ VER
+                            await addDoc(redemptionsRef, {
+                                cliente_nome: userData.name || "Nome Desconhecido",
+                                cliente_email: userData.email,
+                                cliente_uid: currentUser.uid,
+                                item_resgatado: title,
+                                custo_pontos: cost,
+                                data_resgate: new Date().toLocaleString('pt-BR'),
+                                status: "Pendente" // Você pode mudar para "Entregue" lá no painel depois
+                            });
+
                             window.closeRewardsModal();
-                            setTimeout(() => { window.showDialog({ title: 'Sucesso!', message: 'Resgate realizado com sucesso!', type: 'success' }); }, 300);
-                        } catch(e) { window.showDialog({ title: 'Erro', message: 'Erro ao processar troca.', type: 'error' }); }
+                            setTimeout(() => { window.showDialog({ title: 'Sucesso!', message: 'Resgate realizado! Verifique com a administração.', type: 'success' }); }, 300);
+                        } catch(e) { 
+                            console.error("Erro no resgate:", e);
+                            window.showDialog({ title: 'Erro', message: 'Erro ao processar troca. Tente novamente.', type: 'error' }); 
+                        }
                     }
                 });
             } else {
