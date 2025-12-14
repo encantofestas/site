@@ -331,8 +331,13 @@
                 await signInWithPopup(auth, googleProvider);
                 // O resto é tratado pelo onAuthStateChanged
             } catch (error) {
-                console.error(error);
-                window.showDialog({ title: "Erro Google", message: "Não foi possível entrar com Google.", type: "error" });
+                console.error("Erro Google:", error);
+                // MOSTRA O ERRO EXATO PARA DEPURAÇÃO
+                window.showDialog({ 
+                    title: "Erro Google (Mande isso)", 
+                    message: `Código: ${error.code}\nMsg: ${error.message}`, 
+                    type: "error" 
+                });
             }
         };
 
@@ -353,7 +358,13 @@
                     // Não precisa fazer nada aqui, o onAuthStateChanged detecta o login
                     
                 } catch (error) {
-                    window.showDialog({ title: "Erro no Login", message: formatFirebaseError(error.code), type: "error" });
+                    console.error("Erro Login:", error);
+                    // MOSTRA O ERRO EXATO
+                    window.showDialog({ 
+                        title: "Erro Login (Mande isso)", 
+                        message: `Código: ${error.code}\nMsg: ${error.message}`, 
+                        type: "error" 
+                    });
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
                     btn.textContent = "Entrar";
                 }
@@ -381,8 +392,13 @@
                     // O onAuthStateChanged vai pegar isso logo em seguida
                     
                 } catch (error) {
-                    console.error(error);
-                    window.showDialog({ title: "Erro no Cadastro", message: formatFirebaseError(error.code), type: "error" });
+                    console.error("Erro Cadastro:", error);
+                    // MOSTRA O ERRO EXATO
+                    window.showDialog({ 
+                        title: "Erro Cadastro (Mande isso)", 
+                        message: `Código: ${error.code}\nMsg: ${error.message}`, 
+                        type: "error" 
+                    });
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
                     btn.textContent = "Criar Conta";
                 }
@@ -401,9 +417,13 @@
                 };
                 // Usa setDoc com merge: true para não sobrescrever se já existir algo parcial
                 await setDoc(doc(db, "users", user.uid), initialData, { merge: true });
-            } catch (e) {
-                console.error("Erro ao criar perfil:", e);
-                window.showDialog({ title: "Erro", message: "Falha ao criar perfil no banco de dados.", type: "error" });
+            } catch (error) {
+                console.error("Erro Firestore:", error);
+                window.showDialog({ 
+                    title: "Erro Banco de Dados (Mande isso)", 
+                    message: `Código: ${error.code}\nMsg: ${error.message}`, 
+                    type: "error" 
+                });
             }
         }
 
@@ -417,41 +437,47 @@
                 await sendPasswordResetEmail(auth, email);
                 window.showDialog({ title: "Email Enviado", message: "Verifique sua caixa de entrada para redefinir a senha.", type: "success" });
             } catch (error) {
-                window.showDialog({ title: "Erro", message: formatFirebaseError(error.code), type: "error" });
-            }
-        };
-
-        window.confirmLogout = async () => {
-            window.closeLogoutModal();
-            try {
-                await signOut(auth);
-                document.getElementById('loginForm').reset();
-                if(document.getElementById('registerForm')) document.getElementById('registerForm').reset();
-                window.generateAvatar('male');
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        // Salvar Perfil no Firestore
-        window.saveProfileChanges = async () => {
-            if(!currentUser) return;
-            
-            const newName = document.getElementById('editName').value;
-            const newPhone = document.getElementById('editPhone').value;
-            const newNeighborhood = document.getElementById('editNeighborhood').value;
-            const newStreet = document.getElementById('editStreet').value;
-            const newNumber = document.getElementById('editHouseNumber').value;
-            
-            try {
-                const userRef = doc(db, "users", currentUser.uid);
-                await updateDoc(userRef, {
-                    name: newName,
-                    phone: newPhone,
-                    "address.neighborhood": newNeighborhood,
-                    "address.street": newStreet,
-                    "address.number": newNumber
+                window.showDialog({ 
+                    title: "Erro Reset Senha", 
+                    message: `Código: ${error.code}\nMsg: ${error.message}`, 
+                    type: "error" 
                 });
+            }
+        };
+
+        // Escuta mudanças na autenticação
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                // Referência ao documento do usuário
+                const userDocRef = doc(db, "users", user.uid);
+
+                // Listener em tempo real
+                onSnapshot(userDocRef, async (docSnap) => {
+                    if (docSnap.exists()) {
+                        // Se o documento existe, carrega os dados
+                        userData = docSnap.data();
+                        loadAppView(); 
+                    } else {
+                        // Se o usuário logou mas não tem documento (ex: Login Google pela 1ª vez)
+                        console.log("Criando perfil padrão...");
+                        await createDefaultUserDoc(user); 
+                    }
+                }, (error) => {
+                    console.error("Erro ao ler dados:", error);
+                    window.showDialog({ 
+                        title: "Erro Leitura Dados (Mande isso)", 
+                        message: `Código: ${error.code}\nMsg: ${error.message}`, 
+                        type: "error" 
+                    });
+                });
+
+            } else {
+                currentUser = null;
+                resetToAuthView();
+            }
+        });
                 window.closeProfileEditModal();
                 window.showDialog({ title: "Sucesso", message: "Perfil atualizado!", type: "success" });
             } catch (error) {
