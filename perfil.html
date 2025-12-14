@@ -336,7 +336,21 @@
                 onSnapshot(doc(db, "users", user.uid), async (docSnap) => {
                     if (docSnap.exists()) {
                         userData = docSnap.data();
-                        window.userData = userData; // Expor globalmente para a UI usar
+                        
+                        // --- CORREÇÃO AUTOMÁTICA: Se faltar o campo "parties", cria ele ---
+                        if (!userData.stats || userData.stats.parties === undefined) {
+                            console.log("Adicionando campo festas que faltava...");
+                            await setDoc(doc(db, "users", user.uid), {
+                                stats: {
+                                    parties: 1, // Exemplo de 1 festa
+                                    points: userData.stats?.points || 500,
+                                    balance: userData.stats?.balance || 0.00
+                                }
+                            }, { merge: true });
+                        }
+                        // ------------------------------------------------------------------
+
+                        window.userData = userData; 
                         loadAppView(); 
                     } else {
                         console.log("Criando perfil padrão...");
@@ -344,7 +358,6 @@
                     }
                 }, (error) => {
                     console.error("Erro Firestore:", error);
-                    // AVISO "FALSO" REMOVIDO DAQUI
                 });
             } else {
                 currentUser = null;
@@ -414,9 +427,10 @@
                     name: nameOverride || user.displayName || "Novo Usuário",
                     email: user.email,
                     phone: "",
-                    avatar: "", // Add avatar field
+                    avatar: "", 
                     address: { neighborhood: "", street: "", number: "" },
-                    stats: { parties: 0, points: 500, balance: 0.00 },
+                    // Definido parties: 1 como exemplo inicial
+                    stats: { parties: 1, points: 500, balance: 0.00 },
                     history: []
                 };
                 await setDoc(doc(db, "users", user.uid), initialData, { merge: true });
