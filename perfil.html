@@ -594,16 +594,33 @@
                 window.generateAvatar('male', 0, true); // true = save to db
             }
             
-            const points = stats.points;
+            const points = Number(stats.points || 0);
             const levelStep = 500;
+            
+            // Lógica de Nível Exata:
+            // 0-500 = Nível 1
+            // 501-1000 = Nível 2
+            // 1001-1500 = Nível 3
+            // etc.
             const currentLevel = Math.floor(points / levelStep) + 1;
+            
+            // Meta para o próximo nível (Ex: Nível 2 * 500 = 1000 total)
             const nextLevelThreshold = currentLevel * levelStep;
+            
+            // Cálculo para a barra de progresso (visual)
             const previousLevelThreshold = (currentLevel - 1) * levelStep;
             const xpInCurrentLevel = points - previousLevelThreshold;
             
             document.getElementById('userLevelBadge').textContent = `Nível ${currentLevel}`;
+            
+            // Texto mostra: PONTOS TOTAIS / META TOTAL (Ex: 899 / 1000 XP)
             document.getElementById('xpDisplay').textContent = `${points} / ${nextLevelThreshold} XP`;
-            setTimeout(() => { const percentage = Math.max(0, Math.min((xpInCurrentLevel / levelStep) * 100, 100)); document.getElementById('xpBarFill').style.width = `${percentage}%`; }, 100);
+            
+            setTimeout(() => { 
+                const percentage = Math.max(0, Math.min((xpInCurrentLevel / levelStep) * 100, 100)); 
+                document.getElementById('xpBarFill').style.width = `${percentage}%`; 
+            }, 100);
+            
             renderRewards();
             renderHistory();
         }
