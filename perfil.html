@@ -158,7 +158,6 @@
                 <div class="flex justify-between items-center mb-4 px-1">
                     <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">Histórico</h3>
                     <div class="flex gap-2">
-                        <!-- BOTÃO "ADD" REMOVIDO DAQUI -->
                         <button onclick="openFilterModal()" class="text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-100 transition flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                             Filtro <span id="filterCountBadge" class="hidden bg-blue-600 text-white text-[9px] px-1.5 py-0.5 rounded-full ml-1">1</span>
@@ -175,8 +174,6 @@
     <div id="logoutModal" class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-xs modal-enter text-center"><div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></div><h3 class="text-xl font-bold text-gray-800 mb-2">Sair da Conta</h3><p class="text-sm text-gray-500 mb-6">Tem certeza que deseja sair do aplicativo?</p><div class="flex gap-3"><button onclick="closeLogoutModal()" class="flex-1 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition">Cancelar</button><button onclick="confirmLogout()" class="flex-1 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition shadow-lg shadow-red-200">Sair</button></div></div></div>
     
     <div id="dialogModal" class="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-xs modal-enter text-center relative overflow-hidden"><div id="dialogIconContainer" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors"></div><h3 id="dialogTitle" class="text-xl font-bold text-gray-800 mb-2">Titulo</h3><p id="dialogMessage" class="text-sm text-gray-500 mb-6">Mensagem</p><div id="dialogButtons" class="flex gap-3 justify-center"></div></div></div>
-
-    <!-- MODAL DE ADICIONAR HISTÓRICO REMOVIDO -->
 
     <div id="rewardsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm modal-enter overflow-hidden flex flex-col max-h-[85vh]"><div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 relative shrink-0"><button onclick="closeRewardsModal()" class="absolute top-4 right-4 text-white/80 hover:text-white bg-white/10 p-1 rounded-full hover:bg-white/20 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div class="flex items-center gap-3"><div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg></div><div><h2 class="text-white text-lg font-bold">Loja de Pontos</h2><p class="text-white/80 text-xs">Troque seus pontos por benefícios</p></div></div><div class="mt-4 bg-white/10 rounded-xl p-3 flex justify-between items-center backdrop-blur-sm border border-white/10"><span class="text-white/90 text-sm font-medium">Seus Pontos:</span><span class="text-white text-xl font-bold" id="modalUserPoints">0</span></div></div><div class="flex-1 overflow-y-auto p-4 space-y-0 bg-white history-scroll overscroll-contain" id="rewardsList"></div></div></div>
     
@@ -342,12 +339,20 @@
                     if (docSnap.exists()) {
                         userData = docSnap.data();
                         
+                        // CORREÇÃO: Garante 20 slots vazios se histórico estiver vazio/inexistente
+                        if (!userData.history || userData.history.length === 0) {
+                            console.log("Populando histórico com slots vazios...");
+                            const emptySlots = Array.from({length: 20}, () => ({
+                                date: "", neighborhood: "", value: 0, discount: 0
+                            }));
+                            await updateDoc(doc(db, "users", user.uid), { history: emptySlots });
+                        }
+
                         // --- CORREÇÃO AUTOMÁTICA: Se faltar o campo "parties", cria ele ---
                         if (!userData.stats || userData.stats.parties === undefined) {
-                            console.log("Adicionando campo festas que faltava...");
                             await setDoc(doc(db, "users", user.uid), {
                                 stats: {
-                                    parties: 1, // Exemplo de 1 festa
+                                    parties: 1, 
                                     points: userData.stats?.points || 500,
                                     balance: userData.stats?.balance || 0.00
                                 }
@@ -428,6 +433,11 @@
 
         async function createDefaultUserDoc(user, nameOverride = "") {
             try {
+                // Cria 20 slots vazios inicialmente
+                const emptyHistory = Array.from({length: 20}, () => ({
+                    date: "", neighborhood: "", value: 0, discount: 0
+                }));
+
                 const initialData = {
                     name: nameOverride || user.displayName || "Novo Usuário",
                     email: user.email,
@@ -435,7 +445,7 @@
                     avatar: "", 
                     address: { neighborhood: "", street: "", number: "" },
                     stats: { parties: 1, points: 500, balance: 0.00 },
-                    history: []
+                    history: emptyHistory
                 };
                 await setDoc(doc(db, "users", user.uid), initialData, { merge: true });
             } catch (error) {
@@ -459,7 +469,7 @@
             await signOut(auth);
             document.getElementById('loginForm').reset();
             if(document.getElementById('registerForm')) document.getElementById('registerForm').reset();
-            // Dont reset avatar blindly on logout, wait for login
+            window.generateAvatar('male');
         };
 
         window.saveProfileChanges = async () => {
@@ -481,7 +491,6 @@
             }
         };
 
-        // SAVE AVATAR TO DB
         window.saveAvatarAndClose = async () => {
             const currentSrc = document.getElementById('modalAvatarImage').src;
             if (currentUser) {
@@ -540,8 +549,17 @@
             const list = document.getElementById('historyList');
             list.innerHTML = '';
             const historyData = window.userData?.history || [];
-            const filteredData = activeFilter === 'Todos' ? historyData : historyData.filter(item => item.neighborhood === activeFilter);
-            if (filteredData.length === 0) { list.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Nenhum histórico encontrado.</div>'; return; }
+            
+            // FILTRO: Só mostra itens preenchidos (com data)
+            const filledHistory = historyData.filter(item => item.date && item.date.trim() !== "");
+            
+            const filteredData = activeFilter === 'Todos' ? filledHistory : filledHistory.filter(item => item.neighborhood === activeFilter);
+            
+            if (filteredData.length === 0) { 
+                list.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Nenhum histórico encontrado.</div>'; 
+                return; 
+            }
+            
             filteredData.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center py-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-default';
@@ -570,7 +588,11 @@
             const container = document.getElementById('filterOptionsContainer');
             container.innerHTML = '';
             const historyData = window.userData?.history || [];
-            const neighborhoods = ['Todos', ...new Set(historyData.map(item => item.neighborhood))];
+            
+            // Filtra vazios para o filtro também
+            const filledHistory = historyData.filter(item => item.date && item.date.trim() !== "");
+            
+            const neighborhoods = ['Todos', ...new Set(filledHistory.map(item => item.neighborhood))];
             neighborhoods.forEach(bairro => {
                 const label = document.createElement('label');
                 label.className = 'flex items-center p-3 border border-gray-100 rounded-xl cursor-pointer hover:bg-gray-50 transition';
@@ -619,13 +641,9 @@
             const levelStep = 500;
             
             // Lógica de Nível Exata:
-            // 0-500 = Nível 1
-            // 501-1000 = Nível 2
-            // 1001-1500 = Nível 3
-            // etc.
             const currentLevel = Math.floor(points / levelStep) + 1;
             
-            // Meta para o próximo nível (Ex: Nível 2 * 500 = 1000 total)
+            // Meta para o próximo nível
             const nextLevelThreshold = currentLevel * levelStep;
             
             // Cálculo para a barra de progresso (visual)
@@ -634,7 +652,7 @@
             
             document.getElementById('userLevelBadge').textContent = `Nível ${currentLevel}`;
             
-            // Texto mostra: PONTOS TOTAIS / META TOTAL (Ex: 899 / 1000 XP)
+            // Texto mostra: PONTOS TOTAIS / META TOTAL
             document.getElementById('xpDisplay').textContent = `${points} / ${nextLevelThreshold} XP`;
             
             setTimeout(() => { 
@@ -721,7 +739,6 @@
             const numInput = document.getElementById('editHouseNumber');
             const check = document.getElementById('noNumberCheckbox');
             
-            // CORREÇÃO AQUI: Verifica S/N primeiro, ajusta visual, E DEPOIS RESTAURA O VALOR
             if (numVal === 'S/N') { 
                 check.checked = true; 
                 window.toggleHouseNumber(); // Isso desabilita o campo
