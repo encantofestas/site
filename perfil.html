@@ -28,24 +28,25 @@
         .history-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         .history-scroll::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
 
-        /* NOVA ANIMAÇÃO DA BARRA DE PROGRESSO */
         @keyframes moveStripes {
             0% { background-position: 0 0; }
-            100% { background-position: 20px 20px; }
+            100% { background-position: 30px 0; }
         }
         .animated-stripes {
             background-image: linear-gradient(
                 45deg,
-                rgba(255, 255, 255, 0.25) 25%,
+                rgba(255, 255, 255, 0.4) 25%,
                 transparent 25%,
                 transparent 50%,
-                rgba(255, 255, 255, 0.25) 50%,
-                rgba(255, 255, 255, 0.25) 75%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0.4) 75%,
                 transparent 75%,
                 transparent
             );
-            background-size: 20px 20px;
+            background-size: 30px 30px;
             animation: moveStripes 1s linear infinite;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -62,9 +63,13 @@
             <div class="absolute inset-0 bg-gradient-to-b from-indigo-900/30 to-white"></div>
         </div>
 
-        <!-- ÍCONE DE GIFT (Z-50 para ficar clicável) -->
-        <button onclick="openRewardsModal()" class="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-white hover:text-indigo-600 transition-all duration-300 shadow-lg border border-white/30 z-50 animate-pulse hover:animate-none">
+        <!-- ÍCONE DE GIFT -->
+        <button onclick="openRewardsModal()" class="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-white hover:text-indigo-600 transition-all duration-300 shadow-lg border border-white/30 z-50 animate-pulse hover:animate-none group">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
         </button>
 
         <!-- Seção Superior -->
@@ -94,7 +99,7 @@
                 Editar Perfil
             </button>
             
-            <!-- Barra de Nível (ANIMADA) -->
+            <!-- Barra de Nível -->
             <div class="w-full mb-3 px-1 pointer-events-auto">
                 <div class="flex justify-between items-end mb-1.5">
                     <div class="flex items-center gap-1.5">
@@ -102,10 +107,8 @@
                     </div>
                     <span class="text-[10px] font-bold text-gray-400" id="xpDisplay">0 / 2000 XP</span>
                 </div>
-                <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden shadow-inner">
-                    <!-- Adicionado relative e overflow-hidden para conter a animação -->
-                    <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-0 rounded-full relative overflow-hidden shadow-sm">
-                        <!-- Nova div com a animação de listras -->
+                <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner relative">
+                    <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 to-purple-600 w-0 rounded-full relative overflow-hidden shadow-sm flex items-center">
                         <div class="absolute inset-0 w-full h-full animated-stripes"></div>
                     </div>
                 </div>
@@ -164,39 +167,66 @@
                     </div>
                 </div>
                 <div class="mt-4 bg-white/10 rounded-xl p-3 flex justify-between items-center backdrop-blur-sm border border-white/10">
-                    <span class="text-white/90 text-sm font-medium">Seus Pontos:</span>
+                    <span class="text-white/90 text-sm font-medium">Saldo Atual:</span>
                     <span class="text-white text-xl font-bold" id="modalUserPoints">0</span>
                 </div>
             </div>
             <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 history-scroll">
+                
+                <!-- Item: Elogio (50 XP) -->
                 <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3">
-                    <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center shrink-0 text-green-600 text-2xl font-bold">R$</div>
+                    <div class="w-16 h-16 bg-yellow-100 rounded-lg flex items-center justify-center shrink-0 text-yellow-600"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
                     <div class="flex-1 flex flex-col justify-between">
-                        <div><h3 class="font-bold text-gray-800 text-sm">Vale Desconto R$ 15</h3><p class="text-[10px] text-gray-500 line-clamp-1">Válido para qualquer brinquedo</p></div>
-                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">500 XP</span><button onclick="redeemReward(500)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Resgatar</button></div>
+                        <div><h3 class="font-bold text-gray-800 text-sm">Agradecimento Especial</h3><p class="text-[10px] text-gray-500 line-clamp-1">Receba um elogio da equipe!</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">50 XP</span><button onclick="redeemReward(50)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Trocar</button></div>
                     </div>
                 </div>
+
+                <!-- Item: Cliente VIP (150 XP) -->
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3">
+                    <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center shrink-0 text-purple-600"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg></div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div><h3 class="font-bold text-gray-800 text-sm">Status VIP (7 dias)</h3><p class="text-[10px] text-gray-500 line-clamp-1">Ícone exclusivo no seu perfil</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">150 XP</span><button onclick="redeemReward(150)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Trocar</button></div>
+                    </div>
+                </div>
+
+                <!-- Item: 5% Desconto (300 XP) -->
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3">
+                    <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center shrink-0 text-red-600 font-bold text-lg">-5%</div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div><h3 class="font-bold text-gray-800 text-sm">5% de Desconto</h3><p class="text-[10px] text-gray-500 line-clamp-1">Válido na próxima locação</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">300 XP</span><button onclick="redeemReward(300)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Trocar</button></div>
+                    </div>
+                </div>
+
+                <!-- Item: Vale 15 reais (500 XP) -->
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3">
+                    <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center shrink-0 text-green-600 text-xl font-bold">R$</div>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div><h3 class="font-bold text-gray-800 text-sm">Vale R$ 15,00</h3><p class="text-[10px] text-gray-500 line-clamp-1">Desconto direto no valor</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">500 XP</span><button onclick="redeemReward(500)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Trocar</button></div>
+                    </div>
+                </div>
+
+                <!-- Item: Frete Grátis (800 XP) -->
                 <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3">
                     <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center shrink-0"><svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
                     <div class="flex-1 flex flex-col justify-between">
-                        <div><h3 class="font-bold text-gray-800 text-sm">Frete Grátis</h3><p class="text-[10px] text-gray-500 line-clamp-1">Entrega e retirada sem custo</p></div>
-                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">800 XP</span><button onclick="redeemReward(800)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Resgatar</button></div>
+                        <div><h3 class="font-bold text-gray-800 text-sm">Frete Grátis</h3><p class="text-[10px] text-gray-500 line-clamp-1">Entrega sem custo</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">800 XP</span><button onclick="redeemReward(800)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Trocar</button></div>
                     </div>
                 </div>
-                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3">
-                    <div class="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center shrink-0"><svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+
+                <!-- Item: Cupom R$ 50 (2000 XP) -->
+                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 shadow-sm flex gap-3 opacity-80">
+                    <div class="w-16 h-16 bg-amber-100 rounded-lg flex items-center justify-center shrink-0 text-amber-600"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
                     <div class="flex-1 flex flex-col justify-between">
-                        <div><h3 class="font-bold text-gray-800 text-sm">Diária Extra</h3><p class="text-[10px] text-gray-500 line-clamp-1">+24 horas de diversão</p></div>
-                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">1000 XP</span><button onclick="redeemReward(1000)" class="bg-indigo-600 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition">Resgatar</button></div>
+                        <div><h3 class="font-bold text-gray-600 text-sm">Super Cupom R$ 50</h3><p class="text-[10px] text-gray-400 line-clamp-1">Para compras acima de R$ 200</p></div>
+                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-gray-500">2000 XP</span><button disabled class="bg-gray-300 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold cursor-not-allowed">Falta XP</button></div>
                     </div>
                 </div>
-                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 shadow-sm flex gap-3 opacity-70 grayscale">
-                    <div class="w-16 h-16 bg-pink-100 rounded-lg flex items-center justify-center shrink-0"><svg class="w-8 h-8 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg></div>
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div><h3 class="font-bold text-gray-600 text-sm">Brinquedo Surpresa</h3><p class="text-[10px] text-gray-400 line-clamp-1">Um item extra no pedido</p></div>
-                        <div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-gray-500">2500 XP</span><button disabled class="bg-gray-300 text-white text-[10px] px-3 py-1.5 rounded-lg font-semibold cursor-not-allowed">Falta XP</button></div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
@@ -288,6 +318,7 @@
         ];
 
         let activeFilter = 'Todos';
+        const MAX_XP = 2000;
 
         const formatBRL = val => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
         const getRandom = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -360,6 +391,31 @@
         function resetFilters() { activeFilter = 'Todos'; renderHistory(); document.getElementById('filterCountBadge').classList.add('hidden'); toggleModal('filterModal', false); }
         function closeFilterModal() { toggleModal('filterModal', false); }
 
+        // --- UI FUNCTIONS ---
+        function updateUI() {
+            document.getElementById('userNameDisplay').textContent = userData.name;
+            document.getElementById('userEmailDisplay').textContent = userData.email;
+            document.getElementById('partyCountDisplay').textContent = userData.stats.parties;
+            document.getElementById('userPointsDisplay').textContent = userData.stats.points; 
+            document.getElementById('userBalanceDisplay').textContent = formatBRL(userData.stats.balance);
+            document.getElementById('xpDisplay').textContent = `${userData.stats.points} / ${MAX_XP} XP`;
+            
+            const modalPoints = document.getElementById('modalUserPoints');
+            if(modalPoints) modalPoints.textContent = userData.stats.points;
+
+            // Update Bar Width with a small delay for animation effect
+            setTimeout(() => {
+                const percentage = Math.max(0, Math.min((userData.stats.points / MAX_XP) * 100, 100));
+                document.getElementById('xpBarFill').style.width = `${percentage}%`;
+            }, 100);
+        }
+
+        function init() {
+            updateUI();
+            renderHistory();
+            generateAvatar('male'); 
+        }
+
         // --- REWARDS LOGIC ---
         function openRewardsModal() {
             document.getElementById('modalUserPoints').textContent = userData.stats.points;
@@ -368,27 +424,14 @@
         function closeRewardsModal() { toggleModal('rewardsModal', false); }
         function redeemReward(cost) {
             if(userData.stats.points >= cost) {
-                if(confirm(`Deseja trocar ${cost} pontos por este item?`)) {
+                if(confirm(`Você quer trocar ${cost} pontos por este item?`)) {
                     userData.stats.points -= cost;
-                    initUI(); // update main UI
-                    document.getElementById('modalUserPoints').textContent = userData.stats.points; // update modal UI
+                    updateUI(); 
                     alert("Resgate realizado com sucesso!");
                 }
             } else {
-                alert("Pontos insuficientes!");
+                alert("Pontos insuficientes para realizar esta troca.");
             }
-        }
-
-        function initUI() {
-            document.getElementById('userNameDisplay').textContent = userData.name;
-            document.getElementById('userEmailDisplay').textContent = userData.email;
-            document.getElementById('partyCountDisplay').textContent = userData.stats.parties;
-            document.getElementById('userPointsDisplay').textContent = userData.stats.points; 
-            document.getElementById('userBalanceDisplay').textContent = formatBRL(userData.stats.balance);
-            document.getElementById('xpDisplay').textContent = `${userData.stats.points} / 2000 XP`;
-            setTimeout(() => document.getElementById('xpBarFill').style.width = '62.5%', 300);
-            renderHistory();
-            generateAvatar('male'); 
         }
 
         const BASE_URL = "https://api.dicebear.com/9.x/avataaars/svg";
@@ -397,22 +440,14 @@
 
         // === LÓGICA DE RETRY AUTOMÁTICO ===
         function generateAvatar(type, retryCount = 0) {
-            if(retryCount > 3) {
-                console.error("Falha ao gerar avatar após várias tentativas.");
-                return; 
-            }
-
-            if(type) {
-                appState.type = type;
-                updateButtons(type);
-            }
+            if(retryCount > 3) { console.error("Falha ao gerar avatar."); return; }
+            if(type) { appState.type = type; updateButtons(type); }
             
             const seed = getSeed();
             const hair = getRandom(STYLES[appState.type]);
             const beard = appState.type === 'male' ? 30 : 0;
             const url = `${BASE_URL}?seed=${seed}&top=${hair}&facialHairProbability=${beard}&accessoriesProbability=0&scale=110&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9`;
             
-            // ATIVA LOADING
             const l1 = document.getElementById('mainAvatarLoader');
             const l2 = document.getElementById('modalAvatarLoader');
             l1.classList.remove('hidden');
@@ -429,18 +464,13 @@
             };
             
             tmp.onerror = () => { 
-                console.warn(`Erro ao carregar avatar (Tentativa ${retryCount + 1}). Retentando...`);
+                console.warn(`Retry ${retryCount + 1}...`);
                 generateAvatar(appState.type, retryCount + 1);
             };
         }
 
         function generateMale() { generateAvatar('male'); }
         function generateFemale() { generateAvatar('female'); }
-
-        function updateImages(url) {
-            document.getElementById('avatarImage').src = url;
-            document.getElementById('modalAvatarImage').src = url;
-        }
 
         function updateButtons(type) {
             document.querySelectorAll('.gender-button').forEach(btn => {
@@ -506,7 +536,7 @@
         }
 
         ['imageModal','profileEditModal', 'filterModal', 'rewardsModal'].forEach(id => document.getElementById(id).onclick = e => { if(e.target.id===id) toggleModal(id,false) });
-        document.addEventListener('DOMContentLoaded', initUI);
+        document.addEventListener('DOMContentLoaded', init);
 
     </script>
 </body>
