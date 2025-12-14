@@ -2,288 +2,379 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Perfil - Encanto Festas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar de Perfil com Recorte</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Cropper.js CSS (Para a ferramenta de recorte) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    
+    <!-- Cropper.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Inter:wght@400;600&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        h1, h2, h3 { font-family: 'Baloo 2', cursive; }
-        .fade-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        }
+        /* Ajuste para garantir que a imagem do cropper não ultrapasse o container */
+        .cropper-container {
+            max-width: 100%;
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <p class="text-gray-500 font-medium">Carregando perfil...</p>
-    </div>
-
-    <!-- Auth Container (Login/Register) -->
-    <div id="auth-container" class="hidden w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden fade-in">
-        <div class="bg-blue-600 p-6 text-center">
-            <h2 class="text-2xl text-white font-bold">Bem-vindo(a)!</h2>
-            <p class="text-blue-100 text-sm">Faça login para gerenciar sua conta</p>
-        </div>
-        <div class="p-8">
-            <button onclick="handleGoogleLogin()" class="w-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
-                Entrar com Google
-            </button>
-            <div class="relative my-6">
-                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
-                <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-gray-500">Ou use e-mail</span></div>
-            </div>
-            <!-- Login Form -->
-            <form id="login-form" onsubmit="handleEmailLogin(event)" class="space-y-4">
-                <input type="email" id="email" placeholder="Seu e-mail" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
-                <input type="password" id="password" placeholder="Sua senha" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">Entrar</button>
-            </form>
-            <p class="text-center mt-4 text-sm text-gray-600">
-                Ainda não tem conta? <button onclick="toggleAuthMode()" class="text-blue-600 font-bold hover:underline">Cadastre-se</button>
-            </p>
-        </div>
-    </div>
-
-    <!-- Profile Container (Logged In) -->
-    <div id="profile-container" class="hidden w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden fade-in relative">
-        <div class="h-32 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+    <!-- Componente Principal (Avatar + Nome + Email) -->
+    <div class="flex flex-col items-center">
         
-        <div class="px-6 pb-6 text-center relative">
-            <!-- Avatar Circle -->
-            <div class="relative -mt-16 mb-4 inline-block">
-                <div class="w-32 h-32 rounded-full border-4 border-white shadow-lg bg-blue-50 overflow-hidden mx-auto bg-white">
-                    <img id="user-avatar" src="" class="w-full h-full object-cover" 
-                         referrerpolicy="no-referrer"
-                         onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback&backgroundColor=b6e3f4'">
-                </div>
-                <button onclick="toggleEditModal()" class="absolute bottom-2 right-0 bg-yellow-400 text-blue-900 p-2 rounded-full shadow-md hover:bg-yellow-300 transition" title="Mudar Avatar">
-                    <i class="fas fa-pencil-alt text-sm"></i>
+        <!-- Container do Avatar e do Ícone de Edição -->
+        <!-- Adicionei 'cursor-pointer' e onclick para abrir o modal ao clicar na foto também -->
+        <div 
+            class="relative w-32 h-32 group mb-3 cursor-pointer"
+            onclick="openModal()"
+        >
+
+            <!-- 1. Avatar (Imagem Principal) -->
+            <img 
+                id="avatarImage"
+                src="" 
+                alt="" 
+                class="w-full h-full rounded-full object-cover shadow-lg bg-indigo-50 transition-opacity duration-300 opacity-0"
+            >
+
+            <!-- 2. Ícone de Editar/Visualizar (Lápis) -->
+            <button 
+                type="button" 
+                class="absolute bottom-0 right-0 p-2 bg-indigo-600 rounded-full shadow-xl hover:bg-indigo-700 transition duration-150 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 z-10"
+                aria-label="Visualizar/Mudar Foto de Perfil"
+            >
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+            </button>
+
+        </div>
+        
+        <!-- Nome do Usuário -->
+        <p class="text-xl font-semibold text-gray-800">Usuário Teste</p>
+        
+        <!-- Email do Usuário -->
+        <p class="text-sm text-gray-500">usuario.teste@exemplo.com</p>
+
+    </div>
+
+    <!-- Modal Principal (Escolher Gênero ou Upload) -->
+    <div id="imageModal" class="fixed inset-0 z-40 bg-black bg-opacity-75 hidden items-center justify-center p-4 transition-opacity duration-300 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl p-6 relative max-w-lg w-full transform transition-all scale-100">
+            <h2 class="text-xl font-semibold mb-6 text-gray-800 text-center">Alterar Foto de Perfil</h2>
+            
+            <!-- Botões de Seleção de Gênero -->
+            <div class="flex justify-center space-x-4 mb-8">
+                <button 
+                    onclick="generateMale()" 
+                    class="gender-button px-4 py-2 flex items-center bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-indigo-600 hover:text-white transition-colors duration-200 text-sm md:text-base"
+                    data-type="male"
+                >
+                    Gerar Masculino
+                </button>
+                <button 
+                    onclick="generateFemale()" 
+                    class="gender-button px-4 py-2 flex items-center bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-pink-600 hover:text-white transition-colors duration-200 text-sm md:text-base"
+                    data-type="female"
+                >
+                    Gerar Feminino
                 </button>
             </div>
 
-            <h2 id="user-name" class="text-2xl font-bold text-gray-800">Usuário</h2>
-            <p id="user-email" class="text-gray-500 text-sm mb-6">carregando...</p>
-
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
-                    <span class="block text-2xl font-bold text-blue-600">0</span>
-                    <span class="text-xs text-blue-400 uppercase font-bold">Festas</span>
-                </div>
-                <div class="bg-yellow-50 p-3 rounded-xl border border-yellow-100">
-                    <span class="block text-2xl font-bold text-yellow-600">50</span>
-                    <span class="text-xs text-yellow-500 uppercase font-bold">Pontos</span>
+            <!-- Visualização da Imagem no Modal -->
+            <div class="flex justify-center mb-8">
+                <!-- 
+                     Ao clicar aqui, também abre o seletor de arquivos.
+                     Adicionei 'cursor-pointer' e o evento onclick.
+                -->
+                <div 
+                    class="relative p-1 rounded-full border-4 border-indigo-100 shadow-xl group cursor-pointer"
+                    onclick="document.getElementById('photoUploadInput').click();"
+                >
+                    <img 
+                        id="modalAvatarImage"
+                        src="" 
+                        alt="" 
+                        class="w-48 h-48 rounded-full object-cover bg-indigo-50 opacity-0 transition-opacity duration-300"
+                    >
+                    
+                    <!-- Overlay com Ícone de Câmera -->
+                    <div class="absolute inset-0 w-full h-full rounded-full flex items-center justify-center bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.45 4h3.1a2 2 0 011.664.89l.812 1.22a2 2 0 001.664.89H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="absolute bottom-10 text-white text-xs font-medium">Trocar Foto</span>
+                    </div>
                 </div>
             </div>
-
-            <button onclick="logout()" class="w-full border border-red-200 text-red-500 hover:bg-red-50 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
-                <i class="fas fa-sign-out-alt"></i> Sair da Conta
-            </button>
+            
+            <div class="flex justify-end pt-4 border-t border-gray-100">
+                <button 
+                    onclick="closeModal()" 
+                    class="px-6 py-2 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-900 transition duration-150"
+                >
+                    Fechar
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- Edit Avatar Modal -->
-    <div id="edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4 fade-in">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-            <div class="bg-gray-50 p-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-bold text-gray-700">Editar Perfil</h3>
-                <button onclick="toggleEditModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+    <!-- Modal de Recorte (Cropper) - Invisível até selecionar uma foto -->
+    <div id="cropperModal" class="fixed inset-0 z-50 bg-black bg-opacity-90 hidden items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white rounded-xl shadow-2xl p-4 w-full max-w-2xl flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Ajustar Foto (1:1)</h3>
+                <button onclick="closeCropper()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
-            <div class="p-6 text-center">
-                <img id="preview-avatar" src="" class="w-24 h-24 rounded-full mx-auto mb-4 bg-blue-50 border-4 border-white shadow-md object-cover"
-                     referrerpolicy="no-referrer"
-                     onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback&backgroundColor=b6e3f4'">
+            
+            <!-- Área da imagem para recorte -->
+            <div class="relative flex-1 bg-gray-100 overflow-hidden min-h-[300px] flex items-center justify-center rounded-lg">
+                <img id="imageToCrop" src="" alt="Para cortar" class="max-w-full max-h-[60vh] block">
+            </div>
+            
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-100">
+                <button 
+                    onclick="closeCropper()" 
+                    class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    onclick="cropImage()" 
+                    class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition shadow-lg flex items-center"
+                >
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Confirmar e Usar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Input de arquivo escondido -->
+    <input type="file" id="photoUploadInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
+    
+    <script>
+        // --- CONFIGURAÇÕES E ESTADOS ---
+        const BASE_URL = "https://api.dicebear.com/9.x/avataaars/svg";
+        const COMMON_PARAMS = "scale=110&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9";
+        
+        let currentAvatarType = 'male'; 
+        let loadTimeout = null;
+        let cropper = null; // Instância do Cropper.js
+
+        const MALE_HAIR_STYLES = ["shortFlat", "shortRound", "shortWaved", "theCaesar", "theCaesarSidePart", "sides", "shortDreads1", "shortDreads2", "shortFrizzle", "shortCurly"];
+        const FEMALE_HAIR_STYLES = ["longButNotTooLong", "bob", "bun", "curly", "curvy", "straight1", "straight2", "straightStrand", "frida", "miaWallace", "bigHair", "shavedSides", "fro", "froBand"];
+
+        // --- FUNÇÕES UTILITÁRIAS ---
+        function getRandomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function getRandomSeed() { return Math.random().toString(36).substring(2, 15); }
+
+        // --- GERAÇÃO DE AVATARES ---
+        function generateMale() {
+            const seed = getRandomSeed();
+            const hair = getRandomItem(MALE_HAIR_STYLES);
+            const url = `${BASE_URL}?seed=${seed}&top=${hair}&facialHairProbability=30&accessoriesProbability=0&${COMMON_PARAMS}`;
+            currentAvatarType = 'male';
+            updateAvatars(url);
+            highlightButton('male');
+        }
+
+        function generateFemale() {
+            const seed = getRandomSeed();
+            const hair = getRandomItem(FEMALE_HAIR_STYLES);
+            const url = `${BASE_URL}?seed=${seed}&top=${hair}&facialHairProbability=0&accessoriesProbability=0&${COMMON_PARAMS}`;
+            currentAvatarType = 'female';
+            updateAvatars(url);
+            highlightButton('female');
+        }
+
+        // --- ATUALIZAÇÃO VISUAL ---
+        function updateAvatars(url) {
+            const imgMain = document.getElementById('avatarImage');
+            const imgModal = document.getElementById('modalAvatarImage');
+
+            if (loadTimeout) clearTimeout(loadTimeout);
+
+            // Timeout de segurança
+            loadTimeout = setTimeout(() => {
+                console.warn("Demora no carregamento, tentando regerar...");
+                if (currentAvatarType === 'male') generateMale();
+                else if (currentAvatarType === 'female') generateFemale();
+            }, 4000);
+
+            // Hide
+            imgMain.classList.remove('opacity-100'); imgMain.classList.add('opacity-0');
+            imgModal.classList.remove('opacity-100'); imgModal.classList.add('opacity-0');
+
+            // Set URL
+            imgMain.src = url;
+            imgModal.src = url;
+
+            const show = (img) => {
+                img.classList.remove('opacity-0');
+                img.classList.add('opacity-100');
+            };
+
+            imgMain.onload = () => {
+                if (loadTimeout) clearTimeout(loadTimeout);
+                show(imgMain);
+                imgMain.onload = null;
+            };
+            imgModal.onload = () => {
+                show(imgModal);
+                imgModal.onload = null;
+            };
+
+            imgMain.onerror = () => {
+                if (loadTimeout) clearTimeout(loadTimeout);
+                // Pequeno delay para retry
+                setTimeout(() => {
+                    if (currentAvatarType === 'male') generateMale();
+                    else if (currentAvatarType === 'female') generateFemale();
+                }, 100);
+                imgMain.onerror = null;
+            };
+        }
+
+        function highlightButton(type) {
+            document.querySelectorAll('.gender-button').forEach(btn => {
+                const btnType = btn.getAttribute('data-type');
+                btn.className = "gender-button px-4 py-2 flex items-center font-medium rounded-lg transition-colors duration-200 text-sm md:text-base";
                 
-                <p class="text-sm font-bold text-gray-600 mb-3">Escolha seu estilo:</p>
-                <div class="flex gap-3 justify-center mb-6">
-                    <button onclick="setGender('male')" id="btn-male" class="flex-1 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition">👦 Menino</button>
-                    <button onclick="setGender('female')" id="btn-female" class="flex-1 py-2 rounded-lg border-2 border-gray-200 hover:border-pink-500 hover:bg-pink-50 transition">👧 Menina</button>
-                </div>
-
-                <div class="text-left mb-4">
-                    <label class="text-xs font-bold text-gray-500 ml-1">Seu Nome</label>
-                    <input type="text" id="edit-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-
-                <button onclick="saveProfile()" id="btn-save" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
-                    Salvar Alterações
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentGender = 'neutral';
-        let tempAvatarUrl = '';
-
-        // --- Inicialização ---
-        async function init() {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                try { await signInWithCustomToken(auth, __initial_auth_token); } catch(e) { console.error(e); }
-            }
-
-            onAuthStateChanged(auth, async (user) => {
-                const loading = document.getElementById('loading-screen');
-                const authContainer = document.getElementById('auth-container');
-                const profileContainer = document.getElementById('profile-container');
-
-                if (user) {
-                    authContainer.classList.add('hidden');
-                    
-                    const userDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'main'));
-                    let data = userDoc.exists() ? userDoc.data() : {};
-                    
-                    // Avatar inicial seguro
-                    const avatar = data.avatar || user.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}&backgroundColor=b6e3f4`;
-                    const name = data.name || user.displayName || "Usuário";
-
-                    document.getElementById('user-name').innerText = name;
-                    document.getElementById('user-email').innerText = user.email;
-                    document.getElementById('user-avatar').src = avatar;
-                    
-                    profileContainer.classList.remove('hidden');
+                if (btnType === type) {
+                    if (type === 'male') btn.classList.add('bg-indigo-600', 'text-white');
+                    else btn.classList.add('bg-pink-600', 'text-white');
                 } else {
-                    profileContainer.classList.add('hidden');
-                    authContainer.classList.remove('hidden');
+                    btn.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
                 }
-                
-                loading.classList.add('hidden');
             });
         }
 
-        window.handleGoogleLogin = async () => {
-            try {
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
-            } catch (error) { alert("Erro no login Google: " + error.message); }
-        };
+        // --- LÓGICA DE UPLOAD E RECORTE (CROPPER) ---
 
-        window.handleEmailLogin = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            try {
-                try {
-                    await signInWithEmailAndPassword(auth, email, password);
-                } catch (loginError) {
-                    if (loginError.code === 'auth/invalid-credential' || loginError.code === 'auth/user-not-found') {
-                        if(confirm("Conta não encontrada. Deseja criar uma nova com estes dados?")) {
-                            await createUserWithEmailAndPassword(auth, email, password);
-                        }
-                    } else { throw loginError; }
-                }
-            } catch (error) { alert("Erro: " + error.message); }
-        };
+        // 1. Usuário selecionou arquivo
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
 
-        window.logout = () => signOut(auth);
+                reader.onload = function(e) {
+                    // Abre o modal de recorte com a imagem carregada
+                    openCropperModal(e.target.result);
+                    // Reseta o input para permitir selecionar a mesma foto se cancelar
+                    input.value = ''; 
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
-        window.toggleEditModal = () => {
-            const modal = document.getElementById('edit-modal');
-            const isHidden = modal.classList.contains('hidden');
+        // 2. Abre Modal de Recorte
+        function openCropperModal(imageSrc) {
+            const modal = document.getElementById('cropperModal');
+            const imageElement = document.getElementById('imageToCrop');
             
-            if (isHidden) {
-                const currentSrc = document.getElementById('user-avatar').src;
-                const currentName = document.getElementById('user-name').innerText;
-                
-                document.getElementById('edit-name').value = currentName;
-                document.getElementById('preview-avatar').src = currentSrc;
-                tempAvatarUrl = currentSrc;
-                currentGender = null; 
-                
-                document.getElementById('btn-male').className = "flex-1 py-2 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition";
-                document.getElementById('btn-female').className = "flex-1 py-2 rounded-lg border-2 border-gray-200 hover:border-pink-500 hover:bg-pink-50 transition";
-                
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        };
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            imageElement.src = imageSrc;
 
-        // --- Correção Crítica da URL do DiceBear ---
-        window.setGender = (gender) => {
-            currentGender = gender;
-            const user = auth.currentUser;
-            const seed = user.uid + Date.now(); 
-            let url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4`;
-
-            if (gender === 'male') {
-                // Nomes EXATOS aceitos pela API v7 (nada de "shortHair" genérico)
-                const maleStyles = ["shortHairDreads01", "shortHairDreads02", "shortHairFrizzle", "shortHairShaggyMullet", "shortHairShortCurly", "shortHairShortFlat", "shortHairShortRound", "shortHairShortWaved", "shortHairSides", "shortHairTheCaesar", "shortHairTheCaesarSidePart"];
-                
-                // Constrói query string repetindo o parametro top[]
-                maleStyles.forEach(style => {
-                    url += `&top[]=${style}`;
-                });
-                url += "&facialHairProbability=50";
-
-                document.getElementById('btn-male').classList.add('border-blue-600', 'bg-blue-100');
-                document.getElementById('btn-female').classList.remove('border-pink-600', 'bg-pink-100');
-            } else {
-                // Nomes EXATOS aceitos pela API v7
-                const femaleStyles = ["longHairBigHair", "longHairBob", "longHairBun", "longHairCurly", "longHairCurvy", "longHairDreads", "longHairFrida", "longHairFro", "longHairFroBand", "longHairNotTooLong", "longHairShavedSides", "longHairMiaWallace", "longHairStraight", "longHairStraight2", "longHairStraightStrand"];
-                
-                femaleStyles.forEach(style => {
-                    url += `&top[]=${style}`;
-                });
-                url += "&facialHairProbability=0";
-
-                document.getElementById('btn-female').classList.add('border-pink-600', 'bg-pink-100');
-                document.getElementById('btn-male').classList.remove('border-blue-600', 'bg-blue-100');
+            // Destroi cropper anterior se existir
+            if (cropper) {
+                cropper.destroy();
             }
 
-            tempAvatarUrl = url;
-            document.getElementById('preview-avatar').src = url;
-        };
+            // Inicializa Cropper
+            cropper = new Cropper(imageElement, {
+                aspectRatio: 1, // Força quadrado 1:1
+                viewMode: 1,    // Restringe o crop box dentro da imagem
+                dragMode: 'move',
+                autoCropArea: 1,
+                responsive: true,
+                background: false, // Remove grid de fundo padrão
+            });
+        }
 
-        window.saveProfile = async () => {
-            const btn = document.getElementById('btn-save');
-            btn.innerText = "Salvando...";
-            btn.disabled = true;
+        // 3. Executa o Recorte
+        function cropImage() {
+            if (!cropper) return;
 
-            try {
-                const user = auth.currentUser;
-                const newName = document.getElementById('edit-name').value;
+            // Obtém o canvas recortado
+            // max-width/height limitam para não criar imagens gigantescas, mas mantendo qualidade
+            const canvas = cropper.getCroppedCanvas({
+                width: 512,
+                height: 512,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
 
-                await updateProfile(user, { displayName: newName, photoURL: tempAvatarUrl });
+            // Converte para URL e atualiza avatar
+            const croppedUrl = canvas.toDataURL('image/jpeg', 0.9); // JPEG qualidade 90%
+            
+            updateAvatars(croppedUrl);
+            
+            // Atualiza UI
+            currentAvatarType = 'custom';
+            document.querySelectorAll('.gender-button').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'bg-pink-600');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
 
-                const userRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'main');
-                await setDoc(userRef, {
-                    name: newName,
-                    avatar: tempAvatarUrl,
-                    email: user.email,
-                    updatedAt: new Date().toISOString()
-                }, { merge: true });
+            closeCropper();
+        }
 
-                document.getElementById('user-name').innerText = newName;
-                document.getElementById('user-avatar').src = tempAvatarUrl;
-                
-                window.toggleEditModal();
-
-            } catch (error) {
-                console.error(error);
-                alert("Erro ao salvar: " + error.message);
-            } finally {
-                btn.innerText = "Salvar Alterações";
-                btn.disabled = false;
+        // 4. Fecha Modal de Recorte
+        function closeCropper() {
+            const modal = document.getElementById('cropperModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
             }
-        };
+        }
 
-        init();
+        // --- MODAL PRINCIPAL ---
+        function openModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            const mainSrc = document.getElementById('avatarImage').src;
+            // Se já temos uma imagem carregada, garante que o modal a mostre
+            if (mainSrc && document.getElementById('avatarImage').complete) {
+                const modalImg = document.getElementById('modalAvatarImage');
+                modalImg.src = mainSrc;
+                modalImg.classList.remove('opacity-0');
+                modalImg.classList.add('opacity-100');
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Fecha ao clicar fora
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target.id === 'imageModal') closeModal();
+        });
+
+        // --- INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            generateMale();
+        });
+
     </script>
 </body>
 </html>
