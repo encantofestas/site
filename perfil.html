@@ -244,11 +244,12 @@
         // 1. IMPORTAÇÕES DO FIREBASE (CDN)
         // ----------------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        // Adicionado GoogleAuthProvider e signInWithPopup
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
         // ----------------------------------------------------
-        // 2. CONFIGURAÇÃO (COLE SUAS CHAVES AQUI)
+        // 2. CONFIGURAÇÃO (SUAS CHAVES)
         // ----------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyBmwK8KwklpVfPEalJfOfjCB6OSFsidz6Q",
@@ -264,6 +265,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider(); // Provedor Google
 
         // Estado Global
         let currentUser = null;
@@ -272,39 +274,69 @@
             email: '',
             phone: '',
             address: { neighborhood: '', street: '', number: '' },
-            stats: { parties: 0, points: 500, balance: 0.00 }, // Começa com 500
-            history: [] // Histórico começa vazio
+            stats: { parties: 0, points: 500, balance: 0.00 },
+            history: []
         };
 
         // Escuta mudanças na autenticação
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                // Escuta o documento do usuário em tempo real
-                onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                
+                // Referência ao documento do usuário
+                const userDocRef = doc(db, "users", user.uid);
+
+                // Listener em tempo real
+                onSnapshot(userDocRef, async (docSnap) => {
                     if (docSnap.exists()) {
+                        // Se o documento existe, carrega os dados
                         userData = docSnap.data();
-                        
-                        // Atualiza UI
-                        document.getElementById('authView').classList.add('hidden');
-                        document.getElementById('profileView').classList.remove('hidden');
-                        document.getElementById('profileView').classList.add('flex');
-                        
-                        initUI();
+                        loadAppView(); // Função separada para carregar a UI
                     } else {
-                        // Se o usuário existe no Auth mas não no Firestore (erro raro), cria doc padrão
-                        createDefaultUserDoc(user);
+                        // Se o usuário logou mas não tem documento (ex: Login Google pela 1ª vez)
+                        // Cria o documento padrão e espera o próximo snapshot
+                        console.log("Criando perfil padrão...");
+                        await createDefaultUserDoc(user); 
                     }
+                }, (error) => {
+                    console.error("Erro ao ler dados:", error);
+                    // Se der erro de permissão, tenta mostrar algo básico
+                    window.showDialog({ title: "Erro de Dados", message: "Não foi possível carregar seus dados. Verifique sua conexão.", type: "error" });
                 });
+
             } else {
                 currentUser = null;
-                document.getElementById('profileView').classList.add('hidden');
-                document.getElementById('profileView').classList.remove('flex');
-                document.getElementById('authView').classList.remove('hidden');
+                resetToAuthView();
             }
         });
 
-        // Funções Auxiliares de Auth
+        function loadAppView() {
+            document.getElementById('authView').classList.add('hidden');
+            document.getElementById('profileView').classList.remove('hidden');
+            document.getElementById('profileView').classList.add('flex');
+            initUI(); // Inicializa a interface com os dados carregados
+        }
+
+        function resetToAuthView() {
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('profileView').classList.remove('flex');
+            document.getElementById('authView').classList.remove('hidden');
+        }
+
+        // --- FUNÇÕES DE LOGIN / CADASTRO ---
+
+        // Login com Google
+        window.handleGoogleLogin = async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                // O resto é tratado pelo onAuthStateChanged
+            } catch (error) {
+                console.error(error);
+                window.showDialog({ title: "Erro Google", message: "Não foi possível entrar com Google.", type: "error" });
+            }
+        };
+
+        // Login/Cadastro Email e Senha
         async function handleAuthAction(e, type) {
             e.preventDefault();
             
@@ -316,11 +348,12 @@
                 try {
                     btn.classList.add('opacity-50', 'cursor-not-allowed');
                     btn.textContent = "Entrando...";
+                    
                     await signInWithEmailAndPassword(auth, email, pass);
-                    // Sucesso: onAuthStateChanged vai lidar com a UI
+                    // Não precisa fazer nada aqui, o onAuthStateChanged detecta o login
+                    
                 } catch (error) {
                     window.showDialog({ title: "Erro no Login", message: formatFirebaseError(error.code), type: "error" });
-                } finally {
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
                     btn.textContent = "Entrar";
                 }
@@ -335,18 +368,21 @@
                     btn.classList.add('opacity-50', 'cursor-not-allowed');
                     btn.textContent = "Criando...";
                     
+                    // 1. Cria usuário no Auth
                     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                     const user = userCredential.user;
                     
-                    // Atualiza nome no Auth
+                    // 2. Atualiza Nome de Exibição
                     await updateProfile(user, { displayName: name });
                     
-                    // Cria documento no Firestore
+                    // 3. Cria Documento no Firestore IMEDIATAMENTE
                     await createDefaultUserDoc(user, name);
                     
+                    // O onAuthStateChanged vai pegar isso logo em seguida
+                    
                 } catch (error) {
+                    console.error(error);
                     window.showDialog({ title: "Erro no Cadastro", message: formatFirebaseError(error.code), type: "error" });
-                } finally {
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
                     btn.textContent = "Criar Conta";
                 }
@@ -354,15 +390,21 @@
         }
 
         async function createDefaultUserDoc(user, nameOverride = "") {
-            const initialData = {
-                name: nameOverride || user.displayName || "Novo Usuário",
-                email: user.email,
-                phone: "",
-                address: { neighborhood: "", street: "", number: "" },
-                stats: { parties: 0, points: 500, balance: 0.00 }, // Começa nível 1
-                history: []
-            };
-            await setDoc(doc(db, "users", user.uid), initialData);
+            try {
+                const initialData = {
+                    name: nameOverride || user.displayName || "Novo Usuário",
+                    email: user.email,
+                    phone: "",
+                    address: { neighborhood: "", street: "", number: "" },
+                    stats: { parties: 0, points: 500, balance: 0.00 },
+                    history: []
+                };
+                // Usa setDoc com merge: true para não sobrescrever se já existir algo parcial
+                await setDoc(doc(db, "users", user.uid), initialData, { merge: true });
+            } catch (e) {
+                console.error("Erro ao criar perfil:", e);
+                window.showDialog({ title: "Erro", message: "Falha ao criar perfil no banco de dados.", type: "error" });
+            }
         }
 
         window.handleForgotPassword = async () => {
@@ -384,6 +426,7 @@
             try {
                 await signOut(auth);
                 document.getElementById('loginForm').reset();
+                if(document.getElementById('registerForm')) document.getElementById('registerForm').reset();
                 window.generateAvatar('male');
             } catch (error) {
                 console.error(error);
@@ -464,11 +507,12 @@
             switch (code) {
                 case 'auth/invalid-email': return 'Email inválido.';
                 case 'auth/user-disabled': return 'Usuário desativado.';
-                case 'auth/user-not-found': return 'Usuário não encontrado.';
+                case 'auth/user-not-found': return 'Usuário não encontrado. Crie uma conta.';
                 case 'auth/wrong-password': return 'Senha incorreta.';
                 case 'auth/email-already-in-use': return 'Email já está em uso.';
                 case 'auth/weak-password': return 'A senha deve ter pelo menos 6 caracteres.';
-                default: return 'Ocorreu um erro desconhecido.';
+                case 'auth/popup-closed-by-user': return 'Login com Google cancelado.';
+                default: return `Erro: ${code}`;
             }
         }
 
