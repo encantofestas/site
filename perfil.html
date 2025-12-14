@@ -13,13 +13,19 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #ffffff; }
         body.modal-open { overflow: hidden; touch-action: none; }
+        
         .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
         @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         .progress-bar-fill { transition: width 1s ease-in-out; }
         .animated-stripes { background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.4) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.4) 75%, transparent 75%, transparent); background-size: 30px 30px; animation: moveStripes 1s linear infinite; width: 100%; height: 100%; }
         @keyframes moveStripes { 0% { background-position: 0 0; } 100% { background-position: 30px 0; } }
+        
+        /* Ajuste para inputs desabilitados ficarem bonitos */
+        input:disabled { background-color: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center">
@@ -33,6 +39,7 @@
             </div>
 
             <div class="w-full">
+                <!-- Abas -->
                 <div class="flex p-1 bg-black/20 backdrop-blur-sm rounded-xl mb-8 border border-white/10">
                     <button onclick="switchAuthTab('login')" id="tabLogin" class="flex-1 py-3 text-sm font-bold rounded-lg shadow-sm bg-white text-blue-700 transition-all">Entrar</button>
                     <button onclick="switchAuthTab('register')" id="tabRegister" class="flex-1 py-3 text-sm font-bold rounded-lg text-blue-200 hover:text-white transition-all">Cadastrar</button>
@@ -186,7 +193,7 @@
 
     <input type="file" id="photoUploadInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
 
-    <!-- SCRIPTS DE UI (Necessários para os erros funcionarem) -->
+    <!-- SCRIPTS DE UI -->
     <script>
         // Dialog UI
         let currentDialogCallback = null;
@@ -223,12 +230,10 @@
         function closeDialog() { toggleModal('dialogModal', false); currentDialogCallback = null; }
         function confirmDialogAction() { if (currentDialogCallback) currentDialogCallback(); closeDialog(); }
         
-        // Expor funções globais para o módulo
         window.showDialog = showDialog;
         window.closeDialog = closeDialog;
         window.confirmDialogAction = confirmDialogAction;
 
-        // UI Helpers
         function switchAuthTab(tab) {
             const loginForm = document.getElementById('loginForm');
             const registerForm = document.getElementById('registerForm');
@@ -245,6 +250,8 @@
             }
         }
         function forceTwoWords(el) { let val = el.value; const parts = val.split(' '); if (parts.length > 2) { el.value = parts.slice(0, 2).join(' '); } }
+        function formatPhone(input) { let v = input.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); input.value = v; }
+        function toggleHouseNumber() { const chk = document.getElementById('noNumberCheckbox'); const inp = document.getElementById('editHouseNumber'); if (chk.checked) { inp.value = "S/N"; inp.disabled = true; inp.classList.add('bg-gray-100', 'text-gray-500'); } else { inp.value = ""; inp.disabled = false; inp.classList.remove('bg-gray-100', 'text-gray-500'); inp.focus(); } }
         function togglePassword(inputId, btn) {
             const input = document.getElementById(inputId); const icon = btn.querySelector('svg');
             if (input.type === "password") { input.type = "text"; icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>'; btn.classList.add('text-blue-600'); } 
@@ -262,9 +269,10 @@
         function closeFilterModal() { toggleModal('filterModal', false); }
         function closeProfileEditModal() { toggleModal('profileEditModal', false); }
         
-        // Export handlers that are called from HTML
         window.switchAuthTab = switchAuthTab;
         window.forceTwoWords = forceTwoWords;
+        window.formatPhone = formatPhone;
+        window.toggleHouseNumber = toggleHouseNumber;
         window.togglePassword = togglePassword;
         window.openLogoutModal = openLogoutModal;
         window.closeLogoutModal = closeLogoutModal;
@@ -299,37 +307,27 @@
         let currentUser = null;
         let userData = {};
 
-        // 1. Monitoramento de Login e Carregamento de Dados
+        // 1. Monitoramento de Auth
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                const userDocRef = doc(db, "users", user.uid);
-
-                // Listener em tempo real do banco de dados
-                onSnapshot(userDocRef, async (docSnap) => {
+                // Escuta o documento
+                onSnapshot(doc(db, "users", user.uid), async (docSnap) => {
                     if (docSnap.exists()) {
                         userData = docSnap.data();
+                        window.userData = userData; // Expor globalmente para a UI usar
                         loadAppView(); 
                     } else {
-                        // Se logou mas não tem doc (ex: Google novo), cria o doc
-                        console.log("Perfil não encontrado, criando novo...");
+                        console.log("Criando perfil padrão...");
                         await createDefaultUserDoc(user);
                     }
                 }, (error) => {
                     console.error("Erro Firestore:", error);
-                    // DIAGNÓSTICO DE PERMISSÃO
-                    if (error.code === 'permission-denied') {
-                        window.showDialog({ 
-                            title: "Banco Bloqueado", 
-                            message: "Vá no Firebase Console > Firestore Database > Rules e altere para: allow read, write: if request.auth != null;", 
-                            type: "error" 
-                        });
-                    } else {
-                        window.showDialog({ title: "Erro de Dados", message: `Código: ${error.code}`, type: "error" });
-                    }
+                    window.showDialog({ title: "Erro de Dados", message: "Não foi possível carregar seus dados.", type: "error" });
                 });
             } else {
                 currentUser = null;
+                window.userData = null;
                 document.getElementById('profileView').classList.add('hidden');
                 document.getElementById('profileView').classList.remove('flex');
                 document.getElementById('authView').classList.remove('hidden');
@@ -343,18 +341,16 @@
             initUI(); 
         }
 
-        // 2. Funções de Login (Exportadas para Window)
+        // 2. Funções Auth (Window)
         window.handleGoogleLogin = async () => {
             try {
                 await signInWithPopup(auth, googleProvider);
             } catch (error) {
                 console.error("Erro Google:", error);
                 if (error.code === 'auth/unauthorized-domain') {
-                    window.showDialog({ title: "Domínio Não Autorizado", message: "Adicione este domínio no Firebase Console > Authentication > Settings > Authorized Domains.", type: "error" });
-                } else if (error.code === 'auth/popup-closed-by-user') {
-                    // Ignora se o usuário fechou
-                } else {
-                    window.showDialog({ title: "Erro Google", message: `Código: ${error.code}\nMsg: ${error.message}`, type: "error" });
+                    window.showDialog({ title: "Configuração Necessária", message: "Este domínio não está autorizado no Firebase Authentication.", type: "error" });
+                } else if (error.code !== 'auth/popup-closed-by-user') {
+                    window.showDialog({ title: "Erro no Login", message: "Não foi possível conectar com o Google.", type: "error" });
                 }
             }
         };
@@ -381,11 +377,11 @@
                 }
             } catch (error) {
                 console.error("Erro Auth:", error);
-                window.showDialog({ 
-                    title: "Erro de Acesso", 
-                    message: `Código: ${error.code}\nVerifique se o email/senha estão corretos.`, 
-                    type: "error" 
-                });
+                let msg = "Verifique seus dados e tente novamente.";
+                if (error.code === 'auth/email-already-in-use') msg = "Este email já está cadastrado.";
+                if (error.code === 'auth/wrong-password') msg = "Senha incorreta.";
+                if (error.code === 'auth/user-not-found') msg = "Usuário não encontrado.";
+                window.showDialog({ title: "Atenção", message: msg, type: "error" });
                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
                 btn.textContent = originalText;
             }
@@ -403,10 +399,7 @@
                 };
                 await setDoc(doc(db, "users", user.uid), initialData, { merge: true });
             } catch (error) {
-                console.error("Erro ao criar doc:", error);
-                if (error.code === 'permission-denied') {
-                    window.showDialog({ title: "Banco Bloqueado", message: "Erro de Permissão ao criar usuário. Verifique as Regras no Firebase Console.", type: "error" });
-                }
+                console.error("Erro criar doc:", error);
             }
         }
 
@@ -417,7 +410,7 @@
                 await sendPasswordResetEmail(auth, email);
                 window.showDialog({ title: "Email Enviado", message: "Verifique sua caixa de entrada.", type: "success" });
             } catch (error) {
-                window.showDialog({ title: "Erro", message: `Código: ${error.code}`, type: "error" });
+                window.showDialog({ title: "Erro", message: "Não foi possível enviar o email.", type: "error" });
             }
         };
 
@@ -443,7 +436,8 @@
                 window.closeProfileEditModal();
                 window.showDialog({ title: "Sucesso", message: "Perfil atualizado!", type: "success" });
             } catch (error) {
-                window.showDialog({ title: "Erro", message: "Erro de permissão ao salvar.", type: "error" });
+                console.error("Erro ao salvar:", error);
+                window.showDialog({ title: "Erro", message: "Não foi possível salvar as alterações.", type: "error" });
             }
         };
 
@@ -471,8 +465,7 @@
             }
         };
 
-        // --- LÓGICA DE UI (DADOS) ---
-        // Funções que usam userData
+        // --- UI Logic with Global Data ---
         const rewardsData = [
             { id: 'praise', title: 'Agradecimento Especial', desc: 'Receba um elogio da equipe!', cost: 50, iconColor: 'text-yellow-600', bgColor: 'bg-yellow-100', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>' },
             { id: 'vip', title: 'Status VIP (7 dias)', desc: 'Ícone exclusivo no seu perfil', cost: 150, iconColor: 'text-purple-600', bgColor: 'bg-purple-100', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>' },
@@ -490,7 +483,7 @@
         function renderHistory() {
             const list = document.getElementById('historyList');
             list.innerHTML = '';
-            const historyData = userData?.history || [];
+            const historyData = window.userData?.history || [];
             const filteredData = activeFilter === 'Todos' ? historyData : historyData.filter(item => item.neighborhood === activeFilter);
             if (filteredData.length === 0) { list.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Nenhum histórico encontrado.</div>'; return; }
             filteredData.forEach(item => {
@@ -505,7 +498,7 @@
         function renderRewards() {
             const list = document.getElementById('rewardsList');
             list.innerHTML = '';
-            const points = userData?.stats?.points || 0;
+            const points = window.userData?.stats?.points || 0;
             rewardsData.forEach(reward => {
                 const canAfford = points >= reward.cost;
                 const btnClass = canAfford ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-300 text-white cursor-not-allowed";
@@ -520,7 +513,7 @@
         function openFilterModal() {
             const container = document.getElementById('filterOptionsContainer');
             container.innerHTML = '';
-            const historyData = userData?.history || [];
+            const historyData = window.userData?.history || [];
             const neighborhoods = ['Todos', ...new Set(historyData.map(item => item.neighborhood))];
             neighborhoods.forEach(bairro => {
                 const label = document.createElement('label');
@@ -541,7 +534,7 @@
         function resetFilters() { activeFilter = 'Todos'; renderHistory(); document.getElementById('filterCountBadge').classList.add('hidden'); window.toggleModal('filterModal', false); }
 
         function openRewardsModal() {
-            const points = userData?.stats?.points || 0;
+            const points = window.userData?.stats?.points || 0;
             document.getElementById('modalUserPoints').textContent = points;
             renderRewards(); 
             window.toggleModal('rewardsModal', true);
@@ -550,10 +543,10 @@
         }
 
         function initUI() {
-            const stats = userData.stats || { points: 0, parties: 0, balance: 0 };
-            const addr = userData.address || { neighborhood: '', street: '', number: '' };
-            document.getElementById('userNameDisplay').textContent = userData.name || "Usuário";
-            document.getElementById('userEmailDisplay').textContent = userData.email || "";
+            const data = window.userData || {};
+            const stats = data.stats || { points: 0, parties: 0, balance: 0 };
+            document.getElementById('userNameDisplay').textContent = data.name || "Usuário";
+            document.getElementById('userEmailDisplay').textContent = data.email || "";
             document.getElementById('partyCountDisplay').textContent = stats.parties;
             document.getElementById('userPointsDisplay').textContent = stats.points; 
             document.getElementById('userBalanceDisplay').textContent = formatBRL(stats.balance);
@@ -598,7 +591,22 @@
         };
         window.generateMale = () => window.generateAvatar('male');
         window.generateFemale = () => window.generateAvatar('female');
-        function updateButtons(type) { /* ... lógica de botões simplificada para economizar espaço ... */ }
+        function updateButtons(type) {
+            const maleBtn = document.querySelector('button[data-type="male"]');
+            const femaleBtn = document.querySelector('button[data-type="female"]');
+            const refreshIcon = `<svg class="w-4 h-4 ml-2 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
+            if (maleBtn && femaleBtn) {
+                if (type === 'male') {
+                    maleBtn.innerHTML = `Gerar Outra ${refreshIcon}`; femaleBtn.innerHTML = 'Feminino';
+                    maleBtn.className = "gender-button py-3 rounded-xl bg-blue-600 text-white shadow-lg text-sm font-semibold transition-colors flex items-center justify-center transform scale-105 ring-2 ring-blue-200";
+                    femaleBtn.className = "gender-button py-3 rounded-xl bg-pink-50 text-pink-400 hover:bg-pink-100 text-sm font-semibold transition-colors flex items-center justify-center";
+                } else if (type === 'female') {
+                    maleBtn.innerHTML = 'Masculino'; femaleBtn.innerHTML = `Gerar Outra ${refreshIcon}`;
+                    femaleBtn.className = "gender-button py-3 rounded-xl bg-pink-500 text-white shadow-lg text-sm font-semibold transition-colors flex items-center justify-center transform scale-105 ring-2 ring-pink-200";
+                    maleBtn.className = "gender-button py-3 rounded-xl bg-blue-50 text-blue-400 hover:bg-blue-100 text-sm font-semibold transition-colors flex items-center justify-center";
+                }
+            }
+        }
 
         // Mapear funções para window
         window.openFilterModal = openFilterModal;
@@ -607,7 +615,7 @@
         window.openRewardsModal = openRewardsModal;
         window.openModal = () => { window.toggleModal('imageModal', true); window.generateAvatar(); };
         window.openProfileEditModal = () => {
-            const data = userData; const addr = data.address || {};
+            const data = window.userData || {}; const addr = data.address || {};
             document.getElementById('editName').value = data.name || "";
             document.getElementById('editEmail').value = data.email || "";
             document.getElementById('editPhone').value = data.phone || ""; 
@@ -616,8 +624,8 @@
             const numVal = addr.number;
             const numInput = document.getElementById('editHouseNumber');
             const check = document.getElementById('noNumberCheckbox');
-            if (numVal === 'S/N') { numInput.value = 'S/N'; check.checked = true; toggleHouseNumber(); } 
-            else { numInput.value = numVal || ""; check.checked = false; toggleHouseNumber(); }
+            if (numVal === 'S/N') { numInput.value = 'S/N'; check.checked = true; window.toggleHouseNumber(); } 
+            else { numInput.value = numVal || ""; check.checked = false; window.toggleHouseNumber(); }
             window.toggleModal('profileEditModal', true); 
         };
         window.handleFileSelect = (input) => { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => { window.closeModal(); window.openCropper(e.target.result); input.value = ''; }; reader.readAsDataURL(input.files[0]); } };
