@@ -14,7 +14,7 @@
     <!-- Cropper.js JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-    <!-- Google Fonts (Inter) para um visual mais premium -->
+    <!-- Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -31,6 +31,10 @@
         @keyframes modalFadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
+        }
+        /* Animação da barra de progresso */
+        .progress-bar-fill {
+            transition: width 1s ease-in-out;
         }
     </style>
 </head>
@@ -53,19 +57,27 @@
                 class="relative group cursor-pointer"
                 onclick="openModal()"
             >
-                <div class="w-36 h-36 rounded-full p-1 bg-white shadow-lg">
+                <div class="w-36 h-36 rounded-full p-1 bg-white shadow-lg relative">
+                    <!-- Spinner de Loading (Fica invisível por padrão) -->
+                    <div id="mainAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden">
+                        <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+
                     <img 
                         id="avatarImage"
                         src="" 
                         alt="Avatar do Usuário" 
-                        class="w-full h-full rounded-full object-cover bg-gray-100 transition-opacity duration-300 opacity-0"
+                        class="w-full h-full rounded-full object-cover bg-gray-100"
                     >
                 </div>
 
                 <!-- Botão Flutuante de Lápis -->
                 <button 
                     type="button" 
-                    class="absolute bottom-2 right-2 p-2.5 bg-indigo-600 rounded-full shadow-lg border-2 border-white text-white hover:bg-indigo-700 active:scale-95 transition-all duration-200"
+                    class="absolute bottom-2 right-2 p-2.5 bg-indigo-600 rounded-full shadow-lg border-2 border-white text-white hover:bg-indigo-700 active:scale-95 transition-all duration-200 z-30"
                     aria-label="Alterar Foto"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,12 +87,12 @@
             </div>
             
             <!-- Informações do Usuário -->
-            <div class="text-center mt-4 mb-6">
+            <div class="text-center mt-4 mb-5">
                 <h1 class="text-2xl font-bold text-gray-800 tracking-tight" id="userNameDisplay">Carregando...</h1>
                 <p class="text-sm text-gray-500 font-medium" id="userEmailDisplay">carregando@exemplo.com</p>
             </div>
 
-            <!-- Botão Editar Perfil (MOVIDO PARA CIMA) -->
+            <!-- Botão Editar Perfil -->
             <button 
                 onclick="openProfileEditModal()" 
                 class="w-full py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 hover:shadow-md active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 mb-6"
@@ -89,11 +101,28 @@
                 Editar Perfil
             </button>
             
+            <!-- BARRA DE NÍVEL E CATEGORIA (NOVO) -->
+            <div class="w-full mb-6 px-1">
+                <div class="flex justify-between items-end mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-bold uppercase rounded-md tracking-wider">Membro</span>
+                        <span class="text-sm font-bold text-gray-800">Nível 1</span>
+                    </div>
+                    <span class="text-xs font-semibold text-gray-500" id="xpDisplay">1250 / 2000 XP</span>
+                </div>
+                <!-- Barra de Fundo -->
+                <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden shadow-inner">
+                    <!-- Preenchimento Animado -->
+                    <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full w-0 shadow-sm relative">
+                        <!-- Efeito de brilho sutil -->
+                        <div class="absolute top-0 left-0 w-full h-full bg-white/20"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Painel de Indicadores (Stats) -->
-            <!-- Layout Flex com divisórias para alinhamento perfeito -->
             <div class="w-full flex items-center justify-between bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                
-                <!-- Festas (Esquerda) -->
+                <!-- Festas -->
                 <div class="flex-1 flex flex-col items-center justify-center">
                     <span class="text-xl font-bold text-indigo-600" id="partyCountDisplay">0</span>
                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Festas</span>
@@ -102,7 +131,7 @@
                 <!-- Divisória -->
                 <div class="w-px h-8 bg-gray-200"></div>
 
-                <!-- Pontos (Meio) -->
+                <!-- Pontos -->
                 <div class="flex-1 flex flex-col items-center justify-center">
                     <span class="text-xl font-bold text-emerald-500" id="userPointsDisplay">0</span>
                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Pontos</span>
@@ -111,7 +140,7 @@
                 <!-- Divisória -->
                 <div class="w-px h-8 bg-gray-200"></div>
 
-                <!-- Saldo (Direita) - Sem Cifrão -->
+                <!-- Saldo -->
                 <div class="flex-1 flex flex-col items-center justify-center">
                     <span class="text-xl font-bold text-amber-500" id="userBalanceDisplay">0,00</span>
                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Saldo</span>
@@ -122,11 +151,7 @@
     </main>
 
 
-    <!-- 
-      ========================================
-      TELA 2: MODAL DE SELEÇÃO DE AVATAR
-      ========================================
-    -->
+    <!-- TELA 2: MODAL DE SELEÇÃO -->
     <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter relative overflow-hidden">
             
@@ -139,8 +164,15 @@
                 <div 
                     class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-indigo-200 hover:border-indigo-400 transition-colors group cursor-pointer"
                     onclick="document.getElementById('photoUploadInput').click();"
-                    title="Clique para enviar uma foto"
                 >
+                    <!-- Spinner Modal -->
+                    <div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/10 hidden">
+                        <svg class="animate-spin h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+
                     <img 
                         id="modalAvatarImage"
                         src="" 
@@ -184,11 +216,7 @@
     </div>
 
 
-    <!-- 
-      ========================================
-      TELA 3: MODAL DE EDIÇÃO DE DADOS
-      ========================================
-    -->
+    <!-- TELA 3: MODAL EDITAR -->
     <div id="profileEditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter max-h-[90vh] overflow-y-auto">
             
@@ -200,13 +228,10 @@
             </div>
             
             <div class="space-y-5">
-                <!-- Nome -->
                 <div class="space-y-1">
                     <label for="editName" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label>
-                    <input type="text" id="editName" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none" placeholder="Seu nome">
+                    <input type="text" id="editName" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Seu nome">
                 </div>
-
-                <!-- Email -->
                 <div class="space-y-1">
                     <label for="editEmail" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Email</label>
                     <div class="relative">
@@ -214,105 +239,58 @@
                         <svg class="w-5 h-5 text-gray-400 absolute right-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </div>
                 </div>
-
-                <div class="py-2">
-                    <div class="h-px bg-gray-100"></div>
-                </div>
-
+                <div class="py-2"><div class="h-px bg-gray-100"></div></div>
                 <h3 class="text-sm font-bold text-indigo-600 uppercase tracking-wide">Endereço</h3>
-
-                <!-- Bairro -->
                 <div class="space-y-1">
                     <label for="editNeighborhood" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label>
                     <div class="relative">
-                        <select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none appearance-none">
+                        <select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none">
                             <option value="">Selecione...</option>
                             <option value="Centro">Centro</option>
                             <option value="Jardim America">Jardim América</option>
                             <option value="Vila Nova">Vila Nova</option>
                             <option value="Outro">Outro</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
                     </div>
                 </div>
-                
                 <div class="grid grid-cols-3 gap-3">
-                    <!-- Rua -->
                     <div class="col-span-2 space-y-1">
                         <label for="editStreet" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Rua</label>
-                        <input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none" placeholder="Nome da rua">
+                        <input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Nome da rua">
                     </div>
-
-                    <!-- Número -->
                     <div class="space-y-1">
                         <label for="editHouseNumber" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nº</label>
-                        <input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none" placeholder="123">
+                        <input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="123">
                     </div>
                 </div>
             </div>
 
-            <!-- Botões de Ação -->
             <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100">
-                <button 
-                    onclick="closeProfileEditModal()" 
-                    class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition active:scale-[0.98]"
-                >
-                    Cancelar
-                </button>
-                <button 
-                    onclick="saveProfileChanges()" 
-                    class="flex-1 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-[0.98]"
-                >
-                    Salvar Alterações
-                </button>
+                <button onclick="closeProfileEditModal()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition active:scale-[0.98]">Cancelar</button>
+                <button onclick="saveProfileChanges()" class="flex-1 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-[0.98]">Salvar Alterações</button>
             </div>
         </div>
     </div>
 
 
-    <!-- 
-      ========================================
-      TELA 4: MODAL DE RECORTE (CROPPER)
-      ========================================
-    -->
+    <!-- TELA 4: CROPPER -->
     <div id="cropperModal" class="fixed inset-0 z-[60] bg-black/90 hidden flex-col items-center justify-center p-0 md:p-4 backdrop-blur-md">
-        <!-- Header Mobile -->
         <div class="w-full bg-black/50 p-4 absolute top-0 left-0 flex justify-between items-center md:hidden z-10">
             <h3 class="text-white font-medium">Ajustar Foto</h3>
-            <button onclick="closeCropper()" class="text-white p-2">
-                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+            <button onclick="closeCropper()" class="text-white p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
-
         <div class="bg-gray-900 md:bg-white w-full h-full md:h-auto md:max-w-2xl md:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            
             <div class="hidden md:flex justify-between items-center p-4 border-b border-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">Ajustar Foto</h3>
-                <button onclick="closeCropper()" class="text-gray-400 hover:text-gray-600 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <button onclick="closeCropper()" class="text-gray-400 hover:text-gray-600 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            
             <div class="flex-1 bg-black relative flex items-center justify-center overflow-hidden">
                 <img id="imageToCrop" src="" alt="Para cortar" class="block max-w-full">
             </div>
-            
             <div class="p-4 bg-gray-900 md:bg-white border-t border-gray-800 md:border-gray-100 flex justify-end gap-3 z-20">
-                <button 
-                    onclick="closeCropper()" 
-                    class="px-6 py-2.5 rounded-xl font-medium transition text-gray-300 hover:text-white md:text-gray-600 md:bg-gray-100 md:hover:bg-gray-200"
-                >
-                    Cancelar
-                </button>
-                <button 
-                    onclick="cropImage()" 
-                    class="px-8 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-500 md:hover:bg-indigo-700 shadow-lg transition active:scale-95 flex items-center gap-2"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    Confirmar
-                </button>
+                <button onclick="closeCropper()" class="px-6 py-2.5 rounded-xl font-medium transition text-gray-300 hover:text-white md:text-gray-600 md:bg-gray-100 md:hover:bg-gray-200">Cancelar</button>
+                <button onclick="cropImage()" class="px-8 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-500 md:hover:bg-indigo-700 shadow-lg transition active:scale-95 flex items-center gap-2">Confirmar</button>
             </div>
         </div>
     </div>
@@ -324,29 +302,17 @@
         let userData = {
             name: 'Usuário Teste',
             email: 'usuario.teste@exemplo.com',
-            address: {
-                neighborhood: 'Vila Nova',
-                street: 'Rua Principal da Cidade',
-                number: '100A'
-            },
-            stats: {
-                parties: 5,
-                points: 1250,
-                balance: 100.00
-            }
+            address: { neighborhood: 'Vila Nova', street: 'Rua Principal', number: '100A' },
+            stats: { parties: 5, points: 1250, balance: 100.00 }
         };
+
+        const MAX_XP = 2000; // Objetivo do nível 1
 
         // --- CONFIG ---
         const BASE_URL = "https://api.dicebear.com/9.x/avataaars/svg";
         const COMMON_PARAMS = "scale=110&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9";
         
-        // Estado Interno
-        let appState = {
-            avatarType: 'male',
-            cropper: null,
-            loadTimeout: null
-        };
-
+        let appState = { avatarType: 'male', cropper: null, loadTimeout: null };
         const HAIR_STYLES = {
             male: ["shortFlat", "shortRound", "shortWaved", "theCaesar", "theCaesarSidePart", "sides", "shortDreads1", "shortDreads2", "shortFrizzle", "shortCurly"],
             female: ["longButNotTooLong", "bob", "bun", "curly", "curvy", "straight1", "straight2", "straightStrand", "frida", "miaWallace", "bigHair", "shavedSides", "fro", "froBand"]
@@ -355,32 +321,30 @@
         // --- UTILS ---
         const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
         const getSeed = () => Math.random().toString(36).substring(2, 15);
-        
-        // Formata apenas o número, sem R$
-        const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { 
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(val);
+        const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
 
         // --- UI UPDATES ---
         function initUI() {
-            // Preencher Tela 1
             document.getElementById('userNameDisplay').textContent = userData.name;
             document.getElementById('userEmailDisplay').textContent = userData.email;
             document.getElementById('partyCountDisplay').textContent = userData.stats.parties;
             document.getElementById('userPointsDisplay').textContent = userData.stats.points.toLocaleString('pt-BR');
             document.getElementById('userBalanceDisplay').textContent = formatBRL(userData.stats.balance);
+            document.getElementById('xpDisplay').textContent = `${userData.stats.points} / ${MAX_XP} XP`;
+            
+            // Animação da barra de progresso
+            setTimeout(() => {
+                const percentage = Math.min((userData.stats.points / MAX_XP) * 100, 100);
+                document.getElementById('xpBarFill').style.width = `${percentage}%`;
+            }, 500);
 
-            // Gerar avatar inicial
             generateMale();
         }
 
         function generateAvatar(type) {
             const seed = getSeed();
             const hair = getRandom(HAIR_STYLES[type]);
-            // Ajuste probabilidade de barba baseado no gênero
             const beardProb = type === 'male' ? 30 : 0;
-            
             const url = `${BASE_URL}?seed=${seed}&top=${hair}&facialHairProbability=${beardProb}&accessoriesProbability=0&${COMMON_PARAMS}`;
             
             appState.avatarType = type;
@@ -391,38 +355,42 @@
         function generateMale() { generateAvatar('male'); }
         function generateFemale() { generateAvatar('female'); }
 
+        // --- Lógica de Preload de Imagem ---
         function updateAvatarImages(url) {
-            const imgs = [document.getElementById('avatarImage'), document.getElementById('modalAvatarImage')];
-            
-            if (appState.loadTimeout) clearTimeout(appState.loadTimeout);
-            
-            appState.loadTimeout = setTimeout(() => {
-                console.warn("Retrying avatar load...");
-                generateAvatar(appState.avatarType);
-            }, 5000);
+            const mainImg = document.getElementById('avatarImage');
+            const modalImg = document.getElementById('modalAvatarImage');
+            const mainLoader = document.getElementById('mainAvatarLoader');
+            const modalLoader = document.getElementById('modalAvatarLoader');
 
-            imgs.forEach(img => {
-                img.classList.remove('opacity-100');
-                img.classList.add('opacity-0');
-                img.src = url;
+            // 1. Mostrar Spinner IMEDIATAMENTE
+            mainLoader.classList.remove('hidden');
+            modalLoader.classList.remove('hidden');
+            
+            // 2. Criar imagem em memória para carregar em background
+            const tempImg = new Image();
+            tempImg.src = url;
+            
+            tempImg.onload = () => {
+                // 3. Quando carregada, atualiza as imagens reais
+                mainImg.src = url;
+                modalImg.src = url;
                 
-                img.onload = () => {
-                    img.classList.remove('opacity-0');
-                    img.classList.add('opacity-100');
-                    if (appState.loadTimeout) clearTimeout(appState.loadTimeout);
-                };
+                // 4. Esconde os spinners e exibe a imagem nova (troca instantânea)
+                mainLoader.classList.add('hidden');
+                modalLoader.classList.add('hidden');
+            };
 
-                img.onerror = () => {
-                   // Tratamento silencioso
-                };
-            });
+            tempImg.onerror = () => {
+                console.warn("Falha ao carregar imagem em background.");
+                mainLoader.classList.add('hidden'); // Falhou, esconde loader para não travar
+                modalLoader.classList.add('hidden');
+            };
         }
 
         function updateGenderButtons(activeType) {
             document.querySelectorAll('.gender-button').forEach(btn => {
                 const type = btn.getAttribute('data-type');
                 btn.className = "gender-button py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-2";
-                
                 if (type === activeType) {
                     if (type === 'male') btn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-200');
                     else btn.classList.add('bg-pink-500', 'text-white', 'shadow-lg', 'shadow-pink-200');
@@ -435,23 +403,14 @@
         // --- MODALS ---
         const toggleModal = (id, show) => {
             const el = document.getElementById(id);
-            if (show) {
-                el.classList.remove('hidden');
-                el.classList.add('flex');
-            } else {
-                el.classList.add('hidden');
-                el.classList.remove('flex');
-            }
+            if (show) { el.classList.remove('hidden'); el.classList.add('flex'); } 
+            else { el.classList.add('hidden'); el.classList.remove('flex'); }
         };
 
         function openModal() {
+            // Garante que o modal use a mesma imagem que o principal ao abrir
             const mainSrc = document.getElementById('avatarImage').src;
-            if (mainSrc) {
-                const modalImg = document.getElementById('modalAvatarImage');
-                modalImg.src = mainSrc;
-                modalImg.classList.remove('opacity-0');
-                modalImg.classList.add('opacity-100');
-            }
+            if (mainSrc) document.getElementById('modalAvatarImage').src = mainSrc;
             toggleModal('imageModal', true);
         }
         function closeModal() { toggleModal('imageModal', false); }
@@ -471,7 +430,6 @@
             userData.address.neighborhood = document.getElementById('editNeighborhood').value;
             userData.address.street = document.getElementById('editStreet').value;
             userData.address.number = document.getElementById('editHouseNumber').value;
-
             document.getElementById('userNameDisplay').textContent = userData.name;
             closeProfileEditModal();
         }
@@ -493,56 +451,27 @@
             const img = document.getElementById('imageToCrop');
             img.src = src;
             toggleModal('cropperModal', true);
-
             if (appState.cropper) appState.cropper.destroy();
-
             setTimeout(() => {
-                appState.cropper = new Cropper(img, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    dragMode: 'move',
-                    autoCropArea: 0.9,
-                    responsive: true,
-                    background: false,
-                    guides: true,
-                });
+                appState.cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 0.9, responsive: true, background: false, guides: true });
             }, 100);
         }
 
         function cropImage() {
             if (!appState.cropper) return;
-            
-            const canvas = appState.cropper.getCroppedCanvas({
-                width: 512, height: 512,
-                imageSmoothingQuality: 'high'
-            });
-
+            const canvas = appState.cropper.getCroppedCanvas({ width: 512, height: 512, imageSmoothingQuality: 'high' });
             updateAvatarImages(canvas.toDataURL('image/jpeg', 0.9));
-            
-            document.querySelectorAll('.gender-button').forEach(btn => {
-                btn.className = "gender-button py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 bg-gray-100 text-gray-600";
-            });
-
+            document.querySelectorAll('.gender-button').forEach(btn => btn.className = "gender-button py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 bg-gray-100 text-gray-600");
             closeCropper();
         }
-
-        function closeCropper() {
-            toggleModal('cropperModal', false);
-            if (appState.cropper) {
-                appState.cropper.destroy();
-                appState.cropper = null;
-            }
-        }
+        function closeCropper() { toggleModal('cropperModal', false); if (appState.cropper) { appState.cropper.destroy(); appState.cropper = null; } }
 
         // --- LISTENERS ---
         ['imageModal', 'profileEditModal'].forEach(id => {
-            document.getElementById(id).addEventListener('click', (e) => {
-                if (e.target.id === id) toggleModal(id, false);
-            });
+            document.getElementById(id).addEventListener('click', (e) => { if (e.target.id === id) toggleModal(id, false); });
         });
 
         document.addEventListener('DOMContentLoaded', initUI);
-
     </script>
 </body>
 </html>
