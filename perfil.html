@@ -13,7 +13,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f9ff;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%); /* Fundo degradê restaurado */
             min-height: 100vh;
         }
         .cropper-container { max-width: 100%; }
@@ -43,116 +43,172 @@
             100% { background-position: 30px 0; }
         }
         .animated-stripes {
-            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.4) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.4) 75%, transparent 75%, transparent);
+            background-image: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.4) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0.4) 75%,
+                transparent 75%,
+                transparent
+            );
             background-size: 30px 30px;
             animation: moveStripes 1s linear infinite;
             width: 100%; height: 100%;
         }
         
         .btn-loading {
-            background-color: #9ca3af !important; color: #f3f4f6 !important; cursor: wait; transform: scale(0.98); box-shadow: none !important;
+            background-color: #e5e7eb !important; 
+            color: #9ca3af !important; 
+            cursor: wait; 
+            transform: scale(0.95);
+            box-shadow: none !important;
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-800">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <!-- TELA DE LOGIN (AUTH VIEW) -->
-    <section id="authView" class="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50">
-        <div class="absolute top-0 left-0 w-full h-1/2 bg-blue-600 rounded-b-[3rem] shadow-xl z-0"></div>
-        <div class="absolute top-10 left-10 w-24 h-24 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
-        <div class="absolute top-20 right-20 w-32 h-32 bg-blue-400/20 rounded-full blur-3xl"></div>
-
-        <div class="relative z-10 w-full max-w-sm flex flex-col fade-in space-y-8">
-            <div class="text-center mb-6">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl shadow-xl mb-4 text-blue-600 transform rotate-3">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <h1 class="text-3xl font-extrabold text-white drop-shadow-md">xxxxxxxxxxxx</h1>
-                <p class="text-blue-100 font-medium text-sm mt-1">Bem-vindo ao seu Clube</p>
+    <!-- 
+      ========================================
+      TELA DE LOGIN (CARD)
+      ========================================
+    -->
+    <section id="authView" class="w-full max-w-sm flex flex-col fade-in">
+        
+        <!-- Logo / Branding -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl shadow-xl mb-4 text-blue-600 transform rotate-3">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
-
-            <div class="w-full bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/50">
-                <div class="flex p-1 bg-gray-100 rounded-xl mb-6">
-                    <button onclick="switchAuthTab('login')" id="tabLogin" class="flex-1 py-2.5 text-sm font-bold rounded-lg shadow-sm bg-white text-blue-600 transition-all">Entrar</button>
-                    <button onclick="switchAuthTab('register')" id="tabRegister" class="flex-1 py-2.5 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 transition-all">Cadastrar</button>
-                </div>
-
-                <form id="loginForm" class="space-y-5" onsubmit="handleLogin(event)">
-                    <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Email</label><input type="email" placeholder="seu@email.com" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-gray-400" required></div>
-                    <div class="space-y-1"><div class="flex justify-between items-center ml-1"><label class="text-xs font-bold text-gray-500 uppercase">Senha</label><a href="#" class="text-xs text-blue-600 hover:text-blue-700 font-bold">Esqueceu?</a></div><div class="relative"><input type="password" id="loginPassword" placeholder="••••••••" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-gray-400" required><button type="button" onclick="togglePassword('loginPassword', this)" class="absolute right-3 top-3.5 text-gray-400 hover:text-blue-600 transition-colors p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button></div></div>
-                    <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-300/50 transform transition hover:-translate-y-0.5 active:translate-y-0 active:shadow-md mt-2 text-base">Entrar</button>
-                </form>
-
-                <form id="registerForm" class="space-y-4 hidden" onsubmit="handleLogin(event)">
-                    <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Nome</label><input type="text" placeholder="Seu nome" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all" required></div>
-                    <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Email</label><input type="email" placeholder="seu@email.com" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all" required></div>
-                    <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Senha</label><div class="relative"><input type="password" id="regPassword" placeholder="Crie uma senha" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all" required><button type="button" onclick="togglePassword('regPassword', this)" class="absolute right-3 top-3.5 text-gray-400 hover:text-blue-600 transition-colors p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button></div></div>
-                    <button type="submit" class="w-full py-3.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-300/50 transform transition hover:-translate-y-0.5 active:translate-y-0 active:shadow-md mt-2 text-base">Criar Conta</button>
-                </form>
-
-                <div class="relative my-5"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div><div class="relative flex justify-center text-xs uppercase"><span class="bg-white/80 px-3 text-gray-400 font-bold">Ou entre com</span></div></div>
-                <button onclick="handleLogin(event)" class="w-full py-3 bg-white border border-gray-200 text-slate-700 font-bold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-3 group shadow-sm"><svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9494 17.5885 17.2678 16.323 18.1056V21.1039H20.19C22.4608 19.0139 23.766 15.9274 23.766 12.2764Z" fill="#4285F4"/><path d="M12.2401 24.0008C15.4766 24.0008 18.2059 22.9382 20.1945 21.1039L16.3275 18.1055C15.2517 18.8375 13.8627 19.252 12.2445 19.252C9.11388 19.252 6.45946 17.1399 5.50705 14.3003H1.5166V17.3912C3.55371 21.4434 7.7029 24.0008 12.2401 24.0008Z" fill="#34A853"/><path d="M5.50253 14.3003C5.00236 12.8099 5.00236 11.1961 5.50253 9.70575V6.61481H1.51649C-0.18551 10.0056 -0.18551 14.0004 1.51649 17.3912L5.50253 14.3003Z" fill="#FBBC05"/><path d="M12.2401 4.74966C13.9509 4.7232 15.6044 5.36697 16.8434 6.54867L20.2695 3.12262C18.1001 1.0855 15.2208 -0.034466 12.2401 0.000808666C7.7029 0.000808666 3.55371 2.55822 1.5166 6.61481L5.50264 9.70575C6.45064 6.86173 9.10947 4.74966 12.2401 4.74966Z" fill="#EA4335"/></svg>Google</button>
-            </div>
-            
-            <p class="text-center mt-6 text-xs text-slate-400">&copy; 2024 xxxxxxxxxxxx. <br> Todos os direitos reservados.</p>
+            <h1 class="text-3xl font-extrabold text-slate-800 drop-shadow-sm">xxxxxxxxxxxx</h1>
+            <p class="text-slate-500 font-medium text-sm mt-1">Bem-vindo ao seu Clube</p>
         </div>
+
+        <!-- Card do Formulário -->
+        <div class="bg-white rounded-3xl shadow-2xl p-6 border border-white/50 relative overflow-hidden">
+            
+            <div class="flex p-1 bg-gray-100 rounded-xl mb-6">
+                <button onclick="switchAuthTab('login')" id="tabLogin" class="flex-1 py-2.5 text-sm font-bold rounded-lg shadow-sm bg-white text-blue-600 transition-all">Entrar</button>
+                <button onclick="switchAuthTab('register')" id="tabRegister" class="flex-1 py-2.5 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 transition-all">Cadastrar</button>
+            </div>
+
+            <!-- LOGIN -->
+            <form id="loginForm" class="space-y-5" onsubmit="handleLogin(event)">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Email</label>
+                    <div class="relative">
+                        <input type="email" placeholder="seu@email.com" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-gray-400" required>
+                        <svg class="w-5 h-5 text-gray-400 absolute right-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
+                    </div>
+                </div>
+                
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center ml-1">
+                        <label class="text-xs font-bold text-gray-500 uppercase">Senha</label>
+                        <a href="#" class="text-xs text-blue-600 hover:text-blue-700 font-bold">Esqueceu?</a>
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" placeholder="••••••••" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-gray-400" required>
+                        <button type="button" onclick="togglePassword('loginPassword', this)" class="absolute right-3 top-3.5 text-gray-400 hover:text-blue-600 transition-colors p-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-300/50 transform transition hover:-translate-y-0.5 active:translate-y-0 active:shadow-md mt-2 text-base">
+                    Entrar
+                </button>
+            </form>
+
+            <!-- CADASTRO -->
+            <form id="registerForm" class="space-y-4 hidden" onsubmit="handleLogin(event)">
+                <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Nome</label><input type="text" placeholder="Seu nome" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all" required></div>
+                <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Email</label><input type="email" placeholder="seu@email.com" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all" required></div>
+                <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Senha</label><div class="relative"><input type="password" id="regPassword" placeholder="Crie uma senha" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all" required><button type="button" onclick="togglePassword('regPassword', this)" class="absolute right-3 top-3.5 text-gray-400 hover:text-blue-600 transition-colors p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button></div></div>
+                <button type="submit" class="w-full py-3.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-300/50 transform transition hover:-translate-y-0.5 active:translate-y-0 active:shadow-md mt-2 text-base">Criar Conta</button>
+            </form>
+
+            <div class="relative my-5">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
+                <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-3 text-gray-400 font-bold">Ou entre com</span></div>
+            </div>
+
+            <button onclick="handleLogin(event)" class="w-full py-3 bg-white border border-gray-200 text-slate-700 font-bold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-3 group shadow-sm">
+                <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9494 17.5885 17.2678 16.323 18.1056V21.1039H20.19C22.4608 19.0139 23.766 15.9274 23.766 12.2764Z" fill="#4285F4"/><path d="M12.2401 24.0008C15.4766 24.0008 18.2059 22.9382 20.1945 21.1039L16.3275 18.1055C15.2517 18.8375 13.8627 19.252 12.2445 19.252C9.11388 19.252 6.45946 17.1399 5.50705 14.3003H1.5166V17.3912C3.55371 21.4434 7.7029 24.0008 12.2401 24.0008Z" fill="#34A853"/><path d="M5.50253 14.3003C5.00236 12.8099 5.00236 11.1961 5.50253 9.70575V6.61481H1.51649C-0.18551 10.0056 -0.18551 14.0004 1.51649 17.3912L5.50253 14.3003Z" fill="#FBBC05"/><path d="M12.2401 4.74966C13.9509 4.7232 15.6044 5.36697 16.8434 6.54867L20.2695 3.12262C18.1001 1.0855 15.2208 -0.034466 12.2401 0.000808666C7.7029 0.000808666 3.55371 2.55822 1.5166 6.61481L5.50264 9.70575C6.45064 6.86173 9.10947 4.74966 12.2401 4.74966Z" fill="#EA4335"/></svg>
+                Google
+            </button>
+        </div>
+        
+        <p class="text-center mt-8 text-xs text-slate-400">
+            &copy; 2024 xxxxxxxxxxxx. <br> Todos os direitos reservados.
+        </p>
     </section>
 
-    <!-- TELA DO PERFIL (PROFILE VIEW) -->
-    <main id="profileView" class="hidden w-full max-w-md mx-auto bg-white min-h-screen relative flex-col shadow-none fade-in">
+
+    <!-- 
+      ========================================
+      TELA DO PERFIL (CARD)
+      ========================================
+    -->
+    <main id="profileView" class="hidden w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/50 relative flex-col h-[85vh] md:h-[800px] fade-in">
         
         <!-- Topo -->
-        <div class="h-48 w-full relative z-0 overflow-hidden group">
-            <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1470&auto=format&fit=crop" class="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" alt="Fundo Festa">
-            <div class="absolute inset-0 bg-gradient-to-b from-indigo-900/40 via-transparent to-[#f3f4f6]"></div>
+        <div class="h-36 w-full absolute top-0 left-0 z-0 shrink-0 overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1470&auto=format&fit=crop" 
+                 class="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" 
+                 alt="Fundo Festa">
+            <div class="absolute inset-0 bg-gradient-to-b from-indigo-900/30 to-white"></div>
 
             <!-- Botão Sair -->
             <button onclick="openLogoutModal()" class="absolute top-4 left-4 z-50 bg-white/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-white hover:text-red-600 transition-all duration-300 shadow-lg border border-white/30 group">
-                <svg class="w-6 h-6 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                <svg class="w-5 h-5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             </button>
 
-            <!-- Ícone Gift com Bolinha Vermelha Condicional -->
-            <button onclick="openRewardsModal()" class="fixed top-4 right-4 md:absolute md:right-4 z-50 bg-white/30 backdrop-blur-md p-2.5 rounded-full text-white hover:bg-white hover:text-indigo-600 transition-all duration-300 shadow-lg border border-white/40 animate-pulse hover:animate-none group">
+            <!-- Ícone Gift -->
+            <button onclick="openRewardsModal()" class="absolute top-4 right-4 z-50 bg-white/20 backdrop-blur-md p-2.5 rounded-full text-white hover:bg-white hover:text-indigo-600 transition-all duration-300 shadow-lg border border-white/30 animate-pulse hover:animate-none group">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
-                <!-- Bolinha Vermelha (Controle via JS) -->
-                <span id="rewardsBadge" class="absolute -top-0.5 -right-0.5 flex h-3 w-3 hidden">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                </span>
+                <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>
             </button>
         </div>
 
-        <div class="relative z-10 flex flex-col items-center px-4 -mt-20">
+        <div class="relative z-10 flex flex-col items-center pt-12 px-6 pb-2 shrink-0 pointer-events-none">
+            
             <!-- Avatar -->
-            <div class="relative group cursor-pointer" onclick="openModal()">
-                <div class="p-1 rounded-full bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 shadow-xl">
-                    <div class="p-1 bg-white rounded-full relative">
-                        <div id="mainAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-white/80 hidden"><svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
-                        <img id="avatarImage" src="" alt="Avatar" class="w-28 h-28 rounded-full object-cover bg-gray-100">
+            <div class="relative group cursor-pointer pointer-events-auto" onclick="openModal()">
+                <div class="w-32 h-32 rounded-full p-1.5 bg-white shadow-xl relative ring-1 ring-gray-100">
+                    <div id="mainAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/10 hidden">
+                        <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     </div>
+                    <img id="avatarImage" src="" alt="Avatar" class="w-full h-full rounded-full object-cover bg-gray-100 border border-gray-200">
                 </div>
-                <button class="absolute bottom-2 right-2 p-2 bg-blue-600 rounded-full shadow-lg border-2 border-white text-white hover:bg-blue-700 active:scale-95 transition-all z-30"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
+                <button class="absolute bottom-1 right-1 p-2 bg-blue-600 rounded-full shadow-lg border-2 border-white text-white hover:bg-blue-700 active:scale-95 transition-all z-30">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                </button>
             </div>
             
-            <div class="text-center mt-3 mb-4">
+            <!-- Info -->
+            <div class="text-center mt-3 mb-4 pointer-events-auto">
                 <h1 class="text-2xl font-bold text-gray-800 leading-tight" id="userNameDisplay">Carregando...</h1>
                 <p class="text-sm text-gray-600 font-medium" id="userEmailDisplay">...</p>
             </div>
 
-            <button onclick="openProfileEditModal()" class="w-full py-2.5 bg-white/80 backdrop-blur-sm border border-white/50 text-gray-700 text-sm font-semibold rounded-xl hover:bg-white active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-6 shadow-sm">
+            <!-- Botão Editar -->
+            <button onclick="openProfileEditModal()" class="w-full py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mb-6 shadow-sm pointer-events-auto">
                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                 Editar Perfil
             </button>
             
             <!-- Barra de Nível -->
-            <div class="w-full mb-4 px-1">
-                <div class="flex justify-between items-end mb-1.5"><div class="flex items-center gap-1.5"><span class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold uppercase rounded-md tracking-wider shadow-sm" id="levelLabel">Nível 1</span></div><span class="text-xs font-bold text-gray-600" id="xpDisplay">0 / 500 XP</span></div>
+            <div class="w-full mb-4 px-1 pointer-events-auto">
+                <div class="flex justify-between items-end mb-1.5"><div class="flex items-center gap-1.5"><span class="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold uppercase rounded-md tracking-wider shadow-sm">Nível 1</span></div><span class="text-xs font-bold text-gray-600" id="xpDisplay">0 / 2000 XP</span></div>
                 <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner relative">
                     <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-blue-500 to-purple-600 w-0 rounded-full relative overflow-hidden shadow-sm flex items-center"><div class="absolute inset-0 w-full h-full animated-stripes"></div></div>
                 </div>
             </div>
 
-            <div class="w-full flex items-center justify-between bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6">
+            <!-- Stats -->
+            <div class="w-full flex items-center justify-between bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6 pointer-events-auto">
                 <div class="flex-1 flex flex-col items-center"><span class="text-xl font-bold text-blue-600 leading-none" id="partyCountDisplay">0</span><span class="text-[10px] font-bold text-gray-500 uppercase mt-1">Festas</span></div>
                 <div class="w-px h-8 bg-gray-200"></div>
                 <div class="flex-1 flex flex-col items-center"><span class="text-xl font-bold text-purple-600 leading-none" id="userPointsDisplay">0</span><span class="text-[10px] font-bold text-gray-500 uppercase mt-1">Pontos</span></div>
@@ -160,28 +216,94 @@
                 <div class="flex-1 flex flex-col items-center"><span class="text-xl font-bold text-green-600 leading-none" id="userBalanceDisplay">0,00</span><div class="flex items-center gap-1 mt-1"><svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg><span class="text-[10px] font-bold text-gray-500 uppercase">Saldo</span></div></div>
             </div>
 
-            <div class="w-full pb-10">
-                <div class="flex justify-between items-center mb-3 px-1"><h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Histórico de Locações</h3><button onclick="openFilterModal()" class="text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-100 transition flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>Filtro <span id="filterCountBadge" class="hidden bg-blue-600 text-white text-[9px] px-1 rounded-full ml-1"></span></button></div>
-                <div class="space-y-3" id="historyList"></div>
+            <!-- Histórico -->
+            <div class="flex-1 flex flex-col overflow-hidden bg-white mt-2 border-t border-gray-100 w-full pointer-events-auto">
+                <div class="px-6 py-3 flex justify-between items-center bg-white z-10 shadow-sm"><h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Histórico de Locações</h3><button onclick="openFilterModal()" class="text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-100 transition flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>Filtro <span id="filterCountBadge" class="hidden bg-blue-600 text-white text-[9px] px-1 rounded-full ml-1"></span></button></div>
+                <div class="flex-1 overflow-y-auto px-5 pb-6 history-scroll space-y-2" id="historyList"></div>
+                <div class="h-4 bg-gradient-to-t from-white to-transparent pointer-events-none absolute bottom-0 w-full"></div>
             </div>
         </div>
     </main>
 
-    <!-- MODAL LOGOUT -->
+    <!-- Modais -->
     <div id="logoutModal" class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-xs modal-enter text-center"><div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></div><h3 class="text-xl font-bold text-gray-800 mb-2">Sair da Conta</h3><p class="text-sm text-gray-500 mb-6">Tem certeza que deseja sair do aplicativo?</p><div class="flex gap-3"><button onclick="closeLogoutModal()" class="flex-1 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition">Cancelar</button><button onclick="confirmLogout()" class="flex-1 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition shadow-lg shadow-red-200">Sair</button></div></div></div>
-
-    <!-- MODAL RECOMPENSAS -->
-    <div id="rewardsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm modal-enter overflow-hidden flex flex-col max-h-[85vh]"><div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 relative shrink-0"><button onclick="closeRewardsModal()" class="absolute top-4 right-4 text-white/80 hover:text-white bg-white/10 p-1 rounded-full hover:bg-white/20 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div class="flex items-center gap-3"><div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg></div><div><h2 class="text-white text-lg font-bold">Loja de Pontos</h2><p class="text-white/80 text-xs">Troque seus pontos por benefícios</p></div></div><div class="mt-4 bg-white/10 rounded-xl p-3 flex justify-between items-center backdrop-blur-sm border border-white/10"><span class="text-white/90 text-sm font-medium">Seus Pontos:</span><span class="text-white text-xl font-bold" id="modalUserPoints">0</span></div></div><div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 history-scroll" id="rewardsList"></div></div></div>
     
-    <!-- Modais restantes iguais (Filtro, Foto, Editar, Cropper) -->
+    <div id="rewardsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm modal-enter overflow-hidden flex flex-col max-h-[85vh]"><div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 relative shrink-0"><button onclick="closeRewardsModal()" class="absolute top-4 right-4 text-white/80 hover:text-white bg-white/10 p-1 rounded-full hover:bg-white/20 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div class="flex items-center gap-3"><div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg></div><div><h2 class="text-white text-lg font-bold">Loja de Pontos</h2><p class="text-white/80 text-xs">Troque seus pontos por benefícios</p></div></div><div class="mt-4 bg-white/10 rounded-xl p-3 flex justify-between items-center backdrop-blur-sm border border-white/10"><span class="text-white/90 text-sm font-medium">Seus Pontos:</span><span class="text-white text-xl font-bold" id="modalUserPoints">0</span></div></div><div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 history-scroll" id="rewardsList"></div></div></div>
     <div id="filterModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm modal-enter relative"><div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-gray-800">Filtrar Histórico</h2><button onclick="closeFilterModal()" class="text-gray-400 hover:text-gray-600 p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="space-y-4"><h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Por Bairro</h3><div id="filterOptionsContainer" class="space-y-2 max-h-48 overflow-y-auto"></div></div><div class="flex gap-3 mt-8 pt-4 border-t border-gray-100"><button onclick="resetFilters()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition">Limpar</button><button onclick="applyFilters()" class="flex-1 px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition">Aplicar</button></div></div></div>
     <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter relative overflow-hidden"><div class="text-center mb-6"><h2 class="text-xl font-bold text-gray-800">Alterar Foto</h2><p class="text-sm text-gray-500">Escolha um avatar ou envie sua foto</p></div><div class="flex justify-center mb-8"><div class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-blue-200 hover:border-blue-400 cursor-pointer group" onclick="document.getElementById('photoUploadInput').click()"><div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden"><svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div><img id="modalAvatarImage" src="" class="w-full h-full rounded-full object-cover bg-gray-50"><div class="absolute inset-0 rounded-full flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold uppercase"><span>Enviar Foto</span></div></div></div><div class="grid grid-cols-2 gap-3 mb-6"><button onclick="generateMale()" class="gender-button py-3 rounded-xl bg-blue-50 text-blue-700 text-sm font-bold shadow-sm hover:bg-blue-100 transition-colors" data-type="male">Masculino</button><button onclick="generateFemale()" class="gender-button py-3 rounded-xl bg-pink-50 text-pink-700 text-sm font-bold shadow-sm hover:bg-pink-100 transition-colors" data-type="female">Feminino</button></div><div class="flex justify-end border-t pt-4"><button onclick="closeModal()" class="px-6 py-2 bg-gray-800 text-white rounded-xl font-medium">Concluir</button></div></div></div>
-    <div id="profileEditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter max-h-[90vh] overflow-y-auto"><div class="flex justify-between items-center mb-6"><h2 class="text-lg font-bold">Editar Perfil</h2><button onclick="closeProfileEditModal()">✕</button></div><div class="space-y-5"><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label><input type="text" id="editName" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"><input type="tel" id="editPhone" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="WhatsApp" oninput="formatPhone(this)"><input type="email" id="editEmail" class="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200" disabled></div><div class="py-2"><div class="h-px bg-gray-100"></div></div><h3 class="text-sm font-bold text-blue-600 uppercase tracking-wide">Endereço</h3><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label><div class="relative"><select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none appearance-none"><option value="">Selecione...</option><option value="Centro">Centro</option><option value="Jardim America">Jardim América</option><option value="Vila Nova">Vila Nova</option><option value="Outro">Outro</option></select><div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div></div></div><div class="grid grid-cols-3 gap-3"><div class="col-span-2 space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Rua</label><input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"></div><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nº</label><div class="relative"><input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"></div><div class="flex items-center mt-1.5 ml-1"><input type="checkbox" id="noNumberCheckbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="toggleHouseNumber()"><label for="noNumberCheckbox" class="ml-1.5 text-xs text-gray-500 font-medium cursor-pointer">Sem número (S/N)</label></div></div></div></div><div class="flex gap-3 mt-8 pt-4 border-t border-gray-100"><button onclick="closeProfileEditModal()" class="flex-1 px-4 py-3 bg-white border border-gray-200 font-semibold rounded-xl">Cancelar</button><button onclick="saveProfileChanges()" class="flex-1 px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700">Salvar</button></div></div></div>
+    <div id="profileEditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter max-h-[90vh] overflow-y-auto"><div class="flex justify-between items-center mb-6"><h2 class="text-lg font-bold">Editar Perfil</h2><button onclick="closeProfileEditModal()">✕</button></div><div class="space-y-5"><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label><input type="text" id="editName" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Seu nome"></div><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">WhatsApp / Telefone</label><input type="tel" id="editPhone" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="(xx) xxxxx-xxxx" maxlength="15" oninput="formatPhone(this)"></div><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Email</label><input type="email" id="editEmail" class="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200" disabled></div><div class="py-2"><div class="h-px bg-gray-100"></div></div><h3 class="text-sm font-bold text-blue-600 uppercase tracking-wide">Endereço</h3><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label><div class="relative"><select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none appearance-none"><option value="">Selecione...</option><option value="Centro">Centro</option><option value="Jardim America">Jardim América</option><option value="Vila Nova">Vila Nova</option><option value="Outro">Outro</option></select><div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div></div></div><div class="grid grid-cols-3 gap-3"><div class="col-span-2 space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Rua</label><input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none" placeholder="Nome da rua"></div><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nº</label><div class="relative"><input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none" placeholder="123"></div><div class="flex items-center mt-1.5 ml-1"><input type="checkbox" id="noNumberCheckbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="toggleHouseNumber()"><label for="noNumberCheckbox" class="ml-1.5 text-xs text-gray-500 font-medium cursor-pointer">Sem número (S/N)</label></div></div></div></div><div class="flex gap-3 mt-8 pt-4 border-t border-gray-100"><button onclick="closeProfileEditModal()" class="flex-1 px-4 py-3 bg-white border border-gray-200 font-semibold rounded-xl">Cancelar</button><button onclick="saveProfileChanges()" class="flex-1 px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700">Salvar</button></div></div></div>
     <div id="cropperModal" class="fixed inset-0 z-[60] bg-zinc-900 hidden flex-col justify-center p-0 md:p-6 transition-opacity duration-300"><div class="w-full max-w-2xl mx-auto flex flex-col h-full md:h-auto md:max-h-[90vh] bg-zinc-900 rounded-2xl overflow-hidden relative"><div class="flex justify-between items-center p-4 z-10 bg-zinc-900"><h3 class="text-lg font-bold text-white">Ajustar</h3><button onclick="closeCropper()" class="text-zinc-400 hover:text-white">✕</button></div><div class="flex-1 bg-black relative flex items-center justify-center overflow-hidden"><img id="imageToCrop" class="max-w-full max-h-full block"></div><div class="p-6 bg-zinc-900 flex justify-between items-center gap-4 border-t border-zinc-800"><button onclick="closeCropper()" class="flex-1 px-6 py-3.5 rounded-xl font-semibold text-zinc-300 border border-zinc-700">Cancelar</button><button onclick="cropImage()" class="flex-1 px-6 py-3.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg">Salvar Foto</button></div></div></div>
 
     <input type="file" id="photoUploadInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
 
     <script>
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const btnLogin = document.getElementById('tabLogin');
+            const btnRegister = document.getElementById('tabRegister');
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+
+            if(tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                btnLogin.classList.add('bg-white', 'text-blue-600', 'shadow-sm', 'ring-1', 'ring-black/5');
+                btnLogin.classList.remove('text-gray-400', 'hover:bg-white/50');
+                btnRegister.classList.remove('bg-white', 'text-blue-600', 'shadow-sm', 'ring-1', 'ring-black/5');
+                btnRegister.classList.add('text-gray-400', 'hover:bg-white/50');
+                title.textContent = "xxxxxxxxxxxx";
+                subtitle.textContent = "Acesse sua conta para continuar.";
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                btnRegister.classList.add('bg-white', 'text-blue-600', 'shadow-sm', 'ring-1', 'ring-black/5');
+                btnRegister.classList.remove('text-gray-400', 'hover:bg-white/50');
+                btnLogin.classList.remove('bg-white', 'text-blue-600', 'shadow-sm', 'ring-1', 'ring-black/5');
+                btnLogin.classList.add('text-gray-400', 'hover:bg-white/50');
+                title.textContent = "Crie sua conta";
+                subtitle.textContent = "Junte-se ao clube e comece agora.";
+            }
+        }
+
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('svg');
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+                btn.classList.add('text-blue-600');
+            } else {
+                input.type = "password";
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>';
+                btn.classList.remove('text-blue-600');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const authView = document.getElementById('authView');
+            const profileView = document.getElementById('profileView');
+            authView.classList.add('hidden');
+            profileView.classList.remove('hidden');
+            profileView.classList.add('flex');
+            initUI();
+        }
+
+        // --- LOGOUT LOGIC ---
+        function openLogoutModal() { toggleModal('logoutModal', true); }
+        function closeLogoutModal() { toggleModal('logoutModal', false); }
+        function confirmLogout() {
+            closeLogoutModal();
+            document.getElementById('profileView').classList.add('hidden');
+            document.getElementById('profileView').classList.remove('flex');
+            document.getElementById('authView').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+            // Reset to default male avatar for next login
+            generateAvatar('male');
+        }
+
         // --- DADOS ---
         const userData = {
             name: 'Usuário Teste',
@@ -191,25 +313,6 @@
             stats: { parties: 5, points: 1250, balance: 100.00 }
         };
 
-        let hasViewedRewards = false; // Controle da bolinha
-
-        // Lógica de Níveis (500 pts por nível, max 20)
-        function calculateLevel(points) {
-            let level = Math.floor(points / 500) + 1;
-            if (level > 20) level = 20;
-            return level;
-        }
-
-        function getLevelProgress(points) {
-            let level = calculateLevel(points);
-            if (level >= 20) return 100;
-            
-            // Ex: 1250 pts. Nível 3 (1000-1500). Progresso no nível: 250.
-            let rangeStart = (level - 1) * 500;
-            let progressInLevel = points - rangeStart;
-            return Math.min((progressInLevel / 500) * 100, 100);
-        }
-
         const rewardsData = [
             { id: 'praise', title: 'Agradecimento Especial', desc: 'Receba um elogio da equipe!', cost: 50, iconColor: 'text-yellow-600', bgColor: 'bg-yellow-100', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>' },
             { id: 'vip', title: 'Status VIP (7 dias)', desc: 'Ícone exclusivo no seu perfil', cost: 150, iconColor: 'text-purple-600', bgColor: 'bg-purple-100', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>' },
@@ -218,33 +321,106 @@
             { id: 'shipping', title: 'Frete Grátis', desc: 'Entrega sem custo', cost: 800, iconColor: 'text-blue-600', bgColor: 'bg-blue-100', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>' },
             { id: 'cupom_50', title: 'Super Cupom R$ 50', desc: 'Para compras acima de R$ 200', cost: 2000, iconColor: 'text-amber-600', bgColor: 'bg-amber-100', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>' },
         ];
-        
-        // Badge Logic
-        function checkRewardsBadge() {
-            const badge = document.getElementById('rewardsBadge');
-            if (hasViewedRewards) {
-                badge.classList.add('hidden');
-                return;
-            }
 
-            // Check if user can afford ANY reward
-            const affordable = rewardsData.some(r => userData.stats.points >= r.cost);
-            
-            if (affordable) {
-                badge.classList.remove('hidden');
+        const historyData = [
+            { date: '12/08/2024', neighborhood: 'Centro', value: 150.00, discount: 15.00 },
+            { date: '05/07/2024', neighborhood: 'Vila Nova', value: 200.00, discount: 20.00 },
+            { date: '20/06/2024', neighborhood: 'Jardim America', value: 120.00, discount: 10.00 },
+            { date: '15/05/2024', neighborhood: 'Centro', value: 180.00, discount: 0.00 },
+            { date: '02/04/2024', neighborhood: 'Outro', value: 300.00, discount: 30.00 },
+            { date: '12/03/2024', neighborhood: 'Centro', value: 150.00, discount: 15.00 },
+            { date: '05/02/2024', neighborhood: 'Vila Nova', value: 200.00, discount: 20.00 }
+        ];
+
+        let activeFilter = 'Todos';
+        const MAX_XP = 2000;
+
+        const formatBRL = val => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
+        const getRandom = arr => arr[Math.floor(Math.random() * arr.length)];
+        const getSeed = () => Math.random().toString(36).substring(2);
+
+        function formatPhone(input) {
+            let v = input.value.replace(/\D/g,'');
+            v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); 
+            v = v.replace(/(\d)(\d{4})$/,"$1-$2"); 
+            input.value = v;
+        }
+
+        function toggleHouseNumber() {
+            const checkbox = document.getElementById('noNumberCheckbox');
+            const input = document.getElementById('editHouseNumber');
+            if (checkbox.checked) {
+                input.value = "S/N"; input.disabled = true;
+                input.classList.add('bg-gray-100', 'text-gray-500'); input.classList.remove('bg-gray-50', 'text-gray-800');
             } else {
-                badge.classList.add('hidden');
+                input.value = ""; input.disabled = false;
+                input.classList.remove('bg-gray-100', 'text-gray-500'); input.classList.add('bg-gray-50', 'text-gray-800');
+                input.focus();
             }
         }
 
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            const filteredData = activeFilter === 'Todos' ? historyData : historyData.filter(item => item.neighborhood === activeFilter);
+            if (filteredData.length === 0) { list.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Nenhum histórico encontrado.</div>'; return; }
+            filteredData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center p-3 bg-white hover:bg-white backdrop-blur-sm rounded-xl transition cursor-default border border-gray-100/50 shadow-sm mb-2';
+                const discountTag = item.discount > 0 ? `<div class="flex items-center justify-end mt-1"><span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> Economizou R$ ${formatBRL(item.discount)}</span></div>` : '';
+                div.innerHTML = `<div><p class="text-[10px] text-gray-400 font-bold mb-0.5">${item.date}</p><p class="text-sm font-bold text-gray-700">${item.neighborhood}</p></div><div class="text-right"><p class="text-sm font-bold text-gray-800">R$ ${formatBRL(item.value)}</p>${discountTag}</div>`;
+                list.appendChild(div);
+            });
+        }
+
+        function renderRewards() {
+            const list = document.getElementById('rewardsList');
+            list.innerHTML = '';
+            rewardsData.forEach(reward => {
+                const canAfford = userData.stats.points >= reward.cost;
+                const btnClass = canAfford ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-300 text-white cursor-not-allowed";
+                const btnText = canAfford ? "Trocar" : "Faltam Pontos";
+                const btnAction = canAfford ? `onclick="redeemReward(${reward.cost}, '${reward.id}')"` : "disabled";
+                const iconHtml = reward.textIcon ? `<span class="text-xl font-bold">${reward.textIcon}</span>` : `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">${reward.icon}</svg>`;
+                const itemHtml = `<div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3 ${!canAfford ? 'opacity-70' : ''}"><div class="w-16 h-16 ${reward.bgColor} rounded-lg flex items-center justify-center shrink-0 ${reward.iconColor}">${iconHtml}</div><div class="flex-1 flex flex-col justify-between"><div><h3 class="font-bold text-gray-800 text-sm">${reward.title}</h3><p class="text-[10px] text-gray-500 line-clamp-1">${reward.desc}</p></div><div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">${reward.cost} XP</span><button ${btnAction} class="${btnClass} text-[10px] px-3 py-1.5 rounded-lg font-semibold transition">${btnText}</button></div></div></div>`;
+                list.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
+
+        function openFilterModal() {
+            const container = document.getElementById('filterOptionsContainer');
+            container.innerHTML = '';
+            const neighborhoods = ['Todos', ...new Set(historyData.map(item => item.neighborhood))];
+            neighborhoods.forEach(bairro => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center p-3 border border-gray-100 rounded-xl cursor-pointer hover:bg-gray-50 transition';
+                const isChecked = bairro === activeFilter ? 'checked' : '';
+                label.innerHTML = `<input type="radio" name="neighborhoodFilter" value="${bairro}" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" ${isChecked}><span class="ml-3 text-sm font-medium text-gray-700">${bairro}</span>`;
+                container.appendChild(label);
+            });
+            toggleModal('filterModal', true);
+        }
+
+        function applyFilters() {
+            const selected = document.querySelector('input[name="neighborhoodFilter"]:checked');
+            if (selected) {
+                activeFilter = selected.value;
+                renderHistory();
+                const badge = document.getElementById('filterCountBadge');
+                if (activeFilter !== 'Todos') { badge.textContent = '1'; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
+            }
+            toggleModal('filterModal', false);
+        }
+
+        function resetFilters() { activeFilter = 'Todos'; renderHistory(); document.getElementById('filterCountBadge').classList.add('hidden'); toggleModal('filterModal', false); }
+        function closeFilterModal() { toggleModal('filterModal', false); }
+
         function openRewardsModal() {
-            hasViewedRewards = true;
-            checkRewardsBadge(); // Esconde a bolinha
             document.getElementById('modalUserPoints').textContent = userData.stats.points;
             renderRewards(); 
             toggleModal('rewardsModal', true);
         }
-        
+        function closeRewardsModal() { toggleModal('rewardsModal', false); }
         function redeemReward(cost, type) {
             if(userData.stats.points >= cost) {
                 if(confirm(`Você quer trocar ${cost} pontos por este item?`)) {
@@ -255,117 +431,179 @@
                     renderRewards(); 
                     alert("Resgate realizado com sucesso!");
                 }
+            } else {
+                alert("Pontos insuficientes para realizar esta troca.");
             }
         }
 
-        // --- UI UPDATES ---
-        const formatBRL = val => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
-        
+        // --- UI FUNCTIONS ---
         function updateUI() {
             document.getElementById('userNameDisplay').textContent = userData.name;
             document.getElementById('userEmailDisplay').textContent = userData.email;
             document.getElementById('partyCountDisplay').textContent = userData.stats.parties;
             document.getElementById('userPointsDisplay').textContent = userData.stats.points; 
             document.getElementById('userBalanceDisplay').textContent = formatBRL(userData.stats.balance);
-
-            // Level Logic Update
-            const currentLevel = calculateLevel(userData.stats.points);
-            const nextLevelXP = currentLevel * 500; // Target for NEXT level
-            const progress = getLevelProgress(userData.stats.points);
-
-            document.getElementById('levelLabel').textContent = `Nível ${currentLevel}`;
-            
-            // Show XP relative to current level target (e.g. 1250 / 1500 XP)
-            // Or total accumulated? Usually "Current / Next Target" is clearer
-            document.getElementById('xpDisplay').textContent = `${userData.stats.points} / ${nextLevelXP} XP`;
-            
+            document.getElementById('xpDisplay').textContent = `${userData.stats.points} / ${MAX_XP} XP`;
             setTimeout(() => {
-                document.getElementById('xpBarFill').style.width = `${progress}%`;
+                const percentage = Math.max(0, Math.min((userData.stats.points / MAX_XP) * 100, 100));
+                document.getElementById('xpBarFill').style.width = `${percentage}%`;
             }, 100);
-
-            // Check badge visibility (re-check if points changed, though flag prevents re-show unless reset logic exists)
-            // In this specific flow, badge only hides on open. 
-            // If we wanted it to re-appear on point GAIN, we'd need to set hasViewedRewards = false when points increase.
-            checkRewardsBadge();
+            renderRewards();
         }
 
-        // --- Login/Auth ---
-        function switchAuthTab(tab) {
-            const loginForm = document.getElementById('loginForm'); const registerForm = document.getElementById('registerForm');
-            const btnLogin = document.getElementById('tabLogin'); const btnRegister = document.getElementById('tabRegister');
-            const title = document.getElementById('authTitle'); const subtitle = document.getElementById('authSubtitle');
-            if(tab === 'login') {
-                loginForm.classList.remove('hidden'); registerForm.classList.add('hidden');
-                btnLogin.classList.add('bg-white', 'text-blue-600', 'shadow-sm', 'ring-1', 'ring-black/5'); btnLogin.classList.remove('text-gray-400', 'hover:bg-white/50');
-                btnRegister.classList.remove('bg-white', 'text-blue-600', 'shadow-sm', 'ring-1', 'ring-black/5'); btnRegister.classList.add('text-gray-400', 'hover:bg-white/50');
-                title.textContent = "xxxxxxxxxxxx"; subtitle.textContent = "Acesse sua conta para continuar.";
-            } else {
-                loginForm.classList.add('hidden'); registerForm.classList.remove('hidden');
-                btnRegister.classList.add('bg-white', 'text-blue-600', 'shadow-sm', 'ring-1', 'ring-black/5'); btnRegister.classList.remove('text-gray-400', 'hover:bg-white/50');
-                btnLogin.classList.remove('bg-white', 'text-blue-600', 'shadow-sm', 'ring-1', 'ring-black/5'); btnLogin.classList.add('text-gray-400', 'hover:bg-white/50');
-                title.textContent = "Crie sua conta"; subtitle.textContent = "Junte-se ao clube e comece agora.";
-            }
+        function initUI() {
+            updateUI();
+            renderHistory();
+            generateAvatar('male'); 
         }
-        function togglePassword(inputId, btn) {
-            const input = document.getElementById(inputId); const icon = btn.querySelector('svg');
-            if (input.type === "password") { input.type = "text"; icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>'; btn.classList.add('text-blue-600'); } 
-            else { input.type = "password"; icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>'; btn.classList.remove('text-blue-600'); }
-        }
-        function handleLogin(e) { e.preventDefault(); document.getElementById('authView').classList.add('hidden'); document.getElementById('profileView').classList.remove('hidden'); document.getElementById('profileView').classList.add('flex'); initUI(); }
-        function openLogoutModal() { toggleModal('logoutModal', true); }
-        function closeLogoutModal() { toggleModal('logoutModal', false); }
-        function confirmLogout() { closeLogoutModal(); document.getElementById('profileView').classList.add('hidden'); document.getElementById('profileView').classList.remove('flex'); document.getElementById('authView').classList.remove('hidden'); document.getElementById('loginForm').reset(); generateAvatar('male'); }
 
-        // --- Common ---
-        const historyData = [ { date: '12/08/2024', neighborhood: 'Centro', value: 150.00, discount: 15.00 }, { date: '05/07/2024', neighborhood: 'Vila Nova', value: 200.00, discount: 20.00 }, { date: '20/06/2024', neighborhood: 'Jardim America', value: 120.00, discount: 10.00 }, { date: '15/05/2024', neighborhood: 'Centro', value: 180.00, discount: 0.00 }, { date: '02/04/2024', neighborhood: 'Outro', value: 300.00, discount: 30.00 }, { date: '12/03/2024', neighborhood: 'Centro', value: 150.00, discount: 15.00 }, { date: '05/02/2024', neighborhood: 'Vila Nova', value: 200.00, discount: 20.00 } ];
-        const getRandom = arr => arr[Math.floor(Math.random() * arr.length)];
-        const getSeed = () => Math.random().toString(36).substring(2);
-        function formatPhone(input) { let v = input.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); input.value = v; }
-        function toggleHouseNumber() { const checkbox = document.getElementById('noNumberCheckbox'); const input = document.getElementById('editHouseNumber'); if (checkbox.checked) { input.value = "S/N"; input.disabled = true; input.classList.add('bg-gray-100', 'text-gray-500'); input.classList.remove('bg-gray-50', 'text-gray-800'); } else { input.value = ""; input.disabled = false; input.classList.remove('bg-gray-100', 'text-gray-500'); input.classList.add('bg-gray-50', 'text-gray-800'); input.focus(); } }
-        function renderHistory() { const list = document.getElementById('historyList'); list.innerHTML = ''; const filteredData = activeFilter === 'Todos' ? historyData : historyData.filter(item => item.neighborhood === activeFilter); if (filteredData.length === 0) { list.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Nenhum histórico encontrado.</div>'; return; } filteredData.forEach(item => { const div = document.createElement('div'); div.className = 'flex justify-between items-center p-3 bg-white/80 hover:bg-white backdrop-blur-sm rounded-xl transition cursor-default border border-gray-100/50 shadow-sm mb-2'; const discountTag = item.discount > 0 ? `<div class="flex items-center justify-end mt-1"><span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> Economizou R$ ${formatBRL(item.discount)}</span></div>` : ''; div.innerHTML = `<div><p class="text-[10px] text-gray-400 font-bold mb-0.5">${item.date}</p><p class="text-sm font-bold text-gray-700">${item.neighborhood}</p></div><div class="text-right"><p class="text-sm font-bold text-gray-800">R$ ${formatBRL(item.value)}</p>${discountTag}</div>`; list.appendChild(div); }); }
-        function renderRewards() { const list = document.getElementById('rewardsList'); list.innerHTML = ''; rewardsData.forEach(reward => { const canAfford = userData.stats.points >= reward.cost; const btnClass = canAfford ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-300 text-white cursor-not-allowed"; const btnText = canAfford ? "Trocar" : "Faltam Pontos"; const btnAction = canAfford ? `onclick="redeemReward(${reward.cost}, '${reward.id}')"` : "disabled"; const iconHtml = reward.textIcon ? `<span class="text-xl font-bold">${reward.textIcon}</span>` : `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">${reward.icon}</svg>`; const itemHtml = `<div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex gap-3 ${!canAfford ? 'opacity-70' : ''}"><div class="w-16 h-16 ${reward.bgColor} rounded-lg flex items-center justify-center shrink-0 ${reward.iconColor}">${iconHtml}</div><div class="flex-1 flex flex-col justify-between"><div><h3 class="font-bold text-gray-800 text-sm">${reward.title}</h3><p class="text-[10px] text-gray-500 line-clamp-1">${reward.desc}</p></div><div class="flex justify-between items-end mt-1"><span class="text-xs font-bold text-purple-600">${reward.cost} XP</span><button ${btnAction} class="${btnClass} text-[10px] px-3 py-1.5 rounded-lg font-semibold transition">${btnText}</button></div></div></div>`; list.insertAdjacentHTML('beforeend', itemHtml); }); }
-        function openFilterModal() { const container = document.getElementById('filterOptionsContainer'); container.innerHTML = ''; const neighborhoods = ['Todos', ...new Set(historyData.map(item => item.neighborhood))]; neighborhoods.forEach(bairro => { const label = document.createElement('label'); label.className = 'flex items-center p-3 border border-gray-100 rounded-xl cursor-pointer hover:bg-gray-50 transition'; const isChecked = bairro === activeFilter ? 'checked' : ''; label.innerHTML = `<input type="radio" name="neighborhoodFilter" value="${bairro}" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" ${isChecked}><span class="ml-3 text-sm font-medium text-gray-700">${bairro}</span>`; container.appendChild(label); }); toggleModal('filterModal', true); }
-        function applyFilters() { const selected = document.querySelector('input[name="neighborhoodFilter"]:checked'); if (selected) { activeFilter = selected.value; renderHistory(); const badge = document.getElementById('filterCountBadge'); if (activeFilter !== 'Todos') { badge.textContent = '1'; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } } toggleModal('filterModal', false); }
-        function resetFilters() { activeFilter = 'Todos'; renderHistory(); document.getElementById('filterCountBadge').classList.add('hidden'); toggleModal('filterModal', false); }
-        function closeFilterModal() { toggleModal('filterModal', false); }
-        function closeRewardsModal() { toggleModal('rewardsModal', false); }
-        
-        // Avatar Stuff
         const BASE_URL = "https://api.dicebear.com/9.x/avataaars/svg";
         const STYLES = { male: ["shortFlat", "shortRound", "theCaesar", "shortWaved"], female: ["longButNotTooLong", "bob", "longCurly", "straight1"] };
         let appState = { cropper: null, type: 'male' };
+
         function generateAvatar(type, retryCount = 0) {
             if(retryCount > 3) { console.error("Falha ao gerar avatar."); return; }
             if(type) { appState.type = type; setButtonLoading(type, true); }
-            const seed = getSeed(); const hair = getRandom(STYLES[appState.type]); const beard = appState.type === 'male' ? 30 : 0;
+            const seed = getSeed();
+            const hair = getRandom(STYLES[appState.type]);
+            const beard = appState.type === 'male' ? 30 : 0;
             const url = `${BASE_URL}?seed=${seed}&top=${hair}&facialHairProbability=${beard}&accessoriesProbability=0&scale=110&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9`;
-            const l1 = document.getElementById('mainAvatarLoader'); const l2 = document.getElementById('modalAvatarLoader');
-            l1.classList.remove('hidden'); l2.classList.remove('hidden');
-            const tmp = new Image(); tmp.src = url;
-            tmp.onload = () => { document.getElementById('avatarImage').src = url; document.getElementById('modalAvatarImage').src = url; l1.classList.add('hidden'); l2.classList.add('hidden'); if(type) setButtonLoading(type, false); updateButtons(appState.type); };
-            tmp.onerror = () => { console.warn(`Retry ${retryCount + 1}...`); generateAvatar(appState.type, retryCount + 1); };
+            
+            const l1 = document.getElementById('mainAvatarLoader');
+            const l2 = document.getElementById('modalAvatarLoader');
+            l1.classList.remove('hidden');
+            l2.classList.remove('hidden');
+
+            const tmp = new Image();
+            tmp.src = url;
+            
+            tmp.onload = () => { 
+                document.getElementById('avatarImage').src = url;
+                document.getElementById('modalAvatarImage').src = url;
+                l1.classList.add('hidden');
+                l2.classList.add('hidden');
+                if(type) setButtonLoading(type, false);
+                updateButtons(appState.type); 
+            };
+            
+            tmp.onerror = () => { 
+                console.warn(`Retry ${retryCount + 1}...`);
+                generateAvatar(appState.type, retryCount + 1);
+            };
         }
+
         function generateMale() { generateAvatar('male'); }
         function generateFemale() { generateAvatar('female'); }
-        function setButtonLoading(type, isLoading) { const btn = document.querySelector(`button[data-type="${type}"]`); if(!btn) return; if(isLoading) { btn.classList.add('btn-loading'); btn.classList.remove('bg-blue-600', 'bg-pink-500', 'text-white', 'bg-gray-100', 'text-gray-600'); } else { btn.classList.remove('btn-loading'); } }
-        function updateButtons(type) {
-            const maleBtn = document.querySelector('button[data-type="male"]'); const femaleBtn = document.querySelector('button[data-type="female"]');
-            const refreshIcon = `<svg class="w-4 h-4 ml-2 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
-            if (type === 'male') { maleBtn.innerHTML = `Gerar Outra ${refreshIcon}`; femaleBtn.innerHTML = 'Feminino'; maleBtn.className = "gender-button py-3 rounded-xl bg-blue-600 text-white shadow-lg text-sm font-semibold transition-colors flex items-center justify-center transform scale-105"; femaleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors flex items-center justify-center"; } 
-            else if (type === 'female') { maleBtn.innerHTML = 'Masculino'; femaleBtn.innerHTML = `Gerar Outra ${refreshIcon}`; femaleBtn.className = "gender-button py-3 rounded-xl bg-pink-500 text-white shadow-lg text-sm font-semibold transition-colors flex items-center justify-center transform scale-105"; maleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors flex items-center justify-center"; }
+
+        function setButtonLoading(type, isLoading) {
+            const btn = document.querySelector(`button[data-type="${type}"]`);
+            if(!btn) return;
+            if(isLoading) {
+                btn.classList.add('btn-loading');
+                btn.classList.remove('bg-blue-50', 'bg-pink-50', 'text-blue-700', 'text-pink-700', 'shadow-sm');
+            } else {
+                btn.classList.remove('btn-loading');
+            }
         }
-        function resetGenderButtons() { const maleBtn = document.querySelector('button[data-type="male"]'); const femaleBtn = document.querySelector('button[data-type="female"]'); maleBtn.innerHTML = 'Masculino'; femaleBtn.innerHTML = 'Feminino'; const neutralClass = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors flex items-center justify-center"; maleBtn.className = neutralClass; femaleBtn.className = neutralClass; }
-        const toggleModal = (id, show) => { const el = document.getElementById(id); if(show) { el.classList.remove('hidden'); el.classList.add('flex'); } else { el.classList.add('hidden'); el.classList.remove('flex'); } }
-        function openModal() { resetGenderButtons(); const mainSrc = document.getElementById('avatarImage').src; if (mainSrc) document.getElementById('modalAvatarImage').src = mainSrc; toggleModal('imageModal', true); }
+
+        function updateButtons(type) {
+            const maleBtn = document.querySelector('button[data-type="male"]');
+            const femaleBtn = document.querySelector('button[data-type="female"]');
+            const refreshIcon = `<svg class="w-4 h-4 ml-2 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
+
+            if (type === 'male') {
+                maleBtn.innerHTML = `Gerar Outra ${refreshIcon}`;
+                femaleBtn.innerHTML = 'Feminino';
+                maleBtn.className = "gender-button py-3 rounded-xl bg-blue-600 text-white shadow-lg text-sm font-semibold transition-colors flex items-center justify-center transform scale-105";
+                femaleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors flex items-center justify-center";
+            } else if (type === 'female') {
+                maleBtn.innerHTML = 'Masculino';
+                femaleBtn.innerHTML = `Gerar Outra ${refreshIcon}`;
+                femaleBtn.className = "gender-button py-3 rounded-xl bg-pink-500 text-white shadow-lg text-sm font-semibold transition-colors flex items-center justify-center transform scale-105";
+                maleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors flex items-center justify-center";
+            }
+        }
+
+        function resetGenderButtons() {
+            const maleBtn = document.querySelector('button[data-type="male"]');
+            const femaleBtn = document.querySelector('button[data-type="female"]');
+            maleBtn.innerHTML = 'Masculino';
+            femaleBtn.innerHTML = 'Feminino';
+            const neutralClass = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors flex items-center justify-center";
+            maleBtn.className = neutralClass;
+            femaleBtn.className = neutralClass;
+        }
+
+        const toggleModal = (id, show) => {
+            const el = document.getElementById(id);
+            if(show) { el.classList.remove('hidden'); el.classList.add('flex'); }
+            else { el.classList.add('hidden'); el.classList.remove('flex'); }
+        }
+        function openModal() { 
+            resetGenderButtons(); 
+            const mainSrc = document.getElementById('avatarImage').src;
+            if (mainSrc) document.getElementById('modalAvatarImage').src = mainSrc;
+            toggleModal('imageModal', true); 
+        }
         function closeModal() { toggleModal('imageModal', false); }
-        function openProfileEditModal() { document.getElementById('editName').value = userData.name; document.getElementById('editEmail').value = userData.email; document.getElementById('editPhone').value = userData.phone; document.getElementById('editNeighborhood').value = userData.address.neighborhood; document.getElementById('editStreet').value = userData.address.street; const numVal = userData.address.number; const numInput = document.getElementById('editHouseNumber'); const check = document.getElementById('noNumberCheckbox'); if (numVal === 'S/N') { numInput.value = 'S/N'; check.checked = true; toggleHouseNumber(); } else { numInput.value = numVal; check.checked = false; toggleHouseNumber(); } toggleModal('profileEditModal', true); }
+        function openProfileEditModal() { 
+            document.getElementById('editName').value = userData.name;
+            document.getElementById('editEmail').value = userData.email;
+            document.getElementById('editPhone').value = userData.phone; 
+            document.getElementById('editNeighborhood').value = userData.address.neighborhood;
+            document.getElementById('editStreet').value = userData.address.street;
+            const numVal = userData.address.number;
+            const numInput = document.getElementById('editHouseNumber');
+            const check = document.getElementById('noNumberCheckbox');
+            if (numVal === 'S/N') { numInput.value = 'S/N'; check.checked = true; toggleHouseNumber(); } 
+            else { numInput.value = numVal; check.checked = false; toggleHouseNumber(); }
+            
+            toggleModal('profileEditModal', true); 
+        }
         function closeProfileEditModal() { toggleModal('profileEditModal', false); }
-        function saveProfileChanges() { userData.name = document.getElementById('editName').value || userData.name; userData.phone = document.getElementById('editPhone').value || userData.phone; userData.address.neighborhood = document.getElementById('editNeighborhood').value; userData.address.street = document.getElementById('editStreet').value; userData.address.number = document.getElementById('editHouseNumber').value; document.getElementById('userNameDisplay').textContent = userData.name; closeProfileEditModal(); }
-        function handleFileSelect(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => { closeModal(); openCropper(e.target.result); input.value = ''; }; reader.readAsDataURL(input.files[0]); } }
-        function openCropper(src) { document.getElementById('imageToCrop').src = src; toggleModal('cropperModal', true); if(appState.cropper) appState.cropper.destroy(); updateButtons(null); setTimeout(() => { appState.cropper = new Cropper(document.getElementById('imageToCrop'), { aspectRatio:1, viewMode:1, background: false, autoCropArea: 0.9, guides: true }); }, 100); }
+        function saveProfileChanges() {
+            userData.name = document.getElementById('editName').value || userData.name;
+            userData.phone = document.getElementById('editPhone').value || userData.phone; 
+            userData.address.neighborhood = document.getElementById('editNeighborhood').value;
+            userData.address.street = document.getElementById('editStreet').value;
+            userData.address.number = document.getElementById('editHouseNumber').value;
+            document.getElementById('userNameDisplay').textContent = userData.name;
+            closeProfileEditModal();
+        }
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { closeModal(); openCropper(e.target.result); input.value = ''; };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function openCropper(src) {
+            document.getElementById('imageToCrop').src = src;
+            toggleModal('cropperModal', true);
+            if(appState.cropper) appState.cropper.destroy();
+            updateButtons(null); 
+            setTimeout(() => {
+                appState.cropper = new Cropper(document.getElementById('imageToCrop'), { 
+                    aspectRatio:1, 
+                    viewMode:1,
+                    background: false,
+                    autoCropArea: 0.9,
+                    guides: true 
+                });
+            }, 100);
+        }
         function closeCropper() { toggleModal('cropperModal', false); }
-        function cropImage() { if(!appState.cropper) return; const url = appState.cropper.getCroppedCanvas({width:512,height:512}).toDataURL(); document.getElementById('avatarImage').src = url; document.getElementById('modalAvatarImage').src = url; closeCropper(); }
+        function cropImage() {
+            if(!appState.cropper) return;
+            const url = appState.cropper.getCroppedCanvas({width:512,height:512}).toDataURL();
+            document.getElementById('avatarImage').src = url;
+            document.getElementById('modalAvatarImage').src = url;
+            closeCropper();
+        }
+
         ['imageModal','profileEditModal', 'filterModal', 'rewardsModal', 'logoutModal'].forEach(id => document.getElementById(id).onclick = e => { if(e.target.id===id) toggleModal(id,false) });
+        // Don't auto init, wait for login
     </script>
 </body>
 </html>
