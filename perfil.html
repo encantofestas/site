@@ -17,6 +17,10 @@
             min-height: 100vh;
         }
         .cropper-container { max-width: 100%; }
+        .cropper-view-box,
+        .cropper-face {
+            border-radius: 50%; /* Mostra o circulo de recorte */
+        }
         .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
         @keyframes modalFadeIn {
             from { opacity: 0; transform: scale(0.95); }
@@ -24,6 +28,11 @@
         }
         .progress-bar-fill { transition: width 1s ease-in-out; }
         
+        .history-scroll::-webkit-scrollbar { width: 5px; }
+        .history-scroll::-webkit-scrollbar-track { background: transparent; }
+        .history-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        .history-scroll::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+
         @keyframes moveStripes {
             0% { background-position: 0 0; }
             100% { background-position: 30px 0; }
@@ -46,21 +55,16 @@
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <!-- 
-        LAYOUT PRINCIPAL (Sem Card)
-        max-w-md mx-auto: Centraliza em telas grandes, mas ocupa 100% em mobile
-    -->
-    <main class="w-full max-w-md mx-auto relative min-h-screen pb-20">
+    <!-- CARD PRINCIPAL -->
+    <main class="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/50 relative flex flex-col h-[85vh] md:h-[800px]">
         
-        <!-- Topo Decorativo (Fundo da parte superior) -->
-        <!-- Estende-se até o topo da página -->
+        <!-- Topo Decorativo -->
         <div class="h-48 w-full absolute top-0 left-0 z-0 overflow-hidden">
             <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1470&auto=format&fit=crop" 
                  class="w-full h-full object-cover opacity-90" 
                  alt="Fundo Festa">
-            <!-- Gradiente para fundir com o fundo do site na parte inferior da imagem -->
             <div class="absolute inset-0 bg-gradient-to-b from-indigo-900/40 via-transparent to-[#f3f4f6]"></div>
         </div>
 
@@ -199,7 +203,7 @@
         </div>
     </div>
 
-    <!-- TELA 5: FILTRO -->
+    <!-- TELA 5: MODAL DE FILTRO -->
     <div id="filterModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
         <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm modal-enter relative">
             <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-gray-800">Filtrar Histórico</h2><button onclick="closeFilterModal()" class="text-gray-400 hover:text-gray-600 p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
@@ -208,10 +212,13 @@
         </div>
     </div>
 
-    <!-- TELA 2: FOTO -->
+    <!-- TELA 2: MODAL DE FOTO -->
     <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
         <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter relative overflow-hidden">
-            <div class="text-center mb-6"><h2 class="text-xl font-bold text-gray-800">Alterar Foto</h2><p class="text-sm text-gray-500">Escolha um avatar ou envie sua foto</p></div>
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Alterar Foto</h2>
+                <p class="text-sm text-gray-500">Escolha um avatar ou envie sua foto</p>
+            </div>
             <div class="flex justify-center mb-8">
                 <div class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-indigo-200 hover:border-indigo-400 cursor-pointer group" onclick="document.getElementById('photoUploadInput').click()">
                     <div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden"><svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
@@ -227,7 +234,7 @@
         </div>
     </div>
 
-    <!-- TELA 3: EDITAR -->
+    <!-- TELA 3: MODAL EDITAR -->
     <div id="profileEditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6"><h2 class="text-lg font-bold">Editar Perfil</h2><button onclick="closeProfileEditModal()" class="text-gray-400 hover:text-gray-600">✕</button></div>
@@ -244,8 +251,35 @@
         </div>
     </div>
 
-    <!-- TELA 4: CROPPER -->
-    <div id="cropperModal" class="fixed inset-0 z-[60] bg-black/90 hidden flex-col justify-center p-4"><div class="bg-white w-full max-w-lg rounded-2xl overflow-hidden flex flex-col h-3/4"><div class="p-4 flex justify-between border-b"><h3>Ajustar</h3><button onclick="closeCropper()">✕</button></div><div class="flex-1 bg-black relative"><img id="imageToCrop" class="block max-w-full"></div><div class="p-4 border-t flex justify-end gap-3"><button onclick="closeCropper()" class="px-4 py-2 border rounded-lg">Cancelar</button><button onclick="cropImage()" class="px-6 py-2 bg-indigo-600 text-white rounded-lg">Confirmar</button></div></div></div>
+    <!-- TELA 4: CROPPER (NOVO DESIGN DARK) -->
+    <div id="cropperModal" class="fixed inset-0 z-[60] bg-zinc-900 hidden flex-col justify-center p-0 md:p-6 transition-opacity duration-300">
+        <div class="w-full max-w-2xl mx-auto flex flex-col h-full md:h-auto md:max-h-[90vh] bg-zinc-900 rounded-2xl overflow-hidden relative">
+            
+            <!-- Header -->
+            <div class="flex justify-between items-center p-4 z-10 bg-zinc-900">
+                <h3 class="text-lg font-bold text-white tracking-wide">Ajustar Foto</h3>
+                <button onclick="closeCropper()" class="text-zinc-400 hover:text-white transition p-2 rounded-full hover:bg-zinc-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Área da Imagem -->
+            <div class="flex-1 bg-black relative flex items-center justify-center overflow-hidden">
+                <img id="imageToCrop" class="max-w-full max-h-full block" alt="Foto para recortar">
+            </div>
+
+            <!-- Footer de Ação -->
+            <div class="p-6 bg-zinc-900 flex justify-between items-center gap-4 border-t border-zinc-800">
+                <button onclick="closeCropper()" class="flex-1 px-6 py-3.5 rounded-xl font-semibold text-zinc-300 border border-zinc-700 hover:bg-zinc-800 hover:text-white transition active:scale-95">
+                    Cancelar
+                </button>
+                <button onclick="cropImage()" class="flex-1 px-6 py-3.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-900/20 transition active:scale-95 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Salvar Foto
+                </button>
+            </div>
+        </div>
+    </div>
 
     <input type="file" id="photoUploadInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
 
@@ -286,17 +320,12 @@
         function toggleHouseNumber() {
             const checkbox = document.getElementById('noNumberCheckbox');
             const input = document.getElementById('editHouseNumber');
-            
             if (checkbox.checked) {
-                input.value = "S/N";
-                input.disabled = true;
-                input.classList.add('bg-gray-100', 'text-gray-500');
-                input.classList.remove('bg-gray-50', 'text-gray-800');
+                input.value = "S/N"; input.disabled = true;
+                input.classList.add('bg-gray-100', 'text-gray-500'); input.classList.remove('bg-gray-50', 'text-gray-800');
             } else {
-                input.value = "";
-                input.disabled = false;
-                input.classList.remove('bg-gray-100', 'text-gray-500');
-                input.classList.add('bg-gray-50', 'text-gray-800');
+                input.value = ""; input.disabled = false;
+                input.classList.remove('bg-gray-100', 'text-gray-500'); input.classList.add('bg-gray-50', 'text-gray-800');
                 input.focus();
             }
         }
@@ -377,7 +406,6 @@
             document.getElementById('userBalanceDisplay').textContent = formatBRL(userData.stats.balance);
             document.getElementById('xpDisplay').textContent = `${userData.stats.points} / ${MAX_XP} XP`;
             
-            // ATUALIZAÇÃO DA BARRA
             setTimeout(() => {
                 const percentage = Math.max(0, Math.min((userData.stats.points / MAX_XP) * 100, 100));
                 document.getElementById('xpBarFill').style.width = `${percentage}%`;
@@ -394,13 +422,9 @@
         const STYLES = { male: ["shortFlat", "shortRound", "theCaesar", "shortWaved"], female: ["longButNotTooLong", "bob", "longCurly", "straight1"] };
         let appState = { cropper: null, type: 'male' };
 
-        // === LÓGICA DE RETRY AUTOMÁTICO ===
         function generateAvatar(type, retryCount = 0) {
             if(retryCount > 3) { console.error("Falha ao gerar avatar."); return; }
             if(type) { appState.type = type; updateButtons(type); }
-            
-            // Se já tem imagem (ex: upload manual), não regenera se não foi clique explícito nos botões
-            // Mas aqui 'generateAvatar' é chamado pelos botões de gênero ou init.
             
             const seed = getSeed();
             const hair = getRandom(STYLES[appState.type]);
@@ -432,11 +456,28 @@
         function generateFemale() { generateAvatar('female'); }
 
         function updateButtons(type) {
-            document.querySelectorAll('.gender-button').forEach(btn => {
-                const t = btn.getAttribute('data-type');
-                if(t === type) btn.classList.add('bg-indigo-600', 'text-white');
-                else { btn.classList.remove('bg-indigo-600', 'text-white'); btn.classList.add('bg-gray-100'); }
-            });
+            const maleBtn = document.querySelector('button[data-type="male"]');
+            const femaleBtn = document.querySelector('button[data-type="female"]');
+
+            if (type === 'male') {
+                maleBtn.innerHTML = 'Gerar Outro';
+                femaleBtn.innerHTML = 'Feminino';
+                
+                maleBtn.className = "gender-button py-3 rounded-xl bg-indigo-600 text-white shadow-lg text-sm font-semibold transition-colors";
+                femaleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors";
+            } else if (type === 'female') {
+                maleBtn.innerHTML = 'Masculino';
+                femaleBtn.innerHTML = 'Gerar Outro';
+                
+                femaleBtn.className = "gender-button py-3 rounded-xl bg-pink-500 text-white shadow-lg text-sm font-semibold transition-colors";
+                maleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors";
+            } else {
+                // Estado neutro ou customizado (reset)
+                maleBtn.innerHTML = 'Masculino';
+                femaleBtn.innerHTML = 'Feminino';
+                maleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors";
+                femaleBtn.className = "gender-button py-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-semibold transition-colors";
+            }
         }
 
         const toggleModal = (id, show) => {
@@ -481,8 +522,18 @@
             document.getElementById('imageToCrop').src = src;
             toggleModal('cropperModal', true);
             if(appState.cropper) appState.cropper.destroy();
+            
+            // Reset gender buttons text when opening custom crop
+            updateButtons(null);
+
             setTimeout(() => {
-                appState.cropper = new Cropper(document.getElementById('imageToCrop'), { aspectRatio:1, viewMode:1 });
+                appState.cropper = new Cropper(document.getElementById('imageToCrop'), { 
+                    aspectRatio:1, 
+                    viewMode:1,
+                    background: false,
+                    autoCropArea: 0.9,
+                    guides: true 
+                });
             }, 100);
         }
         function closeCropper() { toggleModal('cropperModal', false); }
