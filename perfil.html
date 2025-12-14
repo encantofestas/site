@@ -363,8 +363,8 @@
                         if (!userData.stats || userData.stats.parties === undefined) {
                             await setDoc(doc(db, "users", user.uid), {
                                 stats: {
-                                    parties: 0, // Inicia com 0 para novos/corrigidos
-                                    points: userData.stats?.points || 500,
+                                    parties: 0, 
+                                    points: userData.stats?.points || 0,
                                     balance: userData.stats?.balance || 0.00
                                 }
                             }, { merge: true });
@@ -455,7 +455,7 @@
                     phone: "",
                     avatar: "", 
                     address: { neighborhood: "", street: "", number: "" },
-                    stats: { parties: 0, points: 500, balance: 0.00 }, // Começa com 0 festas
+                    stats: { parties: 0, points: 0, balance: 0.00 }, // Começa com 0 festas
                     history: emptyHistory
                 };
                 await setDoc(doc(db, "users", user.uid), initialData, { merge: true });
@@ -649,7 +649,6 @@
             const stats = data.stats || { points: 0, parties: 0, balance: 0 };
             document.getElementById('userNameDisplay').textContent = data.name || "Usuário";
             document.getElementById('userEmailDisplay').textContent = data.email || "";
-            document.getElementById('partyCountDisplay').textContent = stats.parties;
             document.getElementById('userPointsDisplay').textContent = stats.points; 
             document.getElementById('userBalanceDisplay').textContent = formatBRL(stats.balance);
             
@@ -684,17 +683,20 @@
                 document.getElementById('xpBarFill').style.width = `${percentage}%`; 
             }, 100);
             
+            // Calcular Festas reais
+            const history = data.history || [];
+            const realPartiesCount = history.filter(item => item.date && item.date.trim() !== "").length;
+            document.getElementById('partyCountDisplay').textContent = realPartiesCount;
+
             // --- LÓGICA DO ÍCONE AZUL (Sincronizar) ---
-            const parties = stats.parties || 0;
             const addr = data.address || {};
             // Verifica se o perfil está incompleto (falta telefone, bairro, rua ou número)
             // Note que editName e editEmail (userEmailDisplay) já são validados no login, mas podemos incluir name.
             const isProfileComplete = data.name && data.phone && addr.neighborhood && addr.street && addr.number && addr.number !== "S/N" && addr.number !== "";
             
             const btn = document.getElementById('syncDataBtn');
-            // Regra: Aparece se 0 festas E perfil incompleto.
-            // Se tiver festas > 0, some. Se perfil completo, some.
-            if (parties === 0 && !isProfileComplete) {
+            // Regra: Aparece se 0 festas reais E perfil incompleto.
+            if (realPartiesCount === 0 && !isProfileComplete) {
                 btn.classList.remove('hidden');
             } else {
                 btn.classList.add('hidden');
