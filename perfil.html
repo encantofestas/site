@@ -183,7 +183,7 @@
     
     <div id="filterModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm modal-enter relative"><div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-gray-800">Filtrar Histórico</h2><button onclick="closeFilterModal()" class="text-gray-400 hover:text-gray-600 p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="space-y-4"><h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">Por Bairro</h3><div id="filterOptionsContainer" class="space-y-2 max-h-48 overflow-y-auto overscroll-contain"></div></div><div class="flex gap-3 mt-8 pt-4 border-t border-gray-100"><button onclick="resetFilters()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition">Limpar</button><button onclick="applyFilters()" class="flex-1 px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition">Aplicar</button></div></div></div>
     
-    <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter relative overflow-hidden"><div class="text-center mb-6"><h2 class="text-xl font-bold text-gray-800">Alterar Foto</h2><p class="text-sm text-gray-500">Escolha um avatar ou envie sua foto</p></div><div class="flex justify-center mb-8"><div class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-blue-200 hover:border-blue-400 cursor-pointer group" onclick="document.getElementById('photoUploadInput').click()"><div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden"><svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div><img id="modalAvatarImage" src="" class="w-full h-full rounded-full object-cover bg-gray-50"><div class="absolute inset-0 rounded-full flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold uppercase"><span>Enviar Foto</span></div></div></div><div class="grid grid-cols-2 gap-3 mb-6"><button onclick="generateMale()" class="gender-button py-3 rounded-xl bg-blue-50 text-blue-700 text-sm font-bold shadow-sm hover:bg-blue-100 transition-colors" data-type="male">Masculino</button><button onclick="generateFemale()" class="gender-button py-3 rounded-xl bg-pink-50 text-pink-700 text-sm font-bold shadow-sm hover:bg-pink-100 transition-colors" data-type="female">Feminino</button></div><div class="flex justify-end border-t pt-4"><button onclick="closeModal()" class="px-6 py-2 bg-gray-800 text-white rounded-xl font-medium">Concluir</button></div></div></div>
+    <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter relative overflow-hidden"><div class="text-center mb-6"><h2 class="text-xl font-bold text-gray-800">Alterar Foto</h2><p class="text-sm text-gray-500">Escolha um avatar ou envie sua foto</p></div><div class="flex justify-center mb-8"><div class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-blue-200 hover:border-blue-400 cursor-pointer group" onclick="document.getElementById('photoUploadInput').click()"><div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden"><svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div><img id="modalAvatarImage" src="" class="w-full h-full rounded-full object-cover bg-gray-50"><div class="absolute inset-0 rounded-full flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold uppercase"><span>Enviar Foto</span></div></div></div><div class="grid grid-cols-2 gap-3 mb-6"><button onclick="generateMale()" class="gender-button py-3 rounded-xl bg-blue-50 text-blue-700 text-sm font-bold shadow-sm hover:bg-blue-100 transition-colors" data-type="male">Masculino</button><button onclick="generateFemale()" class="gender-button py-3 rounded-xl bg-pink-50 text-pink-700 text-sm font-bold shadow-sm hover:bg-pink-100 transition-colors" data-type="female">Feminino</button></div><div class="flex justify-end border-t pt-4"><button onclick="saveAvatarAndClose()" class="px-6 py-2 bg-gray-800 text-white rounded-xl font-medium">Concluir</button></div></div></div>
     
     <div id="profileEditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter max-h-[90vh] overflow-y-auto"><div class="flex justify-between items-center mb-6"><h2 class="text-lg font-bold">Editar Perfil</h2><button onclick="closeProfileEditModal()">✕</button></div><div class="space-y-5"><div class="space-y-1">
         <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label>
@@ -393,6 +393,7 @@
                     name: nameOverride || user.displayName || "Novo Usuário",
                     email: user.email,
                     phone: "",
+                    avatar: "", // Add avatar field
                     address: { neighborhood: "", street: "", number: "" },
                     stats: { parties: 0, points: 500, balance: 0.00 },
                     history: []
@@ -419,7 +420,7 @@
             await signOut(auth);
             document.getElementById('loginForm').reset();
             if(document.getElementById('registerForm')) document.getElementById('registerForm').reset();
-            window.generateAvatar('male');
+            // Dont reset avatar blindly on logout, wait for login
         };
 
         window.saveProfileChanges = async () => {
@@ -440,6 +441,22 @@
                 window.showDialog({ title: "Erro", message: "Não foi possível salvar as alterações.", type: "error" });
             }
         };
+
+        // SAVE AVATAR TO DB
+        window.saveAvatarAndClose = async () => {
+            const currentSrc = document.getElementById('modalAvatarImage').src;
+            if (currentUser) {
+                 try {
+                     const userRef = doc(db, "users", currentUser.uid);
+                     await updateDoc(userRef, { avatar: currentSrc });
+                     window.showDialog({ title: "Sucesso", message: "Avatar atualizado!", type: "success" });
+                 } catch (e) {
+                     console.error("Erro saving avatar", e);
+                 }
+            }
+            document.getElementById('avatarImage').src = currentSrc;
+            window.closeModal();
+        }
 
         window.redeemReward = (cost, type) => {
             if(!currentUser) return;
@@ -551,6 +568,14 @@
             document.getElementById('userPointsDisplay').textContent = stats.points; 
             document.getElementById('userBalanceDisplay').textContent = formatBRL(stats.balance);
             
+            // Set avatar if exists, else generate ONE time and save
+            if (data.avatar) {
+                document.getElementById('avatarImage').src = data.avatar;
+                document.getElementById('modalAvatarImage').src = data.avatar;
+            } else {
+                window.generateAvatar('male', 0, true); // true = save to db
+            }
+            
             const points = stats.points;
             const levelStep = 500;
             const currentLevel = Math.floor(points / levelStep) + 1;
@@ -563,14 +588,14 @@
             setTimeout(() => { const percentage = Math.max(0, Math.min((xpInCurrentLevel / levelStep) * 100, 100)); document.getElementById('xpBarFill').style.width = `${percentage}%`; }, 100);
             renderRewards();
             renderHistory();
-            window.generateAvatar('male'); 
         }
 
         // Avatar logic (Dicebear)
         const BASE_URL = "https://api.dicebear.com/9.x/avataaars/svg";
         const STYLES = { male: ["shortFlat", "shortRound", "theCaesar", "shortWaved"], female: ["longButNotTooLong", "bob", "longCurly", "straight1"] };
         let appState = { cropper: null, type: 'male' };
-        window.generateAvatar = (type, retryCount = 0) => {
+        
+        window.generateAvatar = (type, retryCount = 0, saveToDb = false) => {
             if(retryCount > 3) return;
             if(type) { appState.type = type; updateButtons(type); }
             const seed = getSeed();
@@ -586,11 +611,19 @@
                 if(document.getElementById('avatarImage')) document.getElementById('avatarImage').src = url;
                 if(document.getElementById('modalAvatarImage')) document.getElementById('modalAvatarImage').src = url;
                 if(l1) l1.classList.add('hidden'); if(l2) l2.classList.add('hidden');
+                
+                // If this is initial generation or explicit save required
+                if (saveToDb && currentUser) {
+                     const userRef = doc(db, "users", currentUser.uid);
+                     updateDoc(userRef, { avatar: url });
+                }
             };
-            tmp.onerror = () => { window.generateAvatar(appState.type, retryCount + 1); };
+            tmp.onerror = () => { window.generateAvatar(appState.type, retryCount + 1, saveToDb); };
         };
+        
         window.generateMale = () => window.generateAvatar('male');
         window.generateFemale = () => window.generateAvatar('female');
+        
         function updateButtons(type) {
             const maleBtn = document.querySelector('button[data-type="male"]');
             const femaleBtn = document.querySelector('button[data-type="female"]');
@@ -613,7 +646,14 @@
         window.applyFilters = applyFilters;
         window.resetFilters = resetFilters;
         window.openRewardsModal = openRewardsModal;
-        window.openModal = () => { window.toggleModal('imageModal', true); window.generateAvatar(); };
+        window.openModal = () => { 
+            // Reset modal image to current user avatar to start
+            if (window.userData && window.userData.avatar) {
+                document.getElementById('modalAvatarImage').src = window.userData.avatar;
+            }
+            window.toggleModal('imageModal', true); 
+            // Removed automatic generation on open
+        };
         window.openProfileEditModal = () => {
             const data = window.userData || {}; const addr = data.address || {};
             document.getElementById('editName').value = data.name || "";
@@ -630,7 +670,21 @@
         };
         window.handleFileSelect = (input) => { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => { window.closeModal(); window.openCropper(e.target.result); input.value = ''; }; reader.readAsDataURL(input.files[0]); } };
         window.openCropper = (src) => { document.getElementById('imageToCrop').src = src; window.toggleModal('cropperModal', true); setTimeout(() => { appState.cropper = new Cropper(document.getElementById('imageToCrop'), { aspectRatio:1, viewMode:1, background: false, autoCropArea: 0.9 }); }, 100); };
-        window.cropImage = () => { if(appState.cropper) { const url = appState.cropper.getCroppedCanvas({width:512,height:512}).toDataURL(); document.getElementById('avatarImage').src = url; document.getElementById('modalAvatarImage').src = url; window.closeCropper(); } };
+        window.cropImage = () => { 
+            if(appState.cropper) { 
+                const url = appState.cropper.getCroppedCanvas({width:512,height:512}).toDataURL(); 
+                document.getElementById('avatarImage').src = url; 
+                document.getElementById('modalAvatarImage').src = url; 
+                
+                // SAVE CROPPED IMAGE TO DB
+                if (currentUser) {
+                     const userRef = doc(db, "users", currentUser.uid);
+                     updateDoc(userRef, { avatar: url });
+                }
+                
+                window.closeCropper(); 
+            } 
+        };
         window.closeModal = () => window.toggleModal('imageModal', false);
 
         ['imageModal','profileEditModal', 'filterModal', 'rewardsModal', 'logoutModal', 'dialogModal'].forEach(id => { const el = document.getElementById(id); if(el) el.onclick = e => { if(e.target.id===id) window.toggleModal(id,false) } });
