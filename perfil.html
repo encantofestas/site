@@ -158,11 +158,7 @@
                 <div class="flex justify-between items-center mb-4 px-1">
                     <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">Histórico</h3>
                     <div class="flex gap-2">
-                        <!-- BOTÃO DE ADICIONAR FESTA -->
-                        <button onclick="openAddHistoryModal()" class="text-xs font-semibold text-green-600 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg border border-green-100 transition flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                            Add
-                        </button>
+                        <!-- BOTÃO "ADD" REMOVIDO DAQUI -->
                         <button onclick="openFilterModal()" class="text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-100 transition flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                             Filtro <span id="filterCountBadge" class="hidden bg-blue-600 text-white text-[9px] px-1.5 py-0.5 rounded-full ml-1">1</span>
@@ -180,61 +176,7 @@
     
     <div id="dialogModal" class="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-xs modal-enter text-center relative overflow-hidden"><div id="dialogIconContainer" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors"></div><h3 id="dialogTitle" class="text-xl font-bold text-gray-800 mb-2">Titulo</h3><p id="dialogMessage" class="text-sm text-gray-500 mb-6">Mensagem</p><div id="dialogButtons" class="flex gap-3 justify-center"></div></div></div>
 
-    <!-- MODAL DE ADICIONAR HISTÓRICO -->
-    <div id="addHistoryModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter relative">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-lg font-bold">Adicionar Festa</h2>
-                <button onclick="closeAddHistoryModal()">✕</button>
-            </div>
-            <div class="space-y-4">
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Data</label>
-                    <input type="text" id="addHistoryDate" placeholder="dd/mm/aaaa" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label>
-                    <div class="relative">
-                        <select id="addHistoryNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none appearance-none">
-                            <option value="">Selecione...</option>
-                            <option value="Acaraí">Acaraí</option>
-                            <option value="Água Branca">Água Branca</option>
-                            <option value="Capri">Capri</option>
-                            <option value="Centro - Sfs">Centro - Sfs</option>
-                            <option value="Centro Histórico">Centro Histórico</option>
-                            <option value="Enseada">Enseada</option>
-                            <option value="Ervino">Ervino</option>
-                            <option value="Iperoba">Iperoba</option>
-                            <option value="Itaguaçu">Itaguaçu</option>
-                            <option value="Laranjeiras">Laranjeiras</option>
-                            <option value="Majorca">Majorca</option>
-                            <option value="Miranda">Miranda</option>
-                            <option value="Morro Grande">Morro Grande</option>
-                            <option value="Paulas">Paulas</option>
-                            <option value="Praia Grande">Praia Grande</option>
-                            <option value="Reta">Reta</option>
-                            <option value="Ribeira">Ribeira</option>
-                            <option value="Rocio Grande">Rocio Grande</option>
-                            <option value="Rocio Pequeno">Rocio Pequeno</option>
-                            <option value="Sandra Regina">Sandra Regina</option>
-                            <option value="Tapera">Tapera</option>
-                            <option value="Ubatuba">Ubatuba</option>
-                            <option value="Vila da Glória">Vila da Glória</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
-                    </div>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Valor (R$)</label>
-                    <input type="number" id="addHistoryValue" placeholder="0.00" step="0.01" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-            </div>
-            <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100">
-                <button onclick="closeAddHistoryModal()" class="flex-1 px-4 py-3 bg-white border border-gray-200 font-semibold rounded-xl">Cancelar</button>
-                <button onclick="saveHistoryItem()" class="flex-1 px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700">Salvar</button>
-            </div>
-        </div>
-    </div>
+    <!-- MODAL DE ADICIONAR HISTÓRICO REMOVIDO -->
 
     <div id="rewardsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm modal-enter overflow-hidden flex flex-col max-h-[85vh]"><div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 relative shrink-0"><button onclick="closeRewardsModal()" class="absolute top-4 right-4 text-white/80 hover:text-white bg-white/10 p-1 rounded-full hover:bg-white/20 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div class="flex items-center gap-3"><div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg></div><div><h2 class="text-white text-lg font-bold">Loja de Pontos</h2><p class="text-white/80 text-xs">Troque seus pontos por benefícios</p></div></div><div class="mt-4 bg-white/10 rounded-xl p-3 flex justify-between items-center backdrop-blur-sm border border-white/10"><span class="text-white/90 text-sm font-medium">Seus Pontos:</span><span class="text-white text-xl font-bold" id="modalUserPoints">0</span></div></div><div class="flex-1 overflow-y-auto p-4 space-y-0 bg-white history-scroll overscroll-contain" id="rewardsList"></div></div></div>
     
@@ -352,8 +294,6 @@
         function closeRewardsModal() { toggleModal('rewardsModal', false); }
         function closeFilterModal() { toggleModal('filterModal', false); }
         function closeProfileEditModal() { toggleModal('profileEditModal', false); }
-        function openAddHistoryModal() { toggleModal('addHistoryModal', true); }
-        function closeAddHistoryModal() { toggleModal('addHistoryModal', false); }
         
         window.switchAuthTab = switchAuthTab;
         window.forceTwoWords = forceTwoWords;
@@ -367,8 +307,6 @@
         window.closeRewardsModal = closeRewardsModal;
         window.closeFilterModal = closeFilterModal;
         window.closeProfileEditModal = closeProfileEditModal;
-        window.openAddHistoryModal = openAddHistoryModal;
-        window.closeAddHistoryModal = closeAddHistoryModal;
     </script>
 
     <!-- FIREBASE & LÓGICA -->
@@ -557,37 +495,6 @@
             }
             document.getElementById('avatarImage').src = currentSrc;
             window.closeModal();
-        }
-
-        window.saveHistoryItem = async () => {
-            if (!currentUser) return;
-            const date = document.getElementById('addHistoryDate').value;
-            const neighborhood = document.getElementById('addHistoryNeighborhood').value;
-            const value = parseFloat(document.getElementById('addHistoryValue').value);
-
-            if(!date || !neighborhood || isNaN(value)) {
-                alert("Preencha todos os campos!");
-                return;
-            }
-
-            try {
-                const userRef = doc(db, "users", currentUser.uid);
-                await updateDoc(userRef, {
-                    history: arrayUnion({
-                        date: date,
-                        neighborhood: neighborhood,
-                        value: value,
-                        discount: 0
-                    }),
-                    "stats.parties": increment(1), // Incrementa contador de festas
-                    // Opcional: Adicionar pontos com base no valor? Por enquanto não.
-                });
-                window.closeAddHistoryModal();
-                window.showDialog({ title: "Sucesso", message: "Festa adicionada!", type: "success" });
-            } catch (error) {
-                console.error("Erro ao adicionar festa:", error);
-                window.showDialog({ title: "Erro", message: "Não foi possível adicionar a festa.", type: "error" });
-            }
         }
 
         window.redeemReward = (cost, type) => {
