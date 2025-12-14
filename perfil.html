@@ -32,9 +32,19 @@
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
-        /* Animação da barra de progresso */
         .progress-bar-fill {
             transition: width 1s ease-in-out;
+        }
+        /* Estilização da barra de rolagem fina para o histórico */
+        .history-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .history-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
         }
     </style>
 </head>
@@ -45,12 +55,14 @@
       TELA 1: CARD DE PERFIL PRINCIPAL
       ========================================
     -->
-    <main class="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/50 relative">
+    <main class="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/50 relative flex flex-col max-h-[90vh]">
         
-        <!-- Cabeçalho Decorativo -->
-        <div class="h-32 bg-gradient-to-r from-indigo-500 to-purple-600 w-full absolute top-0 left-0 z-0"></div>
+        <!-- Cabeçalho Decorativo (Fixo no topo relativo) -->
+        <div class="h-32 bg-gradient-to-r from-indigo-500 to-purple-600 w-full absolute top-0 left-0 z-0 shrink-0"></div>
 
-        <div class="relative z-10 flex flex-col items-center pt-12 px-6 pb-8">
+        <!-- Conteúdo Rolável (Se necessário, ou apenas o histórico rola) -->
+        <!-- Aqui optamos por deixar o perfil fixo e o histórico rolar em baixo se faltar espaço -->
+        <div class="relative z-10 flex flex-col items-center pt-12 px-6 pb-2 shrink-0">
             
             <!-- Container do Avatar -->
             <div 
@@ -58,7 +70,7 @@
                 onclick="openModal()"
             >
                 <div class="w-36 h-36 rounded-full p-1 bg-white shadow-lg relative">
-                    <!-- Spinner de Loading (Fica invisível por padrão) -->
+                    <!-- Spinner de Loading -->
                     <div id="mainAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden">
                         <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -87,7 +99,7 @@
             </div>
             
             <!-- Informações do Usuário -->
-            <div class="text-center mt-4 mb-5">
+            <div class="text-center mt-4 mb-4">
                 <h1 class="text-2xl font-bold text-gray-800 tracking-tight" id="userNameDisplay">Carregando...</h1>
                 <p class="text-sm text-gray-500 font-medium" id="userEmailDisplay">carregando@exemplo.com</p>
             </div>
@@ -95,14 +107,14 @@
             <!-- Botão Editar Perfil -->
             <button 
                 onclick="openProfileEditModal()" 
-                class="w-full py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 hover:shadow-md active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 mb-6"
+                class="w-full py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 hover:shadow-md active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 mb-4"
             >
                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                 Editar Perfil
             </button>
             
-            <!-- BARRA DE NÍVEL E CATEGORIA (NOVO) -->
-            <div class="w-full mb-6 px-1">
+            <!-- BARRA DE NÍVEL E CATEGORIA -->
+            <div class="w-full mb-4 px-1">
                 <div class="flex justify-between items-end mb-2">
                     <div class="flex items-center gap-2">
                         <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-bold uppercase rounded-md tracking-wider">Membro</span>
@@ -110,37 +122,25 @@
                     </div>
                     <span class="text-xs font-semibold text-gray-500" id="xpDisplay">1250 / 2000 XP</span>
                 </div>
-                <!-- Barra de Fundo -->
                 <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden shadow-inner">
-                    <!-- Preenchimento Animado -->
                     <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full w-0 shadow-sm relative">
-                        <!-- Efeito de brilho sutil -->
                         <div class="absolute top-0 left-0 w-full h-full bg-white/20"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Painel de Indicadores (Stats) -->
-            <div class="w-full flex items-center justify-between bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                <!-- Festas -->
+            <div class="w-full flex items-center justify-between bg-gray-50 rounded-2xl p-4 border border-gray-100 mb-2">
                 <div class="flex-1 flex flex-col items-center justify-center">
                     <span class="text-xl font-bold text-indigo-600" id="partyCountDisplay">0</span>
                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Festas</span>
                 </div>
-
-                <!-- Divisória -->
                 <div class="w-px h-8 bg-gray-200"></div>
-
-                <!-- Pontos -->
                 <div class="flex-1 flex flex-col items-center justify-center">
                     <span class="text-xl font-bold text-emerald-500" id="userPointsDisplay">0</span>
                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Pontos</span>
                 </div>
-                
-                <!-- Divisória -->
                 <div class="w-px h-8 bg-gray-200"></div>
-
-                <!-- Saldo -->
                 <div class="flex-1 flex flex-col items-center justify-center">
                     <span class="text-xl font-bold text-amber-500" id="userBalanceDisplay">0,00</span>
                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Saldo</span>
@@ -148,151 +148,78 @@
             </div>
 
         </div>
+
+        <!-- 
+           ========================================
+           SEÇÃO DE HISTÓRICO (Scrollável)
+           ========================================
+        -->
+        <div class="flex-1 flex flex-col overflow-hidden bg-white border-t border-gray-100">
+            <!-- Header do Histórico -->
+            <div class="px-6 py-4 flex justify-between items-center bg-white z-10 sticky top-0">
+                <h3 class="text-lg font-bold text-gray-800">Histórico</h3>
+                <button class="flex items-center gap-1 text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    Filtros
+                </button>
+            </div>
+
+            <!-- Lista de Itens -->
+            <div class="flex-1 overflow-y-auto px-6 pb-6 history-scroll space-y-1" id="historyList">
+                <!-- Itens serão inseridos via JS -->
+            </div>
+            
+            <!-- Gradiente para indicar scroll -->
+            <div class="h-6 bg-gradient-to-t from-white to-transparent pointer-events-none absolute bottom-0 w-full"></div>
+        </div>
+
     </main>
 
+    <!-- ... (Modais de Foto, Edição e Recorte permanecem iguais) ... -->
+    <!-- Mantendo os modais existentes ocultos no código para brevidade, mas funcionais -->
 
     <!-- TELA 2: MODAL DE SELEÇÃO -->
     <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter relative overflow-hidden">
-            
             <div class="text-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Alterar Foto</h2>
                 <p class="text-sm text-gray-500">Escolha um avatar ou envie sua foto</p>
             </div>
-
             <div class="flex justify-center mb-8">
-                <div 
-                    class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-indigo-200 hover:border-indigo-400 transition-colors group cursor-pointer"
-                    onclick="document.getElementById('photoUploadInput').click();"
-                >
-                    <!-- Spinner Modal -->
-                    <div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/10 hidden">
-                        <svg class="animate-spin h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </div>
-
-                    <img 
-                        id="modalAvatarImage"
-                        src="" 
-                        alt="Visualização" 
-                        class="w-full h-full rounded-full object-cover bg-gray-50"
-                    >
-                    
-                    <div class="absolute inset-0 rounded-full flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <svg class="w-10 h-10 text-white mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.45 4h3.1a2 2 0 011.664.89l.812 1.22a2 2 0 001.664.89H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span class="text-white text-xs font-semibold tracking-wide uppercase">Enviar Foto</span>
-                    </div>
+                <div class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-indigo-200 hover:border-indigo-400 transition-colors group cursor-pointer" onclick="document.getElementById('photoUploadInput').click();">
+                    <div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/10 hidden"><svg class="animate-spin h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                    <img id="modalAvatarImage" src="" alt="Visualização" class="w-full h-full rounded-full object-cover bg-gray-50">
+                    <div class="absolute inset-0 rounded-full flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200"><svg class="w-10 h-10 text-white mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.45 4h3.1a2 2 0 011.664.89l.812 1.22a2 2 0 001.664.89H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span class="text-white text-xs font-semibold tracking-wide uppercase">Enviar Foto</span></div>
                 </div>
             </div>
-            
             <div class="grid grid-cols-2 gap-3 mb-8">
-                <button 
-                    onclick="generateMale()" 
-                    class="gender-button py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    data-type="male"
-                >
-                    <span>Masculino</span>
-                </button>
-                <button 
-                    onclick="generateFemale()" 
-                    class="gender-button py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    data-type="female"
-                >
-                    <span>Feminino</span>
-                </button>
+                <button onclick="generateMale()" class="gender-button py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="male"><span>Masculino</span></button>
+                <button onclick="generateFemale()" class="gender-button py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="female"><span>Feminino</span></button>
             </div>
-
-            <div class="pt-4 border-t border-gray-100 flex justify-end">
-                <button 
-                    onclick="closeModal()" 
-                    class="px-6 py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-xl transition shadow-lg active:scale-95"
-                >
-                    Concluir
-                </button>
-            </div>
+            <div class="pt-4 border-t border-gray-100 flex justify-end"><button onclick="closeModal()" class="px-6 py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-xl transition shadow-lg active:scale-95">Concluir</button></div>
         </div>
     </div>
-
 
     <!-- TELA 3: MODAL EDITAR -->
     <div id="profileEditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter max-h-[90vh] overflow-y-auto">
-            
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-800">Editar Perfil</h2>
-                <button onclick="closeProfileEditModal()" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            
+            <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-gray-800">Editar Perfil</h2><button onclick="closeProfileEditModal()" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
             <div class="space-y-5">
-                <div class="space-y-1">
-                    <label for="editName" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label>
-                    <input type="text" id="editName" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Seu nome">
-                </div>
-                <div class="space-y-1">
-                    <label for="editEmail" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Email</label>
-                    <div class="relative">
-                        <input type="email" id="editEmail" class="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 text-gray-500 cursor-not-allowed" disabled>
-                        <svg class="w-5 h-5 text-gray-400 absolute right-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    </div>
-                </div>
+                <div class="space-y-1"><label for="editName" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label><input type="text" id="editName" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Seu nome"></div>
+                <div class="space-y-1"><label for="editEmail" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Email</label><div class="relative"><input type="email" id="editEmail" class="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 text-gray-500 cursor-not-allowed" disabled><svg class="w-5 h-5 text-gray-400 absolute right-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div></div>
                 <div class="py-2"><div class="h-px bg-gray-100"></div></div>
                 <h3 class="text-sm font-bold text-indigo-600 uppercase tracking-wide">Endereço</h3>
-                <div class="space-y-1">
-                    <label for="editNeighborhood" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label>
-                    <div class="relative">
-                        <select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none">
-                            <option value="">Selecione...</option>
-                            <option value="Centro">Centro</option>
-                            <option value="Jardim America">Jardim América</option>
-                            <option value="Vila Nova">Vila Nova</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="col-span-2 space-y-1">
-                        <label for="editStreet" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Rua</label>
-                        <input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Nome da rua">
-                    </div>
-                    <div class="space-y-1">
-                        <label for="editHouseNumber" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nº</label>
-                        <input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="123">
-                    </div>
-                </div>
+                <div class="space-y-1"><label for="editNeighborhood" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label><div class="relative"><select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none"><option value="">Selecione...</option><option value="Centro">Centro</option><option value="Jardim America">Jardim América</option><option value="Vila Nova">Vila Nova</option><option value="Outro">Outro</option></select><div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div></div></div>
+                <div class="grid grid-cols-3 gap-3"><div class="col-span-2 space-y-1"><label for="editStreet" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Rua</label><input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="Nome da rua"></div><div class="space-y-1"><label for="editHouseNumber" class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nº</label><input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="123"></div></div>
             </div>
-
-            <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100">
-                <button onclick="closeProfileEditModal()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition active:scale-[0.98]">Cancelar</button>
-                <button onclick="saveProfileChanges()" class="flex-1 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-[0.98]">Salvar Alterações</button>
-            </div>
+            <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100"><button onclick="closeProfileEditModal()" class="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition active:scale-[0.98]">Cancelar</button><button onclick="saveProfileChanges()" class="flex-1 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-[0.98]">Salvar Alterações</button></div>
         </div>
     </div>
 
-
     <!-- TELA 4: CROPPER -->
     <div id="cropperModal" class="fixed inset-0 z-[60] bg-black/90 hidden flex-col items-center justify-center p-0 md:p-4 backdrop-blur-md">
-        <div class="w-full bg-black/50 p-4 absolute top-0 left-0 flex justify-between items-center md:hidden z-10">
-            <h3 class="text-white font-medium">Ajustar Foto</h3>
-            <button onclick="closeCropper()" class="text-white p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-        </div>
-        <div class="bg-gray-900 md:bg-white w-full h-full md:h-auto md:max-w-2xl md:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            <div class="hidden md:flex justify-between items-center p-4 border-b border-gray-100">
-                <h3 class="text-lg font-bold text-gray-800">Ajustar Foto</h3>
-                <button onclick="closeCropper()" class="text-gray-400 hover:text-gray-600 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            <div class="flex-1 bg-black relative flex items-center justify-center overflow-hidden">
-                <img id="imageToCrop" src="" alt="Para cortar" class="block max-w-full">
-            </div>
-            <div class="p-4 bg-gray-900 md:bg-white border-t border-gray-800 md:border-gray-100 flex justify-end gap-3 z-20">
-                <button onclick="closeCropper()" class="px-6 py-2.5 rounded-xl font-medium transition text-gray-300 hover:text-white md:text-gray-600 md:bg-gray-100 md:hover:bg-gray-200">Cancelar</button>
-                <button onclick="cropImage()" class="px-8 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-500 md:hover:bg-indigo-700 shadow-lg transition active:scale-95 flex items-center gap-2">Confirmar</button>
-            </div>
-        </div>
+        <div class="w-full bg-black/50 p-4 absolute top-0 left-0 flex justify-between items-center md:hidden z-10"><h3 class="text-white font-medium">Ajustar Foto</h3><button onclick="closeCropper()" class="text-white p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
+        <div class="bg-gray-900 md:bg-white w-full h-full md:h-auto md:max-w-2xl md:rounded-2xl shadow-2xl flex flex-col overflow-hidden"><div class="hidden md:flex justify-between items-center p-4 border-b border-gray-100"><h3 class="text-lg font-bold text-gray-800">Ajustar Foto</h3><button onclick="closeCropper()" class="text-gray-400 hover:text-gray-600 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="flex-1 bg-black relative flex items-center justify-center overflow-hidden"><img id="imageToCrop" src="" alt="Para cortar" class="block max-w-full"></div><div class="p-4 bg-gray-900 md:bg-white border-t border-gray-800 md:border-gray-100 flex justify-end gap-3 z-20"><button onclick="closeCropper()" class="px-6 py-2.5 rounded-xl font-medium transition text-gray-300 hover:text-white md:text-gray-600 md:bg-gray-100 md:hover:bg-gray-200">Cancelar</button><button onclick="cropImage()" class="px-8 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-500 md:hover:bg-indigo-700 shadow-lg transition active:scale-95 flex items-center gap-2">Confirmar</button></div></div>
     </div>
     
     <input type="file" id="photoUploadInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
@@ -306,9 +233,17 @@
             stats: { parties: 5, points: 1250, balance: 100.00 }
         };
 
-        const MAX_XP = 2000; // Objetivo do nível 1
+        // --- DADOS DO HISTÓRICO (Mock) ---
+        const historyData = [
+            { date: '12/08/2024', neighborhood: 'Centro', value: 150.00, discount: 15.00 },
+            { date: '05/07/2024', neighborhood: 'Vila Nova', value: 200.00, discount: 20.00 },
+            { date: '20/06/2024', neighborhood: 'Jardim America', value: 120.00, discount: 10.00 },
+            { date: '15/05/2024', neighborhood: 'Centro', value: 180.00, discount: 0.00 },
+            { date: '02/04/2024', neighborhood: 'Outro', value: 300.00, discount: 30.00 },
+            { date: '10/03/2024', neighborhood: 'Vila Nova', value: 90.00, discount: 5.00 }
+        ];
 
-        // --- CONFIG ---
+        const MAX_XP = 2000;
         const BASE_URL = "https://api.dicebear.com/9.x/avataaars/svg";
         const COMMON_PARAMS = "scale=110&radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9";
         
@@ -318,12 +253,10 @@
             female: ["longButNotTooLong", "bob", "bun", "curly", "curvy", "straight1", "straight2", "straightStrand", "frida", "miaWallace", "bigHair", "shavedSides", "fro", "froBand"]
         };
 
-        // --- UTILS ---
         const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
         const getSeed = () => Math.random().toString(36).substring(2, 15);
         const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
 
-        // --- UI UPDATES ---
         function initUI() {
             document.getElementById('userNameDisplay').textContent = userData.name;
             document.getElementById('userEmailDisplay').textContent = userData.email;
@@ -332,13 +265,43 @@
             document.getElementById('userBalanceDisplay').textContent = formatBRL(userData.stats.balance);
             document.getElementById('xpDisplay').textContent = `${userData.stats.points} / ${MAX_XP} XP`;
             
-            // Animação da barra de progresso
             setTimeout(() => {
                 const percentage = Math.min((userData.stats.points / MAX_XP) * 100, 100);
                 document.getElementById('xpBarFill').style.width = `${percentage}%`;
             }, 500);
 
+            renderHistory();
             generateMale();
+        }
+
+        // --- RENDERIZAÇÃO DO HISTÓRICO ---
+        function renderHistory() {
+            const listContainer = document.getElementById('historyList');
+            listContainer.innerHTML = '';
+
+            historyData.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'flex justify-between items-center p-3 hover:bg-gray-50 rounded-xl transition border-b border-gray-50 last:border-0 cursor-default';
+                
+                const hasDiscount = item.discount > 0;
+                const discountBadge = hasDiscount 
+                    ? `<span class="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-md ml-2">- R$ ${formatBRL(item.discount)}</span>` 
+                    : '';
+
+                el.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="text-xs font-semibold text-gray-400 mb-0.5">${item.date}</span>
+                        <div class="flex items-center">
+                            <span class="text-sm font-bold text-gray-700">${item.neighborhood}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="text-sm font-bold text-gray-800">R$ ${formatBRL(item.value)}</span>
+                        ${discountBadge}
+                    </div>
+                `;
+                listContainer.appendChild(el);
+            });
         }
 
         function generateAvatar(type) {
@@ -346,7 +309,6 @@
             const hair = getRandom(HAIR_STYLES[type]);
             const beardProb = type === 'male' ? 30 : 0;
             const url = `${BASE_URL}?seed=${seed}&top=${hair}&facialHairProbability=${beardProb}&accessoriesProbability=0&${COMMON_PARAMS}`;
-            
             appState.avatarType = type;
             updateAvatarImages(url);
             updateGenderButtons(type);
@@ -355,34 +317,27 @@
         function generateMale() { generateAvatar('male'); }
         function generateFemale() { generateAvatar('female'); }
 
-        // --- Lógica de Preload de Imagem ---
         function updateAvatarImages(url) {
             const mainImg = document.getElementById('avatarImage');
             const modalImg = document.getElementById('modalAvatarImage');
             const mainLoader = document.getElementById('mainAvatarLoader');
             const modalLoader = document.getElementById('modalAvatarLoader');
 
-            // 1. Mostrar Spinner IMEDIATAMENTE
             mainLoader.classList.remove('hidden');
             modalLoader.classList.remove('hidden');
             
-            // 2. Criar imagem em memória para carregar em background
             const tempImg = new Image();
             tempImg.src = url;
             
             tempImg.onload = () => {
-                // 3. Quando carregada, atualiza as imagens reais
                 mainImg.src = url;
                 modalImg.src = url;
-                
-                // 4. Esconde os spinners e exibe a imagem nova (troca instantânea)
                 mainLoader.classList.add('hidden');
                 modalLoader.classList.add('hidden');
             };
 
             tempImg.onerror = () => {
-                console.warn("Falha ao carregar imagem em background.");
-                mainLoader.classList.add('hidden'); // Falhou, esconde loader para não travar
+                mainLoader.classList.add('hidden');
                 modalLoader.classList.add('hidden');
             };
         }
@@ -400,7 +355,6 @@
             });
         }
 
-        // --- MODALS ---
         const toggleModal = (id, show) => {
             const el = document.getElementById(id);
             if (show) { el.classList.remove('hidden'); el.classList.add('flex'); } 
@@ -408,7 +362,6 @@
         };
 
         function openModal() {
-            // Garante que o modal use a mesma imagem que o principal ao abrir
             const mainSrc = document.getElementById('avatarImage').src;
             if (mainSrc) document.getElementById('modalAvatarImage').src = mainSrc;
             toggleModal('imageModal', true);
@@ -434,7 +387,6 @@
             closeProfileEditModal();
         }
 
-        // --- CROPPER / UPLOAD ---
         function handleFileSelect(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -466,7 +418,6 @@
         }
         function closeCropper() { toggleModal('cropperModal', false); if (appState.cropper) { appState.cropper.destroy(); appState.cropper = null; } }
 
-        // --- LISTENERS ---
         ['imageModal', 'profileEditModal'].forEach(id => {
             document.getElementById(id).addEventListener('click', (e) => { if (e.target.id === id) toggleModal(id, false); });
         });
