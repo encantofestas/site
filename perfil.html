@@ -136,11 +136,11 @@
                 </div>
             </div>
 
-            <!-- Stats (CORRIGIDO: Apenas 1 coluna para Festas) -->
+            <!-- Stats -->
             <div class="w-full grid grid-cols-3 gap-0 py-6 border-b border-gray-100 mb-6 relative z-20">
-                <!-- Ícone Atualizar (Pequeno) -->
-                <button onclick="this.querySelector('svg').classList.add('animate-spin'); setTimeout(() => this.querySelector('svg').classList.remove('animate-spin'), 1000); window.location.reload();" class="absolute top-1 right-1 p-1 bg-gray-800 text-white rounded-full shadow-sm hover:bg-gray-700 transition-colors" title="Atualizar Dados">
-                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                <!-- Ícone Sincronizar (Azul, condicional) -->
+                <button id="syncDataBtn" onclick="openSyncInfoModal()" class="hidden absolute top-1 right-1 p-1.5 bg-blue-100 text-blue-600 rounded-full shadow-sm hover:bg-blue-200 transition-colors animate-pulse" title="Atualizar Cadastro">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </button>
 
                 <div class="flex flex-col items-center border-r border-gray-100">
@@ -242,7 +242,8 @@
             if (type === 'confirm') {
                 iconBg = 'bg-blue-100'; iconColor = 'text-blue-600';
                 iconHtml = '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-                btnsContainer.innerHTML = `<button onclick="closeDialog()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition active:scale-95">Cancelar</button><button onclick="confirmDialogAction()" class="flex-1 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition active:scale-95">Confirmar</button>`;
+                // Botões personalizados para o modal de sincronização
+                btnsContainer.innerHTML = `<button onclick="closeDialog()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition active:scale-95">Entendi</button><button onclick="confirmDialogAction()" class="flex-1 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition active:scale-95">Editar Perfil</button>`;
             } else if (type === 'success') {
                 iconBg = 'bg-green-100'; iconColor = 'text-green-600';
                 iconHtml = '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
@@ -251,6 +252,10 @@
                 iconBg = 'bg-red-100'; iconColor = 'text-red-600';
                 iconHtml = '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
                 btnsContainer.innerHTML = `<button onclick="closeDialog()" class="w-full py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition active:scale-95">Fechar</button>`;
+            } else if (type === 'simple_confirm') { // Novo tipo para confirmação simples
+                iconBg = 'bg-blue-100'; iconColor = 'text-blue-600';
+                iconHtml = '<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                btnsContainer.innerHTML = `<button onclick="closeDialog()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition active:scale-95">Cancelar</button><button onclick="confirmDialogAction()" class="flex-1 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition active:scale-95">Confirmar</button>`;
             }
             iconContainer.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${iconBg} ${iconColor}`;
             iconContainer.innerHTML = iconHtml;
@@ -354,11 +359,11 @@
                             await updateDoc(doc(db, "users", user.uid), { history: emptySlots });
                         }
 
-                        // --- CORREÇÃO AUTOMÁTICA: Se faltar o campo "parties", cria ele ---
+                        // --- CORREÇÃO AUTOMÁTICA: Se faltar o campo "parties", cria ele com 0 ---
                         if (!userData.stats || userData.stats.parties === undefined) {
                             await setDoc(doc(db, "users", user.uid), {
                                 stats: {
-                                    parties: 1, 
+                                    parties: 0, // Inicia com 0 para novos/corrigidos
                                     points: userData.stats?.points || 500,
                                     balance: userData.stats?.balance || 0.00
                                 }
@@ -450,7 +455,7 @@
                     phone: "",
                     avatar: "", 
                     address: { neighborhood: "", street: "", number: "" },
-                    stats: { parties: 1, points: 500, balance: 0.00 },
+                    stats: { parties: 0, points: 500, balance: 0.00 }, // Começa com 0 festas
                     history: emptyHistory
                 };
                 await setDoc(doc(db, "users", user.uid), initialData, { merge: true });
@@ -512,6 +517,19 @@
             window.closeModal();
         }
 
+        // Função do novo botão de sincronização
+        window.openSyncInfoModal = () => {
+            window.showDialog({
+                title: "Atualizar Cadastro",
+                message: "Para aparecer a quantidade de pontos, locação, etc você deve preencher as informações para buscar no banco de dados. Após preencher, aguarde até 48 horas para aparecerem no seu perfil.",
+                type: "confirm", // Usa o tipo confirm para mostrar 2 botões
+                onConfirm: () => {
+                    // Ao confirmar (clicar em Editar Perfil), abre o modal de edição
+                    window.openProfileEditModal();
+                }
+            });
+        }
+
         window.redeemReward = (cost, type) => {
             if(!currentUser) return;
             const points = userData?.stats?.points || 0;
@@ -519,7 +537,7 @@
                 window.showDialog({
                     title: 'Confirmar Troca',
                     message: `Você quer trocar ${cost} pontos por este item?`,
-                    type: 'confirm',
+                    type: 'simple_confirm', // Usando confirmação simples para troca
                     onConfirm: async () => {
                         try {
                             const userRef = doc(db, "users", currentUser.uid);
@@ -666,6 +684,22 @@
                 document.getElementById('xpBarFill').style.width = `${percentage}%`; 
             }, 100);
             
+            // --- LÓGICA DO ÍCONE AZUL (Sincronizar) ---
+            const parties = stats.parties || 0;
+            const addr = data.address || {};
+            // Verifica se o perfil está incompleto (falta telefone, bairro, rua ou número)
+            // Note que editName e editEmail (userEmailDisplay) já são validados no login, mas podemos incluir name.
+            const isProfileComplete = data.name && data.phone && addr.neighborhood && addr.street && addr.number && addr.number !== "S/N" && addr.number !== "";
+            
+            const btn = document.getElementById('syncDataBtn');
+            // Regra: Aparece se 0 festas E perfil incompleto.
+            // Se tiver festas > 0, some. Se perfil completo, some.
+            if (parties === 0 && !isProfileComplete) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+
             renderRewards();
             renderHistory();
         }
