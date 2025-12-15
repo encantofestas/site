@@ -25,8 +25,14 @@
 </head>
 <body class="min-h-screen flex flex-col items-center">
 
-    <!-- TELA DE LOGIN -->
-    <section id="authView" class="w-full min-h-screen bg-gradient-to-br from-blue-600 to-indigo-900 flex flex-col items-center justify-center px-6 py-10 fade-in">
+    <!-- TELA DE CARREGAMENTO (SPLASH SCREEN) -->
+    <div id="loadingScreen" class="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <div class="text-blue-600 font-bold text-lg animate-pulse">Carregando Clube VIP...</div>
+    </div>
+
+    <!-- TELA DE LOGIN (Começa HIDDEN para evitar o flash) -->
+    <section id="authView" class="hidden w-full min-h-screen bg-gradient-to-br from-blue-600 to-indigo-900 flex-col items-center justify-center px-6 py-10 fade-in">
         <div class="w-full max-w-md mx-auto">
             <div class="text-center mb-10">
                 <h1 class="text-4xl font-extrabold text-white tracking-tight">Acesse sua Conta</h1>
@@ -349,6 +355,10 @@
 
         // 1. Monitoramento de Auth
         onAuthStateChanged(auth, async (user) => {
+            const loading = document.getElementById('loadingScreen');
+            const authView = document.getElementById('authView');
+            const profile = document.getElementById('profileView');
+
             if (user) {
                 currentUser = user;
                 // Escuta o documento
@@ -378,7 +388,14 @@
                         // ------------------------------------------------------------------
 
                         window.userData = userData; 
-                        loadAppView(); 
+                        
+                        // SUCESSO: Esconde loading e login, mostra perfil
+                        loading.classList.add('opacity-0', 'pointer-events-none');
+                        authView.classList.add('hidden');
+                        profile.classList.remove('hidden');
+                        profile.classList.add('flex');
+                        
+                        initUI(); 
                     } else {
                         console.log("Criando perfil padrão...");
                         await createDefaultUserDoc(user);
@@ -389,18 +406,13 @@
             } else {
                 currentUser = null;
                 window.userData = null;
-                document.getElementById('profileView').classList.add('hidden');
-                document.getElementById('profileView').classList.remove('flex');
-                document.getElementById('authView').classList.remove('hidden');
+                // LOGOUT: Esconde loading e perfil, mostra login
+                loading.classList.add('opacity-0', 'pointer-events-none');
+                profile.classList.add('hidden');
+                profile.classList.remove('flex');
+                authView.classList.remove('hidden');
             }
         });
-
-        function loadAppView() {
-            document.getElementById('authView').classList.add('hidden');
-            document.getElementById('profileView').classList.remove('hidden');
-            document.getElementById('profileView').classList.add('flex');
-            initUI(); 
-        }
 
         // 2. Funções Auth (Window)
         window.handleGoogleLogin = async () => {
