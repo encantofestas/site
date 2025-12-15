@@ -165,7 +165,7 @@
     <!-- TOAST -->
     <div id="toast-notification" class="bg-gray-800/95 backdrop-blur-sm text-white px-5 py-4 rounded-xl shadow-2xl z-[60] flex items-center justify-center space-x-3 text-center border border-gray-700">
         <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-        <span class="text-sm font-semibold leading-tight">Reservas permitidas apenas até 6 meses à frente.</span>
+        <span class="text-sm font-semibold leading-tight">Agenda disponível até 2 anos à frente.</span>
     </div>
 
     <!-- MODAL PERSONALIZADO (AVISOS) -->
@@ -556,7 +556,9 @@
         };
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
-        let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
+        let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); 
+        // AUMENTADO O LIMITE PARA 24 MESES (Permite visualizar 2026 e 2027 tranquilamente)
+        const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 24, 1);
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const monthYearDisplay = document.getElementById('current-month-year'); const calendarBody = document.getElementById('calendar-body'); const prevButton = document.getElementById('prev-month'); const nextButton = document.getElementById('next-month'); const toast = document.getElementById('toast-notification');
         let currentSelectedDateISO = "";
@@ -592,6 +594,55 @@
             return { text: '?', color: 'bg-gray-400', title: 'Idade não informada' };
         }
         
+        // --- NOVA FUNÇÃO DE PARSE DE DATA ROBUSTA (Resolve problemas de 2026 e formatos variados) ---
+        function safeParseDate(input) {
+            if (!input) return null;
+            
+            // Se for objeto Date
+            if (input instanceof Date) {
+                const y = input.getFullYear();
+                const m = String(input.getMonth() + 1).padStart(2, '0');
+                const d = String(input.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            const str = String(input).trim();
+            if (!str) return null;
+
+            // Tenta detectar DD/MM/AAAA ou DD-MM-AAAA
+            // Aceita 1 ou 2 dígitos para dia/mês (ex: 1/1/2026)
+            const ptBrMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+            if (ptBrMatch) {
+                let y = ptBrMatch[3];
+                // Corrige ano de 2 dígitos (26 -> 2026)
+                if (y.length === 2) y = '20' + y;
+                const m = ptBrMatch[2].padStart(2, '0');
+                const d = ptBrMatch[1].padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            // Tenta detectar ISO YYYY-MM-DD
+            const isoMatch = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+            if (isoMatch) {
+                const y = isoMatch[1];
+                const m = isoMatch[2].padStart(2, '0');
+                const d = isoMatch[3].padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            // Tenta Date.parse() como último recurso (cuidado com timezone aqui)
+            // Para garantir, criamos a data e usamos métodos locais (não UTC)
+            const dObj = new Date(str);
+            if (!isNaN(dObj.getTime())) {
+                const y = dObj.getFullYear();
+                const m = String(dObj.getMonth() + 1).padStart(2, '0');
+                const d = String(dObj.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            
+            return null;
+        }
+
         function addDays(dateStr, days) {
             const result = new Date(dateStr + 'T00:00:00');
             result.setDate(result.getDate() + days);
@@ -1479,8 +1530,9 @@
         // FUNÇÃO FETCH AGENDAMENTOS (AUTOMÁTICA)
         async function fetchAgendamentosReais() {
             try {
-                // MESMA URL USADA NO POST
-                const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec';
+                // ADICIONADO timestamp para evitar cache do navegador (?t=...)
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec' + '?t=' + new Date().getTime();
+                
                 const response = await fetch(scriptURL); 
                 const data = await response.json();
                 
@@ -1494,21 +1546,10 @@
                 staticData.brinquedos.forEach(b => mapNomeId[b.name] = b.id);
 
                 data.forEach(row => {
-                    // Normaliza a data (Assumindo formato DD/MM/AAAA ou objeto Date do sheets)
-                    // Na planilha, a coluna agora é 'EVENTO' (Data da Festa)
-                    let rawDate = row['EVENTO'];
-                    if (!rawDate) return;
+                    const rawDate = row['EVENTO'];
                     
-                    let dateISO = '';
-                    if (typeof rawDate === 'string') {
-                        // Tenta converter "15/12/2025" para ISO
-                        const parts = rawDate.split('/');
-                        if (parts.length === 3) {
-                            dateISO = `${parts[2]}-${parts[1]}-${parts[0]}`; // YYYY-MM-DD
-                        }
-                    } else if (new Date(rawDate) !== "Invalid Date") {
-                         dateISO = new Date(rawDate).toISOString().split('T')[0];
-                    }
+                    // USANDO A NOVA FUNÇÃO DE PARSE SEGURA
+                    const dateISO = safeParseDate(rawDate);
 
                     if (!dateISO) return;
 
@@ -1519,7 +1560,10 @@
                     if (itensStr) {
                         const linhas = itensStr.split('\n');
                         linhas.forEach(linha => {
-                            const match = linha.match(/(?:•\s*)?(\d+)x\s+(.+)/);
+                            // Regex ajustada para ser mais flexível com espaços
+                            const match = linha.match(/(?:•\s*)?(\d+)x\s+(.+?)(?:\s*\(.*\))?$/);
+                            // O Regex acima pega: (qtd)x (nome do item) (ignora coisas entre parenteses no final se tiver)
+                            
                             if (match) {
                                 const qtd = parseInt(match[1]);
                                 const nome = match[2].trim();
@@ -1546,7 +1590,6 @@
                 
             } catch (e) {
                 console.error("Erro ao carregar agendamentos:", e);
-                // Fallback para dados estáticos se falhar (opcional, já carregou no onload)
             }
         }
 
