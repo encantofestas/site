@@ -27,8 +27,16 @@
 
     <!-- TELA DE CARREGAMENTO (SPLASH SCREEN) -->
     <div id="loadingScreen" class="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <div class="text-blue-600 font-bold text-lg animate-pulse">Carregando Clube VIP...</div>
+        <!-- Ícone Balão/Festa Animado -->
+        <div class="relative w-24 h-24 mb-2 animate-bounce">
+            <svg class="w-full h-full text-blue-500 drop-shadow-xl" viewBox="0 0 24 24" fill="currentColor">
+                <!-- Formato de Balão -->
+                <path d="M12.5 2C8.36 2 5 5.36 5 9.5c0 3.68 2.64 6.73 6.14 7.36c-0.34 1.86-1.64 3.28-1.64 3.28S10.5 22 12.5 22 s3-1.86 3-1.86s-1.3-1.42-1.64-3.28C17.36 16.23 20 13.18 20 9.5C20 5.36 16.64 2 12.5 2z"/>
+                <!-- Brilho no balão -->
+                <path d="M9.5 6.5c1.5-1.5 4-1.5 5.5 0" stroke="white" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.3"/>
+            </svg>
+        </div>
+        <div class="text-blue-600 font-bold text-lg animate-pulse tracking-wide">Carregando...</div>
     </div>
 
     <!-- TELA DE LOGIN (Começa HIDDEN para evitar o flash) -->
