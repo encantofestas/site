@@ -1276,26 +1276,25 @@
             const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec'; 
             // ==========================================================
             
-            const formData = new FormData();
-            
-            // Nomes exatos das colunas da sua Planilha
-            formData.append('Data', new Date().toLocaleString('pt-BR'));
-            formData.append('Inicio', eventStartTime);
-            formData.append('Termino', eventEndTime);
-            formData.append('Nome', name);
-            formData.append('Bairro', neighborhood);
-            formData.append('Rua', street);
-            formData.append('Numero', number);
-            formData.append('Referencia', reference);
-            formData.append('Itens', itensFormatados);
-            formData.append('EntregaAntes', deliveryDayBeforeSelect);
-            formData.append('Piscina Coberta', rainProtectionValue);
-            formData.append('Monitores + Horas', monitorTexto);
-            formData.append('Tomadas', tomadasFormatadas);
-            formData.append('Seguro', seguroTexto);
-            formData.append('NotaFiscal (CNPJ)', notaTexto);
-            formData.append('Diarias', selectedDayCount);
-            formData.append('Total', finalTotalText);
+            const data = {
+                'Data': new Date().toLocaleString('pt-BR'),
+                'Inicio': eventStartTime,
+                'Termino': eventEndTime,
+                'Nome': name,
+                'Bairro': neighborhood,
+                'Rua': street,
+                'Numero': number,
+                'Referencia': reference,
+                'Itens': itensFormatados,
+                'EntregaAntes': deliveryDayBeforeSelect,
+                'Piscina Coberta': rainProtectionValue,
+                'Monitores + Horas': monitorTexto,
+                'Tomadas': tomadasFormatadas,
+                'Seguro': seguroTexto,
+                'NotaFiscal (CNPJ)': notaTexto,
+                'Diarias': selectedDayCount,
+                'Total': finalTotalText
+            };
 
             // Feedback visual (Botão carrega)
             const btn = document.getElementById('action-button');
@@ -1304,7 +1303,13 @@
             btn.disabled = true;
             btn.classList.add('opacity-50', 'cursor-not-allowed');
 
-            fetch(scriptURL, { method: 'POST', body: formData })
+            fetch(scriptURL, { 
+                method: 'POST', 
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8",
+                },
+            })
             .then(response => {
                 // --- SUCESSO ---
                 alert(`Obrigado, ${name}! \n\nSeu pedido foi recebido com sucesso. \nValor Total: ${finalTotalText}\n\nEntraremos em contato em breve.`);
