@@ -191,8 +191,9 @@
                     <div class="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
                         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <h3 class="text-white text-xl font-extrabold brand-font">Reserva Recebida!</h3>
-                    <p class="text-green-100 text-sm mt-1">Agora só falta garantir sua data.</p>
+                    <h3 class="text-white text-xl font-extrabold brand-font">Reserva com Sucesso</h3>
+                    <!-- SUBTÍTULO DINÂMICO (Preenchido via JS) -->
+                    <p id="success-date-msg" class="text-green-100 text-sm mt-1">A data xx de xxxxx já é sua!</p>
                 </div>
             </div>
             
@@ -220,7 +221,8 @@
                     </div>
                 </div>
 
-                <button onclick="closeSuccessModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transform transition active:scale-95">
+                <!-- AÇÃO DO BOTÃO ALTERADA -->
+                <button onclick="finalizeAndOpenWhatsApp()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transform transition active:scale-95">
                     Já fiz o PIX, finalizar!
                 </button>
                 <p class="text-xs text-center text-gray-400 mt-4">A confirmação chegará no seu WhatsApp.</p>
@@ -1404,7 +1406,23 @@
             .then(response => {
                 // --- SUCESSO ---
                 // Mostra o Modal de PIX em vez de alert
+                const dateText = document.getElementById('selected-date-display').innerText.replace('Para ', '').trim();
+                
+                // Formata a data para "15 de Dezembro"
+                let dateFormatted = dateText;
+                try {
+                    const parts = dateText.split('/');
+                    if (parts.length === 3) {
+                        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+                        const monthIndex = parseInt(parts[1]) - 1;
+                        dateFormatted = `${parts[0]} de ${monthNames[monthIndex]}`;
+                    }
+                } catch(e) { console.log(e); }
+
+                document.getElementById('success-date-msg').innerText = `A data ${dateFormatted} já é sua!`;
+                
                 document.getElementById('success-modal-overlay').classList.add('open');
+                document.body.style.overflow = 'hidden';
                 
                 // Restaura o botão
                 btn.innerText = textoOriginal;
@@ -1424,6 +1442,19 @@
             });
         }
         
+        // NOVA FUNÇÃO PARA FINALIZAR E ABRIR WHATSAPP
+        window.finalizeAndOpenWhatsApp = function() {
+            const whatsappNumber = "5547992277324"; 
+            const message = "Reservei pelo site, pode confirmar?";
+            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            
+            // Abre o WhatsApp
+            window.open(url, '_blank');
+            
+            // Fecha o modal e limpa tudo
+            closeSuccessModal();
+        }
+
         // FUNÇÕES DO MODAL DE SUCESSO
         window.copyPix = function() {
             const pixKey = "57545647000116"; 
@@ -1478,6 +1509,7 @@
 
         window.closeSuccessModal = function() {
             document.getElementById('success-modal-overlay').classList.remove('open');
+            document.body.style.overflow = ''; // Libera o scroll
             window.closeToysPanel();
             window.changeStep('selection');
             
