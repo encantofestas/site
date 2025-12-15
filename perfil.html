@@ -36,27 +36,11 @@
 
     <!-- TELA DE CARREGAMENTO (SPLASH SCREEN) -->
     <div id="loadingScreen" class="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center transition-opacity duration-500">
-        <!-- Grupo de Balões Animados -->
-        <div class="relative w-40 h-40 mb-6">
-            <!-- Balão 1 (Trás Esquerda - Roxo) -->
-            <svg class="absolute bottom-2 left-2 w-20 h-24 text-purple-300 animate-float-slow" style="animation-delay: 0s;" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.5 2C8.36 2 5 5.36 5 9.5c0 3.68 2.64 6.73 6.14 7.36c-0.34 1.86-1.64 3.28-1.64 3.28S10.5 22 12.5 22 s3-1.86 3-1.86s-1.3-1.42-1.64-3.28C17.36 16.23 20 13.18 20 9.5C20 5.36 16.64 2 12.5 2z"/>
-                <path d="M12.5 22c-0.5 3-1 8 2 12" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
-            </svg>
-            
-            <!-- Balão 2 (Trás Direita - Azul Claro) -->
-            <svg class="absolute bottom-4 right-2 w-18 h-22 text-blue-300 animate-float-medium" style="animation-delay: 1s;" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.5 2C8.36 2 5 5.36 5 9.5c0 3.68 2.64 6.73 6.14 7.36c-0.34 1.86-1.64 3.28-1.64 3.28S10.5 22 12.5 22 s3-1.86 3-1.86s-1.3-1.42-1.64-3.28C17.36 16.23 20 13.18 20 9.5C20 5.36 16.64 2 12.5 2z"/>
-                <path d="M12.5 22c0.5 3 0 8 -2 10" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
-            </svg>
-            
-            <!-- Balão 3 (Frente Centro - Azul Forte) -->
-            <svg class="absolute bottom-6 left-8 w-24 h-28 text-blue-600 animate-float-fast z-10 drop-shadow-lg" style="animation-delay: 0.5s;" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.5 2C8.36 2 5 5.36 5 9.5c0 3.68 2.64 6.73 6.14 7.36c-0.34 1.86-1.64 3.28-1.64 3.28S10.5 22 12.5 22 s3-1.86 3-1.86s-1.3-1.42-1.64-3.28C17.36 16.23 20 13.18 20 9.5C20 5.36 16.64 2 12.5 2z"/>
-                <!-- Brilho -->
-                <path d="M9 6c1.5-1.5 5-1.5 6 0" stroke="white" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.4"/>
-                <!-- Corda -->
-                <path d="M12.5 22c0 3 -0.5 8 1 12" stroke="#94a3b8" stroke-width="2" fill="none"/>
+        <div class="relative mb-4">
+            <!-- Spinner Padrão Bonito e Giratório -->
+            <svg class="animate-spin h-16 w-16 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
         </div>
         <div class="text-blue-600 font-bold text-lg animate-pulse tracking-wide">Carregando...</div>
