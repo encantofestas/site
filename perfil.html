@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -152,11 +153,17 @@
             <!-- Banner Fundo (Design Festivo com Confetes Detalhados) -->
             <div class="h-44 w-full relative shrink-0 overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700">
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                
                 <!-- Luzes de Fundo -->
                 <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
                 <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl transform translate-x-10 -translate-y-10"></div>
+                
                 <!-- Serpentinas (SVG de fundo) -->
-                <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 400 150" preserveAspectRatio="none"><path d="M0,20 Q50,80 100,20 T200,20" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/><path d="M200,100 Q250,50 300,100 T400,80" fill="none" stroke="#FCD34D" stroke-width="2"/></svg>
+                <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 400 150" preserveAspectRatio="none">
+                    <path d="M0,20 Q50,80 100,20 T200,20" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/>
+                    <path d="M200,100 Q250,50 300,100 T400,80" fill="none" stroke="#FCD34D" stroke-width="2"/>
+                </svg>
+
                 <!-- Confetes Coloridos (Formas CSS) -->
                 <div class="absolute top-6 left-[10%] w-2 h-2 bg-yellow-300 rounded-full opacity-80 animate-bounce" style="animation-duration: 3s;"></div>
                 <div class="absolute top-10 left-[15%] w-1.5 h-3 bg-pink-300 rotate-45 opacity-70 confetti-float"></div>
@@ -344,7 +351,11 @@
         }
         function openLogoutModal() { toggleModal('logoutModal', true); }
         function closeLogoutModal() { toggleModal('logoutModal', false); }
-        function toggleModal(id, show) { const el = document.getElementById(id); if(show) { el.classList.remove('hidden'); el.classList.add('flex'); document.body.classList.add('modal-open'); } else { el.classList.add('hidden'); el.classList.remove('flex'); document.body.classList.remove('modal-open'); } }
+        function toggleModal(id, show) {
+            const el = document.getElementById(id);
+            if(show) { el.classList.remove('hidden'); el.classList.add('flex'); document.body.classList.add('modal-open'); }
+            else { el.classList.add('hidden'); el.classList.remove('flex'); document.body.classList.remove('modal-open'); }
+        }
         function closeCropper() { toggleModal('cropperModal', false); }
         function closeRewardsModal() { toggleModal('rewardsModal', false); }
         function closeFilterModal() { toggleModal('filterModal', false); }
@@ -414,7 +425,7 @@
             const pass = type === 'login' ? document.getElementById('loginPassword').value : document.getElementById('regPassword').value;
             const btn = type === 'login' ? document.getElementById('btnLoginSubmit') : document.getElementById('btnRegSubmit');
             const originalText = btn.textContent;
-            
+
             // VALIDAÇÃO DE SENHA (6 DÍGITOS)
             if (type === 'register' && pass.length < 6) {
                 window.showDialog({ 
