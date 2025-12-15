@@ -335,7 +335,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência <span class="text-red-500">*</span></label>
                             <textarea id="client-reference" rows="2" class="w-full px-4 py-3 border border-gray-300 rounded-xl" placeholder="Detalhes da casa (cor, muro, etc)"></textarea>
                         </div>
                         <!-- NOVO CAMPO OBSERVAÇÃO -->
@@ -552,18 +552,7 @@
             { "id": 12, "name": "Ping Pong", "total_stock": 1, "price": 200, "measure": "", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pingpong.webp" },
             { "id": 13, "name": "Jogos de Mesa", "total_stock": 4, "price": 15, "measure": "Padrão", "note": "Kit", "needsPower": false, "ageRating": "L", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/mesas.webp" }
           ],
-          "agendamentos": {
-            "2025-12-10": { "2": 1, "4": 1 },
-            "2025-12-13": { "1": 1, "2": 1, "8": 1, "9": 1, "13": 4 },
-            "2025-12-14": { "2": 3, "4": 2, "13": 2 },
-            "2025-12-17": { "10": 1, "12": 1, "2": 2, "4": 1, "11": 1, "8": 1, "5": 1, "3": 1, "6": 1 },
-            "2025-12-20": { "1": 1, "2": 3, "3": 1, "4": 2, "5": 1, "6": 1, "7": 1, "10": 1, "11": 1, "12": 1, "13": 4 },
-            "2025-12-21": { "7": 1 },
-            "2025-12-24": { "3": 1, "13": 4, "2": 1, "4": 1 },
-            "2026-01-10": { "3": 1, "2": 1, "4": 1 },
-            "2026-01-16": { "1": 1 },
-            "2026-04-18": { "10": 1, "11": 1, "12": 1 }
-          }
+          "agendamentos": {}
         };
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
@@ -819,7 +808,17 @@
             const { details, total: subtotal } = window.getSelectedItemDetails();
             const summaryDiv = document.getElementById('checkout-summary'); summaryDiv.innerHTML = '';
             
-            const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
+            // EXCLUIR MESAS DO "CONTAGEM DE COMBO"
+            const itemCount = details.reduce((acc, item) => {
+                if (item.id === 13) return acc; // ID 13 = Jogos de Mesa (não conta)
+                return acc + item.quantity;
+            }, 0);
+            
+            // EXCLUIR MESAS DO VALOR ELEGIVEL AO DESCONTO
+            const subtotalForDiscount = details.reduce((acc, item) => {
+                if (item.id === 13) return acc;
+                return acc + item.lineTotal;
+            }, 0);
             
             // LÓGICA DE CUPOM DE DESCONTO ATUALIZADA (20%)
             const valid20PercentCoupons = ["fsd8s2", "jof383", "939fjs"];
@@ -833,8 +832,26 @@
                 couponRate = 0.10;
             }
             
+            // APLICA DESCONTO APENAS NO SUBTOTAL ELEGIVEL (SEM MESAS)
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
-            const quantityDiscount = subtotal * discountRate; 
+            
+            let daysMultiplier = 1;
+            if (selectedDayCount === 2) daysMultiplier = 1.7;
+            else if (selectedDayCount === 3) daysMultiplier = 2.3;
+            else if (selectedDayCount === 4) daysMultiplier = 2.8;
+            else if (selectedDayCount === 5) daysMultiplier = 3.2;
+
+            // O desconto é calculado sobre o valor dos itens elegíveis * multiplicador de dias
+            const discountBase = subtotalForDiscount * daysMultiplier;
+            const quantityDiscount = discountBase * discountRate;
+            
+            // Cupom aplica sobre TUDO ou só sobre elegíveis? Geralmente sobre tudo, mas vamos manter coerência
+            // Se "não dê desconto nas mesas" vale para tudo, então cupom também não deveria aplicar nelas?
+            // Vou assumir que cupom aplica no total geral (exceto frete/seguro), mas o combo só nos brinquedos.
+            // Se quiser mudar, avise. Por enquanto: Cupom no subtotal ajustado (incluindo mesas).
+            const adjustedSubtotal = subtotal * daysMultiplier;
+            const adjustedCouponDiscount = adjustedSubtotal * couponRate;
+
 
             const neighborhood = document.getElementById('client-neighborhood')?.value;
             const extraShippingNeighborhoods = ['Capri', 'Enseada', 'Itaguaçu', 'Laranjeiras', 'Majorca', 'Miranda', 'Praia Grande', 'Ribeira', 'Sandra Regina', 'Tapera', 'Ubatuba'];
@@ -848,12 +865,6 @@
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             const monitorHours = parseFloat(document.getElementById('monitor-hours')?.value || 0);
             let monitorFee = 0;
-            
-            let daysMultiplier = 1;
-            if (selectedDayCount === 2) daysMultiplier = 1.7;
-            else if (selectedDayCount === 3) daysMultiplier = 2.3;
-            else if (selectedDayCount === 4) daysMultiplier = 2.8;
-            else if (selectedDayCount === 5) daysMultiplier = 3.2;
             
             if (monitorCount > 0) {
                 monitorFee = (monitorCount * monitorHours * 30) * selectedDayCount;
@@ -870,17 +881,13 @@
                 itemContainer.innerHTML = `<div class="font-medium text-gray-700">${item.quantity}x ${item.name} <span class="text-xs text-blue-500">(${selectedDayCount} dias)</span></div><div class="text-sm font-bold text-green-600">R$ ${lineTotal.toFixed(2).replace('.', ',')}</div>`;
                 summaryDiv.appendChild(itemContainer);
             });
-            
-            const adjustedSubtotal = subtotal * daysMultiplier;
-            const adjustedQtyDiscount = adjustedSubtotal * discountRate;
-            const adjustedCouponDiscount = adjustedSubtotal * couponRate;
 
             const summaryTotalDiv = document.getElementById('total-summary-rows'); summaryTotalDiv.innerHTML = '';
             summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Itens (${selectedDayCount} diárias):</span><span>R$ ${adjustedSubtotal.toFixed(2).replace('.', ',')}</span></div>`;
             
             if (monitorFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Monitores (${selectedDayCount} dias):</span><span>+ R$ ${monitorFee.toFixed(2).replace('.', ',')}</span></div>`;
             if (timeFee > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between"><span>Taxa Duração:</span><span>+ R$ ${timeFee.toFixed(2).replace('.', ',')}</span></div>`; 
-            if (quantityDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto Combo (5%):</span><span>- R$ ${adjustedQtyDiscount.toFixed(2).replace('.', ',')}</span></div>`; 
+            if (quantityDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Desconto Combo (5%):</span><span>- R$ ${quantityDiscount.toFixed(2).replace('.', ',')}</span></div>`; 
             if (adjustedCouponDiscount > 0) summaryTotalDiv.innerHTML += `<div class="flex justify-between text-green-600 font-bold"><span>Cupom (${(couponRate * 100).toFixed(0)}%):</span><span>- R$ ${adjustedCouponDiscount.toFixed(2).replace('.', ',')}</span></div>`;
             
             // LÓGICA DE EXIBIÇÃO DE FRETE (GRÁTIS OU VALOR) - Só mostra se um bairro estiver selecionado
@@ -898,7 +905,17 @@
         
         window.calculateTotal = function() {
             const { details, total: subtotal } = window.getSelectedItemDetails();
-            const itemCount = details.reduce((acc, item) => acc + item.quantity, 0);
+            
+            // EXCLUIR MESAS DA CONTAGEM E DO CÁLCULO DE BASE DE DESCONTO
+            const itemCount = details.reduce((acc, item) => {
+                if (item.id === 13) return acc; 
+                return acc + item.quantity;
+            }, 0);
+
+            const subtotalForDiscount = details.reduce((acc, item) => {
+                if (item.id === 13) return acc;
+                return acc + item.lineTotal;
+            }, 0);
             
             let daysMultiplier = 1;
             if (selectedDayCount === 2) daysMultiplier = 1.7;
@@ -907,8 +924,10 @@
             else if (selectedDayCount === 5) daysMultiplier = 3.2;
 
             const adjustedSubtotal = subtotal * daysMultiplier;
+            const discountBase = subtotalForDiscount * daysMultiplier;
+
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
-            const quantityDiscount = adjustedSubtotal * discountRate;
+            const quantityDiscount = discountBase * discountRate;
             
             // LÓGICA DE CUPOM DE DESCONTO ATUALIZADA (20%)
             const valid20PercentCoupons = ["fsd8s2", "jof383", "939fjs"];
@@ -1187,15 +1206,17 @@
                 const name = document.getElementById('client-name').value.trim();
                 const whatsapp = document.getElementById('client-whatsapp').value.trim();
                 if (!name) { alert("Por favor, informe seu nome."); return false; }
-                if (!whatsapp) { alert("Por favor, informe seu WhatsApp."); return false; }
+                if (whatsapp.length < 15) { alert("Por favor, digite o número do WhatsApp completo."); return false; }
             }
             if (checkoutSubStep === 2) {
                 const neighborhood = document.getElementById('client-neighborhood').value;
                 const street = document.getElementById('client-street').value.trim();
+                const reference = document.getElementById('client-reference').value.trim();
                 // Removida validação obrigatória do número
                 // const number = document.getElementById('client-number').value.trim();
                 if (!neighborhood) { alert("Por favor, selecione o bairro."); return false; }
                 if (!street) { alert("Por favor, informe o nome da rua."); return false; }
+                if (!reference) { alert("Por favor, informe o ponto de referência."); return false; }
                 // if (!number) { alert("Por favor, informe o número da casa."); return false; }
             }
             if (checkoutSubStep === 3) {
@@ -1357,7 +1378,7 @@
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             if (document.getElementById('has-monitors').value === 'Sim' && monitorCount > 0) {
                 const monitorHours = document.getElementById('monitor-hours').value || 0;
-                monitorTexto = `Sim: ${monitorCount} monitor(es) / ${monitorHours}h`;
+                monitorTexto = `Sim: ${monitorCount} monitor / ${monitorHours}h`;
             }
 
             // NOVO: Pega a data escolhida para a festa
