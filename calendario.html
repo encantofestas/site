@@ -28,6 +28,14 @@
         .dia-hoje { border: 2px solid #2563EB; font-weight: 700; z-index: 5; }
         .dia-numero { position: absolute; top: 2px; right: 4px; font-size: 0.85rem; font-weight: 600; color: rgba(0, 0, 0, 0.7); z-index: 10; }
         
+        /* Loading do Calendário */
+        #calendar-loading {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 20;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        #calendar-loading.active { opacity: 1; pointer-events: auto; }
+        
         /* Ajuste do toast para ficar ACIMA da barra de navegação (6rem) */
         #toast-notification { visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translate(-50%, 20px); left: 50%; position: fixed; bottom: 6rem; width: 90%; max-width: 400px; z-index: 80; pointer-events: none; }
         #toast-notification.show { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
@@ -230,229 +238,16 @@
         </div>
     </div>
 
-    <!-- OVERLAY E PAINEL DE BRINQUEDOS -->
-    <div id="toys-overlay" onclick="closeToysPanel()"></div>
-    <div id="toys-panel">
-        <div class="w-full flex justify-center pt-3 pb-1" onclick="closeToysPanel()"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
-        
-        <div id="panel-content-area" class="flex-grow overflow-y-auto" style="padding-bottom: 2rem;">
-            <!-- View 1: Seleção -->
-            <div id="selection-view">
-                <div class="px-5 pb-3 border-b border-gray-100 flex justify-between items-center">
-                    <div><h3 class="text-lg font-bold text-gray-800 brand-font">Brinquedos Disponíveis</h3><p id="selected-date-display" class="text-sm text-blue-600 font-medium">Data selecionada</p></div>
-                    <button onclick="closeToysPanel()" class="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                </div>
-
-                <!-- FILTROS -->
-                <div class="p-4 border-b border-gray-100 space-y-3">
-                    <label class="block text-sm font-medium text-gray-700">Filtrar/Ordenar:</label>
-                    <div class="flex space-x-3 overflow-x-auto pb-1">
-                        <select id="sort-filter" onchange="renderToysList()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white flex-shrink-0">
-                            <!-- PADRÃO: Mais Adquiridos -->
-                            <option value="most_rented" selected>Mais Adquiridos</option>
-                            <option value="name_asc">Nome (A-Z)</option>
-                            <option value="name_desc">Nome (Z-A)</option>
-                            <option value="age_asc">Faixa Etária (Cresc.)</option>
-                        </select>
-                        <!-- Filtro de Faixa Etária -->
-                        <select id="age-filter" onchange="renderToysList()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white flex-shrink-0">
-                            <option value="all">Todas as Idades</option>
-                            <option value="L">Livre</option>
-                            <option value="6">Max 6 Anos</option>
-                            <option value="14">Max 14 Anos</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="p-4 space-y-4" id="toys-list-container"></div>
-            </div>
-
-            <!-- View 2: Checkout (Agora com Wizard) -->
-            <div id="checkout-view" class="px-5 py-4 hidden">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-lg font-bold text-gray-800 brand-font" id="checkout-title">Dados do Pedido</h3>
-                    <button onclick="handleBackStep()" class="text-blue-600 text-sm font-medium hover:text-blue-700">← Voltar</button>
-                </div>
-
-                <div class="step-indicator">
-                    <div id="progress-bar" class="step-progress" style="width: 20%;"></div>
-                </div>
-                <p id="step-label" class="text-xs text-gray-500 font-semibold mb-4 text-right">Passo 1 de 5</p>
-                
-                <div class="p-4 bg-gray-50 rounded-lg shadow-inner mb-6 border border-gray-100 hidden" id="summary-container"><h4 class="font-bold text-gray-700 mb-2">Resumo do Pedido:</h4><div id="checkout-summary" class="text-sm text-gray-600 space-y-2"></div></div>
-                
-                <form id="checkout-form" onsubmit="event.preventDefault();">
-                    
-                    <!-- PASSO 1: Diárias e Nome -->
-                    <div id="step-1" class="step-container active space-y-4">
-                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                            <label class="block text-sm font-bold text-gray-800 mb-2">Quantas Diárias? <span class="text-xs font-normal text-blue-600 ml-1">(Promoção!)</span></label>
-                            <div class="flex gap-3 overflow-x-auto pb-1" style="scrollbar-width: none; -ms-overflow-style: none;">
-                                <div id="day-1" onclick="selectDays(1)" class="day-option selected cursor-pointer">1</div>
-                                <div id="day-2" onclick="selectDays(2)" class="day-option cursor-pointer">2</div>
-                                <div id="day-3" onclick="selectDays(3)" class="day-option cursor-pointer">3</div>
-                                <div id="day-4" onclick="selectDays(4)" class="day-option cursor-pointer">4</div>
-                                <div id="day-5" onclick="selectDays(5)" class="day-option cursor-pointer">5</div>
-                            </div>
-                            <p id="promo-message" class="text-xs text-blue-600 font-medium mt-2">Valor normal.</p>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Seu nome <span class="text-red-500">*</span></label>
-                                <input type="text" id="client-name" oninput="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="">
-                            </div>
-
-                            <!-- NOVO CAMPO WHATSAPP -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                                    <svg class="w-4 h-4 text-green-500 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                                    WhatsApp <span class="text-red-500">*</span>
-                                </label>
-                                <input type="tel" id="client-whatsapp" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="(47) 99999-9999" maxlength="15">
-                                <p class="text-xs text-gray-500 mt-1">A confirmação será enviada neste WhatsApp.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- PASSO 2: Endereço -->
-                    <div id="step-2" class="step-container space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Bairro de Entrega <span class="text-red-500">*</span></label>
-                            <select id="client-neighborhood" onchange="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                                <option value="" disabled selected>Selecione</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option>
-                            </select>
-                        </div>
-                        
-                        <div class="flex space-x-2">
-                            <div class="flex-grow">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Rua <span class="text-red-500">*</span></label>
-                                <input type="text" id="client-street" oninput="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl" placeholder="Nome da Rua">
-                            </div>
-                            <div class="w-24">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nº</label>
-                                <input type="number" id="client-number" oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);" class="w-full px-4 py-3 border border-gray-300 rounded-xl" placeholder="Nº">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Ponto de Referência <span class="text-red-500">*</span></label>
-                            <textarea id="client-reference" rows="2" class="w-full px-4 py-3 border border-gray-300 rounded-xl" placeholder="Detalhes da casa (cor, muro, etc)"></textarea>
-                        </div>
-                        <!-- NOVO CAMPO OBSERVAÇÃO -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Observações (opcional)</label>
-                            <textarea id="client-observation" rows="2" class="w-full px-4 py-3 border border-gray-300 rounded-xl" placeholder="Ex: Há cachorros no local, campainha estragada, etc."></textarea>
-                        </div>
-                    </div>
-
-                    <!-- PASSO 3: Logística e Monitores -->
-                    <div id="step-3" class="step-container space-y-4">
-                        <div class="flex flex-col">
-                            <div class="flex space-x-2">
-                                <div class="w-1/2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Início da Festa <span class="text-red-500">*</span></label>
-                                    <select id="event-start-time" onchange="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white"><option value="" disabled selected>--:--</option><option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select>
-                                </div>
-                                <div class="w-1/2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Término <span class="text-red-500">*</span></label>
-                                    <select id="event-end-time" onchange="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white"><option value="" disabled selected>--:--</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option></select>
-                                </div>
-                            </div>
-                            <div id="time-fee-warning" class="text-xs text-gray-500 mt-1 hidden font-normal"></div>
-                        </div>
-
-                        <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                            <select id="delivery-day-before" onchange="calculateTotal()" class="w-20 px-2 py-2 border border-gray-300 rounded-lg bg-white text-sm font-bold">
-                                <option value="Nao" selected>Não</option>
-                                <option value="Sim">Sim</option>
-                            </select>
-                            <label class="text-sm font-medium text-gray-700 leading-tight">Entregar/montar 1 dia antes pelo mesmo valor caso necessário?</label>
-                        </div>
-
-                        <div class="space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <label class="block text-sm font-bold text-gray-800 mb-1">Deseja contratar monitores?</label>
-                            <select id="has-monitors" onchange="toggleMonitorFields(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
-                                <option value="Nao" selected>Não</option>
-                                <option value="Sim">Sim</option>
-                            </select>
-                            <div id="monitor-options" class="space-y-3 mt-3 hidden">
-                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Quantos?</label><select id="monitor-count" onchange="renderMonitorHours(); calculateTotal();" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"><option value="1">1</option><option value="2">2</option></select></div>
-                                <div id="monitor-hours-fields" class="space-y-3"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- PASSO 4: Detalhes Técnicos (Piscina e Tomadas) -->
-                    <div id="step-4" class="step-container space-y-4">
-                        <div id="rain-protection-field" class="space-y-3 p-3 bg-red-50 rounded-lg border border-red-200 hidden">
-                            <div class="space-y-1">
-                                <label for="rain-protection" class="block text-sm font-medium text-gray-700 mb-1">A piscina fica totalmente coberta em caso de chuva (lona ou telhado)?</label>
-                                <select id="rain-protection" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white">
-                                    <option value="Nao" selected>Não</option>
-                                    <option value="Sim">Sim</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div id="power-outlet-anchor"></div>
-                    </div>
-
-                    <!-- PASSO 5: Pagamento e Documentação -->
-                    <div id="step-5" class="step-container space-y-4">
-                        <div class="space-y-2 p-3 bg-green-50 rounded-lg border border-green-200">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <input type="checkbox" id="additional-insurance" onchange="calculateTotal()" class="w-5 h-5 text-green-600 border-gray-300 rounded">
-                                    <label for="additional-insurance" class="text-sm font-medium text-gray-700 select-none">Seguro Adicional <span class="font-bold text-green-600">(+ R$ 10,00)</span></label>
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">Cobre danos acidentais aos brinquedos. Sem seguro, o contratante arca com custos de reparo.</p>
-                        </div>
-                        
-                        <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200">
-                            <div class="space-y-1">
-                                <label for="request-invoice" class="block text-sm font-medium text-gray-700 mb-1">Precisa de Nota Fiscal (PJ)?</label>
-                                <select id="request-invoice" onchange="toggleCnpjField(); calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white">
-                                    <option value="Nao" selected>Não</option>
-                                    <option value="Sim">Sim</option>
-                                </select>
-                            </div>
-                            <div id="cnpj-field" class="hidden mt-2">
-                                <input type="text" id="client-cnpj" name="client-cnpj" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="CNPJ (00.000.000/0000-00)">
-                            </div>
-                        </div>
-
-                        <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Cupom de Desconto</label>
-                            <input type="text" id="discount-coupon" oninput="calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl uppercase tracking-wider font-bold text-gray-600" placeholder="CÓDIGO">
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- RODAPÉ -->
-        <div class="p-4 border-t border-gray-100 bg-white shadow-lg pb-8 md:pb-4 flex-shrink-0">
-            <div id="total-summary-rows" class="space-y-1 text-sm text-gray-700 mb-2"></div>
-            <div class="flex justify-between items-center mb-3 pt-2 border-t border-gray-300"><span class="text-lg font-bold text-gray-800">Total:</span><span id="total-price-display" class="text-xl md:text-2xl font-extrabold text-green-600">R$ 0,00</span></div>
-            <button id="action-button" onclick="handleActionButton()" class="w-full bg-gray-400 text-white font-bold py-3 rounded-xl shadow-lg transition transform active:scale-95 disabled:bg-gray-400" disabled>Continuar Agendamento</button>
-        </div>
-    </div>
-
-    <!-- NOTIFICAÇÕES (Lateral) -->
-    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
-    <div id="notification-panel">
-        <div id="notification-content">
-            <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10"><h3 class="text-xl font-bold brand-font text-white">Notificações</h3><button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
-            <div class="flex-grow overflow-y-auto relative"><ul id="notification-list" class="p-4 space-y-3 pb-24"></ul><div id="loading-notifications" class="p-4 text-center hidden"><div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div><p class="text-sm text-blue-200 mt-2">Carregando...</p></div></div>
-            <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));"><button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline disabled:opacity-50">Marcar todas como lidas</button></div>
-        </div>
-    </div>
-
     <!-- MAIN -->
     <main class="flex-grow w-full pt-24 pb-28 md:pb-12 bg-white md:bg-gray-50 flex flex-col items-center justify-start">
         <!-- WRAPPER DO CALENDÁRIO COM ID PARA EVENTOS -->
-        <div id="calendar-wrapper" class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100 calendar-transition relative overflow-hidden">
+        <div id="calendar-wrapper" class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100 calendar-transition relative overflow-hidden min-h-[400px]">
+            <!-- LOADING OVERLAY NOVO -->
+            <div id="calendar-loading" class="active rounded-2xl">
+                <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full mb-4"></div>
+                <p class="text-blue-600 font-bold brand-font text-lg animate-pulse">Verificando datas...</p>
+            </div>
+
             <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Para a data <span id="display-date-main">...</span></h2>
             <div class="flex justify-between items-center mb-6 px-2">
                 <button id="prev-month" class="nav-btn p-2 rounded-full text-blue-600 hover:bg-blue-50 active:bg-blue-100 disabled:opacity-30"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
@@ -556,7 +351,16 @@
         };
 
         let toysInventory = [], currentAvailableStock = {}, mockedDayData = {}, globalAgendamentos = {};
-        let currentCalendarDate = new Date(); const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
+        // INICIALIZAÇÃO DA DATA COM PERSISTÊNCIA (SESSION STORAGE)
+        let currentCalendarDate;
+        const storedDate = sessionStorage.getItem('calendarDate');
+        if (storedDate) {
+            currentCalendarDate = new Date(storedDate);
+        } else {
+            currentCalendarDate = new Date();
+        }
+
+        const today = new Date(); today.setHours(0, 0, 0, 0); const maxFutureDate = new Date(today.getFullYear(), today.getMonth() + 6, 1);
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const monthYearDisplay = document.getElementById('current-month-year'); const calendarBody = document.getElementById('calendar-body'); const prevButton = document.getElementById('prev-month'); const nextButton = document.getElementById('next-month'); const toast = document.getElementById('toast-notification');
         let currentSelectedDateISO = "";
@@ -832,7 +636,6 @@
                 couponRate = 0.10;
             }
             
-            // APLICA DESCONTO APENAS NO SUBTOTAL ELEGIVEL (SEM MESAS)
             const discountRate = itemCount >= 2 ? 0.05 : 0; 
             
             let daysMultiplier = 1;
@@ -1479,6 +1282,9 @@
         // FUNÇÃO FETCH AGENDAMENTOS (AUTOMÁTICA)
         async function fetchAgendamentosReais() {
             try {
+                // Remove indicador de carregamento
+                document.getElementById('calendar-loading').classList.remove('active');
+
                 // MESMA URL USADA NO POST
                 const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec';
                 const response = await fetch(scriptURL); 
@@ -1501,10 +1307,14 @@
                     
                     let dateISO = '';
                     if (typeof rawDate === 'string') {
-                        // Tenta converter "15/12/2025" para ISO
+                        // Tenta converter "15/12/2025" para ISO (YYYY-MM-DD)
                         const parts = rawDate.split('/');
                         if (parts.length === 3) {
-                            dateISO = `${parts[2]}-${parts[1]}-${parts[0]}`; // YYYY-MM-DD
+                            // Padroniza para YYYY-MM-DD com zeros à esquerda
+                            const day = parts[0].padStart(2, '0');
+                            const month = parts[1].padStart(2, '0');
+                            const year = parts[2];
+                            dateISO = `${year}-${month}-${day}`;
                         }
                     } else if (new Date(rawDate) !== "Invalid Date") {
                          dateISO = new Date(rawDate).toISOString().split('T')[0];
@@ -1546,7 +1356,8 @@
                 
             } catch (e) {
                 console.error("Erro ao carregar agendamentos:", e);
-                // Fallback para dados estáticos se falhar (opcional, já carregou no onload)
+                // Remove loading even if error
+                document.getElementById('calendar-loading').classList.remove('active');
             }
         }
 
@@ -1683,8 +1494,24 @@
             } else {
                 currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); 
                 renderCalendar(); 
+                // Persistência
+                sessionStorage.setItem('calendarDate', currentCalendarDate.toISOString());
+                // Atualiza disponibilidade ao mudar mês (opcional, já está carregado, mas força redraw)
+                processAvailability({ agendamentos: globalAgendamentos });
+                renderCalendar();
             }
         }
+        
+        function navigatePrev() { 
+            if (prevButton.disabled) return; 
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1); 
+            renderCalendar(); 
+            // Persistência
+            sessionStorage.setItem('calendarDate', currentCalendarDate.toISOString());
+            processAvailability({ agendamentos: globalAgendamentos });
+            renderCalendar();
+        }
+
         function getDayStatus(year, month, day) { const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; return mockedDayData[dateKey] || { color: 'bg-green-500', isHoliday: false }; }
         function renderCalendar() {
             const currentMonth = currentCalendarDate.getMonth(); const currentYear = currentCalendarDate.getFullYear();
@@ -1710,7 +1537,6 @@
                 cell.innerHTML = `<div class="dia-numero">${day}</div>`; calendarBody.appendChild(cell);
             }
         }
-        function navigatePrev() { if (prevButton.disabled) return; currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1); renderCalendar(); }
         prevButton.addEventListener('click', navigatePrev);
         let readNotificationsIds = new Set(JSON.parse(localStorage.getItem('encanto_read_ids') || '[]')); let notificationsData = [];
         function updateLocalCache() { localStorage.setItem('encanto_read_ids', JSON.stringify(Array.from(readNotificationsIds))); }
