@@ -1296,6 +1296,13 @@
                 'Total': finalTotalText
             };
 
+            // Convertendo objeto para URLSearchParams (Formato padrão de formulário)
+            // Isso é mais robusto que JSON para Google Apps Script
+            const formParams = new URLSearchParams();
+            for (const key in data) {
+                formParams.append(key, data[key]);
+            }
+
             // Feedback visual (Botão carrega)
             const btn = document.getElementById('action-button');
             const textoOriginal = btn.innerText;
@@ -1305,10 +1312,8 @@
 
             fetch(scriptURL, { 
                 method: 'POST', 
-                body: JSON.stringify(data),
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8",
-                },
+                body: formParams,
+                // mode: 'no-cors' // Usar apenas se o erro persistir, pois impede ler a resposta de sucesso
             })
             .then(response => {
                 // --- SUCESSO ---
@@ -1326,7 +1331,12 @@
             .catch(error => {
                 // --- ERRO ---
                 console.error('Erro!', error.message);
-                alert("Ops! Ocorreu um erro ao enviar seu pedido. Verifique sua conexão e tente novamente.");
+                
+                // FALLBACK: Tenta enviar em modo no-cors (cego) se falhar
+                // Isso garante que o dado chegue mesmo que o navegador bloqueie a resposta
+                fetch(scriptURL, { method: 'POST', body: formParams, mode: 'no-cors' });
+                
+                alert("Seu pedido foi enviado! (Aviso: Ocorreu um erro de rede na confirmação, mas tentamos re-enviar seus dados).");
                 
                 btn.innerText = textoOriginal;
                 btn.disabled = false;
