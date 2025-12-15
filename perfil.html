@@ -159,10 +159,6 @@
 
             <!-- Stats -->
             <div class="w-full grid grid-cols-3 gap-0 py-6 border-b border-gray-100 mb-6 relative z-20">
-                <!-- Ícone Atualizar (Pequeno) -->
-                <button onclick="this.querySelector('svg').classList.add('animate-spin'); setTimeout(() => this.querySelector('svg').classList.remove('animate-spin'), 1000); window.location.reload();" class="absolute top-1 right-1 p-1 bg-gray-800 text-white rounded-full shadow-sm hover:bg-gray-700 transition-colors" title="Atualizar Dados">
-                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                </button>
                 
                 <!-- Ícone Sincronizar (Azul, condicional) -->
                 <button id="syncDataBtn" onclick="openSyncInfoModal()" class="hidden absolute top-1 left-1 p-1.5 bg-blue-100 text-blue-600 rounded-full shadow-sm hover:bg-blue-200 transition-colors animate-pulse" title="Atualizar Cadastro">
