@@ -326,7 +326,7 @@
                         <div class="space-y-3 p-3 bg-gray-100 rounded-lg border border-gray-200">
                             <div class="space-y-1">
                                 <label for="request-invoice" class="block text-sm font-medium text-gray-700 mb-1">Precisa de Nota Fiscal (PJ)?</label>
-                                <select id="request-invoice" onchange="toggleCnpjField(); calculateTotal();" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white">
+                                <select id="request-invoice" onchange="toggleCnpjField(); calculateTotal()" class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white">
                                     <option value="Nao" selected>Não</option>
                                     <option value="Sim">Sim</option>
                                 </select>
@@ -580,22 +580,22 @@
                 const lonaToys = toysInventory.filter(t => t.exclusiveGroup === 'LONA');
                 let isLonaBooked = false;
                 if (lonaToys.length > 0) {
-                     isLonaBooked = Object.keys(items).some(id => {
-                         const toy = toysInventory.find(t => t.id == id);
-                         return toy && toy.exclusiveGroup === 'LONA';
-                     });
+                      isLonaBooked = Object.keys(items).some(id => {
+                          const toy = toysInventory.find(t => t.id == id);
+                          return toy && toy.exclusiveGroup === 'LONA';
+                      });
                 }
 
                 toysInventory.forEach(toy => {
-                     let stock = toy.total_stock;
-                     const rented = items[toy.id] || 0;
-                     if (toy.exclusiveGroup === 'LONA' && isLonaBooked) {
-                         if (rented === 0) stock = 0; 
-                         else stock = stock - rented;
-                     } else {
-                         stock = stock - rented;
-                     }
-                     realRemainingStock += Math.max(0, stock);
+                      let stock = toy.total_stock;
+                      const rented = items[toy.id] || 0;
+                      if (toy.exclusiveGroup === 'LONA' && isLonaBooked) {
+                          if (rented === 0) stock = 0; 
+                          else stock = stock - rented;
+                      } else {
+                          stock = stock - rented;
+                      }
+                      realRemainingStock += Math.max(0, stock);
                 });
 
                 let color = 'bg-green-500';
@@ -921,7 +921,7 @@
                     7: 9,       // Escorrega Bolinhas
                     6: 10,       // Mini Baby
                     5: 11,      // Area Baby
-                    12: 12,     // Ping Pong
+                    12: 12,      // Ping Pong
                     13: 13      // Mesas
                 };
                 filteredToys.sort((a, b) => {
@@ -1216,66 +1216,117 @@
         }
 
         window.submitOrder = function() {
+            // --- 1. CAPTURA DOS DADOS ---
             const name = document.getElementById('client-name').value.trim() || '(Não informado)';
             const neighborhood = document.getElementById('client-neighborhood').value || '(Não informado)';
             const street = document.getElementById('client-street').value.trim() || '(Não informado)';
             const number = document.getElementById('client-number').value.trim() || 'S/N';
             const reference = document.getElementById('client-reference').value.trim() || '(Não informado)';
+            
             const startVal = document.getElementById('event-start-time').value;
             const endVal = document.getElementById('event-end-time').value;
             const eventStartTime = startVal ? startVal + ":00" : "(Não def.)";
             const eventEndTime = endVal ? endVal + ":00" : "(Não def.)";
-            const insuranceChecked = document.getElementById('additional-insurance').checked;
+            
             const deliveryDayBeforeSelect = document.getElementById('delivery-day-before').value;
+            const rainProtectionValue = document.getElementById('rain-protection')?.value || 'Não se aplica';
             
-            // Novos Selects
-            const invoiceChecked = document.getElementById('request-invoice').value === 'Sim';
-            const rainProtectionValue = document.getElementById('rain-protection')?.value === 'Sim';
-            
+            // Seguro
+            const insuranceChecked = document.getElementById('additional-insurance').checked;
+            const seguroTexto = insuranceChecked ? 'Sim' : 'Não';
+
+            // Nota Fiscal
+            const invoiceSelect = document.getElementById('request-invoice').value;
             const cnpj = document.getElementById('client-cnpj').value.trim();
-            const coupon = document.getElementById('discount-coupon').value.trim();
+            const notaTexto = invoiceSelect === 'Sim' ? `Sim (CNPJ: ${cnpj})` : 'Não';
+
+            const finalTotalText = document.getElementById('total-price-display').innerText;
+
+            // --- 2. FORMATAÇÃO DOS ITENS (Vertical na célula) ---
+            const { details } = window.getSelectedItemDetails();
+            // O "\n" faz pular linha dentro da célula do Google Sheets
+            let itensFormatados = details.map(item => `• ${item.quantity}x ${item.name}`).join("\n");
+
+            // --- 3. FORMATAÇÃO DAS TOMADAS ---
             const powerInputs = document.querySelectorAll('#power-outlet-fields-container input[type="number"]');
-            let powerDetails = "";
-            for (let input of powerInputs) {
-                const label = input.previousElementSibling.innerText.replace('*', '').trim();
-                const val = input.value ? input.value + 'm' : '(Não inf.)';
-                powerDetails += `⚡ ${label}: ${val}\n`;
+            let tomadasFormatadas = "";
+            if(powerInputs.length > 0) {
+                let listaTomadas = [];
+                powerInputs.forEach(input => {
+                    const label = input.previousElementSibling.innerText.replace('*', '').trim();
+                    const val = input.value ? input.value + 'm' : '(Não inf.)';
+                    listaTomadas.push(`${label}: ${val}`);
+                });
+                tomadasFormatadas = listaTomadas.join("\n");
+            } else {
+                tomadasFormatadas = "Não necessita";
             }
-            let monitorText = "";
+
+            // --- 4. FORMATAÇÃO DOS MONITORES ---
+            let monitorTexto = "Não";
             const monitorCount = parseInt(document.getElementById('monitor-count')?.value || 0);
             if (document.getElementById('has-monitors').value === 'Sim' && monitorCount > 0) {
                 const monitorHours = document.getElementById('monitor-hours').value || 0;
-                monitorText = `👮 Monitores: ${monitorCount} (${monitorHours}h)\n`;
+                monitorTexto = `Sim: ${monitorCount} monitor(es) / ${monitorHours}h`;
             }
-            const { details } = window.getSelectedItemDetails();
-            let itemsList = "";
-            details.forEach(item => { itemsList += `• ${item.quantity}x ${item.name}\n`; });
-            let extrasText = "";
-            const timeFee = calculateDurationFee();
-            if (timeFee > 0) extrasText += `🕒 Taxa Duração: R$ ${timeFee.toFixed(2)}\n`;
-            const finalTotalText = document.getElementById('total-price-display').innerText;
-            let msg = `*NOVO AGENDAMENTO*\n`;
-            msg += `📅 Data: ${document.getElementById('selected-date-display').innerText.replace('Para ', '')} (${selectedDayCount} diárias)\n`;
-            msg += `👤 Nome: ${name}\n`;
-            msg += `📍 Local: ${street}, ${number} - ${neighborhood}\n`;
-            msg += `🗒️ Ref: ${reference}\n`;
-            if (invoiceChecked) msg += `📄 CNPJ: ${cnpj || 'Não informado'}\n`;
-            msg += `⏰ Horário: ${eventStartTime} - ${eventEndTime}\n`;
-            msg += `🚚 Entr. Antecipada: ${deliveryDayBeforeSelect}\n`;
-            msg += `🛡️ Seguro: ${insuranceChecked ? 'SIM' : 'NÃO'}\n`;
-            if (coupon) msg += `🎟️ Cupom: ${coupon}\n`;
-            const isBallPitIncluded = details.some(item => item.id === 4 && item.quantity > 0);
-            if (isBallPitIncluded) msg += `🌧 Piscina Coberta: ${rainProtectionValue ? 'SIM' : 'NÃO'}\n`;
-            if (powerDetails) msg += `\n*ENERGIA:*\n${powerDetails}`;
-            if (monitorText) msg += monitorText;
-            if (extrasText) msg += extrasText;
-            msg += `\n*ITENS (${selectedDayCount} dias):*\n${itemsList}`;
-            msg += `\n💰 *TOTAL: ${finalTotalText}*`;
-            const whatsappNumber = "5547992277324";
-            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
-            window.open(url, '_blank');
-            window.closeToysPanel(); 
-            window.changeStep('selection'); 
+
+            // --- 5. ENVIO PARA O GOOGLE SHEETS ---
+            // ==========================================================
+            // COLE SUA URL ABAIXO (MANTENHA AS ASPAS):
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec'; 
+            // ==========================================================
+            
+            const formData = new FormData();
+            
+            // Nomes exatos das colunas da sua Planilha
+            formData.append('Data', new Date().toLocaleString('pt-BR'));
+            formData.append('Inicio', eventStartTime);
+            formData.append('Termino', eventEndTime);
+            formData.append('Nome', name);
+            formData.append('Bairro', neighborhood);
+            formData.append('Rua', street);
+            formData.append('Numero', number);
+            formData.append('Referencia', reference);
+            formData.append('Itens', itensFormatados);
+            formData.append('EntregaAntes', deliveryDayBeforeSelect);
+            formData.append('Piscina Coberta', rainProtectionValue);
+            formData.append('Monitores + Horas', monitorTexto);
+            formData.append('Tomadas', tomadasFormatadas);
+            formData.append('Seguro', seguroTexto);
+            formData.append('NotaFiscal (CNPJ)', notaTexto);
+            formData.append('Diarias', selectedDayCount);
+            formData.append('Total', finalTotalText);
+
+            // Feedback visual (Botão carrega)
+            const btn = document.getElementById('action-button');
+            const textoOriginal = btn.innerText;
+            btn.innerText = "Processando reserva...";
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+            .then(response => {
+                // --- SUCESSO ---
+                alert(`Obrigado, ${name}! \n\nSeu pedido foi recebido com sucesso. \nValor Total: ${finalTotalText}\n\nEntraremos em contato em breve.`);
+                
+                // Reseta tudo e fecha o painel
+                window.closeToysPanel();
+                window.changeStep('selection');
+                
+                // Restaura o botão
+                btn.innerText = textoOriginal;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            })
+            .catch(error => {
+                // --- ERRO ---
+                console.error('Erro!', error.message);
+                alert("Ops! Ocorreu um erro ao enviar seu pedido. Verifique sua conexão e tente novamente.");
+                
+                btn.innerText = textoOriginal;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
         }
         
         window.openToysPanel = function(day, month, year) {
