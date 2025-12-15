@@ -594,55 +594,6 @@
             return { text: '?', color: 'bg-gray-400', title: 'Idade não informada' };
         }
         
-        // --- NOVA FUNÇÃO DE PARSE DE DATA ROBUSTA (Resolve problemas de 2026 e formatos variados) ---
-        function safeParseDate(input) {
-            if (!input) return null;
-            
-            // Se for objeto Date
-            if (input instanceof Date) {
-                const y = input.getFullYear();
-                const m = String(input.getMonth() + 1).padStart(2, '0');
-                const d = String(input.getDate()).padStart(2, '0');
-                return `${y}-${m}-${d}`;
-            }
-
-            const str = String(input).trim();
-            if (!str) return null;
-
-            // Tenta detectar DD/MM/AAAA ou DD-MM-AAAA
-            // Aceita 1 ou 2 dígitos para dia/mês (ex: 1/1/2026)
-            const ptBrMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
-            if (ptBrMatch) {
-                let y = ptBrMatch[3];
-                // Corrige ano de 2 dígitos (26 -> 2026)
-                if (y.length === 2) y = '20' + y;
-                const m = ptBrMatch[2].padStart(2, '0');
-                const d = ptBrMatch[1].padStart(2, '0');
-                return `${y}-${m}-${d}`;
-            }
-
-            // Tenta detectar ISO YYYY-MM-DD
-            const isoMatch = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-            if (isoMatch) {
-                const y = isoMatch[1];
-                const m = isoMatch[2].padStart(2, '0');
-                const d = isoMatch[3].padStart(2, '0');
-                return `${y}-${m}-${d}`;
-            }
-
-            // Tenta Date.parse() como último recurso (cuidado com timezone aqui)
-            // Para garantir, criamos a data e usamos métodos locais (não UTC)
-            const dObj = new Date(str);
-            if (!isNaN(dObj.getTime())) {
-                const y = dObj.getFullYear();
-                const m = String(dObj.getMonth() + 1).padStart(2, '0');
-                const d = String(dObj.getDate()).padStart(2, '0');
-                return `${y}-${m}-${d}`;
-            }
-            
-            return null;
-        }
-
         function addDays(dateStr, days) {
             const result = new Date(dateStr + 'T00:00:00');
             result.setDate(result.getDate() + days);
@@ -1530,9 +1481,8 @@
         // FUNÇÃO FETCH AGENDAMENTOS (AUTOMÁTICA)
         async function fetchAgendamentosReais() {
             try {
-                // ADICIONADO timestamp para evitar cache do navegador (?t=...)
-                const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec' + '?t=' + new Date().getTime();
-                
+                // MESMA URL USADA NO POST
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec';
                 const response = await fetch(scriptURL); 
                 const data = await response.json();
                 
@@ -1546,10 +1496,39 @@
                 staticData.brinquedos.forEach(b => mapNomeId[b.name] = b.id);
 
                 data.forEach(row => {
-                    const rawDate = row['EVENTO'];
+                    // Normaliza a data (Assumindo formato DD/MM/AAAA ou objeto Date do sheets)
+                    // Na planilha, a coluna agora é 'EVENTO' (Data da Festa)
+                    let rawDate = row['EVENTO'];
+                    if (!rawDate) return;
                     
-                    // USANDO A NOVA FUNÇÃO DE PARSE SEGURA
-                    const dateISO = safeParseDate(rawDate);
+                    let dateISO = '';
+
+                    // LÓGICA DE DATA MELHORADA PARA 2026
+                    if (typeof rawDate === 'string') {
+                        rawDate = rawDate.trim();
+                        // Caso venha como DD/MM/AAAA (Padrão brasileiro)
+                        if (rawDate.includes('/')) {
+                            const parts = rawDate.split('/');
+                            if (parts.length === 3) {
+                                // Garante que o ano tenha 4 dígitos (ex: 26 vira 2026)
+                                let year = parts[2];
+                                if (year.length === 2) year = '20' + year;
+                                dateISO = `${year}-${parts[1]}-${parts[0]}`; // YYYY-MM-DD
+                            }
+                        } 
+                        // Caso venha como AAAA-MM-DD (Padrão ISO/Sheets JSON às vezes)
+                        else if (rawDate.includes('-')) {
+                            dateISO = rawDate.substring(0, 10);
+                        }
+                    } 
+                    
+                    // Fallback para Objeto Date (Caso o JSON já venha parseado ou formato ISO completo)
+                    if (!dateISO) {
+                        const dateObj = new Date(rawDate);
+                        if (!isNaN(dateObj)) {
+                            dateISO = dateObj.toISOString().split('T')[0];
+                        }
+                    }
 
                     if (!dateISO) return;
 
@@ -1560,10 +1539,7 @@
                     if (itensStr) {
                         const linhas = itensStr.split('\n');
                         linhas.forEach(linha => {
-                            // Regex ajustada para ser mais flexível com espaços
-                            const match = linha.match(/(?:•\s*)?(\d+)x\s+(.+?)(?:\s*\(.*\))?$/);
-                            // O Regex acima pega: (qtd)x (nome do item) (ignora coisas entre parenteses no final se tiver)
-                            
+                            const match = linha.match(/(?:•\s*)?(\d+)x\s+(.+)/);
                             if (match) {
                                 const qtd = parseInt(match[1]);
                                 const nome = match[2].trim();
@@ -1590,6 +1566,7 @@
                 
             } catch (e) {
                 console.error("Erro ao carregar agendamentos:", e);
+                // Fallback para dados estáticos se falhar (opcional, já carregou no onload)
             }
         }
 
