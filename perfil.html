@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        html, body { overflow-x: hidden; width: 100%; font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+        html, body { overflow-x: hidden; width: 100%; font-family: 'Inter', sans-serif; background-color: #f0f4f8; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
         h1, h2, h3, h4, .brand-font { font-family: 'Baloo 2', cursive; }
         .min-h-screen-safe { min-height: 100vh; min-height: 100dvh; }
         .bg-primary { background-color: #2563EB; }
@@ -19,118 +19,160 @@
         
         body.modal-open { overflow: hidden; touch-action: none; }
         
+        /* Padrão de Fundo Sutil */
+        .bg-pattern {
+            background-image: radial-gradient(#2563EB 0.5px, transparent 0.5px), radial-gradient(#2563EB 0.5px, #f0f4f8 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            opacity: 0.05;
+        }
+
+        /* Animação de Blobs de Fundo */
+        .blob { position: absolute; filter: blur(40px); z-index: 0; opacity: 0.6; animation: floatBlob 10s infinite alternate; }
+        @keyframes floatBlob { from { transform: translate(0, 0) scale(1); } to { transform: translate(20px, -20px) scale(1.1); } }
+
         /* Ajustes Bottom Bar */
         #bottom-nav { padding-bottom: env(safe-area-inset-bottom); height: calc(4rem + env(safe-area-inset-bottom)); }
         .floating-fab { box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5); }
 
         /* Notificações */
-        #notification-panel { z-index: 100; transition: transform 0.3s ease-out; position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; background-color: #2563EB; pointer-events: none; transform: translateX(100%); }
+        #notification-panel { z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: fixed; top: 0; right: 0; bottom: 0; width: 100vw; max-width: 100vw; height: 100dvh; background-color: #2563EB; pointer-events: none; transform: translateX(100%); }
         #notification-panel.open { pointer-events: auto; transform: translateX(0); }
         
         /* Animações Clube */
-        .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
-        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .progress-bar-fill { transition: width 1s ease-in-out; }
-        .animated-stripes { background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.4) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.4) 75%, transparent 75%, transparent); background-size: 30px 30px; animation: moveStripes 1s linear infinite; width: 100%; height: 100%; }
-        @keyframes moveStripes { 0% { background-position: 0 0; } 100% { background-position: 30px 0; } }
-        input:disabled { background-color: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
+        .modal-enter { animation: modalFadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar-fill { transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .animated-stripes { background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent); background-size: 20px 20px; animation: moveStripes 1s linear infinite; width: 100%; height: 100%; }
+        @keyframes moveStripes { 0% { background-position: 0 0; } 100% { background-position: 20px 0; } }
+        input:disabled { background-color: #f8fafc; color: #94a3b8; cursor: not-allowed; border-color: #e2e8f0; }
+
+        /* Glassmorphism */
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
     </style>
 </head>
-<body class="text-gray-700 min-h-screen-safe flex flex-col">
+<body class="text-gray-700 min-h-screen-safe flex flex-col bg-gray-50">
+
+    <!-- Fundo Global com Padrão -->
+    <div class="fixed inset-0 bg-pattern pointer-events-none z-0"></div>
 
     <!-- HEADER (Fixo em todas as páginas) - z-50 -->
-    <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16">
+    <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-lg shadow-blue-900/10 z-50 h-16">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner" onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
-                <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
+                <span class="text-white text-2xl font-bold brand-font tracking-wide drop-shadow-sm">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
             <div class="hidden md:flex items-center space-x-4">
-                <button onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600">
+                <button onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 0 0 0 4 0v-1" /></svg>
-                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div>
+                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden transform scale-0 transition-transform duration-200"></div>
                 </button>
             </div>
-            <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600" onclick="toggleNotificationPanel()">
+            <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 0 0 0 4 0v-1" /></svg>
-                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div>
+                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden transform scale-0 transition-transform duration-200"></div>
             </button>
         </div>
     </header>
 
     <!-- NOTIFICAÇÕES (Lateral) -->
-    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
-    <div id="notification-panel">
-        <div class="h-full flex flex-col">
-            <div class="bg-blue-700 border-b border-blue-800 p-4 flex-none flex justify-between items-center z-10"><h3 class="text-xl font-bold brand-font text-white">Notificações</h3><button onclick="toggleNotificationPanel()" class="text-blue-200 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
-            <div class="flex-grow overflow-y-auto relative"><ul id="notification-list" class="p-4 space-y-3 pb-24"></ul><div id="loading-notifications" class="p-4 text-center hidden"><div class="animate-spin inline-block w-6 h-6 border-4 border-blue-300 border-t-transparent rounded-full"></div><p class="text-sm text-blue-200 mt-2">Carregando...</p></div></div>
-            <div class="p-2 border-t border-blue-800 bg-blue-700 text-center flex-none w-full" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));"><button id="mark-all-button" onclick="markAllAsRead()" class="text-white font-semibold text-xs uppercase tracking-wide hover:text-blue-200 hover:underline disabled:opacity-50">Marcar todas como lidas</button></div>
+    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[80] transition-opacity"></div>
+    <div id="notification-panel" class="shadow-2xl">
+        <div class="h-full flex flex-col bg-white">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-5 flex-none flex justify-between items-center z-10 shadow-md">
+                <h3 class="text-xl font-bold brand-font text-white flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    Notificações
+                </h3>
+                <button onclick="toggleNotificationPanel()" class="text-blue-100 hover:text-white p-1 rounded-full hover:bg-white/10 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="flex-grow overflow-y-auto relative bg-gray-50">
+                <ul id="notification-list" class="p-4 space-y-3 pb-24"></ul>
+                <div id="loading-notifications" class="p-8 text-center hidden flex flex-col items-center">
+                    <svg class="animate-spin h-8 w-8 text-blue-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <p class="text-sm text-gray-500">Atualizando...</p>
+                </div>
+            </div>
+            <div class="p-3 border-t border-gray-100 bg-white text-center flex-none w-full shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]" style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));">
+                <button id="mark-all-button" onclick="markAllAsRead()" class="w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl text-sm hover:bg-blue-100 disabled:opacity-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors">Marcar todas como lidas</button>
+            </div>
         </div>
     </div>
 
-    <!-- TELA DE CARREGAMENTO (SPLASH) - AGORA Z-40 (Atrás do Header/Footer) -->
+    <!-- TELA DE CARREGAMENTO (SPLASH) - Z-40 -->
     <div id="loadingScreen" class="fixed inset-0 z-40 bg-white flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="relative mb-4">
-            <svg class="animate-spin h-12 w-12 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-10" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <!-- Spinner Fino e Elegante -->
+            <svg class="animate-spin h-12 w-12 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-10" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
         </div>
         <div class="text-blue-600 font-medium text-sm animate-pulse tracking-widest uppercase">Carregando...</div>
     </div>
 
     <!-- CONTEÚDO PRINCIPAL (Login e Perfil) -->
-    <!-- AJUSTE: Mudei de pt-20 para pt-16 para remover o espaço branco -->
-    <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-white md:bg-gray-50 flex flex-col items-center">
+    <main class="flex-grow w-full pt-16 pb-28 md:pb-12 flex flex-col items-center relative z-0">
         
         <!-- VISÃO DE LOGIN -->
-        <section id="authView" class="hidden w-full max-w-md mx-auto px-4 fade-in">
-            <div class="text-center mb-8 mt-4">
-                <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight brand-font">Acesse sua Conta</h1>
-                <p class="text-gray-500 font-medium text-sm mt-1">Seus Pontos, Prêmios e Benefícios Exclusivos</p>
+        <section id="authView" class="hidden w-full max-w-md mx-auto px-4 fade-in min-h-[80vh] flex-col justify-center relative">
+            <!-- Background Blobs (Decoração) -->
+            <div class="blob w-64 h-64 bg-blue-300 rounded-full top-0 -left-10 mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+            <div class="blob w-64 h-64 bg-purple-300 rounded-full bottom-0 -right-10 mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+
+            <div class="text-center mb-8 mt-4 relative z-10">
+                <div class="inline-block p-3 rounded-2xl bg-blue-50 mb-3 shadow-sm transform hover:scale-105 transition-transform duration-300">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                </div>
+                <h1 class="text-3xl font-extrabold text-blue-900 tracking-tight brand-font">Acesse sua Conta</h1>
+                <p class="text-gray-500 font-medium text-sm mt-1">Acumule pontos, ganhe prêmios e aproveite benefícios exclusivos!</p>
             </div>
 
-            <div class="bg-white rounded-2xl p-1">
-                <div class="flex p-1 bg-gray-100 rounded-xl mb-6 border border-gray-200">
+            <div class="glass-panel rounded-2xl p-6 shadow-xl relative z-10 bg-white/80">
+                <div class="flex p-1 bg-gray-100/80 rounded-xl mb-6 border border-gray-200">
                     <button onclick="switchAuthTab('login')" id="tabLogin" class="flex-1 py-2.5 text-sm font-bold rounded-lg shadow-sm bg-white text-blue-700 transition-all">Entrar</button>
                     <button onclick="switchAuthTab('register')" id="tabRegister" class="flex-1 py-2.5 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 transition-all">Cadastrar</button>
                 </div>
 
                 <form id="loginForm" class="space-y-4" onsubmit="handleAuthAction(event, 'login')">
                     <div class="space-y-1">
-                        <label class="text-xs font-bold text-gray-500 uppercase ml-1">Email</label>
-                        <input type="email" id="loginEmail" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="seu@email.com" required>
+                        <label class="text-xs font-bold text-gray-500 uppercase ml-1 tracking-wide">Email</label>
+                        <input type="email" id="loginEmail" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm" placeholder="seu@email.com" required>
                     </div>
                     <div class="space-y-1">
-                        <div class="flex justify-between items-center ml-1"><label class="text-xs font-bold text-gray-500 uppercase">Senha</label></div>
+                        <div class="flex justify-between items-center ml-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Senha</label></div>
                         <div class="relative">
-                            <input type="password" id="loginPassword" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="••••••••" required>
-                            <button type="button" onclick="togglePassword('loginPassword', this)" class="absolute right-3 top-3.5 text-gray-400 hover:text-blue-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
+                            <input type="password" id="loginPassword" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm" placeholder="••••••••" required>
+                            <button type="button" onclick="togglePassword('loginPassword', this)" class="absolute right-3 top-3.5 text-gray-400 hover:text-blue-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
                         </div>
                     </div>
                     <div class="flex justify-between items-center px-1">
-                        <label class="flex items-center cursor-pointer"><input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"><span class="ml-2 text-xs text-gray-600 font-medium">Lembrar</span></label>
-                        <button type="button" onclick="handleForgotPassword()" class="text-xs font-bold text-blue-600 hover:text-blue-800">Esqueceu a senha?</button>
+                        <label class="flex items-center cursor-pointer group"><input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"><span class="ml-2 text-xs text-gray-600 font-medium group-hover:text-blue-600 transition-colors">Lembrar de mim</span></label>
+                        <button type="button" onclick="handleForgotPassword()" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">Esqueceu a senha?</button>
                     </div>
-                    <button type="submit" id="btnLoginSubmit" class="w-full py-3.5 bg-primary hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transform transition active:scale-[0.98]">Entrar</button>
+                    <button type="submit" id="btnLoginSubmit" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transform transition active:scale-[0.98]">Entrar</button>
                 </form>
 
                 <form id="registerForm" class="space-y-4 hidden" onsubmit="handleAuthAction(event, 'register')">
                     <div class="space-y-1">
-                        <label class="text-xs font-bold text-gray-500 uppercase ml-1">Nome</label>
-                        <input type="text" id="regName" oninput="forceTwoWords(this)" maxlength="18" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Seu nome" required>
+                        <label class="text-xs font-bold text-gray-500 uppercase ml-1 tracking-wide">Nome</label>
+                        <input type="text" id="regName" oninput="forceTwoWords(this)" maxlength="18" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="Seu nome" required>
                     </div>
-                    <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Email</label><input type="email" id="regEmail" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="seu@email.com" required></div>
-                    <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Senha</label><div class="relative"><input type="password" id="regPassword" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Crie uma senha" required><button type="button" onclick="togglePassword('regPassword', this)" class="absolute right-3 top-3.5 text-gray-400 hover:text-blue-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button></div></div>
-                    <button type="submit" id="btnRegSubmit" class="w-full py-3.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-200 transform transition active:scale-[0.98]">Criar Conta</button>
+                    <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1 tracking-wide">Email</label><input type="email" id="regEmail" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="seu@email.com" required></div>
+                    <div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1 tracking-wide">Senha</label><div class="relative"><input type="password" id="regPassword" class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" placeholder="Crie uma senha" required><button type="button" onclick="togglePassword('regPassword', this)" class="absolute right-3 top-3.5 text-gray-400 hover:text-blue-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button></div></div>
+                    <button type="submit" id="btnRegSubmit" class="w-full py-3.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-200 transform transition active:scale-[0.98]">Criar Conta</button>
                 </form>
 
                 <div class="relative my-6">
                     <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
-                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-3 text-gray-400 font-bold">Ou entre com</span></div>
+                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-white/80 backdrop-blur px-3 text-gray-400 font-bold">Ou entre com</span></div>
                 </div>
 
-                <button onclick="handleGoogleLogin()" class="w-full py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition active:scale-[0.98] flex items-center justify-center gap-3 shadow-sm">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9494 17.5885 17.2678 16.323 18.1056V21.1039H20.19C22.4608 19.0139 23.766 15.9274 23.766 12.2764Z" fill="#4285F4"/><path d="M12.2401 24.0008C15.4766 24.0008 18.2059 22.9382 20.1945 21.1039L16.3275 18.1055C15.2517 18.8375 13.8627 19.252 12.2445 19.252C9.11388 19.252 6.45946 17.1399 5.50705 14.3003H1.5166V17.3912L5.50253 14.3003Z" fill="#34A853"/><path d="M12.2401 4.74966C13.9509 4.7232 15.6044 5.36697 16.8434 6.54867L20.2695 3.12262C18.1001 1.0855 15.2208 -0.034466 12.2401 0.000808666C7.7029 0.000808666 3.55371 2.55822 1.5166 6.61481L5.50264 9.70575C6.45064 6.86173 9.10947 4.74966 12.2401 4.74966Z" fill="#EA4335"/></svg>
+                <button onclick="handleGoogleLogin()" class="w-full py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition active:scale-[0.98] flex items-center justify-center gap-3 shadow-sm group">
+                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9494 17.5885 17.2678 16.323 18.1056V21.1039H20.19C22.4608 19.0139 23.766 15.9274 23.766 12.2764Z" fill="#4285F4"/><path d="M12.2401 24.0008C15.4766 24.0008 18.2059 22.9382 20.1945 21.1039L16.3275 18.1055C15.2517 18.8375 13.8627 19.252 12.2445 19.252C9.11388 19.252 6.45946 17.1399 5.50705 14.3003H1.5166V17.3912L5.50253 14.3003Z" fill="#34A853"/><path d="M12.2401 4.74966C13.9509 4.7232 15.6044 5.36697 16.8434 6.54867L20.2695 3.12262C18.1001 1.0855 15.2208 -0.034466 12.2401 0.000808666C7.7029 0.000808666 3.55371 2.55822 1.5166 6.61481L5.50264 9.70575C6.45064 6.86173 9.10947 4.74966 12.2401 4.74966Z" fill="#EA4335"/></svg>
                     Google
                 </button>
             </div>
@@ -140,74 +182,93 @@
         <section id="profileView" class="hidden w-full max-w-lg mx-auto px-0 fade-in flex-col items-center">
             
             <!-- Botões Topo -->
-            <button onclick="openLogoutModal()" class="absolute top-4 left-4 z-30 bg-white/30 backdrop-blur-md p-2 rounded-full text-white hover:bg-white hover:text-red-600 transition shadow-lg border border-white/40"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
-            <button onclick="openRewardsModal()" class="absolute top-4 right-4 z-30 bg-white/30 backdrop-blur-md p-2.5 rounded-full text-white hover:bg-white hover:text-indigo-600 transition shadow-lg border border-white/40 animate-pulse hover:animate-none"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg><span id="rewardsNotificationBadge" class="absolute -top-0.5 -right-0.5 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span></button>
+            <button onclick="openLogoutModal()" class="absolute top-4 left-4 z-30 bg-white/30 backdrop-blur-md p-2 rounded-full text-white hover:bg-white hover:text-red-600 transition shadow-lg border border-white/40 group"><svg class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
+            <button onclick="openRewardsModal()" class="absolute top-4 right-4 z-30 bg-white/30 backdrop-blur-md p-2.5 rounded-full text-white hover:bg-white hover:text-indigo-600 transition shadow-lg border border-white/40 animate-pulse hover:animate-none group"><svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg><span id="rewardsNotificationBadge" class="absolute -top-0.5 -right-0.5 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span></button>
 
-            <!-- Banner Fundo (Design Abstrato Restaurado) -->
-            <div class="h-40 w-full relative shrink-0 overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600">
-                <!-- Efeitos de Luz/Design -->
-                <div class="absolute inset-0 bg-black/5"></div>
-                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+            <!-- Banner Fundo (Design Abstrato Restaurado com Vidro) -->
+            <div class="h-44 w-full relative shrink-0 overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
                 <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl transform translate-x-10 -translate-y-10"></div>
-                
-                <!-- Partículas de "Confete" Sutis (Design) -->
-                <div class="absolute top-4 left-1/4 w-2 h-2 bg-yellow-300 rounded-full opacity-40 animate-pulse"></div>
-                <div class="absolute bottom-8 right-1/3 w-3 h-3 bg-white rounded-full opacity-20"></div>
-                <div class="absolute top-10 right-10 w-1.5 h-1.5 bg-pink-300 rounded-full opacity-50"></div>
+                <!-- Partículas -->
+                <div class="absolute top-4 left-1/4 w-2 h-2 bg-yellow-300 rounded-full opacity-60 animate-pulse"></div>
+                <div class="absolute bottom-8 right-1/3 w-3 h-3 bg-white rounded-full opacity-30"></div>
+                <div class="absolute top-10 right-10 w-1.5 h-1.5 bg-pink-300 rounded-full opacity-60"></div>
             </div>
 
             <!-- Avatar e Info -->
             <div class="relative z-10 flex flex-col items-center -mt-16 w-full px-4">
-                <div class="relative group cursor-pointer pointer-events-auto mb-2" onclick="openModal()">
-                    <div class="w-32 h-32 rounded-full p-[3px] bg-white shadow-xl relative">
-                        <div class="w-full h-full rounded-full bg-gray-100 p-[2px] relative overflow-hidden">
+                <div class="relative group cursor-pointer pointer-events-auto mb-3" onclick="openModal()">
+                    <div class="w-32 h-32 rounded-full p-[3px] bg-white shadow-2xl relative z-10">
+                        <div class="w-full h-full rounded-full bg-gray-50 p-[2px] relative overflow-hidden ring-1 ring-gray-100">
                             <div id="mainAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center bg-white/90 hidden"><svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
-                            <img id="avatarImage" src="" alt="Avatar" class="w-full h-full rounded-full object-cover bg-white">
+                            <img id="avatarImage" src="" alt="Avatar" class="w-full h-full rounded-full object-cover bg-white hover:scale-105 transition-transform duration-500">
                         </div>
                     </div>
-                    <button class="absolute bottom-1 right-1 p-2 bg-primary rounded-full shadow-lg border-2 border-white text-white hover:bg-blue-700 active:scale-95 transition-all z-30">
+                    <button class="absolute bottom-1 right-1 p-2 bg-blue-600 rounded-full shadow-lg border-2 border-white text-white hover:bg-blue-700 active:scale-95 transition-all z-30">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     </button>
                 </div>
                 
                 <div class="text-center mt-1 mb-6">
                     <h1 class="text-2xl font-extrabold text-gray-800 leading-tight brand-font" id="userNameDisplay">Carregando...</h1>
-                    <p class="text-xs text-gray-500 font-medium" id="userEmailDisplay">...</p>
+                    <p class="text-xs text-gray-500 font-medium tracking-wide mt-1" id="userEmailDisplay">...</p>
                     
-                    <!-- Botão Editar Perfil Recolocado -->
-                    <button onclick="openProfileEditModal()" class="mt-3 px-6 py-1.5 bg-white border border-gray-200 text-gray-600 text-xs font-bold uppercase tracking-wide rounded-full hover:bg-gray-50 hover:text-blue-600 active:scale-[0.98] transition-all inline-flex items-center gap-2 shadow-sm">
+                    <button onclick="openProfileEditModal()" class="mt-3 px-5 py-1.5 bg-white border border-gray-200 text-gray-600 text-[10px] font-bold uppercase tracking-wider rounded-full hover:bg-gray-50 hover:text-blue-600 hover:border-blue-200 active:scale-[0.98] transition-all inline-flex items-center gap-2 shadow-sm group">
+                        <svg class="w-3 h-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         Editar Perfil
                     </button>
                 </div>
                 
-                <!-- Gamificação -->
-                <div class="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-6 relative">
+                <!-- Gamificação (Card Elevado) -->
+                <div class="w-full bg-white rounded-2xl p-5 shadow-lg shadow-blue-900/5 border border-gray-100 mb-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-yellow-100 to-transparent rounded-bl-full opacity-50"></div>
+                    
                     <!-- Ícone Sincronizar (Condicional) -->
-                    <button id="syncDataBtn" onclick="openSyncInfoModal()" class="hidden absolute top-2 right-2 p-1.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition animate-pulse" title="Atualizar Cadastro"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>
+                    <button id="syncDataBtn" onclick="openSyncInfoModal()" class="hidden absolute top-3 right-3 p-1.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition animate-pulse z-10" title="Atualizar Cadastro"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>
 
-                    <div class="flex justify-between items-end mb-2 px-1">
-                        <span id="userLevelBadge" class="px-2.5 py-0.5 bg-primary text-white text-[10px] font-bold uppercase rounded-md tracking-wider">Nível 1</span>
+                    <div class="flex justify-between items-end mb-2 px-1 relative z-10">
+                        <span id="userLevelBadge" class="px-2.5 py-0.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-[10px] font-bold uppercase rounded-md tracking-wider shadow-sm">Nível 1</span>
                         <span class="text-xs font-bold text-gray-400" id="xpDisplay">0 / 500 XP</span>
                     </div>
-                    <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden mb-6 relative">
+                    <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden mb-6 relative shadow-inner">
                         <div id="xpBarFill" class="progress-bar-fill h-full bg-gradient-to-r from-blue-400 to-primary w-0 rounded-full relative overflow-hidden"><div class="absolute inset-0 w-full h-full animated-stripes"></div></div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-0">
-                        <div class="flex flex-col items-center border-r border-gray-100">
+                    <div class="grid grid-cols-3 gap-4 relative z-10">
+                        <div class="flex flex-col items-center">
                             <span class="text-2xl font-black text-gray-800 leading-none brand-font" id="partyCountDisplay">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase mt-1 tracking-wide">Festas</span>
+                            <span class="text-[9px] font-bold text-gray-400 uppercase mt-1 tracking-wider">Festas</span>
                         </div>
-                        <div class="flex flex-col items-center border-r border-gray-100">
+                        <div class="flex flex-col items-center border-x border-gray-100">
                             <span class="text-2xl font-black text-primary leading-none brand-font" id="userPointsDisplay">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase mt-1 tracking-wide">Pontos</span>
+                            <span class="text-[9px] font-bold text-gray-400 uppercase mt-1 tracking-wider">Pontos</span>
                         </div>
                         <div class="flex flex-col items-center">
                             <span class="text-2xl font-black text-green-600 leading-none brand-font" id="userBalanceDisplay">0,00</span>
                             <div class="flex items-center gap-1 mt-1">
                                 <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Saldo</span>
+                                <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Saldo</span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nova Seção: Destaques (Preenchimento) -->
+                <div class="w-full mb-6 overflow-x-auto pb-2 no-scrollbar">
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0 w-32 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl p-3 flex flex-col justify-between text-white shadow-md relative overflow-hidden">
+                            <div class="absolute right-0 bottom-0 opacity-20"><svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd"></path></svg></div>
+                            <span class="text-[10px] font-bold uppercase opacity-80">Novidade</span>
+                            <span class="text-sm font-bold leading-tight">Ganhe + Pontos</span>
+                        </div>
+                        <div class="flex-shrink-0 w-32 h-20 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl p-3 flex flex-col justify-between text-white shadow-md relative overflow-hidden">
+                             <div class="absolute right-0 bottom-0 opacity-20"><svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg></div>
+                            <span class="text-[10px] font-bold uppercase opacity-80">Indique</span>
+                            <span class="text-sm font-bold leading-tight">Amigos & Festas</span>
+                        </div>
+                        <div class="flex-shrink-0 w-32 h-20 bg-white border border-gray-100 rounded-xl p-3 flex flex-col justify-center items-center text-gray-400 shadow-sm">
+                            <span class="text-xs">Em breve...</span>
                         </div>
                     </div>
                 </div>
@@ -215,13 +276,28 @@
                 <!-- Histórico -->
                 <div class="w-full mb-4">
                     <div class="flex justify-between items-center mb-4 px-1">
-                        <h3 class="text-lg font-bold brand-font text-gray-800">Histórico</h3>
-                        <button onclick="openFilterModal()" class="text-xs font-semibold text-primary bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-100 transition flex items-center gap-1">
+                        <h3 class="text-lg font-bold brand-font text-gray-800 flex items-center gap-2">
+                            Histórico
+                            <div class="h-1 w-1 bg-gray-300 rounded-full"></div>
+                            <span class="text-xs font-normal text-gray-400 font-sans" id="historyCountLabel">0</span>
+                        </h3>
+                        <button onclick="openFilterModal()" class="text-xs font-semibold text-primary bg-white hover:bg-blue-50 px-3 py-1.5 rounded-full border border-gray-200 hover:border-blue-200 transition flex items-center gap-1 shadow-sm">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                             Filtro <span id="filterCountBadge" class="hidden bg-primary text-white text-[9px] px-1.5 py-0.5 rounded-full ml-1">1</span>
                         </button>
                     </div>
-                    <div class="space-y-0 w-full" id="historyList"></div>
+                    
+                    <!-- Lista de Histórico com Empty State Melhorado -->
+                    <div class="space-y-0 w-full min-h-[100px]" id="historyList">
+                        <!-- Estado Vazio padrão (será substituído pelo JS se houver dados) -->
+                        <div class="flex flex-col items-center justify-center py-8 text-center bg-white rounded-2xl border border-dashed border-gray-200">
+                            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            </div>
+                            <h3 class="text-sm font-bold text-gray-600">Nenhuma festa ainda</h3>
+                            <p class="text-xs text-gray-400 mt-1 max-w-[200px]">Suas locações aparecerão aqui assim que forem confirmadas.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -230,32 +306,11 @@
     <!-- BOTTOM NAVIGATION BAR (Mantida) -->
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
-            <!-- Item 1: Início -->
-            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
-                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                <span class="text-[10px] font-medium">Início</span>
-            </a>
-            <!-- Item 2: Combos -->
-            <a href="combos.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
-                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4H8a2 2 0 00-2 2v1" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8V6a2 2 0 00-2-2h-3" /></svg>
-                <span class="text-[10px] font-medium">Combos</span>
-            </a>
-            <!-- Item 3: FAB Central -->
-            <div class="relative flex justify-center items-center h-full w-full">
-                <a href="calendario.html" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                </a>
-            </div>
-            <!-- Item 4: Catálogo -->
-            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer">
-                <svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
-                <span class="text-[10px] font-medium">Catálogo</span>
-            </a>
-            <!-- Item 5: Perfil (ATIVO) -->
-            <a href="#" class="flex flex-col items-center justify-center w-full h-full text-blue-600 pointer-events-none cursor-default">
-                <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-                <span class="text-[10px] font-medium">Perfil</span>
-            </a>
+            <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[10px] font-medium">Início</span></a>
+            <a href="combos.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4H8a2 2 0 00-2 2v1" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8V6a2 2 0 00-2-2h-3" /></svg><span class="text-[10px] font-medium">Combos</span></a>
+            <div class="relative flex justify-center items-center h-full w-full"><a href="calendario.html" class="cursor-pointer floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition hover:scale-105 border-4 border-gray-50 z-10"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></a></div>
+            <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg><span class="text-[10px] font-medium">Catálogo</span></a>
+            <a href="#" class="flex flex-col items-center justify-center w-full h-full text-blue-600 pointer-events-none cursor-default"><svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg><span class="text-[10px] font-medium">Perfil</span></a>
         </div>
     </nav>
 
@@ -273,99 +328,9 @@
     <!-- MODAL EDITAR PERFIL (Botões Fixos) -->
     <div id="profileEditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md modal-enter max-h-[90vh] flex flex-col overflow-hidden">
-            
-            <!-- Cabeçalho Fixo -->
-            <div class="flex justify-between items-center p-5 border-b border-gray-100 shrink-0 bg-white z-10">
-                <h2 class="text-lg font-bold text-gray-800">Editar Perfil</h2>
-                <button onclick="closeProfileEditModal()" class="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-
-            <!-- Corpo com Rolagem -->
-            <div class="p-6 overflow-y-auto">
-                <div class="space-y-5">
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label>
-                        <input type="text" id="editName" oninput="forceTwoWords(this)" maxlength="18" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Seu nome">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">WhatsApp / Telefone</label>
-                        <input type="tel" id="editPhone" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="(xx) xxxxx-xxxx" maxlength="15" oninput="formatPhone(this)">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Email</label>
-                        <div class="relative">
-                            <input type="email" id="editEmail" class="w-full pl-4 pr-10 py-3 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed select-none" disabled>
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="py-2"><div class="h-px bg-gray-100"></div></div>
-                    <h3 class="text-sm font-bold text-blue-600 uppercase tracking-wide">Endereço</h3>
-                    
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label>
-                        <div class="relative">
-                            <select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none appearance-none">
-                                <option value="">Selecione...</option>
-                                <option value="Acaraí">Acaraí</option>
-                                <option value="Água Branca">Água Branca</option>
-                                <option value="Capri">Capri</option>
-                                <option value="Centro - Sfs">Centro - Sfs</option>
-                                <option value="Centro Histórico">Centro Histórico</option>
-                                <option value="Enseada">Enseada</option>
-                                <option value="Ervino">Ervino</option>
-                                <option value="Iperoba">Iperoba</option>
-                                <option value="Itaguaçu">Itaguaçu</option>
-                                <option value="Laranjeiras">Laranjeiras</option>
-                                <option value="Majorca">Majorca</option>
-                                <option value="Miranda">Miranda</option>
-                                <option value="Morro Grande">Morro Grande</option>
-                                <option value="Paulas">Paulas</option>
-                                <option value="Praia Grande">Praia Grande</option>
-                                <option value="Reta">Reta</option>
-                                <option value="Ribeira">Ribeira</option>
-                                <option value="Rocio Grande">Rocio Grande</option>
-                                <option value="Rocio Pequeno">Rocio Pequeno</option>
-                                <option value="Sandra Regina">Sandra Regina</option>
-                                <option value="Tapera">Tapera</option>
-                                <option value="Ubatuba">Ubatuba</option>
-                                <option value="Vila da Glória">Vila da Glória</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="col-span-2 space-y-1">
-                            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Rua</label>
-                            <input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none" placeholder="Nome da rua">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nº</label>
-                            <div class="relative">
-                                <input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none" placeholder="123">
-                            </div>
-                            <div class="flex items-center mt-1.5 ml-1">
-                                <input type="checkbox" id="noNumberCheckbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="toggleHouseNumber()">
-                                <label for="noNumberCheckbox" class="ml-1.5 text-xs text-gray-500 font-medium cursor-pointer">Sem número (S/N)</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rodapé Fixo -->
-            <div class="p-5 border-t border-gray-100 bg-gray-50 shrink-0 z-10 rounded-b-3xl">
-                <div class="flex gap-3">
-                    <button onclick="closeProfileEditModal()" class="flex-1 px-4 py-3.5 bg-white border border-gray-200 font-bold text-gray-700 rounded-xl hover:bg-gray-100 active:scale-95 transition shadow-sm">Cancelar</button>
-                    <button onclick="saveProfileChanges()" class="flex-1 px-4 py-3.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition">Salvar</button>
-                </div>
-            </div>
-
+            <div class="flex justify-between items-center p-5 border-b border-gray-100 shrink-0 bg-white z-10"><h2 class="text-lg font-bold text-gray-800">Editar Perfil</h2><button onclick="closeProfileEditModal()" class="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
+            <div class="p-6 overflow-y-auto"><div class="space-y-5"><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nome Completo</label><input type="text" id="editName" oninput="forceTwoWords(this)" maxlength="18" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Seu nome"></div><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">WhatsApp / Telefone</label><input type="tel" id="editPhone" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="(xx) xxxxx-xxxx" maxlength="15" oninput="formatPhone(this)"></div><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Email</label><div class="relative"><input type="email" id="editEmail" class="w-full pl-4 pr-10 py-3 rounded-xl bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed select-none" disabled><div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div></div></div><div class="py-2"><div class="h-px bg-gray-100"></div></div><h3 class="text-sm font-bold text-blue-600 uppercase tracking-wide">Endereço</h3><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Bairro</label><div class="relative"><select id="editNeighborhood" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none appearance-none"><option value="">Selecione...</option><option value="Acaraí">Acaraí</option><option value="Água Branca">Água Branca</option><option value="Capri">Capri</option><option value="Centro - Sfs">Centro - Sfs</option><option value="Centro Histórico">Centro Histórico</option><option value="Enseada">Enseada</option><option value="Ervino">Ervino</option><option value="Iperoba">Iperoba</option><option value="Itaguaçu">Itaguaçu</option><option value="Laranjeiras">Laranjeiras</option><option value="Majorca">Majorca</option><option value="Miranda">Miranda</option><option value="Morro Grande">Morro Grande</option><option value="Paulas">Paulas</option><option value="Praia Grande">Praia Grande</option><option value="Reta">Reta</option><option value="Ribeira">Ribeira</option><option value="Rocio Grande">Rocio Grande</option><option value="Rocio Pequeno">Rocio Pequeno</option><option value="Sandra Regina">Sandra Regina</option><option value="Tapera">Tapera</option><option value="Ubatuba">Ubatuba</option><option value="Vila da Glória">Vila da Glória</option></select><div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div></div></div><div class="grid grid-cols-3 gap-3"><div class="col-span-2 space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Rua</label><input type="text" id="editStreet" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none" placeholder="Nome da rua"></div><div class="space-y-1"><label class="text-xs font-bold text-gray-500 uppercase tracking-wide ml-1">Nº</label><div class="relative"><input type="text" id="editHouseNumber" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none" placeholder="123"></div><div class="flex items-center mt-1.5 ml-1"><input type="checkbox" id="noNumberCheckbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="toggleHouseNumber()"><label for="noNumberCheckbox" class="ml-1.5 text-xs text-gray-500 font-medium cursor-pointer">Sem número (S/N)</label></div></div></div></div></div>
+            <div class="p-5 border-t border-gray-100 bg-gray-50 shrink-0 z-10 rounded-b-3xl"><div class="flex gap-3"><button onclick="closeProfileEditModal()" class="flex-1 px-4 py-3.5 bg-white border border-gray-200 font-bold text-gray-700 rounded-xl hover:bg-gray-100 active:scale-95 transition shadow-sm">Cancelar</button><button onclick="saveProfileChanges()" class="flex-1 px-4 py-3.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition">Salvar</button></div></div>
         </div>
     </div>
     
@@ -584,7 +549,18 @@
             const historyData = window.userData?.history || [];
             const filledHistory = historyData.filter(item => item.date && item.date.trim() !== "");
             const filteredData = activeFilter === 'Todos' ? filledHistory : filledHistory.filter(item => item.neighborhood === activeFilter);
-            if (filteredData.length === 0) { list.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Nenhum histórico encontrado.</div>'; return; }
+            if (filteredData.length === 0) { 
+                list.innerHTML = `<div class="flex flex-col items-center justify-center py-8 text-center bg-white rounded-2xl border border-dashed border-gray-200 mt-2">
+                            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            </div>
+                            <h3 class="text-sm font-bold text-gray-600">Nenhuma festa ainda</h3>
+                            <p class="text-xs text-gray-400 mt-1 max-w-[200px]">Suas locações aparecerão aqui assim que forem confirmadas.</p>
+                        </div>`; 
+                document.getElementById('historyCountLabel').textContent = '0';
+                return; 
+            }
+            document.getElementById('historyCountLabel').textContent = filteredData.length;
             filteredData.forEach(item => { const div = document.createElement('div'); div.className = 'flex justify-between items-center py-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-default'; const discountTag = item.discount > 0 ? `<div class="flex items-center justify-end mt-1"><span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> Economizou R$ ${formatBRL(item.discount)}</span></div>` : ''; div.innerHTML = `<div><p class="text-[10px] text-gray-400 font-bold mb-0.5">${item.date}</p><p class="text-sm font-bold text-gray-700">${item.neighborhood}</p></div><div class="text-right"><p class="text-sm font-bold text-gray-800">R$ ${formatBRL(item.value)}</p>${discountTag}</div>`; list.appendChild(div); });
         }
         function renderRewards() {
