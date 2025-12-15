@@ -28,11 +28,12 @@
         .dia-hoje { border: 2px solid #2563EB; font-weight: 700; z-index: 5; }
         .dia-numero { position: absolute; top: 2px; right: 4px; font-size: 0.85rem; font-weight: 600; color: rgba(0, 0, 0, 0.7); z-index: 10; }
         
-        /* Loading do Calendário */
+        /* Loading do Calendário Bonito */
         #calendar-loading {
-            position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 20;
+            position: absolute; inset: 0; background: rgba(255,255,255,0.95); z-index: 20;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            backdrop-filter: blur(2px);
         }
         #calendar-loading.active { opacity: 1; pointer-events: auto; }
         
@@ -242,10 +243,16 @@
     <main class="flex-grow w-full pt-24 pb-28 md:pb-12 bg-white md:bg-gray-50 flex flex-col items-center justify-start">
         <!-- WRAPPER DO CALENDÁRIO COM ID PARA EVENTOS -->
         <div id="calendar-wrapper" class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100 calendar-transition relative overflow-hidden min-h-[400px]">
-            <!-- LOADING OVERLAY NOVO -->
-            <div id="calendar-loading" class="active rounded-2xl">
-                <div class="animate-spin inline-block w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full mb-4"></div>
-                <p class="text-blue-600 font-bold brand-font text-lg animate-pulse">Verificando datas...</p>
+            <!-- LOADING OVERLAY NOVO E BONITO -->
+            <div id="calendar-loading" class="active rounded-2xl flex flex-col items-center justify-center space-y-4">
+                <div class="relative w-16 h-16">
+                     <div class="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+                     <div class="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+                </div>
+                <div class="text-center">
+                    <p class="text-blue-600 font-bold brand-font text-xl mb-1">Carregando Agenda...</p>
+                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wide">Sincronizando com o sistema</p>
+                </div>
             </div>
 
             <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Para a data <span id="display-date-main">...</span></h2>
@@ -1282,13 +1289,13 @@
         // FUNÇÃO FETCH AGENDAMENTOS (AUTOMÁTICA)
         async function fetchAgendamentosReais() {
             try {
-                // Remove indicador de carregamento
-                document.getElementById('calendar-loading').classList.remove('active');
-
                 // MESMA URL USADA NO POST
                 const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec';
                 const response = await fetch(scriptURL); 
                 const data = await response.json();
+                
+                // Remove indicador de carregamento SÓ DEPOIS de receber dados
+                document.getElementById('calendar-loading').classList.remove('active');
                 
                 if (data.error) throw new Error(data.error);
                 
@@ -1356,7 +1363,7 @@
                 
             } catch (e) {
                 console.error("Erro ao carregar agendamentos:", e);
-                // Remove loading even if error
+                // Remove loading even if error (FALLBACK)
                 document.getElementById('calendar-loading').classList.remove('active');
             }
         }
