@@ -424,6 +424,17 @@
             const pass = type === 'login' ? document.getElementById('loginPassword').value : document.getElementById('regPassword').value;
             const btn = type === 'login' ? document.getElementById('btnLoginSubmit') : document.getElementById('btnRegSubmit');
             const originalText = btn.textContent;
+
+            // VALIDAÇÃO DE SENHA (6 DÍGITOS)
+            if (type === 'register' && pass.length < 6) {
+                window.showDialog({ 
+                    title: "Senha Muito Curta", 
+                    message: "A senha precisa ter 6 dígitos ou mais.", 
+                    type: "error" 
+                });
+                return;
+            }
+
             try {
                 btn.classList.add('opacity-50', 'cursor-not-allowed'); btn.textContent = "Processando...";
                 if (type === 'login') { await signInWithEmailAndPassword(auth, email, pass); } 
@@ -438,6 +449,7 @@
                 let msg = "Verifique seus dados.";
                 if (error.code === 'auth/wrong-password') msg = "Senha incorreta.";
                 if (error.code === 'auth/user-not-found') msg = "Usuário não encontrado.";
+                if (error.code === 'auth/email-already-in-use') msg = "Este email já está cadastrado.";
                 window.showDialog({ title: "Atenção", message: msg, type: "error" });
                 btn.classList.remove('opacity-50', 'cursor-not-allowed'); btn.textContent = originalText;
             }
