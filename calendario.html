@@ -1313,11 +1313,11 @@
             fetch(scriptURL, { 
                 method: 'POST', 
                 body: formParams,
-                // mode: 'no-cors' // Usar apenas se o erro persistir, pois impede ler a resposta de sucesso
+                mode: 'no-cors' // MUDANÇA: Força o modo sem confirmação para evitar erro de CORS
             })
             .then(response => {
                 // --- SUCESSO ---
-                alert(`Obrigado, ${name}! \n\nSeu pedido foi recebido com sucesso. \nValor Total: ${finalTotalText}\n\nEntraremos em contato em breve.`);
+                alert(`Obrigado, ${name}! \n\nSeu pedido foi registrado. \nValor Total: ${finalTotalText}\n\nEntraremos em contato em breve.`);
                 
                 // Reseta tudo e fecha o painel
                 window.closeToysPanel();
@@ -1332,11 +1332,8 @@
                 // --- ERRO ---
                 console.error('Erro!', error.message);
                 
-                // FALLBACK: Tenta enviar em modo no-cors (cego) se falhar
-                // Isso garante que o dado chegue mesmo que o navegador bloqueie a resposta
-                fetch(scriptURL, { method: 'POST', body: formParams, mode: 'no-cors' });
-                
-                alert("Seu pedido foi enviado! (Aviso: Ocorreu um erro de rede na confirmação, mas tentamos re-enviar seus dados).");
+                // Se cair aqui, realmente houve um problema sério de rede
+                alert("Ocorreu um erro de conexão. Por favor, verifique se seu pedido foi enviado ou tente novamente.");
                 
                 btn.innerText = textoOriginal;
                 btn.disabled = false;
