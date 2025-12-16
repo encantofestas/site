@@ -225,7 +225,8 @@
                     <h3 class="text-xl font-bold brand-font flex items-center gap-2">
                         🎉 Próximas Festas
                     </h3>
-                    <p class="text-blue-200 text-xs">Veja quem já garantiu a diversão!</p>
+                    <!-- SUBTÍTULO ATUALIZADO AQUI -->
+                    <p class="text-blue-200 text-xs">Verifique se sua reserva está confirmada</p>
                 </div>
                 <button onclick="closeBookingsModal()" class="bg-white/20 hover:bg-white/30 rounded-full p-2 text-white">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -1817,6 +1818,9 @@
                         });
                     }
                 });
+                
+                // --- NOVO: LOG PARA DEBUG DO USUÁRIO ---
+                console.log(`[Agenda da Galera] Total de reservas futuras carregadas: ${publicBookings.length}`);
                 
                 // Atualiza a variável global e re-renderiza
                 globalAgendamentos = novosAgendamentos;
