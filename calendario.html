@@ -145,6 +145,39 @@
         
         /* LOADER DO CALENDÁRIO */
         .hidden-loader { opacity: 0 !important; pointer-events: none !important; }
+
+        /* MODAL AGENDA DA GALERA (LISTA DE RESERVAS) */
+        #bookings-modal-overlay {
+            position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 85;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+            backdrop-filter: blur(3px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        #bookings-modal-overlay.open { opacity: 1; visibility: visible; }
+        #bookings-modal {
+            background: white; border-radius: 1.5rem; width: 100%; max-width: 400px;
+            height: 80vh; max-height: 700px;
+            transform: translateY(30px); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+        }
+        #bookings-modal-overlay.open #bookings-modal { transform: translateY(0); }
+        
+        /* Card de reserva */
+        .booking-card {
+            background: white;
+            border: 1px solid #f1f5f9;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+        .booking-card:hover { transform: translateY(-2px); border-color: #bfdbfe; }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -157,11 +190,23 @@
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
             <div class="hidden md:flex items-center space-x-4">
+                <!-- Botão Agenda da Galera (Desktop) -->
+                <button onclick="openBookingsModal()" class="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-full text-sm font-bold transition">
+                    <span>📅</span> Agenda da Galera
+                </button>
+
                 <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
                 <button onclick="window.location.href='perfil.html'" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold">Entrar</button>
                 <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 shadow-lg">Agendar Agora</button>
             </div>
-            <button class="md:hidden text-white p-2 relative rounded-full hover:bg-blue-600" onclick="toggleNotificationPanel()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
+            <div class="flex items-center gap-2 md:hidden">
+                <!-- Botão Agenda da Galera (Mobile) - Ícone + Texto curto -->
+                <button onclick="openBookingsModal()" class="text-white text-xs font-bold bg-white/20 p-2 rounded-lg flex flex-col items-center leading-none">
+                    <span>📅</span>
+                    <span class="mt-0.5 scale-90">Agenda</span>
+                </button>
+                <button class="text-white p-2 relative rounded-full hover:bg-blue-600" onclick="toggleNotificationPanel()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
+            </div>
         </div>
     </header>
 
@@ -169,6 +214,44 @@
     <div id="toast-notification" class="bg-gray-800/95 backdrop-blur-sm text-white px-5 py-4 rounded-xl shadow-2xl z-[60] flex items-center justify-center space-x-3 text-center border border-gray-700">
         <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         <span class="text-sm font-semibold leading-tight">Agenda disponível até 6 meses à frente.</span>
+    </div>
+
+    <!-- MODAL AGENDA DA GALERA -->
+    <div id="bookings-modal-overlay" onclick="closeBookingsModal()">
+        <div id="bookings-modal" onclick="event.stopPropagation()">
+            <!-- Cabeçalho do Modal -->
+            <div class="bg-primary p-5 flex justify-between items-center text-white shrink-0">
+                <div>
+                    <h3 class="text-xl font-bold brand-font flex items-center gap-2">
+                        🎉 Próximas Festas
+                    </h3>
+                    <p class="text-blue-200 text-xs">Veja quem já garantiu a diversão!</p>
+                </div>
+                <button onclick="closeBookingsModal()" class="bg-white/20 hover:bg-white/30 rounded-full p-2 text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Busca -->
+            <div class="p-4 border-b border-gray-100 bg-gray-50 shrink-0">
+                <div class="relative">
+                    <input type="text" id="bookings-search" oninput="filterBookings()" placeholder="Pesquisar nome..." class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none shadow-sm text-sm">
+                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+
+            <!-- Lista de Reservas -->
+            <div id="bookings-list-container" class="flex-grow overflow-y-auto p-4 bg-gray-50 space-y-2">
+                <!-- Conteúdo preenchido via JS -->
+            </div>
+
+            <!-- Rodapé Ver Mais -->
+            <div id="bookings-footer" class="p-4 border-t border-gray-100 bg-white shrink-0 text-center hidden">
+                <button onclick="loadMoreBookings()" class="text-blue-600 font-bold text-sm hover:underline py-2 px-4">
+                    Ver mais festas 👇
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL PERSONALIZADO (AVISOS) -->
@@ -463,7 +546,8 @@
                      <div class="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
                      <div class="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
                 </div>
-                <p class="text-blue-600 font-bold brand-font text-lg animate-pulse">Verificando agenda...</p>
+                <!-- O TEXTO FOI ATUALIZADO AQUI -->
+                <p class="text-blue-600 font-bold brand-font text-lg animate-pulse">Atualizando disponibilidade...</p>
             </div>
 
             <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Para a data <span id="display-date-main">...</span></h2>
@@ -545,6 +629,10 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
 
         let app, db, auth, userId, isAuthReady = false, unsubscribeNotifications = null, isPanelOpen = false, currentStep = 'selection', checkoutSubStep = 1, selectedItems = {};
+        
+        // --- NOVAS VARIÁVEIS PARA A LISTA DE RESERVAS ---
+        let publicBookings = []; // Lista de todas as reservas futuras com detalhes
+        let displayedBookingsCount = 10;
         
         let selectedDayCount = 1; 
 
@@ -651,6 +739,122 @@
         }
         window.closeCustomModal = function() {
             document.getElementById('custom-modal-overlay').classList.remove('open');
+        }
+        
+        // --- FUNÇÕES MODAL DE RESERVAS ---
+        window.openBookingsModal = function() {
+            document.getElementById('bookings-modal-overlay').classList.add('open');
+            window.renderBookingsList();
+        }
+        
+        window.closeBookingsModal = function() {
+            document.getElementById('bookings-modal-overlay').classList.remove('open');
+            // Reseta a busca ao fechar
+            setTimeout(() => {
+                document.getElementById('bookings-search').value = '';
+                displayedBookingsCount = 10;
+            }, 300);
+        }
+
+        window.renderBookingsList = function() {
+            const container = document.getElementById('bookings-list-container');
+            const search = document.getElementById('bookings-search').value.toLowerCase();
+            const footer = document.getElementById('bookings-footer');
+            
+            container.innerHTML = '';
+            
+            // Filtra por texto e apenas datas futuras ou hoje
+            const todayTime = new Date().setHours(0,0,0,0);
+            
+            let filtered = publicBookings.filter(b => {
+                // Filtra datas passadas
+                const bDate = new Date(b.dateISO + 'T00:00:00');
+                if (bDate.getTime() < todayTime) return false;
+                
+                // Filtra por nome
+                if (search && !b.name.toLowerCase().includes(search)) return false;
+                
+                return true;
+            });
+            
+            // Ordena por data (mais próxima primeiro)
+            filtered.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+            
+            const total = filtered.length;
+            constToShow = filtered.slice(0, displayedBookingsCount);
+            
+            if (total === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10 text-center opacity-60">
+                        <span class="text-4xl mb-2">📅</span>
+                        <p class="text-gray-500 text-sm">Nenhuma festa encontrada para o futuro.</p>
+                    </div>`;
+                footer.classList.add('hidden');
+                return;
+            }
+            
+            constToShow.forEach(booking => {
+                // Formata Data
+                const parts = booking.dateISO.split('-');
+                const day = parts[2];
+                const month = parts[1];
+                const year = parts[0];
+                
+                // Formata Nome (Primeiro nome apenas se muito longo, ou 2 nomes)
+                let displayName = booking.name.split(' ')[0];
+                if (booking.name.split(' ').length > 1) {
+                    // Adiciona inicial do segundo nome
+                    displayName += ' ' + booking.name.split(' ')[1].charAt(0) + '.';
+                }
+                
+                // Censura Telefone
+                let displayPhone = "(47) 9****-****";
+                if (booking.phone) {
+                    // Remove não digitos
+                    const clean = booking.phone.replace(/\D/g, '');
+                    if (clean.length >= 10) {
+                        const ddd = clean.substring(0, 2);
+                        const prefix = clean.substring(2, 7); // 9XXXX
+                        displayPhone = `(${ddd}) ${prefix}-****`;
+                    }
+                }
+
+                const card = document.createElement('div');
+                card.className = 'booking-card animate-fadeIn';
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="bg-blue-100 text-blue-600 font-bold rounded-lg w-12 h-12 flex flex-col items-center justify-center leading-none shrink-0 border border-blue-200">
+                            <span class="text-lg">${day}</span>
+                            <span class="text-[10px] uppercase">${monthNames[parseInt(month)-1].substring(0,3)}</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-sm">${displayName}</h4>
+                            <p class="text-xs text-gray-500 font-mono">${displayPhone}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full border border-green-200">Reservado</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            // Botão Ver Mais
+            if (displayedBookingsCount < total) {
+                footer.classList.remove('hidden');
+            } else {
+                footer.classList.add('hidden');
+            }
+        }
+        
+        window.loadMoreBookings = function() {
+            displayedBookingsCount += 10;
+            window.renderBookingsList();
+        }
+        
+        window.filterBookings = function() {
+            displayedBookingsCount = 10; // Reseta ao pesquisar
+            window.renderBookingsList();
         }
 
         function checkRangeAvailability() {
@@ -1539,6 +1743,9 @@
                 // Processar dados
                 const novosAgendamentos = {};
                 
+                // Limpa lista pública antes de popular
+                publicBookings = [];
+                
                 // Mapa auxiliar Nome -> ID
                 const mapNomeId = {};
                 staticData.brinquedos.forEach(b => mapNomeId[b.name] = b.id);
@@ -1579,6 +1786,15 @@
                     }
 
                     if (!dateISO) return;
+
+                    // POPULA LISTA PÚBLICA (Se tiver nome)
+                    if (row['NOME']) {
+                        publicBookings.push({
+                            dateISO: dateISO,
+                            name: row['NOME'],
+                            phone: row['WHATSAPP']
+                        });
+                    }
 
                     if (!novosAgendamentos[dateISO]) novosAgendamentos[dateISO] = {};
 
