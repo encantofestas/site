@@ -126,7 +126,7 @@
         #success-modal-overlay {
             position: fixed; inset: 0; background-color: rgba(0,0,0,0.7); z-index: 95;
             opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
-            display: flex; align-items: center; justify-content;
+            display: flex; align-items: center; justify-content: center;
             padding: 1rem; backdrop-filter: blur(4px);
         }
         #success-modal-overlay.open { opacity: 1; visibility: visible; }
@@ -1005,8 +1005,8 @@
             let duration = endHour - startHour;
             
             if (duration <= 0) {
-                 if(warningEl) warningEl.classList.add('hidden');
-                 return 0; 
+                if(warningEl) warningEl.classList.add('hidden');
+                return 0; 
             }
             
             if (duration > 6) {
