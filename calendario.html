@@ -175,7 +175,8 @@
             </div>
             <div class="p-6 bg-white">
                 <div class="text-center mb-5">
-                    <p class="text-gray-600 text-sm mb-1">Para confirmar, faça o sinal de:</p>
+                    <!-- ALTERAÇÃO 4 -->
+                    <p class="text-gray-600 text-sm mb-1">Pedimos um pequeno valor de sinal</p>
                     <p class="text-3xl font-extrabold text-gray-800 brand-font">R$ 25,00</p>
                 </div>
                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-5 text-left space-y-3">
@@ -194,8 +195,10 @@
                         <p class="text-sm font-medium text-gray-800 truncate">William Henrique Freitas Pereira</p>
                     </div>
                 </div>
-                <button onclick="finalizeAndReload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transform transition active:scale-95">Já fiz o PIX, finalizar!</button>
-                <p class="text-xs text-center text-gray-400 mt-4">A confirmação chegará no seu WhatsApp.</p>
+                <!-- ALTERAÇÃO 2 -->
+                <button onclick="finalizeAndReload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transform transition active:scale-95">Confirmar pagamento</button>
+                <!-- ALTERAÇÃO 3 -->
+                <p class="text-xs text-center text-gray-400 mt-4">Pagamento seguro - Encanto Festas</p>
             </div>
         </div>
     </div>
@@ -298,7 +301,8 @@
         <div id="calendar-wrapper" class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100 calendar-transition relative overflow-hidden">
             <div id="calendar-loader" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-[2px] flex flex-col items-center justify-center transition-opacity duration-500">
                 <div class="relative w-16 h-16 mb-4"><div class="absolute inset-0 border-4 border-gray-200 rounded-full"></div><div class="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div></div>
-                <p class="text-blue-600 font-bold brand-font text-lg animate-pulse">Atualizando disponibilidade...</p>
+                <!-- ALTERAÇÃO 1 -->
+                <p class="text-blue-600 font-bold brand-font text-lg animate-pulse">Verificando datas disponíveis...</p>
             </div>
             <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Para a data <span id="display-date-main">...</span></h2>
             <div class="flex justify-between items-center mb-6 px-2">
@@ -1175,6 +1179,7 @@
         window.openToysPanel = function(day, month, year) {
             currentSelectedDateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             document.getElementById('selected-date-display').innerText = `Para ${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
+            selectedItems = {}; 
             document.getElementById('has-monitors').value = 'Nao'; 
             document.getElementById('delivery-day-before').value = 'Nao'; 
             document.getElementById('additional-insurance').checked = false; 
