@@ -66,9 +66,23 @@
         
         .booking-card { background: white; border: 1px solid #f1f5f9; border-radius: 1rem; padding: 1rem; margin-bottom: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: space-between; transition: transform 0.2s; }
         .booking-card:hover { transform: translateY(-2px); border-color: #bfdbfe; }
+
+        /* Estilos do Tour Tooltip */
+        #tour-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.7); z-index: 65; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; pointer-events: auto; }
+        #tour-overlay.show { opacity: 1; visibility: visible; }
+        
+        #tour-tooltip { visibility: hidden; opacity: 0; transform: translateY(10px) scale(0.95); transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s; z-index: 75; position: fixed; width: 280px; pointer-events: none; }
+        #tour-tooltip.show { visibility: visible; opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        
+        .tour-arrow { position: absolute; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 8px solid white; top: -8px; left: 50%; transform: translateX(-50%); filter: drop-shadow(0 -2px 1px rgba(0,0,0,0.05)); }
+        
+        /* Classe para elevar o botão alvo acima do overlay */
+        .tour-highlight { z-index: 80 !important; position: relative; box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.5) !important; background-color: #2563EB !important; border-radius: 0.5rem; }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
+
+    <div id="tour-overlay"></div>
 
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
@@ -77,13 +91,15 @@
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
             <div class="hidden md:flex items-center space-x-4">
-                <button onclick="openBookingsModal()" class="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-full text-sm font-bold transition"><span>📅</span> Agenda da Galera</button>
+                <!-- Botão Desktop -->
+                <button id="tour-target-desktop" onclick="openBookingsModal()" class="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-full text-sm font-bold transition"><span>📅</span> Agenda da Galera</button>
                 <button id="desktop-notification-button" onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
                 <button onclick="window.location.href='perfil.html'" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold">Entrar</button>
                 <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 shadow-lg">Agendar Agora</button>
             </div>
             <div class="flex items-center gap-2 md:hidden">
-                <button onclick="openBookingsModal()" class="text-white text-xs font-bold bg-white/20 p-2 rounded-lg flex flex-col items-center leading-none"><span>📅</span><span class="mt-0.5 scale-90">Agenda</span></button>
+                <!-- Botão Mobile -->
+                <button id="tour-target-mobile" onclick="openBookingsModal()" class="text-white text-xs font-bold bg-white/20 p-2 rounded-lg flex flex-col items-center leading-none"><span>📅</span><span class="mt-0.5 scale-90">Agenda</span></button>
                 <button class="text-white p-2 relative rounded-full hover:bg-blue-600" onclick="toggleNotificationPanel()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a6 6 0 0 0-12 0c0 5-1.5 7-3 8h18c-1.5-1-3-3-3-8z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 18v1a2 2 0 0 0 4 0v-1" /></svg><div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div></button>
             </div>
         </div>
@@ -92,6 +108,29 @@
     <div id="toast-notification" class="bg-gray-800/95 backdrop-blur-sm text-white px-5 py-4 rounded-xl shadow-2xl z-[60] flex items-center justify-center space-x-3 text-center border border-gray-700">
         <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         <span class="text-sm font-semibold leading-tight">Agenda disponível até 6 meses à frente.</span>
+    </div>
+
+    <!-- TOUR TOOLTIP -->
+    <div id="tour-tooltip" class="bg-white rounded-2xl shadow-2xl border border-blue-100 p-0 flex flex-col filter drop-shadow-xl">
+        <div id="tour-arrow" class="tour-arrow"></div>
+        <div class="relative overflow-hidden rounded-2xl p-5">
+            <div class="absolute -right-6 -top-6 w-20 h-20 bg-secondary opacity-20 rounded-full blur-xl"></div>
+            <div class="absolute -left-6 -bottom-6 w-20 h-20 bg-blue-500 opacity-10 rounded-full blur-xl"></div>
+            
+            <div class="flex justify-between items-start mb-2 relative z-10">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🚀</span>
+                    <h4 class="font-extrabold text-blue-800 text-lg brand-font leading-none">Novidade!</h4>
+                </div>
+                <!-- Botão de fechar removido para forçar o clique no botão amarelo conforme pedido 'apenas se clicar no botão' -->
+            </div>
+            
+            <p id="tour-text" class="text-sm text-gray-600 mb-4 leading-relaxed relative z-10 font-medium">Confira se sua reserva está tudo certo! Consulte a <span class="text-blue-600 font-bold">Agenda da Galera</span> para confirmar se sua locação já está registrada.</p>
+            
+            <div class="flex gap-2 relative z-10">
+                <button onclick="closeTour()" class="flex-1 bg-secondary text-blue-900 font-bold py-2.5 rounded-xl text-xs uppercase tracking-wide shadow-md hover:bg-yellow-300 transition transform active:scale-95">Legal, entendi!</button>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL AGENDA DA GALERA -->
@@ -304,6 +343,82 @@
         let displayedBookingsCount = 10;
         let selectedDayCount = 1; 
 
+        // TOUR LOGIC
+        window.closeTour = function() {
+            document.getElementById('tour-tooltip').classList.remove('show');
+            document.getElementById('tour-overlay').classList.remove('show');
+            
+            const mobileTarget = document.getElementById('tour-target-mobile');
+            const desktopTarget = document.getElementById('tour-target-desktop');
+            if(mobileTarget) mobileTarget.classList.remove('tour-highlight');
+            if(desktopTarget) desktopTarget.classList.remove('tour-highlight');
+            
+            localStorage.setItem('encanto_tour_seen', 'true');
+        }
+
+        window.initTour = function(customText = null) {
+            // Se já viu e não é uma chamada forçada (customText), ignora
+            if (!customText && localStorage.getItem('encanto_tour_seen') === 'true') return;
+
+            const tooltip = document.getElementById('tour-tooltip');
+            const arrow = document.getElementById('tour-arrow');
+            const overlay = document.getElementById('tour-overlay');
+            const tourText = document.getElementById('tour-text');
+            
+            if (customText) {
+                tourText.innerHTML = customText;
+            } else {
+                tourText.innerHTML = 'Confira se sua reserva está tudo certo! Consulte a <span class="text-blue-600 font-bold">Agenda da Galera</span> para confirmar se sua locação já está registrada.';
+            }
+            
+            // Determina qual botão está visível
+            const mobileTarget = document.getElementById('tour-target-mobile');
+            const desktopTarget = document.getElementById('tour-target-desktop');
+            
+            let target = null;
+            if (mobileTarget && mobileTarget.offsetParent !== null) target = mobileTarget;
+            else if (desktopTarget && desktopTarget.offsetParent !== null) target = desktopTarget;
+
+            if (!target) return;
+
+            // Adiciona classe de destaque (z-index maior que overlay)
+            target.classList.add('tour-highlight');
+
+            function updatePosition() {
+                const rect = target.getBoundingClientRect();
+                const tooltipWidth = 280; 
+                
+                let top = rect.bottom + 12; 
+                let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+
+                if (left < 10) left = 10;
+                if (left + tooltipWidth > window.innerWidth - 10) {
+                    left = window.innerWidth - tooltipWidth - 10;
+                }
+
+                tooltip.style.top = `${top}px`;
+                tooltip.style.left = `${left}px`;
+
+                const buttonCenter = rect.left + (rect.width / 2);
+                const tooltipLeft = left;
+                const arrowRelativePos = buttonCenter - tooltipLeft;
+                
+                const safeMargin = 20; 
+                const clampedArrowPos = Math.max(safeMargin, Math.min(tooltipWidth - safeMargin, arrowRelativePos));
+
+                arrow.style.left = `${clampedArrowPos}px`;
+                arrow.style.transform = `translateX(-50%)`;
+            }
+
+            // Exibe overlay e tooltip
+            overlay.classList.add('show');
+            setTimeout(() => {
+                updatePosition();
+                tooltip.classList.add('show');
+                window.addEventListener('resize', updatePosition);
+            }, 500); // Pequeno delay para garantir renderização
+        }
+
         // DADOS ESTÁTICOS
         const staticData = {
           "brinquedos": [
@@ -381,6 +496,7 @@
         window.openBookingsModal = function() {
             document.getElementById('bookings-modal-overlay').classList.add('open');
             window.renderBookingsList();
+            window.closeTour(); // Fecha o tour se abrir o modal
         }
         
         window.closeBookingsModal = function() {
@@ -927,6 +1043,11 @@
             const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
             closeSuccessModal();
+            
+            // Reabre o tour com mensagem personalizada
+            setTimeout(() => {
+                window.initTour('Verifique seus dados! Clique aqui para confirmar que sua reserva já aparece no sistema.');
+            }, 800);
         }
         
         async function fetchAgendamentosReais() {
@@ -1000,6 +1121,9 @@
                 renderCalendar();
                 if (isPanelOpen) window.renderToysList();
                 
+                // INICIA O TOUR APÓS O CALENDÁRIO
+                window.initTour();
+                
             } catch (e) {
                 console.error("Erro ao carregar agendamentos:", e);
                 // Mesmo com erro, aplica o bloqueio manual nos dados estáticos
@@ -1063,6 +1187,7 @@
             document.getElementById('toys-panel').classList.add('open'); 
             document.getElementById('toys-overlay').classList.add('open'); 
             document.body.style.overflow = 'hidden';
+            window.closeTour();
         }
         
         window.closeToysPanel = function() { document.getElementById('toys-panel').classList.remove('open'); document.getElementById('toys-overlay').classList.remove('open'); document.body.style.overflow = ''; }
@@ -1083,6 +1208,7 @@
             loadStaticData(); 
             window.renderToysList(); 
             fetchAgendamentosReais(); 
+            // window.initTour(); // REMOVIDO PARA EVITAR DUPLICIDADE COM fetchAgendamentosReais
             const phoneInput = document.getElementById('client-whatsapp');
             if(phoneInput) {
                 phoneInput.addEventListener('input', function (e) {
@@ -1169,6 +1295,7 @@
             loadStaticData(); 
             window.renderToysList(); 
             fetchAgendamentosReais(); 
+            // window.initTour(); // REMOVIDO
             const phoneInput = document.getElementById('client-whatsapp');
             if(phoneInput) {
                 phoneInput.addEventListener('input', function (e) {
