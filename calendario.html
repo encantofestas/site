@@ -126,7 +126,7 @@
         #success-modal-overlay {
             position: fixed; inset: 0; background-color: rgba(0,0,0,0.7); z-index: 95;
             opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content;
             padding: 1rem; backdrop-filter: blur(4px);
         }
         #success-modal-overlay.open { opacity: 1; visibility: visible; }
@@ -1651,7 +1651,7 @@
             // --- 5. ENVIO PARA O GOOGLE SHEETS ---
             // ==========================================================
             // COLE SUA URL ABAIXO (MANTENHA AS ASPAS):
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec'; 
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyapJ0CfH-qrusKQigXTMM-Rt-BB6kP5Cg28j2iJS5cE9joec-iiWxeA6Ig730TgCOA/exec'; 
             // ==========================================================
             
             const data = {
@@ -1748,7 +1748,7 @@
             
             try {
                 // MESMA URL USADA NO POST
-                const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec';
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbyapJ0CfH-qrusKQigXTMM-Rt-BB6kP5Cg28j2iJS5cE9joec-iiWxeA6Ig730TgCOA/exec';
                 const response = await fetch(scriptURL); 
                 const data = await response.json();
                 
@@ -2079,7 +2079,10 @@
             loadStaticData(); 
             window.renderToysList(); 
 
-            // MÁSCARA WHATSAPP E INICIALIZAÇÃO
+            // Chama o fetch de agendamentos reais (sempre deve ser chamado)
+            fetchAgendamentosReais();
+
+            // Adiciona Máscara de Telefone
             const phoneInput = document.getElementById('client-whatsapp');
             if(phoneInput) {
                 phoneInput.addEventListener('input', function (e) {
