@@ -1,0 +1,106 @@
+// --- CONFIGURAÇÃO ---
+var SPREADSHEET_ID = '1PT8i9YX1077LVMF6a5myJhwN3rZMIsM1pJeA1FO4Bt4'; 
+var SHEET_NAME = 'Registros'; // Nome exato da aba
+
+function setup() {
+  var doc = SpreadsheetApp.getActiveSpreadsheet();
+  PropertiesService.getScriptProperties().setProperty('key', doc.getId());
+}
+
+// LER DADOS (Para o calendário)
+function doGet(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+
+  try {
+    var doc = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = doc.getSheetByName(SHEET_NAME);
+    
+    // Pega todos os dados
+    var data = sheet.getDataRange().getValues();
+    
+    // Se tiver menos de 2 linhas, não tem cabeçalho na linha 2 ainda
+    if (data.length < 2) {
+      return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // A LINHA 1 (índice 0) é o Título -> Ignoramos
+    // A LINHA 2 (índice 1) são os Cabeçalhos -> Usamos
+    var headers = data[1]; 
+    var rows = data.slice(2); // Dados começam na Linha 3
+
+    var result = rows.map(function(row) {
+      var obj = {};
+      headers.forEach(function(header, i) {
+        obj[header] = row[i];
+      });
+      return obj;
+    });
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  catch (e) {
+    return ContentService.createTextOutput(JSON.stringify({ 'error': e.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
+  finally {
+    lock.releaseLock();
+  }
+}
+
+// SALVAR PEDIDO (POST)
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+
+  try {
+    var doc = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = doc.getSheetByName(SHEET_NAME);
+
+    // Pega cabeçalhos da LINHA 2
+    // getRange(linha, coluna, numLinhas, numColunas) -> (2, 1, 1, total)
+    var headers = sheet.getRange(2, 1, 1, sheet.getLastColumn()).getValues()[0];
+    
+    // Próxima linha livre (sempre depois da última preenchida)
+    var nextRow = Math.max(sheet.getLastRow() + 1, 3); // Garante que comece no mínimo na linha 3
+
+    var rawData = e.parameter;
+    if (e.postData && e.postData.contents) {
+      try {
+        var jsonData = JSON.parse(e.postData.contents);
+        for (var key in jsonData) rawData[key] = jsonData[key];
+      } catch (err) {}
+    }
+
+    var dataMap = {};
+    for (var key in rawData) {
+      dataMap[key.toString().trim().toLowerCase()] = rawData[key];
+    }
+
+    var newRow = headers.map(function(header) {
+      var headerClean = header.toString().trim().toLowerCase();
+      // Data/Hora automática de registro (se tiver coluna 'Data Registro' ou similar, se não, ignora)
+      if (headerClean === 'data registro') return new Date().toLocaleString('pt-BR');
+      
+      var val = dataMap[headerClean];
+      if (val === undefined) {
+         var headerNoSpace = headerClean.replace(/\s/g, '');
+         val = dataMap[headerNoSpace];
+      }
+      return val || '';
+    });
+
+    sheet.getRange(nextRow, 1, 1, newRow.length).setValues([newRow]);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ 'result': 'success', 'row': nextRow }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  catch (e) {
+    return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': e.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
+  finally {
+    lock.releaseLock();
+  }
+}
