@@ -763,89 +763,101 @@
             const footer = document.getElementById('bookings-footer');
             
             container.innerHTML = '';
-            
-            // Filtra por texto e apenas datas futuras ou hoje
-            const todayTime = new Date().setHours(0,0,0,0);
-            
-            let filtered = publicBookings.filter(b => {
-                // Filtra datas passadas
-                const bDate = new Date(b.dateISO + 'T00:00:00');
-                if (bDate.getTime() < todayTime) return false;
+
+            try {
+                // Filtra por texto e apenas datas futuras ou hoje
+                const todayTime = new Date().setHours(0,0,0,0);
                 
-                // Filtra por nome
-                if (search && !b.name.toLowerCase().includes(search)) return false;
+                let filtered = publicBookings.filter(b => {
+                    // Filtra datas passadas
+                    const bDate = new Date(b.dateISO + 'T00:00:00');
+                    if (bDate.getTime() < todayTime) return false;
+                    
+                    // Filtra por nome
+                    if (search && !b.name.toLowerCase().includes(search)) return false;
+                    
+                    return true;
+                });
                 
-                return true;
-            });
-            
-            // Ordena por data (mais próxima primeiro)
-            filtered.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
-            
-            const total = filtered.length;
-            constToShow = filtered.slice(0, displayedBookingsCount);
-            
-            if (total === 0) {
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-10 text-center opacity-60">
-                        <span class="text-4xl mb-2">📅</span>
-                        <p class="text-gray-500 text-sm">Nenhuma festa encontrada para o futuro.</p>
-                        <p class="text-xs text-gray-400 mt-2">Se você acabou de fazer uma reserva, ela aparecerá aqui assim que for processada.</p>
-                    </div>`;
-                footer.classList.add('hidden');
-                return;
-            }
-            
-            constToShow.forEach(booking => {
-                // Formata Data
-                const parts = booking.dateISO.split('-');
-                const day = parts[2];
-                const month = parts[1];
-                const year = parts[0];
+                // Ordena por data (mais próxima primeiro)
+                filtered.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
                 
-                // Formata Nome (Primeiro nome apenas se muito longo, ou 2 nomes)
-                let displayName = booking.name.split(' ')[0];
-                if (booking.name.split(' ').length > 1) {
-                    // Adiciona inicial do segundo nome
-                    displayName += ' ' + booking.name.split(' ')[1].charAt(0) + '.';
+                const total = filtered.length;
+                const toToShow = filtered.slice(0, displayedBookingsCount);
+                
+                if (total === 0) {
+                    console.warn("[Modal de Reservas] Nenhuma reserva futura encontrada após a filtragem.");
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-10 text-center opacity-60">
+                            <span class="text-4xl mb-2">📅</span>
+                            <p class="text-gray-500 text-sm">Nenhuma festa encontrada para o futuro.</p>
+                            <p class="text-xs text-gray-400 mt-2">Se você acabou de fazer uma reserva, ela aparecerá aqui assim que for processada.</p>
+                        </div>`;
+                    footer.classList.add('hidden');
+                    return;
                 }
                 
-                // Censura Telefone
-                let displayPhone = "(47) 9****-****";
-                if (booking.phone) {
-                    // Remove não digitos
-                    const clean = booking.phone.replace(/\D/g, '');
-                    if (clean.length >= 10) {
-                        const ddd = clean.substring(0, 2);
-                        const prefix = clean.substring(2, 7); // 9XXXX
-                        displayPhone = `(${ddd}) ${prefix}-****`;
+                toToShow.forEach(booking => {
+                    // Formata Data
+                    const parts = booking.dateISO.split('-');
+                    const day = parts[2];
+                    const month = parts[1];
+                    const year = parts[0];
+                    
+                    // Formata Nome (Primeiro nome apenas se muito longo, ou 2 nomes)
+                    let displayName = booking.name.split(' ')[0];
+                    if (booking.name.split(' ').length > 1) {
+                        // Adiciona inicial do segundo nome
+                        displayName += ' ' + booking.name.split(' ')[1].charAt(0) + '.';
                     }
+                    
+                    // Censura Telefone
+                    let displayPhone = "(47) 9****-****";
+                    if (booking.phone) {
+                        // Remove não digitos
+                        const clean = booking.phone.replace(/\D/g, '');
+                        if (clean.length >= 10) {
+                            const ddd = clean.substring(0, 2);
+                            const prefix = clean.substring(2, 7); // 9XXXX
+                            displayPhone = `(${ddd}) ${prefix}-****`;
+                        }
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'booking-card animate-fadeIn';
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-100 text-blue-600 font-bold rounded-lg w-12 h-12 flex flex-col items-center justify-center leading-none shrink-0 border border-blue-200">
+                                <span class="text-lg">${day}</span>
+                                <span class="text-[10px] uppercase">${monthNames[parseInt(month)-1].substring(0,3)}</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">${displayName}</h4>
+                                <p class="text-xs text-gray-500 font-mono">${displayPhone}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full border border-green-200">Reservado</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+                
+                // Botão Ver Mais
+                if (displayedBookingsCount < total) {
+                    footer.classList.remove('hidden');
+                } else {
+                    footer.classList.add('hidden');
                 }
 
-                const card = document.createElement('div');
-                card.className = 'booking-card animate-fadeIn';
-                card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="bg-blue-100 text-blue-600 font-bold rounded-lg w-12 h-12 flex flex-col items-center justify-center leading-none shrink-0 border border-blue-200">
-                            <span class="text-lg">${day}</span>
-                            <span class="text-[10px] uppercase">${monthNames[parseInt(month)-1].substring(0,3)}</span>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-800 text-sm">${displayName}</h4>
-                            <p class="text-xs text-gray-500 font-mono">${displayPhone}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full border border-green-200">Reservado</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-            
-            // Botão Ver Mais
-            if (displayedBookingsCount < total) {
-                footer.classList.remove('hidden');
-            } else {
-                footer.classList.add('hidden');
+            } catch(error) {
+                 console.error("[Modal de Reservas] ERRO DURANTE A RENDERIZAÇÃO DA LISTA:", error);
+                 // Se o erro for aqui, mostramos uma mensagem de erro na área da lista.
+                 container.innerHTML = `
+                    <div class="p-4 text-center text-red-500 bg-red-50 rounded-lg">
+                        <p class="font-bold">Erro ao carregar a lista!</p>
+                        <p class="text-sm mt-1">Houve um problema ao processar os dados da reserva. Verifique o console (F12) para detalhes sobre o erro de JavaScript.</p>
+                    </div>`;
             }
         }
         
@@ -1820,10 +1832,11 @@
                     }
                 });
                 
-                // --- NOVO: LOG PARA DEBUG DO USUÁRIO ---
-                console.log(`[Agenda da Galera] Total de reservas futuras carregadas: ${publicBookings.length}`);
+                // --- LOGS DETALHADOS PARA DEBUG ---
+                console.log(`[Agenda da Galera] Total de linhas lidas da Planilha: ${data.length}`);
+                console.log(`[Agenda da Galera] Total de reservas futuras carregadas (coluna NOME preenchida): ${publicBookings.length}`);
                 if (publicBookings.length === 0 && data.length > 0) {
-                     console.warn("[Agenda da Galera] Zero reservas válidas encontradas. Verifique se a coluna 'NOME' na sua planilha está preenchida corretamente para as festas.");
+                     console.warn("[Agenda da Galera] Zero reservas VÁLIDAS encontradas. Verifique se as colunas 'EVENTO', 'NOME' e 'WHATSAPP' na sua planilha estão preenchidas corretamente.");
                 } else if (data.length === 0) {
                      console.warn("[Agenda da Galera] A planilha retornou 0 linhas. Verifique se o Script Web está retornando os dados.");
                 }
@@ -1839,8 +1852,14 @@
                 if (isPanelOpen) window.renderToysList();
                 
             } catch (e) {
-                console.error("Erro ao carregar agendamentos:", e);
-                // Fallback para dados estáticos se falhar (opcional, já carregou no onload)
+                console.error("Erro ao carregar agendamentos (Fetch):", e);
+                // Exibe uma mensagem de erro na área do calendário se o fetch falhar
+                document.getElementById('calendar-wrapper').innerHTML = `
+                    <div class="p-8 text-center text-red-500">
+                        <h3 class="font-bold">Falha de Conexão</h3>
+                        <p>Não foi possível carregar a agenda. Verifique sua conexão ou a URL do Google Script.</p>
+                    </div>
+                `;
             } finally {
                 // Esconde o loader independente de sucesso ou erro
                 if(loader) loader.classList.add('hidden-loader');
@@ -1960,7 +1979,9 @@
             initializeFirebaseAndAuth(); 
             loadStaticData(); 
             window.renderToysList(); 
-            fetchAgendamentosReais(); // CHAMA A LEITURA DA PLANILHA
+
+            // Chama o fetch de agendamentos reais (sempre deve ser chamado)
+            fetchAgendamentosReais();
 
             // Adiciona Máscara de Telefone
             const phoneInput = document.getElementById('client-whatsapp');
