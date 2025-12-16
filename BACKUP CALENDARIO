@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -143,6 +142,9 @@
             background-position: 0 0, 10px 10px;
             opacity: 0.1;
         }
+        
+        /* LOADER DO CALENDÁRIO */
+        .hidden-loader { opacity: 0 !important; pointer-events: none !important; }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -454,6 +456,16 @@
     <main class="flex-grow w-full pt-24 pb-28 md:pb-12 bg-white md:bg-gray-50 flex flex-col items-center justify-start">
         <!-- WRAPPER DO CALENDÁRIO COM ID PARA EVENTOS -->
         <div id="calendar-wrapper" class="w-full max-w-5xl bg-white p-4 md:p-8 md:mt-6 md:rounded-2xl md:shadow-xl border-b md:border-none border-gray-100 calendar-transition relative overflow-hidden">
+            
+            <!-- LOADER BONITO PARA O CALENDÁRIO -->
+            <div id="calendar-loader" class="absolute inset-0 z-50 bg-white/90 backdrop-blur-[2px] flex flex-col items-center justify-center transition-opacity duration-500">
+                <div class="relative w-16 h-16 mb-4">
+                     <div class="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+                     <div class="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+                </div>
+                <p class="text-blue-600 font-bold brand-font text-lg animate-pulse">Verificando agenda...</p>
+            </div>
+
             <h2 class="text-2xl md:text-3xl font-extrabold brand-font text-blue-600 mb-6 text-center leading-tight">Para a data <span id="display-date-main">...</span></h2>
             <div class="flex justify-between items-center mb-6 px-2">
                 <button id="prev-month" class="nav-btn p-2 rounded-full text-blue-600 hover:bg-blue-50 active:bg-blue-100 disabled:opacity-30"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
@@ -1512,6 +1524,10 @@
         
         // FUNÇÃO FETCH AGENDAMENTOS (AUTOMÁTICA)
         async function fetchAgendamentosReais() {
+            const loader = document.getElementById('calendar-loader');
+            // Garante que o loader está visível ao começar
+            if(loader) loader.classList.remove('hidden-loader');
+            
             try {
                 // MESMA URL USADA NO POST
                 const scriptURL = 'https://script.google.com/macros/s/AKfycbwFmJVOboEhJ54_RHz_FjTMKiXnXnsnoU65_KYBSbgOapk4YbxQRLIOh2nwzdpWNcRV/exec';
@@ -1599,6 +1615,9 @@
             } catch (e) {
                 console.error("Erro ao carregar agendamentos:", e);
                 // Fallback para dados estáticos se falhar (opcional, já carregou no onload)
+            } finally {
+                // Esconde o loader independente de sucesso ou erro
+                if(loader) loader.classList.add('hidden-loader');
             }
         }
 
@@ -1824,4 +1843,4 @@
         });
     </script>
 </body>
-</html>V
+</html>
