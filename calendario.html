@@ -122,7 +122,6 @@
                     <span class="text-xl">🚀</span>
                     <h4 class="font-extrabold text-blue-800 text-lg brand-font leading-none">Novidade!</h4>
                 </div>
-                <!-- Botão de fechar removido para forçar o clique no botão amarelo conforme pedido 'apenas se clicar no botão' -->
             </div>
             
             <p id="tour-text" class="text-sm text-gray-600 mb-4 leading-relaxed relative z-10 font-medium">Confira se sua reserva está tudo certo! Consulte a <span class="text-blue-600 font-bold">Agenda da Galera</span> para confirmar se sua locação já está registrada.</p>
@@ -195,7 +194,7 @@
                         <p class="text-sm font-medium text-gray-800 truncate">William Henrique Freitas Pereira</p>
                     </div>
                 </div>
-                <button onclick="finalizeAndOpenWhatsApp()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transform transition active:scale-95">Já fiz o PIX, finalizar!</button>
+                <button onclick="finalizeAndReload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transform transition active:scale-95">Já fiz o PIX, finalizar!</button>
                 <p class="text-xs text-center text-gray-400 mt-4">A confirmação chegará no seu WhatsApp.</p>
             </div>
         </div>
@@ -359,6 +358,10 @@
         window.initTour = function(customText = null) {
             // Se já viu e não é uma chamada forçada (customText), ignora
             if (!customText && localStorage.getItem('encanto_tour_seen') === 'true') return;
+
+            // Se for o tour inicial, marca como visto IMEDIATAMENTE.
+            // Isso garante que "só aparece uma vez na vida", mesmo se fechar o navegador sem interagir.
+            if (!customText) localStorage.setItem('encanto_tour_seen', 'true');
 
             const tooltip = document.getElementById('tour-tooltip');
             const arrow = document.getElementById('tour-arrow');
@@ -1037,17 +1040,14 @@
             });
         }
         
-        window.finalizeAndOpenWhatsApp = function() {
-            const whatsappNumber = "5547992277324"; 
-            const message = "Reservei pelo site, pode confirmar?";
-            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
+        // MUDANÇA: Renomeado e comportamento alterado
+        window.finalizeAndReload = function() {
+            // Fecha modal
             closeSuccessModal();
-            
-            // Reabre o tour com mensagem personalizada
-            setTimeout(() => {
-                window.initTour('Verifique seus dados! Clique aqui para confirmar que sua reserva já aparece no sistema.');
-            }, 800);
+            // Marca flag para o reload saber que deve exibir o tour pós-reserva
+            localStorage.setItem('encanto_post_booking_tour', 'true');
+            // Recarrega a página para atualizar dados do calendário
+            location.reload();
         }
         
         async function fetchAgendamentosReais() {
@@ -1121,8 +1121,13 @@
                 renderCalendar();
                 if (isPanelOpen) window.renderToysList();
                 
-                // INICIA O TOUR APÓS O CALENDÁRIO
-                window.initTour();
+                // MUDANÇA: Lógica de exibição do tour pós-reserva ou tour normal
+                if (localStorage.getItem('encanto_post_booking_tour') === 'true') {
+                    localStorage.removeItem('encanto_post_booking_tour');
+                    window.initTour('Verifique seus dados! Clique aqui para confirmar que sua reserva já aparece no sistema.');
+                } else {
+                    window.initTour();
+                }
                 
             } catch (e) {
                 console.error("Erro ao carregar agendamentos:", e);
@@ -1208,7 +1213,7 @@
             loadStaticData(); 
             window.renderToysList(); 
             fetchAgendamentosReais(); 
-            // window.initTour(); // REMOVIDO PARA EVITAR DUPLICIDADE COM fetchAgendamentosReais
+            // window.initTour(); // REMOVIDO
             const phoneInput = document.getElementById('client-whatsapp');
             if(phoneInput) {
                 phoneInput.addEventListener('input', function (e) {
