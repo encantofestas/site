@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -48,7 +47,6 @@
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col bg-gray-50">
 
-    <!-- HEADER (Fixo em todas as páginas) - z-50 -->
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
@@ -68,7 +66,6 @@
         </div>
     </header>
 
-    <!-- NOTIFICAÇÕES (Lateral) -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
     <div id="notification-panel">
         <div class="h-full flex flex-col">
@@ -78,7 +75,6 @@
         </div>
     </div>
 
-    <!-- TELA DE CARREGAMENTO (SPLASH) - Z-40 -->
     <div id="loadingScreen" class="fixed inset-0 z-40 bg-white flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="relative mb-4">
             <svg class="animate-spin h-12 w-12 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-10" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -86,10 +82,8 @@
         <div class="text-blue-600 font-medium text-sm animate-pulse tracking-widest uppercase">Carregando...</div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL (Login e Perfil) -->
     <main class="flex-grow w-full pt-16 pb-28 md:pb-12 flex flex-col items-center relative z-0">
         
-        <!-- VISÃO DE LOGIN -->
         <section id="authView" class="hidden w-full max-w-md mx-auto px-4 fade-in min-h-[80vh] flex-col justify-center">
             <div class="text-center mb-8 mt-4">
                 <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight brand-font">Acesse sua Conta</h1>
@@ -143,28 +137,22 @@
             </div>
         </section>
 
-        <!-- VISÃO DE PERFIL (CLUBE DE VANTAGENS) -->
         <section id="profileView" class="hidden w-full max-w-lg mx-auto px-0 fade-in flex-col items-center">
             
-            <!-- Botões Topo -->
             <button onclick="openLogoutModal()" class="absolute top-4 left-4 z-30 bg-white/30 backdrop-blur-md p-2 rounded-full text-white hover:bg-white hover:text-red-600 transition shadow-lg border border-white/40 group"><svg class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
             <button onclick="openRewardsModal()" class="absolute top-4 right-4 z-30 bg-white/30 backdrop-blur-md p-2.5 rounded-full text-white hover:bg-white hover:text-indigo-600 transition shadow-lg border border-white/40 animate-pulse hover:animate-none group"><svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg><span id="rewardsNotificationBadge" class="absolute -top-0.5 -right-0.5 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span></button>
 
-            <!-- Banner Fundo (Design Festivo com Confetes Detalhados) -->
             <div class="h-44 w-full relative shrink-0 overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700">
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 
-                <!-- Luzes de Fundo -->
                 <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
                 <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl transform translate-x-10 -translate-y-10"></div>
                 
-                <!-- Serpentinas (SVG de fundo) -->
                 <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 400 150" preserveAspectRatio="none">
                     <path d="M0,20 Q50,80 100,20 T200,20" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5"/>
                     <path d="M200,100 Q250,50 300,100 T400,80" fill="none" stroke="#FCD34D" stroke-width="2"/>
                 </svg>
 
-                <!-- Confetes Coloridos (Formas CSS) -->
                 <div class="absolute top-6 left-[10%] w-2 h-2 bg-yellow-300 rounded-full opacity-80 animate-bounce" style="animation-duration: 3s;"></div>
                 <div class="absolute top-10 left-[15%] w-1.5 h-3 bg-pink-300 rotate-45 opacity-70 confetti-float"></div>
                 <div class="absolute top-4 right-[20%] w-2.5 h-2.5 bg-blue-300 rounded-sm rotate-12 opacity-80 confetti-float" style="animation-delay: 1s;"></div>
@@ -174,7 +162,6 @@
                 <div class="absolute top-2 left-[50%] w-1.5 h-1.5 bg-white/60 rounded-full blur-[1px]"></div>
             </div>
 
-            <!-- Avatar e Info -->
             <div class="relative z-10 flex flex-col items-center -mt-16 w-full px-4">
                 <div class="relative group cursor-pointer pointer-events-auto mb-3" onclick="openModal()">
                     <div class="w-32 h-32 rounded-full p-[3px] bg-white shadow-2xl relative z-10">
@@ -198,11 +185,9 @@
                     </button>
                 </div>
                 
-                <!-- Gamificação (Card Elevado) -->
                 <div class="w-full bg-white rounded-2xl p-5 shadow-lg shadow-blue-900/5 border border-gray-100 mb-6 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-yellow-100 to-transparent rounded-bl-full opacity-50"></div>
                     
-                    <!-- Ícone Sincronizar (Condicional) -->
                     <button id="syncDataBtn" onclick="openSyncInfoModal()" class="hidden absolute top-3 right-3 p-1.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition animate-pulse z-10" title="Atualizar Cadastro"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>
 
                     <div class="flex justify-between items-end mb-2 px-1 relative z-10">
@@ -232,7 +217,6 @@
                     </div>
                 </div>
 
-                <!-- Histórico -->
                 <div class="w-full mb-4">
                     <div class="flex justify-between items-center mb-4 px-1">
                         <h3 class="text-lg font-bold brand-font text-gray-800 flex items-center gap-2">
@@ -253,7 +237,6 @@
         </section>
     </main>
 
-    <!-- BOTTOM NAVIGATION BAR (Mantida) -->
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
             <a href="index.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition group cursor-pointer"><svg class="w-6 h-6 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-[10px] font-medium">Início</span></a>
@@ -264,7 +247,6 @@
         </div>
     </nav>
 
-    <!-- MODAIS E COMPONENTES AUXILIARES -->
     <div id="logoutModal" class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-xs modal-enter text-center"><div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></div><h3 class="text-xl font-bold text-gray-800 mb-2">Sair da Conta</h3><p class="text-sm text-gray-500 mb-6">Tem certeza que deseja sair do aplicativo?</p><div class="flex gap-3"><button onclick="closeLogoutModal()" class="flex-1 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition">Cancelar</button><button onclick="confirmLogout()" class="flex-1 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition shadow-lg shadow-red-200">Sair</button></div></div></div>
     
     <div id="dialogModal" class="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-xs modal-enter text-center relative overflow-hidden"><div id="dialogIconContainer" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors"></div><h3 id="dialogTitle" class="text-xl font-bold text-gray-800 mb-2">Titulo</h3><p id="dialogMessage" class="text-sm text-gray-500 mb-6">Mensagem</p><div id="dialogButtons" class="flex gap-3 justify-center"></div></div></div>
@@ -275,7 +257,6 @@
     
     <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity"><div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md modal-enter relative overflow-hidden"><div class="text-center mb-6"><h2 class="text-xl font-bold text-gray-800">Alterar Foto</h2><p class="text-sm text-gray-500">Escolha um avatar ou envie sua foto</p></div><div class="flex justify-center mb-8"><div class="relative w-48 h-48 rounded-full p-1 border-2 border-dashed border-blue-200 hover:border-blue-400 cursor-pointer group" onclick="document.getElementById('photoUploadInput').click()"><div id="modalAvatarLoader" class="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/20 hidden"><svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div><img id="modalAvatarImage" src="" class="w-full h-full rounded-full object-cover bg-gray-50"><div class="absolute inset-0 rounded-full flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold uppercase"><span>Enviar Foto</span></div></div></div><div class="grid grid-cols-2 gap-3 mb-6"><button onclick="generateMale()" class="gender-button py-3 rounded-xl bg-blue-50 text-blue-700 text-sm font-bold shadow-sm hover:bg-blue-100 transition-colors" data-type="male">Masculino</button><button onclick="generateFemale()" class="gender-button py-3 rounded-xl bg-pink-50 text-pink-700 text-sm font-bold shadow-sm hover:bg-pink-100 transition-colors" data-type="female">Feminino</button></div><div class="flex justify-end border-t pt-4"><button onclick="saveAvatarAndClose()" class="px-6 py-2 bg-gray-800 text-white rounded-xl font-medium">Concluir</button></div></div></div>
     
-    <!-- MODAL EDITAR PERFIL (Botões Fixos) -->
     <div id="profileEditModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md modal-enter max-h-[90vh] flex flex-col overflow-hidden">
             <div class="flex justify-between items-center p-5 border-b border-gray-100 shrink-0 bg-white z-10"><h2 class="text-lg font-bold text-gray-800">Editar Perfil</h2><button onclick="closeProfileEditModal()" class="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
@@ -288,7 +269,6 @@
 
     <input type="file" id="photoUploadInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
 
-    <!-- SCRIPTS UI -->
     <script>
         // Dialog UI
         let currentDialogCallback = null;
@@ -375,11 +355,10 @@
         window.switchAuthTab = switchAuthTab; window.forceTwoWords = forceTwoWords; window.formatPhone = formatPhone; window.toggleHouseNumber = toggleHouseNumber; window.togglePassword = togglePassword; window.openLogoutModal = openLogoutModal; window.closeLogoutModal = closeLogoutModal; window.toggleModal = toggleModal; window.closeCropper = closeCropper; window.closeRewardsModal = closeRewardsModal; window.closeFilterModal = closeFilterModal; window.closeProfileEditModal = closeProfileEditModal; window.openAddHistoryModal = openAddHistoryModal; window.closeAddHistoryModal = closeAddHistoryModal;
     </script>
 
-    <!-- FIREBASE & LÓGICA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot, increment, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot, increment, collection, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBmwK8KwklpVfPEalJfOfjCB6OSFsidz6Q", authDomain: "encanto-festas-8c123.firebaseapp.com", projectId: "encanto-festas-8c123", storageBucket: "encanto-festas-8c123.firebasestorage.app", messagingSenderId: "371905779100", appId: "1:371905779100:web:48e5d1ba0820547177a459", measurementId: "G-WD1MC40GL4" };
 
@@ -395,16 +374,37 @@
                 onSnapshot(doc(db, "users", user.uid), async (docSnap) => {
                     if (docSnap.exists()) {
                         userData = docSnap.data();
-                        // Garantir campos
-                        if (!userData.history || userData.history.length === 0) { const emptySlots = Array.from({length: 20}, () => ({ date: "", neighborhood: "", value: 0, discount: 0 })); await updateDoc(doc(db, "users", user.uid), { history: emptySlots }); }
-                        if (!userData.stats || userData.stats.parties === undefined) { await setDoc(doc(db, "users", user.uid), { stats: { parties: 0, points: userData.stats?.points || 0, balance: userData.stats?.balance || 0.00 } }, { merge: true }); }
+                        
+                        // ----------------------------------------------------
+                        // ÁREA CORRIGIDA (Proteção contra reset de dados)
+                        // ----------------------------------------------------
+                        
+                        // Garante que o array de histórico exista, mas sem resetar se já existir
+                        if (!userData.history) { 
+                             const emptySlots = Array.from({length: 20}, () => ({ date: "", neighborhood: "", value: 0, discount: 0 })); 
+                             await updateDoc(doc(db, "users", user.uid), { history: emptySlots }); 
+                        }
+
+                        // Garante que o objeto stats exista SE NÃO EXISTIR, usando updateDoc seguro
+                        if (!userData.stats) { 
+                            await updateDoc(doc(db, "users", user.uid), { 
+                                "stats.parties": 0,
+                                "stats.points": 0, 
+                                "stats.balance": 0.00 
+                            }); 
+                        }
+                        
+                        // ----------------------------------------------------
+                        
                         window.userData = userData; 
                         loading.classList.add('opacity-0', 'pointer-events-none');
                         authView.classList.add('hidden');
                         profile.classList.remove('hidden');
                         profile.classList.add('flex');
                         initUI(); 
-                    } else { await createDefaultUserDoc(user); }
+                    } else { 
+                        await createDefaultUserDoc(user); 
+                    }
                 });
             } else {
                 currentUser = null; window.userData = null;
@@ -456,13 +456,41 @@
             }
         };
 
+        // -----------------------------------------------------------
+        // FUNÇÃO DE CRIAÇÃO SEGURA (CORRIGIDA)
+        // -----------------------------------------------------------
         async function createDefaultUserDoc(user, nameOverride = "") {
             try {
+                const userRef = doc(db, "users", user.uid);
+                
+                // TRAVA DE SEGURANÇA: Verifica se existe ANTES de escrever
+                const docSnap = await getDoc(userRef);
+                
+                if (docSnap.exists()) {
+                    console.log("Usuário já existe. Ignorando recriação para proteger dados.");
+                    return; 
+                }
+
+                // Só define dados zerados se for REALMENTE novo
                 const emptyHistory = Array.from({length: 20}, () => ({ date: "", neighborhood: "", value: 0, discount: 0 }));
-                const initialData = { name: nameOverride || user.displayName || "Novo Usuário", email: user.email, phone: "", avatar: "", address: { neighborhood: "", street: "", number: "" }, stats: { parties: 0, points: 0, balance: 0.00 }, history: emptyHistory };
-                await setDoc(doc(db, "users", user.uid), initialData, { merge: true });
-            } catch (error) { console.error("Erro criar doc:", error); }
+                
+                const initialData = { 
+                    name: nameOverride || user.displayName || "Novo Usuário", 
+                    email: user.email, 
+                    phone: "", 
+                    avatar: "", 
+                    address: { neighborhood: "", street: "", number: "" }, 
+                    stats: { parties: 0, points: 0, balance: 0.00 }, 
+                    history: emptyHistory 
+                };
+                
+                await setDoc(userRef, initialData);
+                console.log("Perfil criado com sucesso.");
+            } catch (error) { 
+                console.error("Erro criar doc:", error); 
+            }
         }
+        // -----------------------------------------------------------
 
         window.handleForgotPassword = async () => {
             const email = document.getElementById('loginEmail').value;
@@ -576,9 +604,6 @@
         async function fetchNotifications() { try { const response = await fetch('notificacoes.json'); if (response.ok) { notificationsData = (await response.json()).map(item => ({ ...item, id: String(item.id) })); renderNotificationsPanel(); } } catch (error) { console.error("Erro notifications:", error); } }
         
         document.addEventListener('DOMContentLoaded', () => { fetchNotifications(); });
-        // Sync notifications with Auth
-        // Note: Auth state change already handles initUI and potentially notifications if we add listener there
-        // For simplicity, notifications load independently but mark-as-read syncs if user is logged in.
     </script>
 </body>
 </html>
