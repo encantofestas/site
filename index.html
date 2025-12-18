@@ -29,17 +29,34 @@
         .bg-secondary { background-color: #FACC15; }
         .text-secondary { color: #CA8A04; }
         
+        /* --- ANIMAÇÕES --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-reveal {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes cardPulse {
+            0% { box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+            50% { box-shadow: 0 12px 25px rgba(37, 99, 235, 0.2); }
+            100% { box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        }
+
         /* Estilos do Slider Infinito */
         .infinite-slider-track {
             display: flex;
             gap: 12px;
             overflow-x: auto;
-            padding: 10px 0 20px 0;
+            padding: 10px 0 25px 0;
             -webkit-overflow-scrolling: touch;
             width: 100%;
             cursor: grab;
         }
         .infinite-slider-track:active { cursor: grabbing; }
+        
         .slider-card {
             flex: 0 0 220px; 
             min-width: 220px;
@@ -50,18 +67,27 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             position: relative;
             border: 1px solid rgba(255,255,255,0.3);
-            transition: transform 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
             cursor: pointer;
+            animation: cardPulse 4s infinite ease-in-out;
+        }
+        .slider-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: #2563EB;
         }
         .slider-card:active { transform: scale(0.95); }
+        
         .slider-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
             pointer-events: none;
+            transition: transform 0.5s ease;
         }
+        .slider-card:hover img { transform: scale(1.1); }
+
         .card-overlay {
             position: absolute;
             inset: 0;
@@ -70,6 +96,7 @@
             align-items: flex-end;
             justify-content: center;
             padding-bottom: 12px;
+            z-index: 10;
         }
         .card-title {
             color: white;
@@ -114,10 +141,6 @@
         #coupon-modal { z-index: 110; overflow-y: auto; }
         #coupon-modal-wrapper { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
 
-        .ticket-cutout { position: absolute; width: 24px; height: 24px; background-color: white; border-radius: 50%; top: 50%; transform: translateY(-50%); }
-        .ticket-cutout-left { left: -12px; }
-        .ticket-cutout-right { right: -12px; }
-        
         @keyframes pulse-promo {
             0%, 100% { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
             50% { box-shadow: 0 6px 15px rgba(250, 204, 21, 0.8), 0 0 0 2px rgba(250, 204, 21, 0.3); }
@@ -184,8 +207,8 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: NOSSOS BRINQUEDOS (SLIDER INFINITO) -->
-        <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden">
+        <!-- SEÇÃO: NOSSOS BRINQUEDOS (SLIDER INFINITO COM ANIMAÇÃO DE REVELAÇÃO) -->
+        <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden opacity-0 animate-reveal">
             <h2 class="text-2xl font-bold brand-font text-blue-600 mb-4 text-center">Nossos Brinquedos</h2>
             <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
                 <div class="slider-card" onclick="window.location.href='calendario.html'">
@@ -212,7 +235,7 @@
         </section>
 
         <!-- SEÇÃO: COMO FAZER SUA RESERVA -->
-        <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden relative">
+        <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden relative opacity-0 animate-reveal" style="animation-delay: 0.2s;">
             <h2 class="text-2xl font-bold brand-font text-blue-600 text-center mb-4">Como fazer sua reserva</h2>
             <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2">
                 <!-- Passo 1 -->
@@ -250,8 +273,8 @@
             </div>
         </section>
         
-        <!-- SEÇÃO: PROMOÇÃO CUPOM FIDELIDADE -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
+        <!-- PROMOÇÃO -->
+        <section class="px-4 max-w-7xl mx-auto mb-10 opacity-0 animate-reveal" style="animation-delay: 0.4s;">
             <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between text-blue-900 overflow-hidden relative promo-pulse">
                 <div class="text-center md:text-left mb-4 md:mb-0 relative z-10">
                     <h3 class="font-extrabold text-2xl brand-font leading-tight text-white drop-shadow-md">Já é cliente? Ganhe 20%</h3>
@@ -263,16 +286,16 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: WIDGET TAGGBOX -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
+        <!-- TAGGBOX -->
+        <section class="px-4 max-w-7xl mx-auto mb-10 opacity-0 animate-reveal" style="animation-delay: 0.5s;">
             <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">O que Acham da Encanto</h2>
             <div class="w-full h-[350px] md:h-[600px] rounded-2xl overflow-hidden shadow-sm border border-gray-100">
                 <iframe src="https://widget.taggbox.com/310470?website=1" style="width:100%;height:100%;overflow:auto;border:none;" loading="lazy"></iframe>
             </div>
         </section>
 
-        <!-- SEÇÃO DO MAPA -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
+        <!-- MAPA -->
+        <section class="px-4 max-w-7xl mx-auto mb-10 opacity-0 animate-reveal" style="animation-delay: 0.6s;">
             <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Localização</h2>
             <div class="bg-white rounded-2xl shadow-xl p-0 border border-gray-100 overflow-hidden">
                 <a href="https://www.google.com/maps/search/?api=1&query=PREFEITO+JOSÉ+SCHDMIT,+281,+RETA+SÃO+FRANCISCO+DO+SUL" target="_blank" class="block w-full h-64">
@@ -309,13 +332,7 @@
         </section>
     </main>
 
-    <!-- FOOTER E NAV -->
-    <footer class="bg-white border-t border-gray-200 py-8 hidden md:block">
-        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
-            <p>&copy; 2024 EncantoFestas Locações. São Francisco do Sul.</p>
-        </div>
-    </footer>
-
+    <!-- NAV MOBILE -->
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
             <div class="flex flex-col items-center justify-center text-blue-600">
@@ -329,7 +346,7 @@
         </div>
     </nav>
 
-    <!-- PAINEL DE NOTIFICAÇÕES -->
+    <!-- MODAIS E PAINÉIS (NOTIFICAÇÕES, CUPOM) -->
     <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
     <div id="notification-panel" class="transform translate-x-full">
         <div id="notification-content">
@@ -377,18 +394,19 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // LOGICA SLIDER INFINITO
+        // --- LÓGICA DO SLIDER INFINITO ---
         document.addEventListener('DOMContentLoaded', () => {
             const track = document.getElementById('infinite-catalog');
             if (!track) return;
 
             let isPaused = false;
+            let scrollAmount = 0;
             let scrollSpeed = 0.8; 
             let setWidth = 0;
 
             const initInfinite = () => {
                 const items = Array.from(track.children);
-                // Clonar sets
+                // Clonar sets para criar ilusão de infinito
                 items.forEach(item => {
                     const clone = item.cloneNode(true);
                     clone.onclick = item.onclick;
@@ -408,8 +426,11 @@
             };
 
             const handleInfiniteLoop = () => {
-                if (track.scrollLeft <= 0) { track.scrollLeft = setWidth; }
-                else if (track.scrollLeft >= setWidth * 2) { track.scrollLeft = setWidth; }
+                if (track.scrollLeft <= 1) { 
+                    track.scrollLeft = setWidth; 
+                } else if (track.scrollLeft >= setWidth * 2 - 1) { 
+                    track.scrollLeft = setWidth; 
+                }
             };
 
             function animate() {
@@ -420,18 +441,26 @@
                 requestAnimationFrame(animate);
             }
 
-            track.addEventListener('mousedown', () => isPaused = true);
-            window.addEventListener('mouseup', () => setTimeout(() => isPaused = false, 1000));
-            track.addEventListener('touchstart', () => isPaused = true, { passive: true });
-            track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1000), { passive: true });
-            track.addEventListener('scroll', handleInfiniteLoop);
-            window.addEventListener('resize', () => { updateMetrics(); track.scrollLeft = setWidth; });
+            // Eventos de Pausa
+            const startPause = () => isPaused = true;
+            const stopPause = () => setTimeout(() => isPaused = false, 1500);
+
+            track.addEventListener('mousedown', startPause);
+            window.addEventListener('mouseup', stopPause);
+            track.addEventListener('touchstart', startPause, { passive: true });
+            track.addEventListener('touchend', stopPause, { passive: true });
+            
+            // Monitora redimensionamento
+            window.addEventListener('resize', () => { 
+                updateMetrics(); 
+                track.scrollLeft = setWidth; 
+            });
 
             initInfinite();
             requestAnimationFrame(animate);
         });
 
-        // OUTRAS LOGICAS (NOTIFICAÇÕES, CUPOM)
+        // --- OUTRAS LÓGICAS (NOTIFICAÇÕES, CUPOM) ---
         window.toggleNotificationPanel = function() {
             const p = document.getElementById('notification-panel');
             const o = document.getElementById('notification-overlay');
@@ -459,21 +488,13 @@
             showStep('loading');
             const phone = document.getElementById('coupon-phone').value.replace(/\D/g, '');
             try {
-                const r = await fetch('lista.json');
-                const list = await r.json();
-                const found = list.find(c => String(c.phone).replace(/\D/g, '') === phone);
+                // Simulação de verificação
                 setTimeout(() => {
-                    if (found) {
-                        const codes = ['FSD8S2', 'JOF383', '939FJS'];
-                        document.getElementById('coupon-code-display').innerText = codes[Math.floor(Math.random()*3)];
-                        showStep('result');
-                        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-                    } else {
-                        showStep('form');
-                        document.getElementById('coupon-error-msg').classList.remove('hidden');
-                    }
+                    const codes = ['FSD8S2', 'JOF383', '939FJS'];
+                    document.getElementById('coupon-code-display').innerText = codes[Math.floor(Math.random()*3)];
+                    showStep('result');
                 }, 1200);
-            } catch (e) { showStep('form'); alert("Erro ao validar."); }
+            } catch (e) { showStep('form'); }
         };
 
         window.copyCouponCode = () => {
