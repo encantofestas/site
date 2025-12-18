@@ -24,31 +24,34 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* CONTAINER DO SLIDER */
+        /* CONTAINER DO SLIDER - Removido o Scroll Snap para permitir movimento fluido */
         .infinite-slider-track {
             display: flex;
             gap: 16px;
             overflow-x: auto;
-            padding: 20px;
+            padding: 40px 20px;
             -webkit-overflow-scrolling: touch;
-            scroll-snap-type: x mandatory;
             width: 100vw;
+            cursor: grab;
+        }
+
+        .infinite-slider-track:active {
+            cursor: grabbing;
         }
 
         /* CARTÃO DO BRINQUEDO - PROPORÇÃO AJUSTADA */
         .slider-card {
-            flex: 0 0 280px; 
-            min-width: 280px;
-            height: 180px; /* Aumentado para ser menos horizontal */
+            flex: 0 0 300px; 
+            min-width: 300px;
+            height: 220px; /* Proporção menos horizontal, mais imersiva */
             background: white;
-            border-radius: 1.5rem;
+            border-radius: 2rem;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
             position: relative;
-            border: 1px solid #f1f5f9;
-            scroll-snap-align: center;
-            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.3);
             transition: transform 0.3s ease;
+            user-select: none;
         }
 
         .slider-card img {
@@ -56,34 +59,34 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            background-color: #e2e8f0;
+            pointer-events: none; /* Impede que o arrasto da imagem interfira no scroll */
         }
 
         /* RESPONSIVIDADE PARA DESKTOP */
         @media (min-width: 768px) {
             .slider-card { 
-                flex: 0 0 400px; 
-                min-width: 400px; 
-                height: 260px; 
+                flex: 0 0 450px; 
+                min-width: 450px; 
+                height: 320px; 
             }
         }
 
-        /* TEXTO SOBRE A IMAGEM */
         .card-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            padding-bottom: 16px;
+            padding-bottom: 24px;
         }
 
         .card-title {
             color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -93,83 +96,75 @@
         <!-- Card 1 -->
         <div class="slider-card">
             <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" alt="Mini Baby">
-            <div class="card-overlay">
-                <span class="card-title brand-font">Mini Baby Inflável</span>
-            </div>
+            <div class="card-overlay"><span class="card-title brand-font">Mini Baby Inflável</span></div>
         </div>
         <!-- Card 2 -->
         <div class="slider-card">
             <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" alt="Air Hockey">
-            <div class="card-overlay">
-                <span class="card-title brand-font">Air Hockey (Aero)</span>
-            </div>
+            <div class="card-overlay"><span class="card-title brand-font">Air Hockey (Aero)</span></div>
         </div>
         <!-- Card 3 -->
         <div class="slider-card">
             <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" alt="Cama Elástica">
-            <div class="card-overlay">
-                <span class="card-title brand-font">Cama Elástica P</span>
-            </div>
+            <div class="card-overlay"><span class="card-title brand-font">Cama Elástica P</span></div>
         </div>
         <!-- Card 4 -->
         <div class="slider-card">
             <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" alt="Piscina">
-            <div class="card-overlay">
-                <span class="card-title brand-font">Piscina de Bolinhas</span>
-            </div>
+            <div class="card-overlay"><span class="card-title brand-font">Piscina de Bolinhas</span></div>
         </div>
         <!-- Card 5 -->
         <div class="slider-card">
             <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelobol.webp" alt="Castelo">
-            <div class="card-overlay">
-                <span class="card-title brand-font">Castelo com Bolinhas</span>
-            </div>
+            <div class="card-overlay"><span class="card-title brand-font">Castelo Inflável</span></div>
         </div>
     </div>
 
     <script>
-        window.onload = function() {
+        document.addEventListener('DOMContentLoaded', () => {
             const track = document.getElementById('infinite-catalog');
             let isPaused = false;
-            let scrollSpeed = 0.8; // Velocidade do movimento
+            let scrollSpeed = 1.2; // Velocidade ligeiramente aumentada para melhor fluidez
 
-            // Clona os itens para criar o loop infinito real
-            const items = Array.from(track.children);
-            items.forEach(item => track.appendChild(item.cloneNode(true)));
-            items.forEach(item => track.appendChild(item.cloneNode(true)));
+            // Multiplica os itens para garantir que o scroll nunca acabe
+            const cloneSet = () => {
+                const items = Array.from(track.children);
+                items.forEach(item => track.appendChild(item.cloneNode(true)));
+            };
+            
+            cloneSet(); // 10 itens
+            cloneSet(); // 20 itens - Seguro para qualquer ecrã
 
-            function autoScroll() {
-                if(!isPaused) {
+            function step() {
+                if (!isPaused) {
                     track.scrollLeft += scrollSpeed;
                     
-                    // Reseta para o início do loop sem o usuário perceber
-                    if (track.scrollLeft >= (track.scrollWidth / 3) * 2) {
-                        track.scrollLeft = track.scrollWidth / 3;
+                    // Se chegar a meio do conteúdo total, reseta suavemente
+                    if (track.scrollLeft >= track.scrollWidth / 2) {
+                        track.scrollLeft = 0;
                     }
                 }
-                requestAnimationFrame(autoScroll);
+                requestAnimationFrame(step);
             }
 
-            // CONTROLES DE TOQUE / MOUSE
-            // Pausa apenas quando o usuário toca ou clica no slider
-            track.addEventListener('touchstart', () => { isPaused = true; }, {passive: true});
-            track.addEventListener('mousedown', () => { isPaused = true; });
+            // CONTROLO DE INTERAÇÃO
+            const pause = () => { isPaused = true; };
+            const resume = () => { 
+                // Pequeno delay para não dar um salto após soltar
+                setTimeout(() => { isPaused = false; }, 1500); 
+            };
 
-            // Retoma a reprodução após soltar (com um pequeno delay para suavidade)
-            track.addEventListener('touchend', () => { 
-                setTimeout(() => { isPaused = false; }, 1000); 
-            }, {passive: true});
+            // Eventos de Rato
+            track.addEventListener('mousedown', pause);
+            window.addEventListener('mouseup', resume);
             
-            track.addEventListener('mouseup', () => { 
-                setTimeout(() => { isPaused = false; }, 1000); 
-            });
+            // Eventos de Toque (Telemóvel)
+            track.addEventListener('touchstart', pause, { passive: true });
+            track.addEventListener('touchend', resume, { passive: true });
 
-            // Fallback se o mouse sair da área
-            track.addEventListener('mouseleave', () => { isPaused = false; });
-
-            // Inicia a animação imediatamente
-            autoScroll();
-        };
+            // Garante que o scroll automático começa
+            requestAnimationFrame(step);
+        });
     </script>
 </body>
 </html>
