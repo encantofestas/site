@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         /* =========================================================================================
-           AVISO PARA IA: NÃO ALTERAR NADA QUE NÃO FOI PEDIDO, APENAS O QE FOI ORDENADO, MEMSO QUE PARECÇA QUE FIQUE MELHOR
+           AVISO PARA IA: NÃO ALTERAR NADA QUE NÃO FOI PEDIDO, APENAS O QUE FOI ORDENADO
            ========================================================================================= */
         
         html, body {
@@ -105,6 +105,27 @@
             fill: white; 
             letter-spacing: 0.1px; 
         }
+
+        /* --- COUNTDOWN STYLES --- */
+        .countdown-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-family: 'Baloo 2', cursive;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: white;
+        }
+        .promo-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            box-shadow: 0 10px 30px -10px rgba(30, 58, 138, 0.4);
+        }
     </style>
 </head>
 <body class="text-gray-700 flex flex-col min-h-screen bg-slate-50">
@@ -174,8 +195,8 @@
             </div>
         </section>
 
-        <!-- CATÁLOGO (Título Removido) -->
-        <section class="mt-10 pb-20">
+        <!-- CATÁLOGO -->
+        <section class="mt-10 pb-4">
             <div class="infinite-slider-container">
                 <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
                     <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp"><div class="card-overlay"><span class="card-title brand-font">Mini Baby Inflável</span></div></div>
@@ -194,6 +215,59 @@
                 </div>
             </div>
         </section>
+
+        <!-- CONTAGEM REGRESSIVA (DESIGN SLIM COM VALORES APRIMORADOS) -->
+        <section class="px-5 mb-10">
+            <div class="promo-card rounded-[2rem] p-5 relative overflow-hidden flex flex-col md:flex-row items-center gap-5">
+                <!-- Imagem Compacta -->
+                <div class="w-24 h-24 flex-shrink-0 relative">
+                    <div class="w-full h-full rounded-2xl overflow-hidden border-2 border-white/20">
+                        <img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp" alt="Futebol de Sabão" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <div class="flex-grow text-center md:text-left">
+                    <h2 class="text-xl font-black brand-font text-white leading-tight uppercase tracking-tight mb-1">Futebol de Sabão</h2>
+                    
+                    <!-- Preços Estilizados Aprimorados -->
+                    <div class="flex flex-col md:flex-row items-center md:items-end gap-1 md:gap-3 mb-4">
+                        <div class="flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full border border-white/5">
+                            <span class="text-white/40 text-[9px] font-bold uppercase tracking-wider">De</span>
+                            <span class="text-blue-200/60 line-through text-sm font-medium italic">R$ 450,00</span>
+                        </div>
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-yellow-400 font-black text-3xl tracking-tighter drop-shadow-md">R$ 360,00</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Cronômetro Slim -->
+                    <div class="flex gap-2 justify-center md:justify-start">
+                        <div class="flex flex-col items-center">
+                            <div id="days" class="countdown-box">00</div>
+                            <span class="text-[7px] uppercase font-bold mt-1 text-blue-100">Dias</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div id="hours" class="countdown-box">00</div>
+                            <span class="text-[7px] uppercase font-bold mt-1 text-blue-100">Horas</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div id="minutes" class="countdown-box">00</div>
+                            <span class="text-[7px] uppercase font-bold mt-1 text-blue-100">Min</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div id="seconds" class="countdown-box">00</div>
+                            <span class="text-[7px] uppercase font-bold mt-1 text-white">Seg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-auto">
+                    <button onclick="window.location.href='https://wa.me/5547992277324?text=Olá! Quero aproveitar a oferta do Futebol de Sabão!'" class="w-full md:px-8 bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-black py-4 rounded-xl shadow-xl active:scale-95 transition-all text-xs uppercase tracking-widest">
+                        Reservar Agora
+                    </button>
+                </div>
+            </div>
+        </section>
     </main>
 
     <script type="module">
@@ -207,6 +281,37 @@
             const auth = getAuth(app);
             signInAnonymously(auth);
         } catch(e) { console.warn("Firebase offline"); }
+
+        // --- CONTAGEM REGRESSIVA (TERMINA EM 01/01/2026) ---
+        function startCountdown() {
+            const targetDate = new Date('2026-01-01T00:00:00').getTime();
+
+            function update() {
+                const now = new Date().getTime();
+                const diff = targetDate - now;
+
+                if (diff <= 0) {
+                    document.getElementById('days').innerText = '00';
+                    document.getElementById('hours').innerText = '00';
+                    document.getElementById('minutes').innerText = '00';
+                    document.getElementById('seconds').innerText = '00';
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerText = d.toString().padStart(2, '0');
+                document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+                document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+                document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+            }
+
+            setInterval(update, 1000);
+            update();
+        }
 
         // --- ROLETA ---
         const prizes = [
@@ -339,7 +444,7 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            setupSlider(); drawWheel();
+            setupSlider(); drawWheel(); startCountdown();
             if(!sessionStorage.getItem('encanto_roulette_clean')) {
                 setTimeout(() => {
                     const overlay = document.getElementById('roulette-overlay');
