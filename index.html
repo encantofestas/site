@@ -7,8 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* OBSERVAÇÃO: NÃO ALTERAR ESTILOS DE CORES GERAIS OU ICONES SEM SOLICITAÇÃO DIRETA */
         html, body {
             overflow-x: hidden;
             width: 100%;
@@ -17,9 +18,7 @@
             -webkit-tap-highlight-color: transparent;
             scroll-behavior: smooth;
         }
-        h1, h2, h3, h4, .brand-font {
-            font-family: 'Baloo 2', cursive;
-        }
+        h1, h2, h3, h4, .brand-font { font-family: 'Baloo 2', cursive; }
         .bg-primary { background-color: #2563EB; }
         .bg-secondary { background-color: #FACC15; }
         
@@ -27,17 +26,10 @@
             padding-bottom: env(safe-area-inset-bottom);
             height: calc(4rem + env(safe-area-inset-bottom));
         }
-        .floating-fab {
-            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
-        }
+        .floating-fab { box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5); }
 
-        /* --- ESTILOS DO SLIDER --- */
-        .infinite-slider-container {
-            width: 100vw;
-            overflow: hidden;
-            position: relative;
-        }
-        
+        /* --- SLIDER INFINITO (MANTENDO VELOCIDADE 0.9 E LÓGICA DE TELETRANSPORTE) --- */
+        .infinite-slider-container { width: 100vw; overflow: hidden; position: relative; }
         .infinite-slider-track {
             display: flex;
             gap: 12px;
@@ -46,10 +38,8 @@
             -webkit-overflow-scrolling: touch;
             width: 100%;
             cursor: grab;
-            /* Importante: manter auto para evitar conflito com animação JS */
             scroll-behavior: auto !important;
         }
-        
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -65,12 +55,11 @@
             border: 1px solid rgba(255,255,255,0.3);
             transition: transform 0.2s ease;
             user-select: none;
+            cursor: pointer;
         }
         .slider-card img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
 
-        @media (min-width: 768px) {
-            .slider-card { flex: 0 0 320px; min-width: 320px; height: 220px; }
-        }
+        @media (min-width: 768px) { .slider-card { flex: 0 0 320px; min-width: 320px; height: 220px; } }
 
         .card-overlay {
             position: absolute;
@@ -81,14 +70,7 @@
             justify-content: center;
             padding-bottom: 12px;
         }
-        .card-title {
-            color: white;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            text-align: center;
-            padding: 0 10px;
-        }
+        .card-title { color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; text-align: center; padding: 0 10px; }
 
         /* PAINEL NOTIFICAÇÕES */
         #notification-panel {
@@ -101,20 +83,98 @@
             width: 100vw;
             background-color: #2563EB;
         }
+        
         .promo-pulse { animation: pulse-promo 2s infinite ease-in-out; }
-        @keyframes pulse-promo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        @keyframes pulse-promo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.015); } }
+
+        /* Timer e Flash Deal */
+        .offer-gradient { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); }
+        .timer-unit { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); padding: 8px 4px; border-radius: 12px; min-width: 55px; }
+
+        /* --- ROLETA DESIGN ATUALIZADO (REMOVENDO FUNDO BRANCO E EMOJIS) --- */
+        #roulette-overlay {
+            z-index: 200;
+            background: rgba(15, 23, 42, 0.85); /* Fundo escuro translúcido */
+            backdrop-filter: blur(12px);
+        }
+        .roulette-modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+        .wheel-outer {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto;
+            border: 6px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            background: #0f172a;
+            box-shadow: 0 0 40px rgba(37, 99, 235, 0.5), inset 0 0 30px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+        #wheel {
+            width: 100%;
+            height: 100%;
+            transition: transform 8s cubic-bezier(0.1, 0, 0, 1);
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            z-index: 30;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+        }
+        .prize-text {
+            font-size: 3.5px;
+            font-weight: 900;
+            fill: white;
+            letter-spacing: 0.2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
-<body class="text-gray-700 flex flex-col min-h-screen">
+<body class="text-gray-700 flex flex-col min-h-screen bg-slate-50">
+
+    <!-- ROLETA DE BOAS VINDAS -->
+    <div id="roulette-overlay" class="hidden fixed inset-0 flex items-center justify-center p-4">
+        <div id="roulette-modal" class="roulette-modal-content w-full max-w-sm p-8 text-center relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="inline-block bg-yellow-400 text-slate-900 text-[10px] font-black px-4 py-1 rounded-full uppercase mb-2 shadow-lg">Sorteio Exclusivo</div>
+                <h3 class="text-2xl font-black text-white brand-font mb-1 uppercase leading-tight">Ganhe seu Desconto!</h3>
+                <p class="text-blue-100/70 text-xs font-medium mb-6">Gire a roleta e veja o que a sorte reservou</p>
+                
+                <div class="wheel-outer my-6">
+                    <img class="wheel-pointer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M12 21l-8-12h16l-8 12z'/%3E%3C/svg%3E" alt="Ponteiro">
+                    <!-- SVG da Roleta -->
+                    <svg id="wheel" viewBox="0 0 100 100">
+                        <g id="wheel-segments"></g>
+                    </svg>
+                    <!-- Centro Fixado -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border-4 border-blue-600 rounded-full z-20 shadow-xl flex items-center justify-center text-[10px] font-black text-blue-600">PLAY</div>
+                </div>
+
+                <button id="spin-btn" onclick="spinWheel()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all transform uppercase tracking-widest text-sm mb-4">
+                    Girar Agora!
+                </button>
+                <button onclick="closeRoulette()" class="text-blue-100/40 text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors">Entrar no site</button>
+            </div>
+        </div>
+    </div>
 
     <!-- HEADER -->
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.reload()">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo" class="w-10 h-10 rounded-full border-2 border-secondary object-cover">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" alt="Logo" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner">
                 <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
             </div>
-            <button class="text-white p-2 relative" onclick="toggleNotificationPanel()">
+            <button class="text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                 <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary hidden"></div>
             </button>
@@ -122,118 +182,158 @@
     </header>
 
     <!-- PAINEL NOTIFICAÇÕES -->
-    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
-    <div id="notification-panel" class="transform translate-x-full">
-        <div class="h-full flex flex-col">
-            <div class="bg-blue-700 p-4 flex justify-between items-center border-b border-blue-800">
+    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-40 z-[80] backdrop-blur-sm"></div>
+    <div id="notification-panel" class="transform translate-x-full transition-transform duration-300">
+        <div class="h-full flex flex-col shadow-2xl">
+            <div class="bg-blue-700 p-5 flex justify-between items-center border-b border-blue-800">
                 <h3 class="text-xl font-bold brand-font text-white">Notificações</h3>
-                <button onclick="toggleNotificationPanel()" class="text-white text-2xl">&times;</button>
+                <button onclick="toggleNotificationPanel()" class="text-white text-3xl font-light">&times;</button>
             </div>
-            <div class="flex-grow overflow-y-auto p-4">
-                <ul id="notification-list" class="space-y-3 text-white"></ul>
+            <div class="flex-grow overflow-y-auto p-4 bg-blue-600/95 text-white">
+                <ul id="notification-list" class="space-y-3"></ul>
             </div>
         </div>
     </div>
 
-    <!-- CONTEÚDO -->
     <main class="flex-grow pt-16 pb-28">
-        
-        <!-- Hero -->
-        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-10 text-center relative overflow-hidden">
-            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-2">Realize a festa dos seus <span class="text-yellow-300">sonhos!</span></h1>
-            <p class="text-blue-100 mb-5 max-w-lg mx-auto text-sm md:text-base">Aluguer de brinquedos fácil, rápido e seguro.</p>
-            <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-lg text-sm">Ver disponibilidade</button>
+        <!-- Hero Section -->
+        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-12 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+            
+            <!-- MANTIDO: ÍCONE DE LOCALIZAÇÃO AZUL/BRANCO COMO ORIGINAL -->
+            <div class="inline-flex items-center gap-1.5 bg-blue-800/40 backdrop-blur-md text-blue-50 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest mb-6 border border-white/10 shadow-sm">
+                <svg class="w-3.5 h-3.5 text-blue-100" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                </svg>
+                São Francisco do Sul
+            </div>
+
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-3">
+                Brinquedos que transformam <span class="text-yellow-300">sua festa</span>
+            </h1>
+            <p class="text-blue-50 mb-8 max-w-lg mx-auto text-sm md:text-base font-normal opacity-90">
+                Você escolhe, a gente entrega e monta. Simples assim
+            </p>
+            <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-bold py-4 px-10 rounded-full shadow-xl active:scale-95 transition-all transform hover:scale-105 text-sm uppercase tracking-wider">
+                Fazer Orçamento / Reservar
+            </button>
         </section>
 
-        <!-- SLIDER DOS 13 BRINQUEDOS -->
-        <section class="mt-8">
-            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-4 text-center">Nossos Brinquedos</h2>
+        <!-- SLIDER DOS 13 BRINQUEDOS (VELOCIDADE 0.9) -->
+        <section class="mt-10">
+            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-6 text-center">Nossos Brinquedos</h2>
             <div class="infinite-slider-container">
                 <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp"><div class="card-overlay"><span class="card-title brand-font">Mini Baby Inflável</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp"><div class="card-overlay"><span class="card-title brand-font">Air Hockey</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp"><div class="card-overlay"><span class="card-title brand-font">Cama Elástica Pequena</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camam.webp"><div class="card-overlay"><span class="card-title brand-font">Cama Elástica Média</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp"><div class="card-overlay"><span class="card-title brand-font">Castelinho Pula Pula</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp"><div class="card-overlay"><span class="card-title brand-font">Piscina de Bolinhas</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/areababy.webp"><div class="card-overlay"><span class="card-title brand-font">Área Baby</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/escorregobol.webp"><div class="card-overlay"><span class="card-title brand-font">Escorrega com Bolinha</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/tobogam.webp"><div class="card-overlay"><span class="card-title brand-font">Tobogã Médio</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp"><div class="card-overlay"><span class="card-title brand-font">Futebol de Sabão</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pebolim.webp"><div class="card-overlay"><span class="card-title brand-font">Pebolim</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pingpong.webp"><div class="card-overlay"><span class="card-title brand-font">Ping Pong</span></div></div>
-                    <div class="slider-card"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/mesas.webp"><div class="card-overlay"><span class="card-title brand-font">Jogos de Mesa</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp"><div class="card-overlay"><span class="card-title brand-font">Mini Baby Inflável</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp"><div class="card-overlay"><span class="card-title brand-font">Air Hockey</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp"><div class="card-overlay"><span class="card-title brand-font">Cama Elástica Pequena</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camam.webp"><div class="card-overlay"><span class="card-title brand-font">Cama Elástica Média</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp"><div class="card-overlay"><span class="card-title brand-font">Castelinho Pula Pula</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp"><div class="card-overlay"><span class="card-title brand-font">Piscina de Bolinhas</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/areababy.webp"><div class="card-overlay"><span class="card-title brand-font">Área Baby</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/escorregobol.webp"><div class="card-overlay"><span class="card-title brand-font">Escorrega com Bolinha</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/tobogam.webp"><div class="card-overlay"><span class="card-title brand-font">Tobogã Médio</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp"><div class="card-overlay"><span class="card-title brand-font">Futebol de Sabão</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pebolim.webp"><div class="card-overlay"><span class="card-title brand-font">Pebolim</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/pingpong.webp"><div class="card-overlay"><span class="card-title brand-font">Ping Pong</span></div></div>
+                    <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/mesas.webp"><div class="card-overlay"><span class="card-title brand-font">Jogos de Mesa</span></div></div>
                 </div>
             </div>
         </section>
 
         <!-- COMO RESERVAR -->
-        <section class="px-4 max-w-7xl mx-auto mt-10 mb-10">
-            <h2 class="text-2xl font-bold brand-font text-blue-600 text-center mb-6">Como fazer sua reserva</h2>
-            <div class="flex overflow-x-auto gap-4 pb-4 scrollbar-hide md:grid md:grid-cols-4 px-2">
-                <div class="min-w-[80vw] md:min-w-0 bg-white rounded-full border-2 border-blue-100 p-3 flex items-center gap-4 shadow-sm">
-                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-3xl">🤔</div>
-                    <div><h3 class="font-bold text-blue-700">1. Dúvidas</h3><p class="text-xs text-gray-500">Veja o nosso FAQ.</p></div>
-                </div>
-                <div class="min-w-[80vw] md:min-w-0 bg-white rounded-full border-2 border-yellow-100 p-3 flex items-center gap-4 shadow-sm">
-                    <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center text-3xl">🗓️</div>
-                    <div><h3 class="font-bold text-yellow-700">2. Agenda</h3><p class="text-xs text-gray-500">Escolha a data.</p></div>
-                </div>
-                <div class="min-w-[80vw] md:min-w-0 bg-white rounded-full border-2 border-green-100 p-3 flex items-center gap-4 shadow-sm">
-                    <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-3xl">📝</div>
-                    <div><h3 class="font-bold text-green-700">3. Dados</h3><p class="text-xs text-gray-500">Preencha tudo.</p></div>
-                </div>
-                <div class="min-w-[80vw] md:min-w-0 bg-white rounded-full border-2 border-pink-100 p-3 flex items-center gap-4 shadow-sm">
-                    <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center text-3xl">👍</div>
-                    <div><h3 class="font-bold text-pink-700">4. Pronto</h3><p class="text-xs text-gray-500">Confirmamos tudo.</p></div>
-                </div>
+        <section class="px-4 max-w-7xl mx-auto mt-12 mb-12 text-center">
+            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-8">Como fazer sua reserva</h2>
+            <div class="flex overflow-x-auto gap-5 pb-6 scrollbar-hide md:grid md:grid-cols-4 px-2">
+                <div class="min-w-[180px] md:min-w-0 bg-white rounded-[2rem] border border-blue-100 p-5 shadow-sm flex flex-col items-center group transition-all"><div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl mb-3">🤔</div><h3 class="font-bold text-blue-700 text-sm">1. Dúvidas</h3></div>
+                <div onclick="window.location.href='calendario.html'" class="min-w-[180px] md:min-w-0 bg-white rounded-[2rem] border border-yellow-100 p-5 shadow-sm flex flex-col items-center group transition-all"><div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center text-3xl mb-3">🗓️</div><h3 class="font-bold text-yellow-700 text-sm">2. Agenda</h3></div>
+                <div class="min-w-[180px] md:min-w-0 bg-white rounded-[2rem] border border-green-100 p-5 shadow-sm flex flex-col items-center group transition-all"><div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl mb-3">📝</div><h3 class="font-bold text-green-700 text-sm">3. Dados</h3></div>
+                <div class="min-w-[180px] md:min-w-0 bg-white rounded-[2rem] border border-pink-100 p-5 shadow-sm flex flex-col items-center group transition-all"><div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center text-3xl mb-3">👍</div><h3 class="font-bold text-pink-700 text-sm">4. Pronto</h3></div>
             </div>
         </section>
 
-        <!-- PROMOÇÃO -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
-            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between promo-pulse">
-                <h3 class="font-extrabold text-2xl brand-font text-white drop-shadow-md mb-4 md:mb-0">Ganhe 20% OFF</h3>
-                <button class="bg-white text-yellow-700 font-bold py-3 px-8 rounded-full shadow-lg">Resgatar Cupom 🎁</button>
+        <!-- FLASH DEAL (OFERTA RELÂMPAGO) -->
+        <section class="px-4 max-w-7xl mx-auto mb-12">
+            <div onclick="showOfferModal()" class="offer-gradient p-1 rounded-[2.5rem] shadow-2xl cursor-pointer group transition-all overflow-hidden border border-white/5">
+                <div class="bg-indigo-950/40 p-6 md:p-8 rounded-[2.4rem] flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+                    <div class="relative w-full md:w-1/3 flex justify-center">
+                        <div class="absolute inset-0 bg-yellow-400/20 rounded-full blur-3xl animate-pulse"></div>
+                        <img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp" class="w-56 h-40 object-cover rounded-2xl shadow-2xl relative z-10">
+                        <div class="absolute -top-3 -right-3 bg-red-600 text-white font-black px-4 py-2 rounded-full text-sm shadow-xl z-20 transform rotate-12 border-2 border-white">- R$ 120,00!</div>
+                    </div>
+                    <div class="flex-grow text-center md:text-left text-white">
+                        <span class="inline-block bg-yellow-400 text-indigo-950 text-[10px] font-black px-3 py-1 rounded-full uppercase mb-3">🔥 Oferta do Dia</span>
+                        <h3 class="text-3xl font-black brand-font mb-2 leading-tight">Futebol de Sabão Gigante</h3>
+                        <div class="flex items-center justify-center md:justify-start gap-4 mb-4">
+                            <span class="text-white/40 line-through text-lg font-bold">R$ 600,00</span>
+                            <span class="text-yellow-300 text-4xl font-black">R$ 480,00</span>
+                        </div>
+                        <div id="countdown-container" class="flex justify-center md:justify-start gap-3">
+                            <div class="timer-unit"><span id="days" class="text-xl font-black block leading-none text-white">00</span><span class="text-[7px] uppercase">Dias</span></div>
+                            <div class="timer-unit"><span id="hours" class="text-xl font-black block leading-none text-white">00</span><span class="text-[7px] uppercase">Hrs</span></div>
+                            <div class="timer-unit"><span id="minutes" class="text-xl font-black block leading-none text-white">00</span><span class="text-[7px] uppercase">Min</span></div>
+                            <div class="timer-unit"><span id="seconds" class="text-xl font-black block leading-none text-yellow-400">00</span><span class="text-[7px] uppercase text-yellow-400">Seg</span></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- TAGGBOX -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
-            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-4 text-center">O que acham da Encanto</h2>
-            <div class="w-full h-[400px] rounded-2xl overflow-hidden border">
+        <section class="px-4 max-w-7xl mx-auto mb-12">
+            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-6 text-center">O que acham da Encanto</h2>
+            <div class="w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden border border-slate-200 bg-white">
                 <iframe src="https://widget.taggbox.com/310470?website=1" style="width:100%;height:100%;border:none;"></iframe>
             </div>
         </section>
 
         <!-- MAPA -->
-        <section class="px-4 max-w-7xl mx-auto mb-10">
-            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-4 text-center">Nossa Localização</h2>
-            <div class="rounded-2xl overflow-hidden h-64 shadow-lg">
+        <section class="px-4 max-w-7xl mx-auto mb-12 text-center">
+            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-6">Nossa Localização</h2>
+            <div class="rounded-3xl overflow-hidden h-72 md:h-[400px] shadow-xl border-4 border-white">
                 <iframe src="https://maps.google.com/maps?q=PREFEITO%20JOSÉ%20SCHDMIT,%20281,%20RETA%20SÃO%20FRANCISCO%20DO%20SUL&t=&z=14&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" frameborder="0"></iframe>
             </div>
         </section>
 
         <!-- FAQ -->
-        <section id="faq-section" class="px-4 max-w-7xl mx-auto mb-10">
-            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-4 text-center">Perguntas Frequentes</h2>
-            <div class="space-y-4">
-                <details class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-blue-600">
-                    <summary class="flex justify-between items-center cursor-pointer font-bold">Quanto tempo o brinquedo fica na minha casa?</summary>
-                    <p class="mt-2 text-sm text-gray-500">O período padrão é de até 6 horas.</p>
+        <section id="faq-section" class="px-4 max-w-7xl mx-auto mb-16">
+            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-8 text-center">Perguntas Frequentes</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <details class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 group">
+                    <summary class="flex justify-between items-center cursor-pointer font-bold text-slate-700 list-none">
+                        <span>Quanto tempo o brinquedo fica na minha casa?</span>
+                        <svg class="w-5 h-5 text-blue-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2"></path></svg>
+                    </summary>
+                    <p class="mt-4 text-sm text-slate-500">O período padrão garantido é de 6 horas!</p>
                 </details>
             </div>
         </section>
     </main>
 
+    <!-- POPUP DA OFERTA (MODAL) -->
+    <div id="offer-modal" class="hidden fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-[3rem] p-10 w-full max-w-sm text-center shadow-2xl">
+            <div class="text-5xl mb-6">💰</div>
+            <h3 class="text-3xl font-black text-blue-900 brand-font mb-3 uppercase">Oferta Ativada!</h3>
+            <p class="text-slate-500 text-sm mb-8 px-4 leading-relaxed">Use este cupom para o Futebol de Sabão:</p>
+            <div class="bg-blue-50 border-2 border-blue-600 border-dashed rounded-2xl p-5 mb-8">
+                <span id="promo-code" class="text-3xl font-black text-blue-700 tracking-[0.3em]">BOLHA20</span>
+            </div>
+            <button onclick="copyOfferCode()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl mb-4 uppercase">Copiar e Reservar</button>
+            <button onclick="hideOfferModal()" class="text-slate-400 text-sm font-bold uppercase tracking-widest">Fechar</button>
+        </div>
+    </div>
+
     <!-- NAV BOTTOM -->
-    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white border-t z-50 flex items-start">
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-100 z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full relative">
-            <div class="flex flex-col items-center justify-center text-blue-600"><svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg><span class="text-[10px]">Início</span></div>
-            <a href="combos.html" class="flex flex-col items-center justify-center text-gray-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" /></svg><span class="text-[10px]">Combos</span></a>
-            <div class="relative flex justify-center items-center"><a href="agendamento.html" class="floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center border-4 border-gray-50"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></a></div>
-            <a href="catalogo.html" class="flex flex-col items-center justify-center text-gray-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg><span class="text-[10px]">Catálogo</span></a>
-            <a href="perfil.html" class="flex flex-col items-center justify-center text-gray-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[10px]">Perfil</span></a>
+            <div class="flex flex-col items-center justify-center text-blue-600"><svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg><span class="text-[9px] font-bold uppercase">Início</span></div>
+            <a href="combos.html" class="flex flex-col items-center justify-center text-slate-400"><svg class="w-6 h-6 mb-1 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 4H8a2 2 0 00-2 2v1" /></svg><span class="text-[9px] font-bold uppercase">Combos</span></a>
+            <div class="relative flex justify-center items-center h-full w-full">
+                <a href="agendamento.html" class="floating-fab absolute -top-6 bg-secondary text-indigo-950 w-14 h-14 rounded-full flex items-center justify-center border-4 border-white shadow-xl transition-transform active:scale-90"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></a>
+            </div>
+            <a href="catalogo.html" class="flex flex-col items-center justify-center text-slate-400"><svg class="w-6 h-6 mb-1 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg><span class="text-[9px] font-bold uppercase">Catálogo</span></a>
+            <a href="perfil.html" class="flex flex-col items-center justify-center text-slate-400"><svg class="w-6 h-6 mb-1 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[9px] font-bold uppercase">Perfil</span></a>
         </div>
     </nav>
 
@@ -245,41 +345,141 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        // --- LÓGICA DA ROLETA (NOMES CENTRALIZADOS, SEM EMOJIS, FRENAGEM LENTA) ---
+        const prizes = [
+            { label: "NADA", color: "#475569", prob: 0.25, code: null },
+            { label: "5% OFF", color: "#3b82f6", prob: 0.30, code: "VEM5" },
+            { label: "GIRAR +", color: "#1e293b", prob: 0.20, code: "RETRY" },
+            { label: "10% OFF", color: "#2563eb", prob: 0.15, code: "VEM10" },
+            { label: "FRETE VIP", color: "#10b981", prob: 0.09, code: "FRETE0" },
+            { label: "50% OFF", color: "#FACC15", prob: 0.01, code: "RARO50" }
+        ];
+
+        function drawWheel() {
+            const container = document.getElementById('wheel-segments');
+            const totalSlices = prizes.length;
+            const sliceDeg = 360 / totalSlices;
+            
+            prizes.forEach((p, i) => {
+                const angle = i * sliceDeg;
+                const radiansStart = (angle - 90) * Math.PI / 180;
+                const radiansEnd = (angle + sliceDeg - 90) * Math.PI / 180;
+                
+                const x1 = 50 + 50 * Math.cos(radiansStart);
+                const y1 = 50 + 50 * Math.sin(radiansStart);
+                const x2 = 50 + 50 * Math.cos(radiansEnd);
+                const y2 = 50 + 50 * Math.sin(radiansEnd);
+                
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", `M 50 50 L ${x1} ${y1} A 50 50 0 0 1 ${x2} ${y2} Z`);
+                path.setAttribute("fill", p.color);
+                path.setAttribute("stroke", "rgba(255,255,255,0.1)");
+                path.setAttribute("stroke-width", "0.5");
+                container.appendChild(path);
+
+                // TEXTO CENTRALIZADO NO SEGMENTO
+                const textAngle = angle + (sliceDeg / 2);
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                const textDist = 36; 
+                const tx = 50 + textDist * Math.cos((textAngle - 90) * Math.PI / 180);
+                const ty = 50 + textDist * Math.sin((textAngle - 90) * Math.PI / 180);
+                
+                text.setAttribute("x", tx);
+                text.setAttribute("y", ty);
+                text.setAttribute("class", "prize-text");
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("dominant-baseline", "middle");
+                // Rotaciona o texto para alinhar ao raio do círculo e centralizar
+                text.setAttribute("transform", `rotate(${textAngle}, ${tx}, ${ty})`);
+                
+                // Segmentar cores de texto para marketing (branco em tudo, preto no amarelo)
+                if(p.color === "#FACC15") text.setAttribute("fill", "#0f172a");
+                
+                text.textContent = p.label;
+                container.appendChild(text);
+            });
+        }
+
+        let currentRotation = 0;
+        window.spinWheel = () => {
+            const btn = document.getElementById('spin-btn');
+            const wheel = document.getElementById('wheel');
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            btn.innerText = "SORTEANDO...";
+
+            let rand = Math.random();
+            let prizeIndex = 0;
+            let cumulative = 0;
+            for(let i=0; i<prizes.length; i++) { cumulative += prizes[i].prob; if(rand <= cumulative) { prizeIndex = i; break; } }
+
+            const sliceDeg = 360 / prizes.length;
+            const spins = 10; 
+            const newRotation = (spins * 360) + (360 - (prizeIndex * sliceDeg)) - (sliceDeg / 2);
+            currentRotation += newRotation;
+
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                const prize = prizes[prizeIndex];
+                if (prize.code === "RETRY") {
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                    btn.innerText = "Girar Novamente!";
+                    alert("QUASE! Você ganhou outra chance. Gire novamente!");
+                } else if (prize.code) {
+                    showWinPopup(prize);
+                } else {
+                    alert("Não foi desta vez! Mas aproveite as promoções do site.");
+                    closeRoulette();
+                }
+            }, 8200); 
+        };
+
+        function showWinPopup(prize) {
+            const modal = document.getElementById('roulette-modal');
+            modal.innerHTML = `
+                <div class="py-4">
+                    <div class="text-6xl mb-6">🎯</div>
+                    <h3 class="text-3xl font-black text-white brand-font mb-2">VOCÊ GANHOU!</h3>
+                    <p class="text-blue-100 font-bold mb-6">${prize.label}</p>
+                    <div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8">
+                        <span class="text-3xl font-black text-yellow-400 tracking-widest">${prize.code}</span>
+                    </div>
+                    <button onclick="closeRoulette()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl uppercase tracking-widest text-sm">Usar Desconto</button>
+                </div>
+            `;
+        }
+
+        window.closeRoulette = () => {
+            document.getElementById('roulette-overlay').classList.add('hidden');
+            document.body.style.overflow = '';
+            sessionStorage.setItem('encanto_roulette_shown', 'true');
+        };
+
+        // --- SLIDER INFINITO (VELOCIDADE 0.9) ---
         function setupSlider() {
             const track = document.getElementById('infinite-catalog');
             if (!track) return;
-            
             let isPaused = false;
             let scrollSpeed = 0.9;
             let setWidth = 0;
 
             const initInfinite = () => {
                 const items = Array.from(track.children);
-                // Clonar conteúdo para garantir loop sem espaços
                 items.forEach(item => track.appendChild(item.cloneNode(true)));
                 items.forEach(item => track.insertBefore(item.cloneNode(true), track.firstChild));
-                
                 updateMetrics();
                 track.scrollLeft = setWidth;
             };
 
-            const updateMetrics = () => {
-                // Largura real de um set de 13 itens
-                setWidth = track.scrollWidth / 3;
-            };
-
-            const handleInfiniteLoop = () => {
-                if (track.scrollLeft >= setWidth * 2) {
-                    track.scrollLeft -= setWidth;
-                } else if (track.scrollLeft <= 1) {
-                    track.scrollLeft += setWidth;
-                }
-            };
+            const updateMetrics = () => { setWidth = track.scrollWidth / 3; };
 
             function animate() {
                 if (!isPaused) {
                     track.scrollLeft += scrollSpeed;
-                    handleInfiniteLoop();
+                    if (track.scrollLeft >= setWidth * 2) track.scrollLeft -= setWidth;
+                    else if (track.scrollLeft <= 1) track.scrollLeft += setWidth;
                 }
                 requestAnimationFrame(animate);
             }
@@ -289,36 +489,46 @@
             track.addEventListener('touchstart', () => isPaused = true, { passive: true });
             track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1000), { passive: true });
             
-            window.addEventListener('resize', () => {
-                updateMetrics();
-                track.scrollLeft = setWidth;
-            });
-
+            window.addEventListener('resize', () => { updateMetrics(); track.scrollLeft = setWidth; });
             initInfinite();
-            // Garantir que as métricas atualizam quando as imagens carregam
-            window.onload = () => {
-                updateMetrics();
-                track.scrollLeft = setWidth;
-            };
+            window.onload = () => { updateMetrics(); track.scrollLeft = setWidth; };
             requestAnimationFrame(animate);
         }
 
-        window.toggleNotificationPanel = function() {
+        // --- TIMER ---
+        function startCountdown() {
+            const target = new Date("December 31, 2025 23:59:59").getTime();
+            setInterval(() => {
+                const now = new Date().getTime();
+                const dist = target - now;
+                if (dist < 0) return;
+                document.getElementById("days").innerText = Math.floor(dist / (86400000));
+                document.getElementById("hours").innerText = Math.floor((dist % 86400000) / 3600000);
+                document.getElementById("minutes").innerText = Math.floor((dist % 3600000) / 60000);
+                document.getElementById("seconds").innerText = Math.floor((dist % 60000) / 1000);
+            }, 1000);
+        }
+
+        window.toggleNotificationPanel = () => {
             const panel = document.getElementById('notification-panel');
             const overlay = document.getElementById('notification-overlay');
             const isHidden = panel.classList.contains('translate-x-full');
-            if (isHidden) {
-                panel.classList.remove('translate-x-full');
-                overlay.classList.remove('hidden');
-            } else {
-                panel.classList.add('translate-x-full');
-                overlay.classList.add('hidden');
-            }
+            if (isHidden) { panel.classList.remove('translate-x-full'); overlay.classList.remove('hidden'); }
+            else { panel.classList.add('translate-x-full'); overlay.classList.add('hidden'); }
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
             await signInAnonymously(auth);
             setupSlider();
+            startCountdown();
+            drawWheel();
+            
+            if(!sessionStorage.getItem('encanto_roulette_shown')) {
+                setTimeout(() => {
+                    document.getElementById('roulette-overlay').classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                }, 1000);
+            }
         });
     </script>
 </body>
