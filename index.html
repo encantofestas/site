@@ -24,7 +24,7 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* CONTAINER DO SLIDER */
+        /* CONTENTOR DO SLIDER */
         .infinite-slider-track {
             display: flex;
             gap: 12px;
@@ -39,19 +39,25 @@
             cursor: grabbing;
         }
 
-        /* CARTÃO DO BRINQUEDO - TAMANHO REDUZIDO PARA MOBILE */
+        /* CARTÃO DO BRINQUEDO - TAMANHO COMPACTO */
         .slider-card {
             flex: 0 0 220px; 
             min-width: 220px;
-            height: 150px; /* Altura menor para não ocupar a tela toda */
+            height: 150px; 
             background: white;
             border-radius: 1.25rem;
             overflow: hidden;
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             position: relative;
             border: 1px solid rgba(255,255,255,0.3);
-            transition: transform 0.3s ease;
+            transition: transform 0.2s ease;
             user-select: none;
+            cursor: pointer;
+        }
+
+        /* Efeito de clique visual */
+        .slider-card:active {
+            transform: scale(0.95);
         }
 
         .slider-card img {
@@ -62,7 +68,7 @@
             pointer-events: none;
         }
 
-        /* AJUSTE PARA TELAS MAIORES */
+        /* AJUSTE PARA DESKTOP */
         @media (min-width: 768px) {
             .slider-card { 
                 flex: 0 0 320px; 
@@ -96,29 +102,29 @@
 
     <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
         <!-- Brinquedo 1 -->
-        <div class="slider-card">
+        <div class="slider-card" onclick="window.location.href='calendario.html'">
             <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" alt="Mini Baby">
             <div class="card-overlay"><span class="card-title brand-font">Mini Baby Inflável</span></div>
         </div>
         <!-- Brinquedo 2 -->
-        <div class="slider-card">
+        <div class="slider-card" onclick="window.location.href='calendario.html'">
             <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" alt="Air Hockey">
             <div class="card-overlay"><span class="card-title brand-font">Air Hockey (Aero)</span></div>
         </div>
         <!-- Brinquedo 3 -->
-        <div class="slider-card">
+        <div class="slider-card" onclick="window.location.href='calendario.html'">
             <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" alt="Cama Elástica">
             <div class="card-overlay"><span class="card-title brand-font">Cama Elástica P</span></div>
         </div>
         <!-- Brinquedo 4 -->
-        <div class="slider-card">
+        <div class="slider-card" onclick="window.location.href='calendario.html'">
             <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" alt="Piscina">
             <div class="card-overlay"><span class="card-title brand-font">Piscina de Bolinhas</span></div>
         </div>
         <!-- Brinquedo 5 -->
-        <div class="slider-card">
-            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelobol.webp" alt="Castelo">
-            <div class="card-overlay"><span class="card-title brand-font">Castelo Inflável</span></div>
+        <div class="slider-card" onclick="window.location.href='calendario.html'">
+            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp" alt="Castelinho">
+            <div class="card-overlay"><span class="card-title brand-font">Castelinho</span></div>
         </div>
     </div>
 
@@ -126,15 +132,19 @@
         document.addEventListener('DOMContentLoaded', () => {
             const track = document.getElementById('infinite-catalog');
             let isPaused = false;
-            let scrollSpeed = 0.9; // Velocidade suave
+            let scrollSpeed = 0.9; 
 
-            // Clona os itens para criar o efeito de loop infinito
+            // Função para clonar o conteúdo e permitir o scroll infinito
             const cloneContent = () => {
                 const items = Array.from(track.children);
-                items.forEach(item => track.appendChild(item.cloneNode(true)));
+                items.forEach(item => {
+                    const clone = item.cloneNode(true);
+                    // Garante que o evento onclick também é copiado correctamente
+                    clone.onclick = item.onclick;
+                    track.appendChild(clone);
+                });
             };
             
-            // Duplicamos o conteúdo duas vezes para garantir fluidez
             cloneContent();
             cloneContent();
 
@@ -142,7 +152,7 @@
                 if (!isPaused) {
                     track.scrollLeft += scrollSpeed;
                     
-                    // Reseta para o início de forma imperceptível quando chega ao final do primeiro set
+                    // Reposiciona o scroll quando chega ao final da primeira parte
                     if (track.scrollLeft >= track.scrollWidth / 3) {
                         track.scrollLeft = 0;
                     }
@@ -150,21 +160,17 @@
                 requestAnimationFrame(animate);
             }
 
-            // Pausa ao interagir
             const startPause = () => { isPaused = true; };
             const stopPause = () => { 
                 setTimeout(() => { isPaused = false; }, 1200); 
             };
 
-            // Mouse
+            // Eventos de rato e toque para pausar a animação durante a interacção
             track.addEventListener('mousedown', startPause);
             window.addEventListener('mouseup', stopPause);
-            
-            // Touch
             track.addEventListener('touchstart', startPause, { passive: true });
             track.addEventListener('touchend', stopPause, { passive: true });
 
-            // Inicia o motor de animação
             requestAnimationFrame(animate);
         });
     </script>
