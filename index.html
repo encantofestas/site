@@ -41,6 +41,7 @@
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
+            scroll-behavior: auto !important; /* Essencial para o salto infinito não ter delay */
         }
         
         /* PAINEL MOBILE */
@@ -202,7 +203,7 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: NOSSOS BRINQUEDOS (SLIDER INFINITO) -->
+        <!-- SEÇÃO: NOSSOS BRINQUEDOS (SLIDER INFINITO CORRIGIDO) -->
         <section class="mt-8">
             <h2 class="text-2xl font-bold brand-font text-blue-600 mb-4 text-center">Nossos Brinquedos</h2>
             <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
@@ -385,7 +386,7 @@
             return collection(db, `artifacts/${appId}/users/${uid}/read_notifications_ids`);
         }
 
-        // --- LÓGICA DO SLIDER (EXATA VELOCIDADE 0.9) ---
+        // --- LÓGICA DO SLIDER (CORREÇÃO DE LOOP INFINITO) ---
         function setupSlider() {
             const track = document.getElementById('infinite-catalog');
             if (!track) return;
@@ -395,6 +396,7 @@
 
             const initInfinite = () => {
                 const items = Array.from(track.children);
+                // Clonamos duas vezes para ter [A][B][C] e mantermos o foco no [B]
                 items.forEach(item => {
                     const clone = item.cloneNode(true);
                     clone.onclick = item.onclick;
@@ -406,16 +408,24 @@
                     track.insertBefore(clone, track.firstChild);
                 });
                 updateMetrics();
+                // Começa no início do set central
                 track.scrollLeft = setWidth;
             };
 
             const updateMetrics = () => {
+                // setWidth é a largura de 1/3 do conteúdo total (um set completo de itens)
                 setWidth = track.scrollWidth / 3;
             };
 
             const handleInfiniteLoop = () => {
-                if (track.scrollLeft <= 0) track.scrollLeft = setWidth;
-                else if (track.scrollLeft >= setWidth * 2) track.scrollLeft = setWidth;
+                // Se o scroll passar do final do set central (setWidth * 2), subtrai setWidth
+                if (track.scrollLeft >= setWidth * 2) {
+                    track.scrollLeft -= setWidth;
+                } 
+                // Se o scroll voltar antes do início do set central (setWidth), soma setWidth
+                else if (track.scrollLeft <= 0) {
+                    track.scrollLeft += setWidth;
+                }
             };
 
             function animate() {
@@ -426,12 +436,25 @@
                 requestAnimationFrame(animate);
             }
 
+            // Pausa na interação
             track.addEventListener('mousedown', () => isPaused = true);
             window.addEventListener('mouseup', () => setTimeout(() => isPaused = false, 1000));
             track.addEventListener('touchstart', () => isPaused = true, { passive: true });
             track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1000), { passive: true });
+            
+            // Loop durante scroll manual
             track.addEventListener('scroll', handleInfiniteLoop);
-            window.addEventListener('resize', () => { updateMetrics(); track.scrollLeft = setWidth; });
+            
+            window.addEventListener('resize', () => {
+                updateMetrics();
+                track.scrollLeft = setWidth;
+            });
+
+            // Aguarda imagens carregarem para ter dimensões corretas
+            window.onload = () => {
+                updateMetrics();
+                track.scrollLeft = setWidth;
+            };
 
             initInfinite();
             requestAnimationFrame(animate);
