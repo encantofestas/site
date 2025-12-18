@@ -138,6 +138,73 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+
+        /* --- PROMO POPUP STYLES (REPROJETADO PREMIUM) --- */
+        #promo-modal-overlay {
+            z-index: 10000;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .promo-modal {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 3.5rem;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.4);
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .luxury-coupon {
+            position: relative;
+            background: #F8FAFC;
+            border: 2px dashed #2563EB;
+            padding: 1.5rem;
+            border-radius: 2rem;
+            margin: 2rem 0;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .luxury-coupon:active { transform: scale(0.96); }
+        .luxury-coupon::before, .luxury-coupon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            border: 2px dashed #2563EB;
+        }
+        .luxury-coupon::before { left: -12px; }
+        .luxury-coupon::after { right: -12px; }
+
+        .coupon-text {
+            font-family: 'Baloo 2', cursive;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2563EB;
+            letter-spacing: 4px;
+            line-height: 1;
+        }
+        
+        .pulse-soft {
+            animation: pulse-soft 2s infinite;
+        }
+        @keyframes pulse-soft {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body class="text-gray-700 flex flex-col min-h-screen bg-slate-50">
@@ -163,6 +230,47 @@
                 </button>
                 <button onclick="closeRoulette()" class="text-blue-100/40 text-[10px] font-bold uppercase tracking-widest hover:text-white">Entrar sem desconto</button>
             </div>
+        </div>
+    </div>
+
+    <!-- POPUP DE PROMOÇÃO (REPROJETADO LUXURY) -->
+    <div id="promo-modal-overlay" onclick="closePromoModal(event)">
+        <div class="promo-modal" onclick="event.stopPropagation()">
+            <!-- Detalhe superior -->
+            <div class="bg-blue-600 w-12 h-1.5 rounded-full mx-auto mb-8 opacity-20"></div>
+            
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-50 rounded-full mb-6 text-3xl">✨</div>
+            
+            <h3 class="text-3xl font-black brand-font text-slate-900 uppercase tracking-tighter leading-tight">Oportunidade <br><span class="text-blue-600">Desbloqueada</span></h3>
+            <p class="text-slate-500 text-sm mt-3 font-semibold px-4 tracking-tight">Utilize o código abaixo no fechamento da sua reserva diretamente em nosso site.</p>
+            
+            <div class="luxury-coupon pulse-soft" id="coupon-code-container" onclick="copyPromoCoupon()">
+                <div id="coupon-code" class="coupon-text">CASTELO20</div>
+                <div id="copy-status" class="text-[9px] font-black text-blue-400 uppercase tracking-[0.2em] mt-3">Toque para copiar código</div>
+            </div>
+            
+            <div class="flex items-center justify-center gap-6 py-4 border-y border-slate-100 my-6">
+                <div class="flex flex-col">
+                    <span id="modal-hours" class="text-2xl font-black text-slate-800 leading-none">00</span>
+                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Horas</span>
+                </div>
+                <div class="w-px h-8 bg-slate-100"></div>
+                <div class="flex flex-col">
+                    <span id="modal-mins" class="text-2xl font-black text-slate-800 leading-none">00</span>
+                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Minutos</span>
+                </div>
+                <div class="w-px h-8 bg-slate-100"></div>
+                <div class="flex flex-col">
+                    <span id="modal-segs" class="text-2xl font-black text-blue-600 leading-none">00</span>
+                    <span class="text-[8px] font-bold text-blue-400 uppercase tracking-widest mt-1">Segundos</span>
+                </div>
+            </div>
+
+            <button onclick="closePromoModal(null)" class="w-full bg-slate-900 text-white font-black py-5 rounded-3xl shadow-2xl active:scale-95 transition-all text-xs uppercase tracking-[0.2em]">
+                Aplicar e continuar
+            </button>
+            
+            <p class="mt-6 text-[10px] text-slate-300 font-bold uppercase tracking-widest">Oferta exclusiva para este dispositivo</p>
         </div>
     </div>
 
@@ -199,7 +307,7 @@
                 Você escolhe, a gente entrega e monta. Simples assim
             </p>
             
-            <div class="flex items-center justify-center">
+            <div class="flex flex-col items-center justify-center gap-4">
                 <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-extrabold py-4 px-8 rounded-full shadow-2xl active:scale-95 transition-all transform hover:scale-105 text-xs md:text-sm uppercase tracking-wider flex items-center gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="18" x="5" y="3" rx="2"/><line x1="8" x2="16" y1="7" y2="7"/><path d="M16 11h.01"/><path d="M12 11h.01"/><path d="M8 11h.01"/><path d="M12 15h.01"/><path d="M8 15h.01"/><path d="M12 19h.01"/><path d="M8 19h.01"/></svg>
                     Fazer Orçamento / Reservar
@@ -228,7 +336,7 @@
             </div>
         </section>
 
-        <!-- CONTAGEM REGRESSIVA (DESIGN SLIM LUXURY - ATUALIZADO) -->
+        <!-- CONTAGEM REGRESSIVA (DESIGN SLIM LUXURY) -->
         <section class="px-5 mb-10">
             <div class="promo-card rounded-[2.2rem] p-6 relative overflow-hidden flex flex-col md:flex-row items-center gap-6">
                 <!-- Imagem Compacta -->
@@ -270,7 +378,7 @@
 
                 <div class="w-full md:w-auto text-center">
                     <!-- BOTÃO PEGAR PROMOÇÃO -->
-                    <button onclick="window.location.href='https://wa.me/5547992277324?text=Olá! Vi a oferta no site e quero garantir o Castelinho com desconto!'" class="w-full md:px-10 bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all text-sm uppercase tracking-widest block mb-2">
+                    <button onclick="openPromoModal()" class="w-full md:px-10 bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all text-sm uppercase tracking-widest block mb-2">
                         Pegar promoção
                     </button>
                     <!-- AVISO DE VALIDADE -->
@@ -303,10 +411,7 @@
                 const diff = targetDate - now;
 
                 if (diff <= 0) {
-                    document.getElementById('days').innerText = '00';
-                    document.getElementById('hours').innerText = '00';
-                    document.getElementById('minutes').innerText = '00';
-                    document.getElementById('seconds').innerText = '00';
+                    updateDisplay('00', '00', '00', '00');
                     return;
                 }
 
@@ -315,15 +420,60 @@
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
 
-                document.getElementById('days').innerText = d.toString().padStart(2, '0');
-                document.getElementById('hours').innerText = h.toString().padStart(2, '0');
-                document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
-                document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+                updateDisplay(
+                    d.toString().padStart(2, '0'),
+                    h.toString().padStart(2, '0'),
+                    m.toString().padStart(2, '0'),
+                    s.toString().padStart(2, '0')
+                );
+            }
+
+            function updateDisplay(d, h, m, s) {
+                // Main countdown
+                if(document.getElementById('days')) document.getElementById('days').innerText = d;
+                if(document.getElementById('hours')) document.getElementById('hours').innerText = h;
+                if(document.getElementById('minutes')) document.getElementById('minutes').innerText = m;
+                if(document.getElementById('seconds')) document.getElementById('seconds').innerText = s;
+                
+                // Modal countdown (hours, mins, segs only for cleaner luxury look)
+                if(document.getElementById('modal-hours')) document.getElementById('modal-hours').innerText = h;
+                if(document.getElementById('modal-mins')) document.getElementById('modal-mins').innerText = m;
+                if(document.getElementById('modal-segs')) document.getElementById('modal-segs').innerText = s;
             }
 
             setInterval(update, 1000);
             update();
         }
+
+        // --- PROMO MODAL LOGIC ---
+        window.openPromoModal = () => {
+            document.getElementById('promo-modal-overlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closePromoModal = (e) => {
+            document.getElementById('promo-modal-overlay').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        window.copyPromoCoupon = () => {
+            const text = document.getElementById('coupon-code').innerText;
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            const status = document.getElementById('copy-status');
+            const originalText = status.innerText;
+            status.innerText = "COPIADO PARA ÁREA DE TRANSFERÊNCIA! ✅";
+            status.style.color = "#10b981";
+            setTimeout(() => {
+                status.innerText = originalText;
+                status.style.color = "#60A5FA";
+            }, 2500);
+        };
 
         // --- ROLETA ---
         const prizes = [
@@ -409,7 +559,7 @@
             const el = document.createElement('textarea'); el.value = text;
             document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
             btn.innerText = "COPIADO! ✅"; 
-            setTimeout(() => { closeRoulette(); window.location.href = "https://wa.me/5547992277324?text=Olá! Acabei de ganhar um cupom na roleta!"; }, 1000);
+            setTimeout(() => { closeRoulette(); }, 1000);
         };
 
         window.closeRoulette = () => {
