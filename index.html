@@ -29,23 +29,23 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* CARROSSEL - AJUSTE DE PROPORÇÃO */
+        /* CARROSSEL HORIZONTAL - FORMATO CINEMA */
         .infinite-slider-track {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             overflow-x: auto;
-            padding: 10px 20px;
+            padding: 10px 16px;
             -webkit-overflow-scrolling: touch;
             scroll-snap-type: x mandatory;
         }
         .slider-card {
-            flex: 0 0 200px; 
-            min-width: 200px;
-            height: 200px; /* Formato quadrado para evitar esticar */
+            flex: 0 0 240px; 
+            min-width: 240px;
+            height: 135px; /* Altura reduzida para formato horizontal 16:9 aprox */
             background: white;
-            border-radius: 1.5rem;
+            border-radius: 1.25rem;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             position: relative;
             border: 1px solid #f1f5f9;
             scroll-snap-align: center;
@@ -53,13 +53,13 @@
         .slider-card img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* CORREÇÃO CRÍTICA: Mantém a proporção sem esticar */
+            object-fit: cover; /* Mantém a proporção sem esticar */
             display: block;
             background-color: #f1f5f9;
         }
         
         @media (min-width: 768px) {
-            .slider-card { flex: 0 0 260px; min-width: 260px; height: 260px; }
+            .slider-card { flex: 0 0 320px; min-width: 320px; height: 180px; }
         }
 
         .promo-pulse { animation: pulse 2s infinite ease-in-out; }
@@ -74,7 +74,7 @@
     <!-- HEADER -->
     <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 flex items-center px-4">
         <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.reload()">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" class="w-10 h-10 rounded-full border-2 border-secondary object-cover">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner">
             <span class="text-white text-xl font-bold brand-font">Encanto<span class="text-yellow-300">Festas</span></span>
         </div>
     </header>
@@ -82,13 +82,13 @@
     <main class="flex-grow pt-16 pb-24 bg-gray-50">
         
         <!-- Hero -->
-        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-lg px-6 py-10 text-center mb-6">
-            <h1 class="text-3xl font-extrabold mb-2">Brinquedos para <span class="text-yellow-300">sua festa</span></h1>
-            <p class="text-blue-100 mb-6 text-sm">Diversão garantida com montagem inclusa!</p>
-            <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-bold py-3 px-8 rounded-full shadow-md active:scale-95 transition">Ver Preços e Datas</button>
+        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-lg px-6 py-8 text-center mb-6">
+            <h1 class="text-3xl font-extrabold mb-2">Festas Incríveis em <span class="text-yellow-300">SFS</span></h1>
+            <p class="text-blue-100 mb-6 text-sm">Alugue brinquedos com entrega e montagem inclusas.</p>
+            <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-bold py-3 px-8 rounded-full shadow-md active:scale-95 transition">Ver Catálogo e Preços</button>
         </section>
 
-        <!-- NOSSOS BRINQUEDOS -->
+        <!-- NOSSOS BRINQUEDOS HORIZONTAL -->
         <section class="mb-10">
             <h2 class="px-5 text-xl font-bold brand-font text-blue-600 mb-4 flex items-center gap-2">
                 <span class="text-yellow-500">✨</span> Nossos Brinquedos
@@ -99,45 +99,45 @@
                 <div class="slider-card" onclick="window.location.href='calendario.html'">
                     <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" alt="Mini Baby">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                    <span class="absolute bottom-4 left-0 right-0 text-center text-white font-bold brand-font px-2">Mini Baby Inflável</span>
+                    <span class="absolute bottom-3 left-0 right-0 text-center text-white font-bold brand-font px-2 text-sm">Mini Baby Inflável</span>
                 </div>
                 <!-- Card 2 -->
                 <div class="slider-card" onclick="window.location.href='calendario.html'">
                     <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" alt="Air Hockey">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                    <span class="absolute bottom-4 left-0 right-0 text-center text-white font-bold brand-font px-2">Air Hockey</span>
+                    <span class="absolute bottom-3 left-0 right-0 text-center text-white font-bold brand-font px-2 text-sm">Air Hockey (Aero)</span>
                 </div>
                 <!-- Card 3 -->
                 <div class="slider-card" onclick="window.location.href='calendario.html'">
                     <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" alt="Cama Elástica">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                    <span class="absolute bottom-4 left-0 right-0 text-center text-white font-bold brand-font px-2">Cama Elástica P</span>
+                    <span class="absolute bottom-3 left-0 right-0 text-center text-white font-bold brand-font px-2 text-sm">Cama Elástica P</span>
                 </div>
                 <!-- Card 4 -->
                 <div class="slider-card" onclick="window.location.href='calendario.html'">
                     <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" alt="Piscina">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                    <span class="absolute bottom-4 left-0 right-0 text-center text-white font-bold brand-font px-2">Piscina de Bolinhas</span>
+                    <span class="absolute bottom-3 left-0 right-0 text-center text-white font-bold brand-font px-2 text-sm">Piscina de Bolinhas</span>
                 </div>
             </div>
         </section>
 
         <!-- COMO RESERVAR -->
         <section class="px-5 mb-10">
-            <h2 class="text-lg font-bold text-blue-600 mb-4">Como funciona?</h2>
-            <div class="space-y-4">
+            <h2 class="text-lg font-bold text-blue-600 mb-4">Como alugar?</h2>
+            <div class="grid grid-cols-1 gap-3">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl">💰</div>
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">💰</div>
                     <div>
-                        <h3 class="font-bold text-gray-800">1. Simule Online</h3>
-                        <p class="text-xs text-gray-500">Escolha a data e veja o valor na hora.</p>
+                        <h3 class="font-bold text-gray-800 text-sm">1. Simule Online</h3>
+                        <p class="text-[10px] text-gray-400">Escolha a data e veja o valor na hora.</p>
                     </div>
                 </div>
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-2xl">✅</div>
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-xl">✅</div>
                     <div>
-                        <h3 class="font-bold text-gray-800">2. Reserve e Pronto!</h3>
-                        <p class="text-xs text-gray-500">Nós entregamos e montamos tudo.</p>
+                        <h3 class="font-bold text-gray-800 text-sm">2. Reserva Garantida</h3>
+                        <p class="text-[10px] text-gray-400">Entregamos e montamos para você.</p>
                     </div>
                 </div>
             </div>
@@ -145,12 +145,12 @@
 
         <!-- CUPOM -->
         <section class="px-5 mb-10">
-            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-2xl text-blue-900 promo-pulse flex items-center justify-between">
+            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-5 rounded-2xl text-blue-900 promo-pulse flex items-center justify-between">
                 <div>
-                    <h3 class="font-bold text-lg">Cliente Fiel?</h3>
-                    <p class="text-sm opacity-90">Peça o seu cupom de 20%!</p>
+                    <h3 class="font-bold">Cliente Recorrente?</h3>
+                    <p class="text-xs opacity-90">Peça seu cupom de 20%!</p>
                 </div>
-                <button onclick="alert('Sistema de validação em manutenção. Peça via WhatsApp!')" class="bg-white px-5 py-2 rounded-full font-bold text-sm shadow-md">Resgatar</button>
+                <button onclick="alert('Sistema de fidelidade em atualização!')" class="bg-white px-4 py-2 rounded-full font-bold text-xs shadow-md">Resgatar</button>
             </div>
         </section>
 
@@ -184,12 +184,12 @@
     </nav>
 
     <script>
-        // Carrossel infinito melhorado
+        // Carrossel infinito automático
         window.onload = function() {
             const track = document.getElementById('infinite-catalog');
             let isPaused = false;
 
-            // Clona itens para efeito infinito
+            // Clona itens para criar loop infinito fluído
             const items = Array.from(track.children);
             items.forEach(item => track.appendChild(item.cloneNode(true)));
             items.forEach(item => track.appendChild(item.cloneNode(true)));
@@ -197,6 +197,7 @@
             function autoScroll() {
                 if(!isPaused) {
                     track.scrollLeft += 0.8;
+                    // Se chegar no final da primeira sequência duplicada, volta pro início imperceptivelmente
                     if (track.scrollLeft >= (track.scrollWidth / 3) * 2) {
                         track.scrollLeft = track.scrollWidth / 3;
                     }
@@ -204,9 +205,11 @@
                 requestAnimationFrame(autoScroll);
             }
 
+            // Pausa ao tocar, retoma após 1.5s de inatividade
             track.addEventListener('touchstart', () => isPaused = true);
             track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1500));
             
+            // Inicia o movimento
             autoScroll();
         };
     </script>
