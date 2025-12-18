@@ -3,201 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Encanto Festas - Locação de Brinquedos</title>
+    <title>Slider de Brinquedos - Encanto Festas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        html, body {
-            overflow-x: hidden;
-            width: 100%;
-            font-family: 'Inter', sans-serif;
+        body {
+            margin: 0;
+            padding: 0;
             background-color: #f8fafc;
-            -webkit-tap-highlight-color: transparent;
-            scroll-behavior: smooth;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
-        h1, h2, h3, h4, .brand-font { font-family: 'Baloo 2', cursive; }
-        .bg-primary { background-color: #2563EB; }
-        .bg-secondary { background-color: #FACC15; }
-        
-        #bottom-nav {
-            padding-bottom: env(safe-area-inset-bottom);
-            height: calc(4.5rem + env(safe-area-inset-bottom));
-        }
+        .brand-font { font-family: 'Baloo 2', cursive; }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* CARROSSEL HORIZONTAL - FORMATO CINEMA */
+        /* CONTAINER DO SLIDER */
         .infinite-slider-track {
             display: flex;
-            gap: 12px;
+            gap: 16px;
             overflow-x: auto;
-            padding: 10px 16px;
+            padding: 20px;
             -webkit-overflow-scrolling: touch;
             scroll-snap-type: x mandatory;
+            width: 100vw;
         }
+
+        /* CARTÃO DO BRINQUEDO - PROPORÇÃO AJUSTADA */
         .slider-card {
-            flex: 0 0 240px; 
-            min-width: 240px;
-            height: 135px; /* Altura reduzida para formato horizontal 16:9 aprox */
+            flex: 0 0 280px; 
+            min-width: 280px;
+            height: 180px; /* Aumentado para ser menos horizontal */
             background: white;
-            border-radius: 1.25rem;
+            border-radius: 1.5rem;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             position: relative;
             border: 1px solid #f1f5f9;
             scroll-snap-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
         }
+
         .slider-card img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Mantém a proporção sem esticar */
+            object-fit: cover;
             display: block;
-            background-color: #f1f5f9;
-        }
-        
-        @media (min-width: 768px) {
-            .slider-card { flex: 0 0 320px; min-width: 320px; height: 180px; }
+            background-color: #e2e8f0;
         }
 
-        .promo-pulse { animation: pulse 2s infinite ease-in-out; }
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
-            50% { box-shadow: 0 6px 20px rgba(250, 204, 21, 0.4); }
+        /* RESPONSIVIDADE PARA DESKTOP */
+        @media (min-width: 768px) {
+            .slider-card { 
+                flex: 0 0 400px; 
+                min-width: 400px; 
+                height: 260px; 
+            }
+        }
+
+        /* TEXTO SOBRE A IMAGEM */
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 16px;
+        }
+
+        .card-title {
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
     </style>
 </head>
-<body class="text-gray-700 min-h-screen flex flex-col">
+<body>
 
-    <!-- HEADER -->
-    <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16 flex items-center px-4">
-        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.reload()">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner">
-            <span class="text-white text-xl font-bold brand-font">Encanto<span class="text-yellow-300">Festas</span></span>
+    <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
+        <!-- Card 1 -->
+        <div class="slider-card">
+            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" alt="Mini Baby">
+            <div class="card-overlay">
+                <span class="card-title brand-font">Mini Baby Inflável</span>
+            </div>
         </div>
-    </header>
-
-    <main class="flex-grow pt-16 pb-24 bg-gray-50">
-        
-        <!-- Hero -->
-        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-lg px-6 py-8 text-center mb-6">
-            <h1 class="text-3xl font-extrabold mb-2">Festas Incríveis em <span class="text-yellow-300">SFS</span></h1>
-            <p class="text-blue-100 mb-6 text-sm">Alugue brinquedos com entrega e montagem inclusas.</p>
-            <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-bold py-3 px-8 rounded-full shadow-md active:scale-95 transition">Ver Catálogo e Preços</button>
-        </section>
-
-        <!-- NOSSOS BRINQUEDOS HORIZONTAL -->
-        <section class="mb-10">
-            <h2 class="px-5 text-xl font-bold brand-font text-blue-600 mb-4 flex items-center gap-2">
-                <span class="text-yellow-500">✨</span> Nossos Brinquedos
-            </h2>
-            
-            <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
-                <!-- Card 1 -->
-                <div class="slider-card" onclick="window.location.href='calendario.html'">
-                    <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" alt="Mini Baby">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                    <span class="absolute bottom-3 left-0 right-0 text-center text-white font-bold brand-font px-2 text-sm">Mini Baby Inflável</span>
-                </div>
-                <!-- Card 2 -->
-                <div class="slider-card" onclick="window.location.href='calendario.html'">
-                    <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" alt="Air Hockey">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                    <span class="absolute bottom-3 left-0 right-0 text-center text-white font-bold brand-font px-2 text-sm">Air Hockey (Aero)</span>
-                </div>
-                <!-- Card 3 -->
-                <div class="slider-card" onclick="window.location.href='calendario.html'">
-                    <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" alt="Cama Elástica">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                    <span class="absolute bottom-3 left-0 right-0 text-center text-white font-bold brand-font px-2 text-sm">Cama Elástica P</span>
-                </div>
-                <!-- Card 4 -->
-                <div class="slider-card" onclick="window.location.href='calendario.html'">
-                    <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" alt="Piscina">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                    <span class="absolute bottom-3 left-0 right-0 text-center text-white font-bold brand-font px-2 text-sm">Piscina de Bolinhas</span>
-                </div>
+        <!-- Card 2 -->
+        <div class="slider-card">
+            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" alt="Air Hockey">
+            <div class="card-overlay">
+                <span class="card-title brand-font">Air Hockey (Aero)</span>
             </div>
-        </section>
-
-        <!-- COMO RESERVAR -->
-        <section class="px-5 mb-10">
-            <h2 class="text-lg font-bold text-blue-600 mb-4">Como alugar?</h2>
-            <div class="grid grid-cols-1 gap-3">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex items-center gap-4">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">💰</div>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-sm">1. Simule Online</h3>
-                        <p class="text-[10px] text-gray-400">Escolha a data e veja o valor na hora.</p>
-                    </div>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex items-center gap-4">
-                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-xl">✅</div>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-sm">2. Reserva Garantida</h3>
-                        <p class="text-[10px] text-gray-400">Entregamos e montamos para você.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CUPOM -->
-        <section class="px-5 mb-10">
-            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-5 rounded-2xl text-blue-900 promo-pulse flex items-center justify-between">
-                <div>
-                    <h3 class="font-bold">Cliente Recorrente?</h3>
-                    <p class="text-xs opacity-90">Peça seu cupom de 20%!</p>
-                </div>
-                <button onclick="alert('Sistema de fidelidade em atualização!')" class="bg-white px-4 py-2 rounded-full font-bold text-xs shadow-md">Resgatar</button>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- NAV BOTTOM -->
-    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center shadow-lg z-50">
-        <div class="grid grid-cols-5 w-full">
-            <div class="flex flex-col items-center justify-center text-blue-600 h-16">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-                <span class="text-[10px] font-bold mt-1">Início</span>
-            </div>
-            <a href="combos.html" class="flex flex-col items-center justify-center text-gray-400 h-16">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-width="2"/></svg>
-                <span class="text-[10px] mt-1">Combos</span>
-            </a>
-            <div class="relative flex justify-center">
-                <a href="calendario.html" class="absolute -top-6 bg-secondary w-14 h-14 rounded-full flex items-center justify-center shadow-xl border-4 border-white">
-                    <svg class="w-7 h-7 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="3"/></svg>
-                </a>
-            </div>
-            <a href="catalogo.html" class="flex flex-col items-center justify-center text-gray-400 h-16">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-width="2"/></svg>
-                <span class="text-[10px] mt-1">Catálogo</span>
-            </a>
-            <a href="perfil.html" class="flex flex-col items-center justify-center text-gray-400 h-16">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2"/></svg>
-                <span class="text-[10px] mt-1">Perfil</span>
-            </a>
         </div>
-    </nav>
+        <!-- Card 3 -->
+        <div class="slider-card">
+            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" alt="Cama Elástica">
+            <div class="card-overlay">
+                <span class="card-title brand-font">Cama Elástica P</span>
+            </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="slider-card">
+            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" alt="Piscina">
+            <div class="card-overlay">
+                <span class="card-title brand-font">Piscina de Bolinhas</span>
+            </div>
+        </div>
+        <!-- Card 5 -->
+        <div class="slider-card">
+            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelobol.webp" alt="Castelo">
+            <div class="card-overlay">
+                <span class="card-title brand-font">Castelo com Bolinhas</span>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Carrossel infinito automático
         window.onload = function() {
             const track = document.getElementById('infinite-catalog');
             let isPaused = false;
+            let scrollSpeed = 0.8; // Velocidade do movimento
 
-            // Clona itens para criar loop infinito fluído
+            // Clona os itens para criar o loop infinito real
             const items = Array.from(track.children);
             items.forEach(item => track.appendChild(item.cloneNode(true)));
             items.forEach(item => track.appendChild(item.cloneNode(true)));
 
             function autoScroll() {
                 if(!isPaused) {
-                    track.scrollLeft += 0.8;
-                    // Se chegar no final da primeira sequência duplicada, volta pro início imperceptivelmente
+                    track.scrollLeft += scrollSpeed;
+                    
+                    // Reseta para o início do loop sem o usuário perceber
                     if (track.scrollLeft >= (track.scrollWidth / 3) * 2) {
                         track.scrollLeft = track.scrollWidth / 3;
                     }
@@ -205,11 +150,24 @@
                 requestAnimationFrame(autoScroll);
             }
 
-            // Pausa ao tocar, retoma após 1.5s de inatividade
-            track.addEventListener('touchstart', () => isPaused = true);
-            track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1500));
+            // CONTROLES DE TOQUE / MOUSE
+            // Pausa apenas quando o usuário toca ou clica no slider
+            track.addEventListener('touchstart', () => { isPaused = true; }, {passive: true});
+            track.addEventListener('mousedown', () => { isPaused = true; });
+
+            // Retoma a reprodução após soltar (com um pequeno delay para suavidade)
+            track.addEventListener('touchend', () => { 
+                setTimeout(() => { isPaused = false; }, 1000); 
+            }, {passive: true});
             
-            // Inicia o movimento
+            track.addEventListener('mouseup', () => { 
+                setTimeout(() => { isPaused = false; }, 1000); 
+            });
+
+            // Fallback se o mouse sair da área
+            track.addEventListener('mouseleave', () => { isPaused = false; });
+
+            // Inicia a animação imediatamente
             autoScroll();
         };
     </script>
