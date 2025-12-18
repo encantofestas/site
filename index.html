@@ -97,7 +97,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            touch-action: none; /* Bloqueia scroll no celular */
+            touch-action: none; 
             overscroll-behavior: none;
         }
         .roulette-modal-content {
@@ -141,6 +141,16 @@
             font-weight: 900;
             fill: white;
             letter-spacing: 0.1px;
+        }
+
+        /* TIMER STYLE HORIZONTAL */
+        .timer-unit-h {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 8px;
+            text-align: center;
+            flex: 1;
         }
     </style>
 </head>
@@ -217,12 +227,10 @@
                 Você escolhe, a gente entrega e monta. Simples assim
             </p>
             
-            <!-- Botões Hero -->
-            <div class="flex items-center justify-center gap-3">
-                <button onclick="window.location.href='orcamento.html'" class="bg-blue-800/40 backdrop-blur-md text-white border border-white/20 p-3.5 rounded-full shadow-xl active:scale-95 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2,5" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
-                </button>
-                <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-extrabold py-3 px-6 rounded-full shadow-xl active:scale-95 transition-all transform hover:scale-105 text-xs md:text-sm uppercase tracking-wider">
+            <!-- Botão Hero com Calculadora Integrada -->
+            <div class="flex items-center justify-center">
+                <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-extrabold py-3.5 px-6 rounded-full shadow-xl active:scale-95 transition-all transform hover:scale-105 text-xs md:text-sm uppercase tracking-wider flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
                     Fazer Orçamento / Reservar
                 </button>
             </div>
@@ -250,28 +258,40 @@
             </div>
         </section>
 
-        <!-- FLASH DEAL (OFERTA RELÂMPAGO) -->
-        <section class="px-4 max-w-7xl mx-auto mb-12">
-            <div onclick="showOfferModal()" class="offer-gradient p-1 rounded-[2.5rem] shadow-2xl cursor-pointer group transition-all overflow-hidden border border-white/5">
-                <div class="bg-indigo-950/40 p-6 md:p-8 rounded-[2.4rem] flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-                    <div class="relative w-full md:w-1/3 flex justify-center">
-                        <div class="absolute inset-0 bg-yellow-400/20 rounded-full blur-3xl animate-pulse"></div>
-                        <img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp" class="w-56 h-40 object-cover rounded-2xl shadow-2xl relative z-10">
-                        <div class="absolute -top-3 -right-3 bg-red-600 text-white font-black px-4 py-2 rounded-full text-sm shadow-xl z-20 transform rotate-12 border-2 border-white">- R$ 120,00!</div>
+        <!-- FLASH DEAL HORIZONTAL -->
+        <section class="px-4 max-w-7xl mx-auto mb-12 mt-12">
+            <div class="bg-indigo-950 rounded-[2.5rem] shadow-2xl p-6 relative overflow-hidden border border-white/10 group transition-all">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-900/40 to-transparent pointer-events-none"></div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-6 relative z-10">
+                    <!-- Imagem reduzida para horizontalidade -->
+                    <div class="relative flex-shrink-0">
+                        <img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp" class="w-40 h-32 object-cover rounded-2xl border-2 border-white/20 shadow-lg">
+                        <div class="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-lg">- R$ 120</div>
                     </div>
-                    <div class="flex-grow text-center md:text-left text-white">
-                        <span class="inline-block bg-yellow-400 text-indigo-950 text-[10px] font-black px-3 py-1 rounded-full uppercase mb-3">🔥 Oferta do Dia</span>
-                        <h3 class="text-3xl font-black brand-font mb-2 leading-tight">Futebol de Sabão Gigante</h3>
-                        <div class="flex items-center justify-center md:justify-start gap-4 mb-4">
-                            <span class="text-white/40 line-through text-lg font-bold">R$ 600,00</span>
-                            <span class="text-yellow-300 text-4xl font-black">R$ 480,00</span>
+
+                    <!-- Info e Timer Lado a Lado -->
+                    <div class="flex-grow flex flex-col md:flex-row md:items-center justify-between gap-6 w-full">
+                        <div class="text-center md:text-left">
+                            <h3 class="text-white text-xl font-bold brand-font">Futebol de Sabão <span class="text-blue-300">Gigante</span></h3>
+                            <div class="flex items-center justify-center md:justify-start gap-3 mt-1">
+                                <span class="text-white/40 line-through text-xs font-bold">R$ 600</span>
+                                <span class="text-yellow-400 text-2xl font-black">R$ 480</span>
+                            </div>
                         </div>
-                        <div id="countdown-container" class="flex justify-center md:justify-start gap-3">
-                            <div class="timer-unit"><span id="days" class="text-xl font-black block leading-none">00</span><span class="text-[7px] uppercase">Dias</span></div>
-                            <div class="timer-unit"><span id="hours" class="text-xl font-black block leading-none">00</span><span class="text-[7px] uppercase">Hrs</span></div>
-                            <div class="timer-unit"><span id="minutes" class="text-xl font-black block leading-none">00</span><span class="text-[7px] uppercase">Min</span></div>
-                            <div class="timer-unit"><span id="seconds" class="text-xl font-black block leading-none text-yellow-400">00</span><span class="text-[7px] uppercase text-yellow-400">Seg</span></div>
+
+                        <!-- Timer Horizontal -->
+                        <div id="countdown-container" class="flex gap-2 justify-center">
+                            <div class="timer-unit-h"><span id="days" class="text-white font-black block leading-none">00</span><span class="text-[6px] text-white/50 uppercase">Dias</span></div>
+                            <div class="timer-unit-h"><span id="hours" class="text-white font-black block leading-none">00</span><span class="text-[6px] text-white/50 uppercase">Hrs</span></div>
+                            <div class="timer-unit-h"><span id="minutes" class="text-white font-black block leading-none">00</span><span class="text-[6px] text-white/50 uppercase">Min</span></div>
+                            <div class="timer-unit-h"><span id="seconds" class="text-yellow-400 font-black block leading-none">00</span><span class="text-[6px] text-yellow-400/50 uppercase font-bold">Seg</span></div>
                         </div>
+
+                        <!-- Botão de Reserva que abre o Cupom -->
+                        <button onclick="showOfferModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-black py-3 px-8 rounded-2xl shadow-lg shadow-blue-900/50 transition-all transform active:scale-95 text-xs uppercase tracking-widest">
+                            Reservar Agora
+                        </button>
                     </div>
                 </div>
             </div>
@@ -290,13 +310,13 @@
     <div id="offer-modal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-[3rem] p-10 w-full max-w-sm text-center shadow-2xl border border-blue-50 text-slate-800">
             <div class="text-5xl mb-6">💰</div>
-            <h3 class="text-3xl font-black text-blue-900 brand-font mb-3 uppercase">Oferta Ativada!</h3>
-            <p class="text-slate-500 text-sm mb-8 px-4 leading-relaxed">Use este cupom para o Futebol de Sabão:</p>
+            <h3 class="text-3xl font-black text-blue-900 brand-font mb-3 uppercase leading-tight">CUPOM ATIVADO!</h3>
+            <p class="text-slate-500 text-sm mb-8 px-4 leading-relaxed font-medium">Você desbloqueou um desconto exclusivo para o Futebol de Sabão!</p>
             <div class="bg-blue-50 border-2 border-blue-600 border-dashed rounded-2xl p-5 mb-8 relative">
                 <span id="promo-code-offer" class="text-3xl font-black text-blue-700 tracking-[0.3em] uppercase">BOLHA20</span>
             </div>
-            <button onclick="copyToClipboard('promo-code-offer', this)" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl mb-4 uppercase text-xs tracking-widest">Copiar Cupom</button>
-            <button onclick="hideOfferModal()" class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Fechar</button>
+            <button onclick="copyToClipboard('promo-code-offer', this)" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl mb-4 uppercase text-xs tracking-widest transition-all">Copiar e Reservar</button>
+            <button onclick="hideOfferModal()" class="text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:text-red-500">Voltar</button>
         </div>
     </div>
 
@@ -340,24 +360,20 @@
             if(!container) return;
             const totalSlices = prizes.length;
             const sliceDeg = 360 / totalSlices;
-            
             prizes.forEach((p, i) => {
                 const angle = i * sliceDeg;
                 const radiansStart = (angle - 90) * Math.PI / 180;
                 const radiansEnd = (angle + sliceDeg - 90) * Math.PI / 180;
-                
                 const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 path.setAttribute("d", `M 50 50 L ${50 + 50 * Math.cos(radiansStart)} ${50 + 50 * Math.sin(radiansStart)} A 50 50 0 0 1 ${50 + 50 * Math.cos(radiansEnd)} ${50 + 50 * Math.sin(radiansEnd)} Z`);
                 path.setAttribute("fill", p.color);
                 path.setAttribute("stroke", "rgba(255,255,255,0.1)");
                 container.appendChild(path);
-
                 const textAngle = angle + (sliceDeg / 2);
                 const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 const textDist = 38; 
                 const tx = 50 + textDist * Math.cos((textAngle - 90) * Math.PI / 180);
                 const ty = 50 + textDist * Math.sin((textAngle - 90) * Math.PI / 180);
-                
                 text.setAttribute("x", tx); text.setAttribute("y", ty);
                 text.setAttribute("class", "prize-text");
                 text.setAttribute("text-anchor", "middle");
@@ -374,19 +390,15 @@
             const btn = document.getElementById('spin-btn');
             const wheel = document.getElementById('wheel');
             btn.disabled = true; btn.style.opacity = "0.5";
-            btn.innerText = "SORTEANDO...";
-
             let rand = Math.random();
             let prizeIndex = 0;
             let cumulative = 0;
             for(let i=0; i<prizes.length; i++) { cumulative += prizes[i].prob; if(rand <= cumulative) { prizeIndex = i; break; } }
-
             const spins = 12; 
             const sliceDeg = 360 / prizes.length;
             const newRotation = (spins * 360) + (360 - (prizeIndex * sliceDeg)) - (sliceDeg / 2);
             currentRotation += newRotation;
             wheel.style.transform = `rotate(${currentRotation}deg)`;
-
             setTimeout(() => {
                 const prize = prizes[prizeIndex];
                 if (prize.code === "RETRY") {
@@ -426,7 +438,7 @@
         window.closeRoulette = () => {
             document.getElementById('roulette-overlay').style.display = 'none';
             document.body.style.overflow = '';
-            try { sessionStorage.setItem('encanto_roulette_v1', 'true'); } catch(e){}
+            try { sessionStorage.setItem('encanto_roulette_v2', 'true'); } catch(e){}
         };
 
         // --- SLIDER INFINITO ---
@@ -487,7 +499,7 @@
             setupSlider();
             startCountdown();
             drawWheel();
-            if(!sessionStorage.getItem('encanto_roulette_v1')) {
+            if(!sessionStorage.getItem('encanto_roulette_v2')) {
                 setTimeout(() => {
                     const overlay = document.getElementById('roulette-overlay');
                     if(overlay) {
