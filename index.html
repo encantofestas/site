@@ -139,11 +139,11 @@
             letter-spacing: 0.05em;
         }
 
-        /* --- PROMO POPUP STYLES (REPROJETADO PREMIUM) --- */
+        /* --- NOVO PROMO POPUP STYLES (MARKETING LUXURY) --- */
         #promo-modal-overlay {
             z-index: 10000;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
             position: fixed;
             inset: 0;
             display: none;
@@ -151,60 +151,100 @@
             justify-content: center;
             padding: 24px;
         }
-        .promo-modal {
+        .luxury-modal {
             background: white;
             width: 100%;
-            max-width: 420px;
-            border-radius: 3.5rem;
-            padding: 2.5rem;
+            max-width: 380px;
+            border-radius: 3rem;
             text-align: center;
-            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.4);
             position: relative;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .luxury-coupon {
-            position: relative;
-            background: #F8FAFC;
-            border: 2px dashed #2563EB;
-            padding: 1.5rem;
-            border-radius: 2rem;
-            margin: 2rem 0;
-            cursor: pointer;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
         }
-        .luxury-coupon:active { transform: scale(0.96); }
-        .luxury-coupon::before, .luxury-coupon::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 20px;
-            height: 20px;
+        .promo-header-premium {
+            background: linear-gradient(180deg, #2563EB 0%, #1E40AF 100%);
+            padding: 40px 24px;
+            color: white;
+            position: relative;
+        }
+        .luxury-badge-top {
+            background: #FACC15;
+            color: #1E3A8A;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 16px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: inline-block;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.3);
+        }
+        .ticket-body {
+            padding: 32px 24px;
             background: white;
-            border-radius: 50%;
-            transform: translateY(-50%);
-            border: 2px dashed #2563EB;
         }
-        .luxury-coupon::before { left: -12px; }
-        .luxury-coupon::after { right: -12px; }
-
-        .coupon-text {
+        .luxury-coupon-container {
+            background: #F8FAFC;
+            border: 2px solid #E2E8F0;
+            padding: 24px 16px;
+            border-radius: 2rem;
+            margin: 8px 0 24px 0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .luxury-coupon-container:active { transform: scale(0.96); border-color: #2563EB; }
+        
+        .coupon-code-text {
             font-family: 'Baloo 2', cursive;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: #2563EB;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
             line-height: 1;
+            display: block;
         }
         
-        .pulse-soft {
-            animation: pulse-soft 2s infinite;
+        .timer-strip {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
         }
-        @keyframes pulse-soft {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        .timer-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+        .timer-val {
+            font-size: 22px;
+            font-weight: 900;
+            color: #1E293B;
+            font-family: 'Baloo 2', cursive;
+        }
+        .timer-lab {
+            font-size: 8px;
+            font-weight: 800;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-close-luxury {
+            background: #1E293B;
+            color: white;
+            width: 100%;
+            padding: 18px;
+            border-radius: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 2px;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 25px rgba(30, 41, 59, 0.2);
+        }
+        .btn-close-luxury:active { transform: scale(0.98); opacity: 0.9; }
     </style>
 </head>
 <body class="text-gray-700 flex flex-col min-h-screen bg-slate-50">
@@ -233,44 +273,46 @@
         </div>
     </div>
 
-    <!-- POPUP DE PROMOÇÃO (REPROJETADO LUXURY) -->
+    <!-- POPUP DE PROMOÇÃO (REDESENHADO PREMIUM) -->
     <div id="promo-modal-overlay" onclick="closePromoModal(event)">
-        <div class="promo-modal" onclick="event.stopPropagation()">
-            <!-- Detalhe superior -->
-            <div class="bg-blue-600 w-12 h-1.5 rounded-full mx-auto mb-8 opacity-20"></div>
-            
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-50 rounded-full mb-6 text-3xl">✨</div>
-            
-            <h3 class="text-3xl font-black brand-font text-slate-900 uppercase tracking-tighter leading-tight">Oportunidade <br><span class="text-blue-600">Desbloqueada</span></h3>
-            <p class="text-slate-500 text-sm mt-3 font-semibold px-4 tracking-tight">Utilize o código abaixo no fechamento da sua reserva diretamente em nosso site.</p>
-            
-            <div class="luxury-coupon pulse-soft" id="coupon-code-container" onclick="copyPromoCoupon()">
-                <div id="coupon-code" class="coupon-text">CASTELO20</div>
-                <div id="copy-status" class="text-[9px] font-black text-blue-400 uppercase tracking-[0.2em] mt-3">Toque para copiar código</div>
+        <div class="luxury-modal" onclick="event.stopPropagation()">
+            <div class="promo-header-premium">
+                <div class="luxury-badge-top">Exclusivo</div>
+                <h3 class="text-3xl font-black brand-font uppercase leading-none mb-2">Reserva VIP</h3>
+                <p class="text-blue-100 text-[11px] font-medium opacity-80 uppercase tracking-widest">Aproveite agora mesmo</p>
             </div>
             
-            <div class="flex items-center justify-center gap-6 py-4 border-y border-slate-100 my-6">
-                <div class="flex flex-col">
-                    <span id="modal-hours" class="text-2xl font-black text-slate-800 leading-none">00</span>
-                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Horas</span>
+            <div class="ticket-body">
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Código de Desconto</p>
+                
+                <div class="luxury-coupon-container" onclick="copyPromoCoupon()">
+                    <span id="coupon-code" class="coupon-code-text">CASTELO20</span>
+                    <div id="copy-status" class="text-[9px] font-black text-blue-600 uppercase tracking-widest mt-3 opacity-60">Toque para copiar</div>
                 </div>
-                <div class="w-px h-8 bg-slate-100"></div>
-                <div class="flex flex-col">
-                    <span id="modal-mins" class="text-2xl font-black text-slate-800 leading-none">00</span>
-                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Minutos</span>
-                </div>
-                <div class="w-px h-8 bg-slate-100"></div>
-                <div class="flex flex-col">
-                    <span id="modal-segs" class="text-2xl font-black text-blue-600 leading-none">00</span>
-                    <span class="text-[8px] font-bold text-blue-400 uppercase tracking-widest mt-1">Segundos</span>
-                </div>
-            </div>
 
-            <button onclick="closePromoModal(null)" class="w-full bg-slate-900 text-white font-black py-5 rounded-3xl shadow-2xl active:scale-95 transition-all text-xs uppercase tracking-[0.2em]">
-                Aplicar e continuar
-            </button>
-            
-            <p class="mt-6 text-[10px] text-slate-300 font-bold uppercase tracking-widest">Oferta exclusiva para este dispositivo</p>
+                <div class="timer-strip">
+                    <div class="timer-block">
+                        <span id="modal-hours" class="timer-val">00</span>
+                        <span class="timer-lab">Horas</span>
+                    </div>
+                    <div class="timer-val opacity-20">:</div>
+                    <div class="timer-block">
+                        <span id="modal-mins" class="timer-val">00</span>
+                        <span class="timer-lab">Minutos</span>
+                    </div>
+                    <div class="timer-val opacity-20">:</div>
+                    <div class="timer-block">
+                        <span id="modal-segs" class="timer-val text-blue-600">00</span>
+                        <span class="timer-lab">Segundos</span>
+                    </div>
+                </div>
+
+                <button onclick="closePromoModal(null)" class="btn-close-luxury">
+                    Fechar
+                </button>
+                
+                <p class="mt-6 text-[9px] text-slate-300 font-bold uppercase tracking-widest">O desconto será aplicado no carrinho</p>
+            </div>
         </div>
     </div>
 
@@ -429,13 +471,11 @@
             }
 
             function updateDisplay(d, h, m, s) {
-                // Main countdown
                 if(document.getElementById('days')) document.getElementById('days').innerText = d;
                 if(document.getElementById('hours')) document.getElementById('hours').innerText = h;
                 if(document.getElementById('minutes')) document.getElementById('minutes').innerText = m;
                 if(document.getElementById('seconds')) document.getElementById('seconds').innerText = s;
                 
-                // Modal countdown (hours, mins, segs only for cleaner luxury look)
                 if(document.getElementById('modal-hours')) document.getElementById('modal-hours').innerText = h;
                 if(document.getElementById('modal-mins')) document.getElementById('modal-mins').innerText = m;
                 if(document.getElementById('modal-segs')) document.getElementById('modal-segs').innerText = s;
@@ -466,13 +506,12 @@
             document.body.removeChild(el);
             
             const status = document.getElementById('copy-status');
-            const originalText = status.innerText;
-            status.innerText = "COPIADO PARA ÁREA DE TRANSFERÊNCIA! ✅";
+            status.innerText = "COPIADO COM SUCESSO! ✅";
             status.style.color = "#10b981";
             setTimeout(() => {
-                status.innerText = originalText;
-                status.style.color = "#60A5FA";
-            }, 2500);
+                status.innerText = "Toque para copiar";
+                status.style.color = "#2563EB";
+            }, 2000);
         };
 
         // --- ROLETA ---
