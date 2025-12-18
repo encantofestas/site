@@ -121,6 +121,18 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+
+        /* FAQ Estilos */
+        .faq-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out; }
+        .faq-item[open] .faq-content { max-height: 300px; padding-bottom: 1rem; }
+        .faq-summary svg { transition: transform 0.3s; }
+        .faq-item[open] .faq-summary svg { transform: rotate(180deg); }
+
+        @keyframes pulse-promo {
+            0%, 100% { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 6px 15px rgba(250, 204, 21, 0.8), 0 0 0 2px rgba(250, 204, 21, 0.3); }
+        }
+        .promo-pulse { animation: pulse-promo 2s infinite ease-in-out; }
     </style>
 </head>
 <body class="text-gray-700 min-h-screen-safe flex flex-col">
@@ -252,6 +264,59 @@
             </div>
         </section>
 
+        <!-- SEÇÃO: PROMOÇÃO CUPOM FIDELIDADE -->
+        <section class="px-4 max-w-7xl mx-auto mb-10">
+            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between text-blue-900 overflow-hidden relative promo-pulse">
+                <div class="text-center md:text-left mb-4 md:mb-0 relative z-10">
+                    <h3 class="font-extrabold text-2xl brand-font leading-tight text-white drop-shadow-md">Já é cliente? Ganhe 20%</h3>
+                    <p class="text-sm font-semibold mt-1 text-yellow-50 opacity-90">Validação rápida. Desconto na hora!</p>
+                </div>
+                <button class="relative z-10 bg-white text-yellow-700 hover:bg-yellow-50 font-bold py-3 px-6 rounded-full shadow-lg transition transform active:scale-95 text-sm w-full md:w-auto border-2 border-yellow-200">
+                    Resgatar Cupom 🎁
+                </button>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: WIDGET TAGGBOX -->
+        <section class="px-4 max-w-7xl mx-auto mb-10">
+            <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">O que acham da Encanto</h2>
+            <div class="w-full h-[350px] md:h-[600px] rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                <iframe src="https://widget.taggbox.com/310470?website=1" style="width:100%;height:100%;overflow:auto;border:none;" loading="lazy"></iframe>
+            </div>
+        </section>
+
+        <!-- SEÇÃO DO MAPA -->
+        <section class="px-4 max-w-7xl mx-auto mb-10">
+            <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Nossa Localização</h2>
+            <div class="bg-white rounded-2xl shadow-xl p-0 border border-gray-100 overflow-hidden h-64 md:h-96">
+                <iframe src="https://maps.google.com/maps?q=PREFEITO%20JOSÉ%20SCHDMIT,%20281,%20RETA%20SÃO%20FRANCISCO%20DO%20SUL&t=&z=14&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq-section" class="px-4 max-w-7xl mx-auto mb-10">
+            <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Perguntas Frequentes</h2>
+            <div class="space-y-4">
+                <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-primary">
+                    <h3 class="text-xl font-bold brand-font text-primary mb-3">Reserva e Cancelamento 🗓️</h3>
+                    <details class="faq-item border-b pb-3 pt-2">
+                        <summary class="faq-summary flex justify-between items-center cursor-pointer font-semibold text-gray-700">
+                            <span>Quanto tempo o brinquedo fica na minha casa?</span>
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <p class="faq-content text-gray-600 mt-2 pl-4 text-sm">O tempo garantido é o que você selecionar no agendamento (padrão até 6h). Pode variar dependendo da escala do dia.</p>
+                    </details>
+                    <details class="faq-item pt-2">
+                        <summary class="faq-summary flex justify-between items-center cursor-pointer font-semibold text-gray-700">
+                            <span>Tem taxa de cancelamento?</span>
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <p class="faq-content text-gray-600 mt-2 pl-4 text-sm">A taxa de reserva não é devolvida em caso de desistência, mas pode ser convertida em crédito para uma nova data dentro de 30 dias.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- FOOTER (Desktop) -->
@@ -278,7 +343,7 @@
                 </a>
             </div>
             <a href="catalogo.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400">
-                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
                 <span class="text-[10px] font-medium">Catálogo</span>
             </a>
             <a href="perfil.html" class="flex flex-col items-center justify-center w-full h-full text-gray-400">
