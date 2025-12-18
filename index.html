@@ -87,16 +87,18 @@
         .promo-pulse { animation: pulse-promo 2s infinite ease-in-out; }
         @keyframes pulse-promo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.015); } }
 
-        /* --- ROLETA MOBILE-FIRST (Z-INDEX 9999) --- */
+        /* --- ROLETA MOBILE-FIRST (ESTÁTICA SEM SCROLL) --- */
         #roulette-overlay {
             z-index: 9999;
             background: rgba(15, 23, 42, 0.92);
             backdrop-filter: blur(15px);
             position: fixed;
             inset: 0;
-            display: none; /* Controlado via JS */
+            display: none;
             align-items: center;
             justify-content: center;
+            touch-action: none; /* Bloqueia scroll no celular */
+            overscroll-behavior: none;
         }
         .roulette-modal-content {
             background: rgba(255, 255, 255, 0.08);
@@ -105,19 +107,20 @@
             border-radius: 3rem;
             width: 92%;
             max-width: 380px;
-            padding: 2rem;
+            padding: 1.5rem;
             color: white;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
         .wheel-outer {
             position: relative;
-            width: min(280px, 75vw);
-            height: min(280px, 75vw);
-            margin: 1.5rem auto;
+            width: min(270px, 72vw);
+            height: min(270px, 72vw);
+            margin: 1rem auto;
             border: 5px solid rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             background: #0f172a;
-            box-shadow: 0 0 40px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 0 30px rgba(37, 99, 235, 0.4);
         }
         #wheel {
             width: 100%;
@@ -148,8 +151,8 @@
         <div id="roulette-modal" class="roulette-modal-content text-center">
             <div class="relative z-10">
                 <div class="inline-block bg-yellow-400 text-slate-900 text-[10px] font-black px-4 py-1 rounded-full uppercase mb-2">Presente de Boas-Vindas</div>
-                <h3 class="text-2xl font-black text-white brand-font mb-1 uppercase tracking-tight">Gire e Ganhe!</h3>
-                <p class="text-blue-100/70 text-[11px] font-medium mb-2">Descontos exclusivos para você</p>
+                <h3 class="text-xl font-black text-white brand-font mb-1 uppercase tracking-tight">Gire e Ganhe!</h3>
+                <p class="text-blue-100/70 text-[10px] font-medium mb-2">Sua diversão começa com desconto</p>
                 
                 <div class="wheel-outer">
                     <img class="wheel-pointer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M12 21l-8-12h16l-8 12z'/%3E%3C/svg%3E" alt="Ponteiro">
@@ -213,9 +216,16 @@
             <p class="text-blue-50 mb-8 max-w-lg mx-auto text-sm md:text-base font-normal opacity-90">
                 Você escolhe, a gente entrega e monta. Simples assim
             </p>
-            <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-bold py-4 px-10 rounded-full shadow-xl active:scale-95 transition-all transform hover:scale-105 text-sm uppercase tracking-wider">
-                Fazer Orçamento / Reservar
-            </button>
+            
+            <!-- Botões Hero -->
+            <div class="flex items-center justify-center gap-3">
+                <button onclick="window.location.href='orcamento.html'" class="bg-blue-800/40 backdrop-blur-md text-white border border-white/20 p-3.5 rounded-full shadow-xl active:scale-95 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2,5" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+                </button>
+                <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-extrabold py-3 px-6 rounded-full shadow-xl active:scale-95 transition-all transform hover:scale-105 text-xs md:text-sm uppercase tracking-wider">
+                    Fazer Orçamento / Reservar
+                </button>
+            </div>
         </section>
 
         <!-- SLIDER DOS 13 BRINQUEDOS (VELOCIDADE 0.9) -->
@@ -309,7 +319,6 @@
 
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         
-        // --- INICIALIZAÇÃO SEGURA ---
         try {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
@@ -382,9 +391,8 @@
                 const prize = prizes[prizeIndex];
                 if (prize.code === "RETRY") {
                     btn.disabled = false; btn.style.opacity = "1"; btn.innerText = "Girar Novamente!";
-                    alert("Você ganhou +1 Giro! Tente agora! 🔄");
                 } else if (prize.code) { showWinPopup(prize); } 
-                else { alert("Poxa, não foi dessa vez. Aproveite o site!"); closeRoulette(); }
+                else { closeRoulette(); }
             }, 8200); 
         };
 
@@ -479,10 +487,7 @@
             setupSlider();
             startCountdown();
             drawWheel();
-            
-            // Verificação forçada para mobile
-            const shouldShow = !sessionStorage.getItem('encanto_roulette_v1');
-            if(shouldShow) {
+            if(!sessionStorage.getItem('encanto_roulette_v1')) {
                 setTimeout(() => {
                     const overlay = document.getElementById('roulette-overlay');
                     if(overlay) {
