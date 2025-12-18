@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Encanto Festas - Locação de Brinquedos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'Baloo 2', cursive;
+        }
+        .min-h-screen-safe {
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        .bg-primary { background-color: #2563EB; }
+        .text-primary { color: #2563EB; }
+        .bg-secondary { background-color: #FACC15; }
+        .text-secondary { color: #CA8A04; }
+        #bottom-nav {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(4rem + env(safe-area-inset-bottom));
+        }
+        .floating-fab {
+            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        #notification-panel {
+            z-index: 100;
+            transition: transform 0.3s ease-out;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            max-width: 100vw;
+            height: 100dvh;
+            background-color: #2563EB;
+        }
+        
+        #coupon-modal {
+            z-index: 110;
+            overflow-y: auto;
+        }
+        #coupon-modal-wrapper {
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        @keyframes pulse-promo {
+            0%, 100% { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 6px 15px rgba(250, 204, 21, 0.8), 0 0 0 2px rgba(250, 204, 21, 0.3); }
+        }
+        .promo-pulse {
+            animation: pulse-promo 2s infinite ease-in-out;
+        }
+
+        /* Estilos do Carrossel Otimizados para Mobile */
+        .infinite-slider-track {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            /* Importante: desativar scroll suave aqui para o JS funcionar sem delay */
+            scroll-behavior: auto !important; 
+            -webkit-overflow-scrolling: touch;
+            padding: 0.5rem 1rem;
+            min-height: 160px; /* Garante visibilidade antes das fotos carregarem */
+        }
+        .slider-card {
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+            width: 180px; /* Tamanho fixo base para mobile */
+        }
+        @media (min-width: 768px) {
+            .slider-card { width: 240px; }
+        }
+        .slider-card:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="text-gray-700 min-h-screen-safe flex flex-col">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16">
+        <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.reload()">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
+                    alt="Logo Encanto Festas" 
+                    class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner"
+                    onerror="this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
+                <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
+            </div>
+            
+            <button class="text-white p-2 relative rounded-full hover:bg-blue-600 transition" onclick="toggleNotificationPanel()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-gray-50 overflow-x-hidden">
+        
+        <!-- Hero -->
+        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-8 text-center relative overflow-hidden mb-6">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, #ffffff 2px, transparent 2px); background-size: 30px 30px;"></div>
+            <span class="bg-blue-800 text-blue-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">📍 São Francisco do Sul</span>
+            <h1 class="text-3xl font-extrabold leading-tight mb-2">Brinquedos que transformam <span class="text-yellow-300">sua festa</span></h1>
+            <p class="text-blue-100 mb-5 text-sm">Você escolhe, a gente entrega e monta.</p>
+            <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-bold py-3 px-8 rounded-full shadow-lg active:scale-95 transition text-base">
+                Simular e Reservar
+            </button>
+        </section>
+
+        <!-- CARROSSEL DE PRODUTOS -->
+        <section class="mb-8 overflow-hidden relative">
+            <div class="px-4 mb-3">
+                <h2 class="text-xl font-bold brand-font text-blue-600 flex items-center gap-2">
+                    <span class="text-yellow-500">✨</span> Nossos Brinquedos
+                </h2>
+            </div>
+
+            <!-- Trilho do Carrossel -->
+            <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
+                <!-- Conteúdo gerado pelo JavaScript -->
+            </div>
+            
+            <div class="md:hidden text-center mt-2">
+                <span class="text-[10px] text-gray-400 font-medium animate-pulse">Arraste para ver mais →</span>
+            </div>
+        </section>
+
+        <!-- PASSOS -->
+        <section class="px-4 mb-10">
+            <h2 class="text-2xl font-bold brand-font text-blue-600 text-center mb-6">Festa pronta em 4 passos</h2>
+            <div id="steps-slider" class="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x">
+                
+                <div class="min-w-[80vw] snap-center bg-white rounded-2xl border border-blue-100 shadow-sm p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-xl">🤔</div>
+                    <div>
+                        <h3 class="font-bold text-blue-700">1. Tire dúvidas</h3>
+                        <p class="text-xs text-gray-500">Consulte as regras no FAQ.</p>
+                    </div>
+                </div>
+
+                <div onclick="window.location.href='calendario.html'" class="min-w-[80vw] snap-center bg-white rounded-2xl border-2 border-yellow-200 shadow-md p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex-shrink-0 flex items-center justify-center text-xl">💰</div>
+                    <div>
+                        <h3 class="font-bold text-yellow-700">2. Simule Preço</h3>
+                        <p class="text-xs text-gray-500">Veja o valor na hora.</p>
+                    </div>
+                </div>
+
+                <div class="min-w-[80vw] snap-center bg-white rounded-2xl border border-green-100 shadow-sm p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex-shrink-0 flex items-center justify-center text-xl">📝</div>
+                    <div>
+                        <h3 class="font-bold text-green-700">3. Dados</h3>
+                        <p class="text-xs text-gray-500">Endereço e horário.</p>
+                    </div>
+                </div>
+
+                <div class="min-w-[80vw] snap-center bg-white rounded-2xl border border-pink-100 shadow-sm p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-pink-100 rounded-full flex-shrink-0 flex items-center justify-center text-xl">✅</div>
+                    <div>
+                        <h3 class="font-bold text-pink-700">4. Reserva</h3>
+                        <p class="text-xs text-gray-500">Confirmação garantida!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- PROMO -->
+        <section class="px-4 mb-10">
+            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-2xl shadow-lg text-blue-900 promo-pulse" onclick="showCouponModal()">
+                <h3 class="font-extrabold text-xl brand-font text-white mb-1">Ganhe 20% de Desconto</h3>
+                <p class="text-xs font-semibold text-yellow-50 mb-4">Válido para clientes que já alugaram antes.</p>
+                <button class="bg-white text-yellow-700 font-bold py-2 px-6 rounded-full text-sm w-full">Resgatar Agora 🎁</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- NAV BOTTOM -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-100 z-50 flex items-start md:hidden">
+        <div class="grid grid-cols-5 w-full h-full">
+            <div class="flex flex-col items-center justify-center text-blue-600"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg><span class="text-[10px]">Início</span></div>
+            <a href="combos.html" class="flex flex-col items-center justify-center text-gray-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg><span class="text-[10px]">Combos</span></a>
+            <div class="relative flex justify-center"><a href="calendario.html" class="floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center border-4 border-gray-50"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></a></div>
+            <a href="catalogo.html" class="flex flex-col items-center justify-center text-gray-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg><span class="text-[10px]">Catálogo</span></a>
+            <a href="perfil.html" class="flex flex-col items-center justify-center text-gray-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[10px]">Perfil</span></a>
+        </div>
+    </nav>
+
+    <script type="module">
+        const productsList = [
+             { "id": 6, "name": "Mini Baby Inflável", "image": "https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" },
+             { "id": 11, "name": "Air Hockey", "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" },
+             { "id": 1, "name": "Cama Elástica P", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" },
+             { "id": 2, "name": "Cama Elástica M", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camam.webp" },
+             { "id": 4, "name": "Piscina de Bolinhas", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" },
+             { "id": 5, "name": "Área Baby", "image": "https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/areababy.webp" },
+             { "id": 8, "name": "Tobogã Médio", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/tobogam.webp" },
+             { "id": 9, "name": "Futebol de Sabão", "image": "https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/futebol.webp" }
+        ];
+
+        function initInfiniteSlider() {
+            const track = document.getElementById('infinite-catalog');
+            if (!track) return;
+
+            // Criar triplicata para garantir o loop sem "buracos" brancos
+            const displayList = [...productsList, ...productsList, ...productsList];
+            
+            track.innerHTML = displayList.map(p => `
+                <div class="slider-card rounded-2xl overflow-hidden shadow-lg bg-white border border-gray-100" onclick="window.location.href='calendario.html'">
+                    <div class="aspect-[4/3] w-full relative">
+                        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://placehold.co/300x200?text=${p.name}'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-2 left-0 right-0 text-center px-2">
+                            <span class="text-white font-bold text-xs brand-font">${p.name}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            let scrollAmount = 0;
+            let isPaused = false;
+            let lastTimestamp = 0;
+
+            function step(timestamp) {
+                if (!lastTimestamp) lastTimestamp = timestamp;
+                const delta = timestamp - lastTimestamp;
+                
+                if (!isPaused) {
+                    // Velocidade baseada no tempo para ser consistente em todos os aparelhos
+                    scrollAmount += 0.04 * delta; 
+                    
+                    // Reset do loop (quando chega a 1/3 do conteúdo total triplicado)
+                    if (scrollAmount >= track.scrollWidth / 3) {
+                        scrollAmount = 0;
+                    }
+                    track.scrollLeft = scrollAmount;
+                } else {
+                    // Se o usuário estiver mexendo, atualizamos a variável pra não dar "pulo" ao soltar
+                    scrollAmount = track.scrollLeft;
+                }
+                
+                lastTimestamp = timestamp;
+                requestAnimationFrame(step);
+            }
+
+            requestAnimationFrame(step);
+
+            // Pausar ao tocar/passar mouse
+            track.addEventListener('touchstart', () => isPaused = true, {passive: true});
+            track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 2000), {passive: true});
+            track.addEventListener('mouseenter', () => isPaused = true);
+            track.addEventListener('mouseleave', () => isPaused = false);
+        }
+
+        // Executar inicialização
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initInfiniteSlider);
+        } else {
+            initInfiniteSlider();
+        }
+    </script>
+</body>
+</html>
