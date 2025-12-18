@@ -3,41 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Slider de Brinquedos - Encanto Festas</title>
+    <title>Encanto Festas - Locação de Brinquedos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
         }
-        .brand-font { font-family: 'Baloo 2', cursive; }
-
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'Baloo 2', cursive;
+        }
+        .min-h-screen-safe {
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        .bg-primary { background-color: #2563EB; }
+        .text-primary { color: #2563EB; }
+        .bg-secondary { background-color: #FACC15; }
+        .text-secondary { color: #CA8A04; }
         
+        /* Estilos do Slider Infinito */
         .infinite-slider-track {
             display: flex;
             gap: 12px;
             overflow-x: auto;
-            padding: 20px 10px;
+            padding: 10px 0 20px 0;
             -webkit-overflow-scrolling: touch;
-            width: 100vw;
+            width: 100%;
             cursor: grab;
         }
-
-        .infinite-slider-track:active {
-            cursor: grabbing;
-        }
-
+        .infinite-slider-track:active { cursor: grabbing; }
         .slider-card {
             flex: 0 0 220px; 
             min-width: 220px;
@@ -52,11 +54,7 @@
             user-select: none;
             cursor: pointer;
         }
-
-        .slider-card:active {
-            transform: scale(0.95);
-        }
-
+        .slider-card:active { transform: scale(0.95); }
         .slider-card img {
             width: 100%;
             height: 100%;
@@ -64,15 +62,6 @@
             display: block;
             pointer-events: none;
         }
-
-        @media (min-width: 768px) {
-            .slider-card { 
-                flex: 0 0 320px; 
-                min-width: 320px; 
-                height: 220px; 
-            }
-        }
-
         .card-overlay {
             position: absolute;
             inset: 0;
@@ -82,55 +71,324 @@
             justify-content: center;
             padding-bottom: 12px;
         }
-
         .card-title {
             color: white;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: center;
             padding: 0 10px;
         }
+        @media (min-width: 768px) {
+            .slider-card { flex: 0 0 320px; min-width: 320px; height: 220px; }
+            .card-title { font-size: 1.1rem; }
+        }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        #bottom-nav {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(4rem + env(safe-area-inset-bottom));
+        }
+        .floating-fab {
+            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.5);
+        }
+        
+        #notification-panel {
+            z-index: 100;
+            transition: transform 0.3s ease-out;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            max-width: 100vw;
+            height: 100dvh;
+            background-color: #2563EB;
+        }
+        
+        #notification-content { height: 100%; display: flex; flex-direction: column; }
+        
+        #coupon-modal { z-index: 110; overflow-y: auto; }
+        #coupon-modal-wrapper { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+
+        .ticket-cutout { position: absolute; width: 24px; height: 24px; background-color: white; border-radius: 50%; top: 50%; transform: translateY(-50%); }
+        .ticket-cutout-left { left: -12px; }
+        .ticket-cutout-right { right: -12px; }
+        
+        @keyframes pulse-promo {
+            0%, 100% { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 6px 15px rgba(250, 204, 21, 0.8), 0 0 0 2px rgba(250, 204, 21, 0.3); }
+        }
+        .promo-pulse { animation: pulse-promo 2s infinite ease-in-out; }
+
+        .faq-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out; }
+        .faq-item[open] .faq-content { max-height: 300px; padding-bottom: 1rem; }
+        .faq-summary svg { transition: transform 0.3s; }
+        .faq-item[open] .faq-summary svg { transform: rotate(180deg); }
+
+        .clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            height: 2.6rem;
+            line-height: 1.3rem;
+        }
     </style>
 </head>
-<body>
+<body class="text-gray-700 min-h-screen-safe flex flex-col">
 
-    <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
-        <!-- Brinquedos Originais -->
-        <div class="slider-card" onclick="window.location.href='calendario.html'">
-            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" alt="Mini Baby">
-            <div class="card-overlay"><span class="card-title brand-font">Mini Baby Inflável</span></div>
+    <!-- HEADER -->
+    <header class="fixed top-0 left-0 right-0 w-full bg-primary shadow-md z-50 h-16">
+        <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
+                    alt="Logo Encanto Festas" 
+                    class="w-10 h-10 rounded-full border-2 border-secondary object-cover shadow-inner"
+                    onerror="this.onerror=null;this.src='https://placehold.co/40x40/FACC15/2563EB?text=EF'">
+                <span class="text-white text-2xl font-bold brand-font tracking-wide">Encanto<span class="text-yellow-300">Festas</span></span>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-4">
+                <button onclick="toggleNotificationPanel()" class="text-white p-2 relative rounded-full hover:bg-blue-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div>
+                </button>
+                <button onclick="window.location.href='perfil.html'" class="text-white hover:bg-blue-600 px-4 py-2 rounded-lg transition text-sm font-semibold">Entrar</button>
+                <button onclick="window.location.href='carrinho.html'" class="bg-secondary text-blue-900 px-5 py-2 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg transform hover:-translate-y-0.5">Agendar Agora</button>
+            </div>
+
+            <button class="md:hidden text-white p-2 relative rounded-full" onclick="toggleNotificationPanel()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                <div class="notification-counter absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary leading-none hidden"></div>
+            </button>
         </div>
-        <div class="slider-card" onclick="window.location.href='calendario.html'">
-            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" alt="Air Hockey">
-            <div class="card-overlay"><span class="card-title brand-font">Air Hockey (Aero)</span></div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-grow w-full pt-16 pb-28 md:pb-12 bg-gray-50 overflow-hidden">
+        
+        <!-- Hero Banner -->
+        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-6 md:py-8 text-center relative overflow-hidden mb-8">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, #ffffff 2px, transparent 2px); background-size: 30px 30px;"></div>
+            <span class="bg-blue-800 text-blue-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">📍 São Francisco do Sul</span>
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-2">Brinquedos que transformam <span class="text-yellow-300">sua festa</span></h1>
+            <p class="text-blue-100 mb-5 max-w-lg mx-auto text-sm md:text-base">Você escolhe, a gente entrega e monta. Simples assim.</p>
+            <div class="flex justify-center gap-3">
+                <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition transform active:scale-95 text-sm">Ver disponibilidade</button>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: NOSSOS BRINQUEDOS (SLIDER INFINITO) -->
+        <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden">
+            <h2 class="text-2xl font-bold brand-font text-blue-600 mb-4 text-center">Nossos Brinquedos</h2>
+            <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
+                <div class="slider-card" onclick="window.location.href='calendario.html'">
+                    <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp" alt="Mini Baby">
+                    <div class="card-overlay"><span class="card-title brand-font">Mini Baby Inflável</span></div>
+                </div>
+                <div class="slider-card" onclick="window.location.href='calendario.html'">
+                    <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp" alt="Air Hockey">
+                    <div class="card-overlay"><span class="card-title brand-font">Air Hockey (Aero)</span></div>
+                </div>
+                <div class="slider-card" onclick="window.location.href='calendario.html'">
+                    <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" alt="Cama Elástica">
+                    <div class="card-overlay"><span class="card-title brand-font">Cama Elástica P</span></div>
+                </div>
+                <div class="slider-card" onclick="window.location.href='calendario.html'">
+                    <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" alt="Piscina">
+                    <div class="card-overlay"><span class="card-title brand-font">Piscina de Bolinhas</span></div>
+                </div>
+                <div class="slider-card" onclick="window.location.href='calendario.html'">
+                    <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp" alt="Castelinho">
+                    <div class="card-overlay"><span class="card-title brand-font">Castelinho</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: COMO FAZER SUA RESERVA -->
+        <section class="px-4 max-w-7xl mx-auto mb-10 overflow-hidden relative">
+            <h2 class="text-2xl font-bold brand-font text-blue-600 text-center mb-4">Como fazer sua reserva</h2>
+            <div id="steps-slider" class="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible gap-4 pb-4 md:pb-0 scrollbar-hide px-2">
+                <!-- Passo 1 -->
+                <a href="#faq-section" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-blue-100 shadow-md p-3 flex items-center gap-4 transition active:scale-95 hover:border-blue-300 group cursor-pointer flex-shrink-0">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-blue-200">🤔</div>
+                    <div class="flex-grow pr-4">
+                        <h3 class="font-extrabold text-lg text-blue-700 leading-tight">1. Tire suas dúvidas</h3>
+                        <p class="text-xs text-gray-500 mt-1 clamp-2">Clique aqui para ver possíveis<br>perguntas antes de começar.</p>
+                    </div>
+                </a>
+                <!-- Passo 2 -->
+                <div onclick="window.location.href='calendario.html'" class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-yellow-100 shadow-md p-3 flex items-center gap-4 transition active:scale-95 hover:border-yellow-300 group cursor-pointer flex-shrink-0">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl group-hover:scale-110 transition border-2 border-yellow-200">🗓️</div>
+                    <div class="flex-grow pr-4">
+                        <h3 class="font-extrabold text-lg text-yellow-700 leading-tight">2. Disponibilidade</h3>
+                        <p class="text-xs text-gray-500 mt-1 clamp-2">Clique em "Ver disponibilidade"<br>e veja as datas livres.</p>
+                    </div>
+                </div>
+                <!-- Passo 3 -->
+                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-green-100 shadow-md p-3 flex items-center gap-4 flex-shrink-0">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl border-2 border-green-200">📝</div>
+                    <div class="flex-grow pr-4">
+                        <h3 class="font-extrabold text-lg text-green-700 leading-tight">3. Formulário</h3>
+                        <p class="text-xs text-gray-500 mt-1 clamp-2">Ao terminar, você será redirecionado ao WhatsApp.</p>
+                    </div>
+                </div>
+                <!-- Passo 4 -->
+                <div class="min-w-[85vw] md:min-w-0 bg-white rounded-full border-2 border-pink-100 shadow-md p-3 flex items-center gap-4 flex-shrink-0">
+                    <div class="w-16 h-16 bg-pink-100 rounded-full flex-shrink-0 flex items-center justify-center text-3xl border-2 border-pink-200">👍</div>
+                    <div class="flex-grow pr-4">
+                        <h3 class="font-extrabold text-lg text-pink-700 leading-tight">4. Concluído!</h3>
+                        <p class="text-xs text-gray-500 mt-1 clamp-2">Tudo pronto! Nossa equipe entrará em contato.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- SEÇÃO: PROMOÇÃO CUPOM FIDELIDADE -->
+        <section class="px-4 max-w-7xl mx-auto mb-10">
+            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between text-blue-900 overflow-hidden relative promo-pulse">
+                <div class="text-center md:text-left mb-4 md:mb-0 relative z-10">
+                    <h3 class="font-extrabold text-2xl brand-font leading-tight text-white drop-shadow-md">Já é cliente? Ganhe 20%</h3>
+                    <p class="text-sm font-semibold mt-1 text-yellow-50 opacity-90">Validação rápida. Desconto na hora!</p>
+                </div>
+                <button onclick="showCouponModal()" class="relative z-10 bg-white text-yellow-700 hover:bg-yellow-50 font-bold py-3 px-6 rounded-full shadow-lg transition transform active:scale-95 text-sm w-full md:w-auto border-2 border-yellow-200">
+                    Resgatar Cupom 🎁
+                </button>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: WIDGET TAGGBOX -->
+        <section class="px-4 max-w-7xl mx-auto mb-10">
+            <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">O que Acham da Encanto</h2>
+            <div class="w-full h-[350px] md:h-[600px] rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                <iframe src="https://widget.taggbox.com/310470?website=1" style="width:100%;height:100%;overflow:auto;border:none;" loading="lazy"></iframe>
+            </div>
+        </section>
+
+        <!-- SEÇÃO DO MAPA -->
+        <section class="px-4 max-w-7xl mx-auto mb-10">
+            <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Localização</h2>
+            <div class="bg-white rounded-2xl shadow-xl p-0 border border-gray-100 overflow-hidden">
+                <a href="https://www.google.com/maps/search/?api=1&query=PREFEITO+JOSÉ+SCHDMIT,+281,+RETA+SÃO+FRANCISCO+DO+SUL" target="_blank" class="block w-full h-64">
+                    <iframe src="https://maps.google.com/maps?q=PREFEITO%20JOSÉ%20SCHDMIT,%20281,%20RETA%20SÃO%20FRANCISCO%20DO%20SUL&t=&z=14&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen=""></iframe>
+                </a>
+                <div class="mt-4 mb-4 text-center">
+                    <p class="text-xs font-semibold text-gray-800">Pref. Jose Schmidt, 281, Da Reta, Sfs</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq-section" class="px-4 max-w-7xl mx-auto mb-10">
+            <h2 class="text-2xl font-bold brand-font text-primary mb-4 text-center">Perguntas Frequentes</h2>
+            <div class="space-y-4">
+                <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-primary">
+                    <h3 class="text-xl font-bold brand-font text-primary mb-3">Reserva e Cancelamento 🗓️</h3>
+                    <details class="faq-item border-b pb-3 pt-2">
+                        <summary class="faq-summary flex justify-between items-center cursor-pointer font-semibold text-gray-700">
+                            <span>Quanto tempo o brinquedo fica na minha casa?</span>
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <p class="faq-content text-gray-600 mt-2 pl-4 text-sm">O tempo garantido é o que você selecionar no agendamento (padrão até 6h). Pode chegar a 24h dependendo da escala.</p>
+                    </details>
+                    <details class="faq-item pt-2">
+                        <summary class="faq-summary flex justify-between items-center cursor-pointer font-semibold text-gray-700">
+                            <span>Tem taxa de cancelamento?</span>
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <p class="faq-content text-gray-600 mt-2 pl-4 text-sm">A taxa de reserva (R$ 25) não é devolvida, mas pode ser usada em uma nova reserva em até 30 dias.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER E NAV -->
+    <footer class="bg-white border-t border-gray-200 py-8 hidden md:block">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+            <p>&copy; 2024 EncantoFestas Locações. São Francisco do Sul.</p>
         </div>
-        <div class="slider-card" onclick="window.location.href='calendario.html'">
-            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp" alt="Cama Elástica">
-            <div class="card-overlay"><span class="card-title brand-font">Cama Elástica P</span></div>
+    </footer>
+
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 md:hidden z-50 flex items-start">
+        <div class="grid grid-cols-5 w-full h-full relative">
+            <div class="flex flex-col items-center justify-center text-blue-600">
+                <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                <span class="text-[10px] font-medium">Início</span>
+            </div>
+            <a href="combos.html" class="flex flex-col items-center justify-center text-gray-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="4" y="8" width="13" height="13" rx="2" stroke-width="2" /></svg><span class="text-[10px] font-medium">Combos</span></a>
+            <div class="relative flex justify-center items-center"><a href="calendario.html" class="floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center border-4 border-gray-50"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 9h.01M9 16h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></a></div>
+            <a href="catalogo.html" class="flex flex-col items-center justify-center text-gray-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg><span class="text-[10px] font-medium">Catálogo</span></a>
+            <a href="perfil.html" class="flex flex-col items-center justify-center text-gray-400"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg><span class="text-[10px] font-medium">Perfil</span></a>
         </div>
-        <div class="slider-card" onclick="window.location.href='calendario.html'">
-            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp" alt="Piscina">
-            <div class="card-overlay"><span class="card-title brand-font">Piscina de Bolinhas</span></div>
-        </div>
-        <div class="slider-card" onclick="window.location.href='calendario.html'">
-            <img src="https://images.weserv.nl/?url=raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp" alt="Castelinho">
-            <div class="card-overlay"><span class="card-title brand-font">Castelinho</span></div>
+    </nav>
+
+    <!-- PAINEL DE NOTIFICAÇÕES -->
+    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[80]"></div>
+    <div id="notification-panel" class="transform translate-x-full">
+        <div id="notification-content">
+            <div class="bg-blue-700 p-4 flex justify-between items-center"><h3 class="text-xl font-bold brand-font text-white">Notificações</h3><button onclick="toggleNotificationPanel()" class="text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
+            <div class="flex-grow overflow-y-auto"><ul id="notification-list" class="p-4 space-y-3"></ul></div>
         </div>
     </div>
 
-    <script>
+    <!-- MODAL CUPOM -->
+    <div id="coupon-modal" class="hidden fixed inset-0 z-[110]" style="background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);">
+        <div id="coupon-modal-wrapper">
+            <div id="coupon-modal-content" class="bg-white rounded-3xl p-6 w-full max-w-md">
+                <div id="coupon-step-form">
+                    <h3 class="text-2xl font-bold brand-font text-primary mb-2 text-center">Verificar Fidelidade</h3>
+                    <p class="text-gray-600 mb-6 text-center text-sm">Dados da última locação para validar 20%.</p>
+                    <form onsubmit="event.preventDefault(); validateCoupon();">
+                        <div class="mb-4"><label class="block text-gray-700 text-sm font-bold mb-1">Nome Completo</label><input type="text" id="coupon-name" class="border rounded-xl w-full py-3 px-4 uppercase" required></div>
+                        <div class="mb-4"><label class="block text-gray-700 text-sm font-bold mb-1">Telefone</label><input type="text" id="coupon-phone" oninput="formatPhone(event)" class="border rounded-xl w-full py-3 px-4" placeholder="(47) 99999-9999" required></div>
+                        <div id="coupon-error-msg" class="hidden text-red-600 text-sm text-center mb-4 font-bold">Dados não encontrados no histórico.</div>
+                        <button type="submit" class="bg-primary text-white font-bold py-3 w-full rounded-full shadow-lg">Validar Cupom</button>
+                    </form>
+                    <button onclick="closeCouponModal()" class="text-sm text-gray-500 mt-4 w-full underline text-center">Cancelar</button>
+                </div>
+                <div id="coupon-step-loading" class="hidden text-center py-10"><div class="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div><p>Verificando histórico...</p></div>
+                <div id="coupon-step-result" class="hidden text-center py-8">
+                    <div class="text-4xl mb-2">🎉</div><h3 class="text-2xl font-bold text-green-600">Cupom Liberado!</h3>
+                    <div class="bg-yellow-100 border-2 border-yellow-400 border-dashed rounded-lg p-6 my-4">
+                        <span id="coupon-code-display" class="font-mono font-black text-2xl tracking-widest">------</span>
+                    </div>
+                    <button onclick="copyCouponCode()" class="bg-green-100 text-green-700 py-2 px-6 rounded-full font-bold">Copiar Código</button>
+                    <div id="copy-feedback" class="h-4 mt-2 text-xs text-green-600 opacity-0">Copiado!</div>
+                    <button onclick="closeCouponModal()" class="text-gray-500 underline text-sm mt-4 block mx-auto">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // LOGICA SLIDER INFINITO
         document.addEventListener('DOMContentLoaded', () => {
             const track = document.getElementById('infinite-catalog');
+            if (!track) return;
+
             let isPaused = false;
-            let scrollSpeed = 0.9; 
+            let scrollSpeed = 0.8; 
             let setWidth = 0;
 
-            // Função para clonar o conteúdo de forma inteligente
             const initInfinite = () => {
                 const items = Array.from(track.children);
-                // Clonamos o set original para a esquerda e para a direita
+                // Clonar sets
                 items.forEach(item => {
                     const clone = item.cloneNode(true);
                     clone.onclick = item.onclick;
@@ -141,26 +399,17 @@
                     clone.onclick = item.onclick;
                     track.insertBefore(clone, track.firstChild);
                 });
-                
                 updateMetrics();
-                // Começa no meio (no set original)
                 track.scrollLeft = setWidth;
             };
 
             const updateMetrics = () => {
-                // Largura de um set completo de brinquedos
                 setWidth = track.scrollWidth / 3;
             };
 
-            // Lógica de Teletransporte Seamless
             const handleInfiniteLoop = () => {
-                if (track.scrollLeft <= 0) {
-                    // Se chegar no limite esquerdo, pula para o meio
-                    track.scrollLeft = setWidth;
-                } else if (track.scrollLeft >= setWidth * 2) {
-                    // Se chegar no limite direito, pula para o meio
-                    track.scrollLeft = setWidth;
-                }
+                if (track.scrollLeft <= 0) { track.scrollLeft = setWidth; }
+                else if (track.scrollLeft >= setWidth * 2) { track.scrollLeft = setWidth; }
             };
 
             function animate() {
@@ -171,28 +420,72 @@
                 requestAnimationFrame(animate);
             }
 
-            // Pausa durante interação
-            const startPause = () => { isPaused = true; };
-            const stopPause = () => { 
-                setTimeout(() => { isPaused = false; }, 1000); 
-            };
-
-            track.addEventListener('mousedown', startPause);
-            window.addEventListener('mouseup', stopPause);
-            track.addEventListener('touchstart', startPause, { passive: true });
-            track.addEventListener('touchend', stopPause, { passive: true });
-            
-            // Monitora o scroll manual do usuário para manter o loop
+            track.addEventListener('mousedown', () => isPaused = true);
+            window.addEventListener('mouseup', () => setTimeout(() => isPaused = false, 1000));
+            track.addEventListener('touchstart', () => isPaused = true, { passive: true });
+            track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1000), { passive: true });
             track.addEventListener('scroll', handleInfiniteLoop);
-
-            window.addEventListener('resize', () => {
-                updateMetrics();
-                track.scrollLeft = setWidth;
-            });
+            window.addEventListener('resize', () => { updateMetrics(); track.scrollLeft = setWidth; });
 
             initInfinite();
             requestAnimationFrame(animate);
         });
+
+        // OUTRAS LOGICAS (NOTIFICAÇÕES, CUPOM)
+        window.toggleNotificationPanel = function() {
+            const p = document.getElementById('notification-panel');
+            const o = document.getElementById('notification-overlay');
+            p.classList.toggle('translate-x-full');
+            o.classList.toggle('hidden');
+        };
+
+        window.formatPhone = function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length > 11) v = v.substring(0, 11);
+            if (v.length > 2) v = '(' + v.substring(0, 2) + ') ' + v.substring(2);
+            if (v.length > 9) v = v.substring(0, 10) + '-' + v.substring(10);
+            e.target.value = v;
+        };
+
+        window.showCouponModal = () => { document.getElementById('coupon-modal').classList.remove('hidden'); showStep('form'); };
+        window.closeCouponModal = () => document.getElementById('coupon-modal').classList.add('hidden');
+        
+        function showStep(s) {
+            ['form', 'loading', 'result'].forEach(st => document.getElementById('coupon-step-'+st).classList.add('hidden'));
+            document.getElementById('coupon-step-'+s).classList.remove('hidden');
+        }
+
+        window.validateCoupon = async () => {
+            showStep('loading');
+            const phone = document.getElementById('coupon-phone').value.replace(/\D/g, '');
+            try {
+                const r = await fetch('lista.json');
+                const list = await r.json();
+                const found = list.find(c => String(c.phone).replace(/\D/g, '') === phone);
+                setTimeout(() => {
+                    if (found) {
+                        const codes = ['FSD8S2', 'JOF383', '939FJS'];
+                        document.getElementById('coupon-code-display').innerText = codes[Math.floor(Math.random()*3)];
+                        showStep('result');
+                        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                    } else {
+                        showStep('form');
+                        document.getElementById('coupon-error-msg').classList.remove('hidden');
+                    }
+                }, 1200);
+            } catch (e) { showStep('form'); alert("Erro ao validar."); }
+        };
+
+        window.copyCouponCode = () => {
+            const c = document.getElementById('coupon-code-display').innerText;
+            navigator.clipboard.writeText(c).then(() => {
+                const f = document.getElementById('copy-feedback');
+                f.classList.remove('opacity-0');
+                setTimeout(() => f.classList.add('opacity-0'), 2000);
+            });
+        };
+
+        signInAnonymously(auth);
     </script>
 </body>
 </html>
