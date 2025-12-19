@@ -403,7 +403,7 @@
         <div class="luxury-modal" onclick="event.stopPropagation()">
             <div class="promo-header-premium">
                 <div class="luxury-badge-top">Exclusivo</div>
-                <h3 class="text-3xl font-black brand-font uppercase leading-none mb-2">Reserva VIP</h3>
+                <h3 class="text-3xl font-black brand-font uppercase leading-none mb-2">CUPOM</h3>
                 <p class="text-blue-100 text-[11px] font-medium opacity-80 uppercase tracking-widest">Aproveite agora mesmo</p>
             </div>
             <div class="ticket-body">
@@ -515,7 +515,6 @@
                 </div>
                 <div class="w-full md:w-auto text-center">
                     <button onclick="openPromoModal()" class="w-full md:px-10 bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all text-sm uppercase tracking-widest block mb-2">Pegar promoção</button>
-                    <!-- ATUALIZADO: Texto de validade -->
                     <p class="text-[9px] text-blue-100/60 font-medium uppercase tracking-tighter">válido até o tempo expirar</p>
                 </div>
             </div>
@@ -576,8 +575,7 @@
         <!-- SEÇÃO: AVALIAÇÕES -->
         <section class="px-6 mb-10">
             <h3 class="section-header-premium">Avaliações</h3>
-            <div class="premium-card-wrapper">
-                <!-- ATUALIZADO: Altura reduzida para 350px para eliminar espaço em branco -->
+            <div class="premium-card-wrapper !px-0">
                 <div class="iframe-embed-container" style="height: 350px;">
                     <iframe src="https://widget.taggbox.com/310470?website=1" style="width:100%;height:100%;overflow:hidden;border:none;"></iframe>
                 </div>
@@ -629,6 +627,7 @@
         <section class="px-6 mb-16">
             <h3 class="section-header-premium">Possíveis perguntas</h3>
             <div class="space-y-3">
+                <!-- FAQ 1: Período -->
                 <div class="faq-item-luxury">
                     <button onclick="toggleFaq(this)" class="faq-btn">
                         <span>Qual o período de locação?</span>
@@ -636,35 +635,38 @@
                     </button>
                     <div class="faq-content">
                         <div class="faq-content-inner">
-                            Nosso aluguel padrão é para o período integral do seu evento (até 5 horas), garantindo horas de alegria sem pressa. Agendamos a entrega conforme sua necessidade.
+                            O tempo garantido é o que você selecionar no agendamento (padrão até 6h). Se precisar de mais tempo, há uma pequena taxa. Em alguns casos, o tempo pode chegar a 24 horas pelo mesmo valor, mas isso não é garantido, apenas se colocado no formulário de reserva.
                         </div>
                     </div>
                 </div>
 
+                <!-- FAQ 2: Entrega -->
                 <div class="faq-item-luxury">
                     <button onclick="toggleFaq(this)" class="faq-btn">
-                        <span>Os brinquedos são higienizados?</span>
+                        <span>Qual o horário de entrega?</span>
                         <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </button>
                     <div class="faq-content">
                         <div class="faq-content-inner">
-                            Segurança e saúde são fundamentais. Realizamos higienização premium com produtos biodegradáveis e bactericidas após cada uso, garantindo proteção total.
+                            Começamos as rotas às 09h30! Normalmente entregamos de 1 a 2 horas antes da festa começar para deixar tudo perfeito. Em alguns casos especiais, podemos até levar um dia antes! 🚚💨
                         </div>
                     </div>
                 </div>
 
+                <!-- FAQ 3: Bairros -->
                 <div class="faq-item-luxury">
                     <button onclick="toggleFaq(this)" class="faq-btn">
-                        <span>O que acontece se chover?</span>
+                        <span>Quais bairros vocês atendem?</span>
                         <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </button>
                     <div class="faq-content">
                         <div class="faq-content-inner">
-                            Se houver previsão de chuva, avaliamos o local. Se houver cobertura, montamos normalmente; caso contrário, oferecemos flexibilidade para reagendamento.
+                            Atendemos todos os bairros de São Francisco do Sul, exceto Vila da Glória. Não entregamos atualmente em Araquari ou Joinville, mas temos planos de expandir nossa base!
                         </div>
                     </div>
                 </div>
 
+                <!-- FAQ 4: Pagamento -->
                 <div class="faq-item-luxury">
                     <button onclick="toggleFaq(this)" class="faq-btn">
                         <span>Quais as formas de pagamento?</span>
@@ -672,7 +674,20 @@
                     </button>
                     <div class="faq-content">
                         <div class="faq-content-inner">
-                            Facilitamos sua reserva! Aceitamos PIX com desconto, além de cartões de crédito e débito. Tudo feito de forma segura e prática.
+                            Aceitamos Pix, Cartão de Crédito ou Dinheiro. Lembre-se: os R$ 25 da reserva são pagos antecipadamente para garantir sua data, e o restante do valor é pago no dia da montagem, após a entrega dos brinquedos.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 5: Higienização -->
+                <div class="faq-item-luxury">
+                    <button onclick="toggleFaq(this)" class="faq-btn">
+                        <span>Os brinquedos são higienizados?</span>
+                        <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div class="faq-content">
+                        <div class="faq-content-inner">
+                            Realizamos o melhor esforço possível na manutenção e limpeza. Geralmente os brinquedos vêm de outra locação no mesmo dia, por isso priorizamos a agilidade na montagem, mantendo sempre o padrão de qualidade necessário.
                         </div>
                     </div>
                 </div>
@@ -703,10 +718,6 @@
                 if(document.getElementById('hours')) document.getElementById('hours').innerText = h;
                 if(document.getElementById('minutes')) document.getElementById('minutes').innerText = m;
                 if(document.getElementById('seconds')) document.getElementById('seconds').innerText = s;
-                if(document.getElementById('modal-days')) document.getElementById('modal-days').innerText = d;
-                if(document.getElementById('modal-hours')) document.getElementById('modal-hours').innerText = h;
-                if(document.getElementById('modal-mins')) document.getElementById('modal-mins').innerText = m;
-                if(document.getElementById('modal-segs')) document.getElementById('modal-segs').innerText = s;
             }
             setInterval(update, 1000);
             update();
@@ -723,7 +734,6 @@
             const content = btn.nextElementSibling;
             const icon = btn.querySelector('svg');
             const allItems = document.querySelectorAll('.faq-item-luxury');
-            const allContents = document.querySelectorAll('.faq-content');
             
             const isOpen = content.style.maxHeight !== '0px' && content.style.maxHeight !== '';
             
@@ -742,13 +752,40 @@
             }
         };
 
-        window.openPromoModal = () => { document.getElementById('promo-modal-overlay').style.display = 'flex'; document.body.style.overflow = 'hidden'; };
-        window.closePromoModal = (e) => { document.getElementById('promo-modal-overlay').style.display = 'none'; document.body.style.overflow = ''; };
+        window.openPromoModal = () => { 
+            document.getElementById('promo-modal-overlay').style.display = 'flex'; 
+            document.body.style.overflow = 'hidden'; 
+        };
+        window.closePromoModal = (e) => { 
+            document.getElementById('promo-modal-overlay').style.display = 'none'; 
+            document.body.style.overflow = ''; 
+        };
         window.copyPromoCoupon = () => {
             const text = document.getElementById('coupon-code').innerText;
             const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
             const status = document.getElementById('copy-status'); status.innerText = "COPIADO COM SUCESSO! ✅"; status.style.color = "#10b981";
             setTimeout(() => { status.innerText = "Toque para copiar"; status.style.color = "#2563EB"; }, 2000);
+        };
+
+        window.closeRoulette = () => { 
+            const overlay = document.getElementById('roulette-overlay'); 
+            if(overlay) overlay.style.display = 'none'; 
+            document.body.style.overflow = ''; 
+            try { sessionStorage.setItem('encanto_roulette_clean', 'true'); } catch(e){} 
+        };
+
+        window.toggleNotificationPanel = () => { 
+            const p = document.getElementById('notification-panel'); 
+            const o = document.getElementById('notification-overlay'); 
+            if (p.classList.contains('translate-x-full')) { 
+                p.classList.remove('translate-x-full'); 
+                o.classList.remove('hidden'); 
+                document.body.style.overflow = 'hidden'; 
+            } else { 
+                p.classList.add('translate-x-full'); 
+                o.classList.add('hidden'); 
+                document.body.style.overflow = ''; 
+            } 
         };
 
         const prizes = [ { label: "NADA", color: "#475569", prob: 0.25, code: null }, { label: "5% OFF", color: "#3b82f6", prob: 0.30, code: "VEM5" }, { label: "GIRAR +", color: "#1e293b", prob: 0.20, code: "RETRY" }, { label: "10% OFF", color: "#2563eb", prob: 0.15, code: "VEM10" }, { label: "FRETE VIP", color: "#10b981", prob: 0.09, code: "FRETE0" }, { label: "50% OFF", color: "#FACC15", prob: 0.01, code: "RARO50" } ];
@@ -779,7 +816,6 @@
             modal.innerHTML = `<div class="py-4 text-center"><div class="text-6xl mb-6">🎈</div><h3 class="text-3xl font-black text-white brand-font mb-2 uppercase">GANHOU!</h3><p class="text-blue-100 font-bold mb-6 text-center">${prize.label}</p><div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8 relative text-center"><span id="win-coupon-code" class="text-3xl font-black text-yellow-400 tracking-widest uppercase">${prize.code}</span></div><button onclick="copyToClipboard('win-coupon-code', this)" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl uppercase tracking-widest text-sm mb-3">Copiar Cupom</button><button onclick="closeRoulette()" class="text-white/50 text-[10px] font-bold uppercase">Entrar no Site</button></div>`;
         }
         window.copyToClipboard = (elementId, btn) => { const text = document.getElementById(elementId).innerText; const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); btn.innerText = "COPIADO! ✅"; setTimeout(() => { closeRoulette(); }, 1000); };
-        window.closeRoulette = () => { const overlay = document.getElementById('roulette-overlay'); if(overlay) overlay.style.display = 'none'; document.body.style.overflow = ''; try { sessionStorage.setItem('encanto_roulette_clean', 'true'); } catch(e){} };
         function setupSlider() {
             const track = document.getElementById('infinite-catalog'); if (!track) return;
             let isPaused = false; let scrollSpeed = 0.9; let setWidth = 0;
@@ -789,8 +825,19 @@
             track.addEventListener('mousedown', () => isPaused = true); window.addEventListener('mouseup', () => setTimeout(() => isPaused = false, 1000));
             track.addEventListener('touchstart', () => isPaused = true); track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1000));
             window.addEventListener('resize', updateMetrics); initInfinite(); window.onload = () => { updateMetrics(); track.scrollLeft = setWidth; }; requestAnimationFrame(animate); }
-        window.toggleNotificationPanel = () => { const p = document.getElementById('notification-panel'); const o = document.getElementById('notification-overlay'); if (p.classList.contains('translate-x-full')) { p.classList.remove('translate-x-full'); o.classList.remove('hidden'); } else { p.classList.add('translate-x-full'); o.classList.add('hidden'); } };
-        document.addEventListener('DOMContentLoaded', () => { setupSlider(); drawWheel(); startCountdown(); if(!sessionStorage.getItem('encanto_roulette_clean')) { setTimeout(() => { const overlay = document.getElementById('roulette-overlay'); if(overlay) { overlay.style.display = 'flex'; document.body.style.overflow = 'hidden'; } }, 1200); } });
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            setupSlider(); drawWheel(); startCountdown(); 
+            if(!sessionStorage.getItem('encanto_roulette_clean')) { 
+                setTimeout(() => { 
+                    const overlay = document.getElementById('roulette-overlay'); 
+                    if(overlay) { 
+                        overlay.style.display = 'flex'; 
+                        document.body.style.overflow = 'hidden'; 
+                    } 
+                }, 1200); 
+            } 
+        });
     </script>
 </body>
 </html>
