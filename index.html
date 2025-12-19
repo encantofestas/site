@@ -26,6 +26,8 @@
         body.modal-active {
             overflow: hidden !important;
             height: 100vh !important;
+            position: fixed;
+            width: 100%;
         }
 
         h1, h2, h3, h4, .brand-font { font-family: 'Baloo 2', cursive; }
@@ -91,7 +93,7 @@
         }
         .card-title { color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; text-align: center; padding: 0 10px; }
 
-        /* --- ROLETA --- */
+        /* --- ROLETA INTERATIVA --- */
         #roulette-overlay {
             z-index: 9999;
             background: rgba(15, 23, 42, 0.95);
@@ -120,16 +122,25 @@
             width: min(270px, 72vw);
             height: min(270px, 72vw);
             margin: 1rem auto;
-            border: 5px solid rgba(255, 255, 255, 0.8);
+            border: 8px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             background: #0f172a;
+            box-shadow: 0 0 40px rgba(37, 99, 235, 0.2);
+            cursor: grab;
         }
-        #wheel { width: 100%; height: 100%; transition: transform 8s cubic-bezier(0.1, 0, 0, 1); }
-        .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 35px; z-index: 40; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.3)); }
+        .wheel-outer:active { cursor: grabbing; }
+        
+        #wheel { 
+            width: 100%; 
+            height: 100%; 
+            transition: transform 8s cubic-bezier(0.1, 0, 0.1, 1);
+            pointer-events: none; /* Deixa o container pai lidar com o drag */
+        }
+        .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 35px; z-index: 40; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
         
         .prize-text { font-size: 5px; font-weight: 900; fill: white; letter-spacing: 0.1px; }
 
-        /* --- COUNTDOWN STYLES --- */
+        /* --- OUTROS ESTILOS --- */
         .countdown-box {
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(8px);
@@ -162,7 +173,6 @@
             letter-spacing: 0.05em;
         }
 
-        /* --- PROMO POPUP STYLES --- */
         #promo-modal-overlay {
             z-index: 10000;
             background: rgba(15, 23, 42, 0.95);
@@ -235,7 +245,6 @@
 
         .btn-close-luxury { background: var(--brand-blue); color: white; width: 100%; padding: 18px; border-radius: 1.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
 
-        /* --- SOCIAL PROOF DESIGN --- */
         .trust-container {
             background: white;
             border-radius: 2.5rem;
@@ -280,16 +289,15 @@
         }
 
         .neighborhood-entry-premium.active-bairro {
-            border-color: #FACC15;
+            border-color: var(--brand-yellow);
             background: #fffef5;
             box-shadow: 0 4px 15px rgba(250, 204, 21, 0.15);
         }
         .neighborhood-entry-premium.active-bairro .rank-number-box {
-            background: #FACC15;
-            color: #1e3a8a;
+            background: var(--brand-yellow);
+            color: var(--brand-blue);
         }
 
-        /* --- FAQ STYLES --- */
         .faq-item-luxury {
             background: #ffffff;
             border: 1px solid #e2e8f0;
@@ -327,7 +335,6 @@
             font-weight: 500;
         }
 
-        /* --- MAP & WIDGET SECTION STYLE --- */
         .premium-card-wrapper {
             background: white;
             border-radius: 2.5rem;
@@ -343,7 +350,6 @@
             border: 1px solid #f1f5f9;
         }
 
-        /* --- CONTACT LIST STYLE --- */
         .contact-luxury-list {
             padding: 20px 5px 0 5px;
             display: flex;
@@ -393,13 +399,18 @@
             <div class="relative z-10">
                 <div class="inline-block bg-yellow-400 text-slate-900 text-[10px] font-black px-4 py-1 rounded-full uppercase mb-2">Presente de Boas-Vindas</div>
                 <h3 class="text-xl font-black text-white brand-font mb-1 uppercase tracking-tight">Gire e Ganhe!</h3>
-                <p class="text-blue-100/70 text-[10px] font-medium mb-2">Sua diversão começa com desconto</p>
-                <div class="wheel-outer">
+                <p class="text-blue-100/70 text-[10px] font-medium mb-2">Arraste a roleta forte para girar!</p>
+                
+                <div class="wheel-outer" id="wheel-drag-area">
                     <img class="wheel-pointer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Cpath d='M12 21l-8-12h16l-8 12z'/%3E%3C/svg%3E" alt="Ponteiro">
                     <svg id="wheel" viewBox="0 0 100 100"><g id="wheel-segments"></g></svg>
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white border-4 border-blue-600 rounded-full z-20 shadow-xl flex items-center justify-center text-[8px] font-black text-blue-600 uppercase">Girar</div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border-4 border-blue-600 rounded-full z-20 shadow-xl flex flex-col items-center justify-center pointer-events-none">
+                        <span class="text-[7px] font-black text-blue-600 uppercase leading-none">Puxe</span>
+                        <span class="text-[10px] font-black text-blue-600 uppercase">Forte</span>
+                    </div>
                 </div>
-                <button id="spin-btn" onclick="spinWheel()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all transform uppercase tracking-widest text-sm mb-4">Tentar a Sorte!</button>
+
+                <button id="spin-btn" onclick="spinWheel()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all transform uppercase tracking-widest text-sm mb-4">Ou clique aqui</button>
                 <button onclick="closeRoulette()" class="text-blue-100/40 text-[10px] font-bold uppercase tracking-widest hover:text-white">Entrar sem desconto</button>
             </div>
         </div>
@@ -410,7 +421,6 @@
         <div class="luxury-modal" onclick="event.stopPropagation()">
             <div class="promo-header-premium">
                 <div class="luxury-badge-top">Exclusivo</div>
-                <!-- ATUALIZADO: Nome para CUPOM DE DESCONTO e sutil redução de fonte -->
                 <h3 class="text-2xl font-black brand-font uppercase leading-none mb-2">CUPOM DE DESCONTO</h3>
                 <p class="text-blue-100 text-[11px] font-medium opacity-80 uppercase tracking-widest">Aproveite agora mesmo</p>
             </div>
@@ -515,7 +525,6 @@
                         <div class="savings-tag">Economize R$ 30,00</div>
                     </div>
                     <div class="flex gap-2.5 justify-center md:justify-start">
-                        <!-- ATUALIZADO: Legendas em Branco -->
                         <div class="flex flex-col items-center"><div id="days" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-white tracking-widest">Dias</span></div>
                         <div class="flex flex-col items-center"><div id="hours" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-white tracking-widest">Horas</span></div>
                         <div class="flex flex-col items-center"><div id="minutes" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-white tracking-widest">Mins</span></div>
@@ -705,6 +714,123 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         try { const app = initializeApp(firebaseConfig); const auth = getAuth(app); signInAnonymously(auth); } catch(e) { console.warn("Firebase offline"); }
 
+        /* --- LÓGICA DE CONTROLO DO SCROLL --- */
+        function toggleScroll(lock) {
+            if (lock) {
+                document.body.classList.add('modal-active');
+            } else {
+                document.body.classList.remove('modal-active');
+            }
+        }
+
+        /* --- LÓGICA DA ROLETA INTERATIVA (DRAG & SPIN) --- */
+        let isDragging = false;
+        let startAngle = 0;
+        let currentRotation = 0;
+        let lastTimestamp = 0;
+        let lastAngle = 0;
+        let velocity = 0;
+        let isSpinning = false;
+
+        const wheel = document.getElementById('wheel');
+        const dragArea = document.getElementById('wheel-drag-area');
+
+        function getAngle(x, y) {
+            const rect = dragArea.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            return Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+        }
+
+        function handleStart(e) {
+            if (isSpinning) return;
+            isDragging = true;
+            const pos = e.touches ? e.touches[0] : e;
+            startAngle = getAngle(pos.clientX, pos.clientY) - currentRotation;
+            lastTimestamp = Date.now();
+            lastAngle = currentRotation;
+            velocity = 0;
+            wheel.style.transition = 'none';
+        }
+
+        function handleMove(e) {
+            if (!isDragging) return;
+            const pos = e.touches ? e.touches[0] : e;
+            const angle = getAngle(pos.clientX, pos.clientY);
+            currentRotation = angle - startAngle;
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            const now = Date.now();
+            const dt = now - lastTimestamp;
+            if (dt > 0) {
+                velocity = (currentRotation - lastAngle) / dt;
+                lastTimestamp = now;
+                lastAngle = currentRotation;
+            }
+        }
+
+        function handleEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            // Requisito: Só contabiliza se girar forte (velocidade > limiar)
+            const threshold = 0.5; 
+            if (Math.abs(velocity) > threshold) {
+                triggerSpin(Math.abs(velocity));
+            } else {
+                // Giro fraco: apenas para
+                velocity = 0;
+            }
+        }
+
+        function triggerSpin(initialVelocity) {
+            if (isSpinning) return;
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('spin-btn').style.opacity = "0.5";
+
+            const prizeIndex = calculatePrize();
+            const sliceDeg = 360 / prizes.length;
+            const extraSpins = 5 + Math.floor(initialVelocity * 5); // Quanto mais rápido, mais gira
+            const targetRotation = currentRotation + (extraSpins * 360) + (360 - (currentRotation % 360)) + (360 - (prizeIndex * sliceDeg)) - (sliceDeg / 2);
+            
+            wheel.style.transition = 'transform 8s cubic-bezier(0.1, 0, 0.1, 1)';
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
+            currentRotation = targetRotation;
+
+            setTimeout(() => {
+                isSpinning = false;
+                const prize = prizes[prizeIndex];
+                if (prize.code === "RETRY") {
+                    document.getElementById('spin-btn').disabled = false;
+                    document.getElementById('spin-btn').style.opacity = "1";
+                    document.getElementById('spin-btn').innerText = "Girar Novamente!";
+                } else if (prize.code) {
+                    showWinPopup(prize);
+                } else {
+                    closeRoulette();
+                }
+            }, 8200);
+        }
+
+        function calculatePrize() {
+            let rand = Math.random();
+            let cumulative = 0;
+            for(let i=0; i<prizes.length; i++) {
+                cumulative += prizes[i].prob;
+                if(rand <= cumulative) return i;
+            }
+            return 0;
+        }
+
+        dragArea.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd);
+        dragArea.addEventListener('touchstart', handleStart, {passive: false});
+        window.addEventListener('touchmove', handleMove, {passive: false});
+        window.addEventListener('touchend', handleEnd);
+
+        /* --- RESTO DAS FUNÇÕES ORIGINAIS --- */
         function startCountdown() {
             const targetDate = new Date('2026-01-01T00:00:00').getTime();
             function update() {
@@ -718,10 +844,8 @@
                 updateDisplay(d.toString().padStart(2, '0'), h.toString().padStart(2, '0'), m.toString().padStart(2, '0'), s.toString().padStart(2, '0'));
             }
             function updateDisplay(d, h, m, s) {
-                // Sincronização rigorosa de todos os IDs
                 const ids = ['days', 'modal-days', 'hours', 'modal-hours', 'minutes', 'modal-mins', 'seconds', 'modal-segs'];
                 const values = [d, d, h, h, m, m, s, s];
-                
                 ids.forEach((id, index) => {
                     const el = document.getElementById(id);
                     if(el) el.innerText = values[index];
@@ -742,7 +866,6 @@
             const content = btn.nextElementSibling;
             const allItems = document.querySelectorAll('.faq-item-luxury');
             const isOpen = content.style.maxHeight !== '0px' && content.style.maxHeight !== '';
-            
             allItems.forEach(i => {
                 i.classList.remove('faq-active');
                 const c = i.querySelector('.faq-content');
@@ -750,7 +873,6 @@
                 const s = i.querySelector('.faq-btn svg');
                 if(s) s.style.transform = 'rotate(0deg)';
             });
-            
             if (!isOpen) {
                 item.classList.add('faq-active');
                 content.style.maxHeight = content.scrollHeight + 'px';
@@ -760,11 +882,11 @@
 
         window.openPromoModal = () => { 
             document.getElementById('promo-modal-overlay').style.display = 'flex'; 
-            document.body.classList.add('modal-active'); // Bloqueia scroll
+            toggleScroll(true);
         };
         window.closePromoModal = (e) => { 
             document.getElementById('promo-modal-overlay').style.display = 'none'; 
-            document.body.classList.remove('modal-active'); // Libera scroll
+            toggleScroll(false);
         };
         window.copyPromoCoupon = () => {
             const text = document.getElementById('coupon-code').innerText;
@@ -773,10 +895,11 @@
             setTimeout(() => { status.innerText = "Toque para copiar"; status.style.color = "#2563EB"; }, 2000);
         };
 
+        window.spinWheel = () => { if(!isSpinning) triggerSpin(2); };
+
         window.closeRoulette = () => { 
-            const overlay = document.getElementById('roulette-overlay'); 
-            if(overlay) overlay.style.display = 'none'; 
-            document.body.classList.remove('modal-active'); 
+            document.getElementById('roulette-overlay').style.display = 'none'; 
+            toggleScroll(false);
             try { sessionStorage.setItem('encanto_roulette_clean', 'true'); } catch(e){} 
         };
 
@@ -786,11 +909,11 @@
             if (p.classList.contains('translate-x-full')) { 
                 p.classList.remove('translate-x-full'); 
                 o.classList.remove('hidden'); 
-                document.body.classList.add('modal-active'); 
+                toggleScroll(true);
             } else { 
                 p.classList.add('translate-x-full'); 
                 o.classList.add('hidden'); 
-                document.body.classList.remove('modal-active'); 
+                toggleScroll(false);
             } 
         };
 
@@ -809,19 +932,12 @@
                 if(p.color === "#FACC15") text.setAttribute("fill", "#0f172a"); text.textContent = "   " + p.label; container.appendChild(text);
             });
         }
-        let currentRotation = 0;
-        window.spinWheel = () => {
-            const btn = document.getElementById('spin-btn'); const wheel = document.getElementById('wheel'); btn.disabled = true; btn.style.opacity = "0.5";
-            let rand = Math.random(); let prizeIndex = 0; let cumulative = 0; for(let i=0; i<prizes.length; i++) { cumulative += prizes[i].prob; if(rand <= cumulative) { prizeIndex = i; break; } }
-            const spins = 12; const sliceDeg = 360 / prizes.length; const newRotation = (spins * 360) + (360 - (prizeIndex * sliceDeg)) - (sliceDeg / 2);
-            currentRotation += newRotation; wheel.style.transform = `rotate(${currentRotation}deg)`;
-            setTimeout(() => { const prize = prizes[prizeIndex]; if (prize.code === "RETRY") { btn.disabled = false; btn.style.opacity = "1"; btn.innerText = "Girar Novamente!"; } else if (prize.code) { showWinPopup(prize); } else { closeRoulette(); } }, 8200); 
-        };
+
         function showWinPopup(prize) {
             const modal = document.getElementById('roulette-modal');
-            modal.innerHTML = `<div class="py-4 text-center"><div class="text-6xl mb-6">🎈</div><h3 class="text-3xl font-black text-white brand-font mb-2 uppercase">GANHOU!</h3><p class="text-blue-100 font-bold mb-6 text-center">${prize.label}</p><div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8 relative text-center"><span id="win-coupon-code" class="text-3xl font-black text-yellow-400 tracking-widest uppercase">${prize.code}</span></div><button onclick="copyToClipboard('win-coupon-code', this)" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl uppercase tracking-widest text-sm mb-3">Copiar Cupom</button><button onclick="closeRoulette()" class="text-white/50 text-[10px] font-bold uppercase">Entrar no Site</button></div>`;
+            modal.innerHTML = `<div class="py-4 text-center"><div class="text-6xl mb-6">🎈</div><h3 class="text-3xl font-black text-white brand-font mb-2 uppercase">GANHOU!</h3><p class="text-blue-100 font-bold mb-6 text-center">${prize.label}</p><div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8 relative text-center"><span id="win-coupon-code" class="text-3xl font-black text-yellow-400 tracking-widest uppercase">${prize.code}</span></div><button onclick="copyWinCoupon('win-coupon-code', this)" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl uppercase tracking-widest text-sm mb-3">Copiar Cupom</button><button onclick="closeRoulette()" class="text-white/50 text-[10px] font-bold uppercase">Entrar no Site</button></div>`;
         }
-        window.copyToClipboard = (elementId, btn) => { const text = document.getElementById(elementId).innerText; const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); btn.innerText = "COPIADO! ✅"; setTimeout(() => { closeRoulette(); }, 1000); };
+        window.copyWinCoupon = (elementId, btn) => { const text = document.getElementById(elementId).innerText; const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); btn.innerText = "COPIADO! ✅"; setTimeout(() => { closeRoulette(); }, 1000); };
 
         function setupSlider() {
             const track = document.getElementById('infinite-catalog'); if (!track) return;
@@ -840,7 +956,7 @@
                     const overlay = document.getElementById('roulette-overlay'); 
                     if(overlay) { 
                         overlay.style.display = 'flex'; 
-                        document.body.classList.add('modal-active'); 
+                        toggleScroll(true);
                     } 
                 }, 1200); 
             } 
