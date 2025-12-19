@@ -51,7 +51,7 @@
             text-align: center;
             font-size: 1.25rem;
             letter-spacing: 0.1em;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             display: block;
         }
 
@@ -60,7 +60,7 @@
             display: flex;
             gap: 12px;
             overflow-x: auto;
-            padding: 10px 10px 20px 10px;
+            padding: 5px 10px 15px 10px;
             -webkit-overflow-scrolling: touch;
             scroll-behavior: auto !important;
         }
@@ -134,13 +134,13 @@
             width: 100%; 
             height: 100%; 
             transition: transform 8s cubic-bezier(0.1, 0, 0.1, 1);
-            pointer-events: none; /* Deixa o container pai lidar com o drag */
+            pointer-events: none;
         }
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 35px; z-index: 40; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
         
         .prize-text { font-size: 5px; font-weight: 900; fill: white; letter-spacing: 0.1px; }
 
-        /* --- OUTROS ESTILOS --- */
+        /* --- COUNTDOWN STYLES --- */
         .countdown-box {
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(8px);
@@ -289,13 +289,13 @@
         }
 
         .neighborhood-entry-premium.active-bairro {
-            border-color: var(--brand-yellow);
+            border-color: #FACC15;
             background: #fffef5;
             box-shadow: 0 4px 15px rgba(250, 204, 21, 0.15);
         }
         .neighborhood-entry-premium.active-bairro .rank-number-box {
-            background: var(--brand-yellow);
-            color: var(--brand-blue);
+            background: #FACC15;
+            color: #1e3a8a;
         }
 
         .faq-item-luxury {
@@ -484,11 +484,12 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="18" x="5" y="3" rx="2"/><line x1="8" x2="16" y1="7" y2="7"/><path d="M16 11h.01"/><path d="M12 11h.01"/><path d="M8 11h.01"/><path d="M12 15h.01"/><path d="M8 15h.01"/><path d="M12 19h.01"/><path d="M8 19h.01"/></svg>
                     Fazer Orçamento / Reservar
                 </button>
+                <p class="text-blue-100/60 text-[10px] font-black uppercase tracking-[0.2em] -mt-1 drop-shadow-sm">é muito fácil</p>
             </div>
         </section>
 
-        <!-- CATÁLOGO -->
-        <section class="mt-12 pb-4">
+        <!-- CATÁLOGO (ESPAÇO NORMAL mt-8) -->
+        <section class="mt-8 pb-4"> 
             <h3 class="section-header-premium">Nossos brinquedos</h3>
             <div class="infinite-slider-container">
                 <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
@@ -509,8 +510,8 @@
             </div>
         </section>
 
-        <!-- CONTAGEM REGRESSIVA -->
-        <section class="mt-10 px-5 mb-10">
+        <!-- CONTAGEM REGRESSIVA (SUBIU PARA mt-8) -->
+        <section class="mt-8 px-5 mb-10"> 
             <h3 class="section-header-premium">Promoção</h3>
             <div class="promo-card rounded-[2.2rem] p-6 relative overflow-hidden flex flex-col md:flex-row items-center gap-6">
                 <div class="w-24 h-24 flex-shrink-0 relative">
@@ -538,8 +539,8 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: PROVA SOCIAL E RANKING DE BAIRROS -->
-        <section class="mt-14 px-6 mb-10">
+        <!-- PRESENÇA (SUBIU PARA mt-8) -->
+        <section class="mt-8 px-6 mb-10"> 
             <h3 class="section-header-premium">Presença em São Chico</h3>
             <div class="trust-container">
                 <div class="experience-counter-box">
@@ -590,18 +591,18 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: AVALIAÇÕES -->
-        <section class="px-6 mb-10">
+        <!-- AVALIAÇÕES (SUBIU PARA mt-8) -->
+        <section class="mt-8 px-6 mb-10"> 
             <h3 class="section-header-premium">Avaliações</h3>
             <div class="premium-card-wrapper !px-0">
-                <div class="iframe-embed-container" style="height: 350px;">
+                <div class="iframe-embed-container" style="height: 600px;"> <!-- Aumentado para 600px para nao cortar -->
                     <iframe src="https://widget.taggbox.com/310470?website=1" style="width:100%;height:100%;overflow:hidden;border:none;"></iframe>
                 </div>
             </div>
         </section>
 
-        <!-- SEÇÃO: MAPA E CONTATOS -->
-        <section class="px-6 mb-10">
+        <!-- CONTATO (SUBIU PARA mt-8) -->
+        <section class="mt-8 px-6 mb-10"> 
             <h3 class="section-header-premium">Contato</h3>
             <div class="map-wrapper">
                 <div class="map-iframe-container">
@@ -641,8 +642,8 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: DÚVIDAS FREQUENTES (FAQ) -->
-        <section class="px-6 mb-16">
+        <!-- FAQ (SUBIU PARA mt-8) -->
+        <section class="mt-8 px-6 mb-16"> 
             <h3 class="section-header-premium">Possíveis perguntas</h3>
             <div class="space-y-3">
                 <div class="faq-item-luxury">
@@ -714,7 +715,6 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         try { const app = initializeApp(firebaseConfig); const auth = getAuth(app); signInAnonymously(auth); } catch(e) { console.warn("Firebase offline"); }
 
-        /* --- LÓGICA DE CONTROLO DO SCROLL --- */
         function toggleScroll(lock) {
             if (lock) {
                 document.body.classList.add('modal-active');
@@ -723,23 +723,13 @@
             }
         }
 
-        /* --- LÓGICA DA ROLETA INTERATIVA (DRAG & SPIN) --- */
-        let isDragging = false;
-        let startAngle = 0;
-        let currentRotation = 0;
-        let lastTimestamp = 0;
-        let lastAngle = 0;
-        let velocity = 0;
-        let isSpinning = false;
-
-        const wheel = document.getElementById('wheel');
-        const dragArea = document.getElementById('wheel-drag-area');
+        /* --- ROLETA INTERATIVA --- */
+        let isDragging = false, startAngle = 0, currentRotation = 0, lastTimestamp = 0, lastAngle = 0, velocity = 0, isSpinning = false;
+        const wheel = document.getElementById('wheel'), dragArea = document.getElementById('wheel-drag-area');
 
         function getAngle(x, y) {
             const rect = dragArea.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            return Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+            return Math.atan2(y - (rect.top + rect.height / 2), x - (rect.left + rect.width / 2)) * (180 / Math.PI);
         }
 
         function handleStart(e) {
@@ -747,40 +737,23 @@
             isDragging = true;
             const pos = e.touches ? e.touches[0] : e;
             startAngle = getAngle(pos.clientX, pos.clientY) - currentRotation;
-            lastTimestamp = Date.now();
-            lastAngle = currentRotation;
-            velocity = 0;
+            lastTimestamp = Date.now(); lastAngle = currentRotation;
             wheel.style.transition = 'none';
         }
 
         function handleMove(e) {
             if (!isDragging) return;
             const pos = e.touches ? e.touches[0] : e;
-            const angle = getAngle(pos.clientX, pos.clientY);
-            currentRotation = angle - startAngle;
+            currentRotation = getAngle(pos.clientX, pos.clientY) - startAngle;
             wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-            const now = Date.now();
-            const dt = now - lastTimestamp;
-            if (dt > 0) {
-                velocity = (currentRotation - lastAngle) / dt;
-                lastTimestamp = now;
-                lastAngle = currentRotation;
-            }
+            const now = Date.now(), dt = now - lastTimestamp;
+            if (dt > 0) { velocity = (currentRotation - lastAngle) / dt; lastTimestamp = now; lastAngle = currentRotation; }
         }
 
         function handleEnd() {
             if (!isDragging) return;
             isDragging = false;
-            
-            // Requisito: Só contabiliza se girar forte (velocidade > limiar)
-            const threshold = 0.5; 
-            if (Math.abs(velocity) > threshold) {
-                triggerSpin(Math.abs(velocity));
-            } else {
-                // Giro fraco: apenas para
-                velocity = 0;
-            }
+            if (Math.abs(velocity) > 0.5) triggerSpin(Math.abs(velocity));
         }
 
         function triggerSpin(initialVelocity) {
@@ -788,39 +761,21 @@
             isSpinning = true;
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('spin-btn').style.opacity = "0.5";
-
-            const prizeIndex = calculatePrize();
-            const sliceDeg = 360 / prizes.length;
-            const extraSpins = 5 + Math.floor(initialVelocity * 5); // Quanto mais rápido, mais gira
-            const targetRotation = currentRotation + (extraSpins * 360) + (360 - (currentRotation % 360)) + (360 - (prizeIndex * sliceDeg)) - (sliceDeg / 2);
-            
+            const prizeIndex = Math.floor(Math.random() * prizes.length); 
+            const extraSpins = 5 + Math.floor(initialVelocity * 5);
+            const targetRotation = currentRotation + (extraSpins * 360) + (360 - (currentRotation % 360)) + (360 - (prizeIndex * (360/prizes.length))) - (180/prizes.length);
             wheel.style.transition = 'transform 8s cubic-bezier(0.1, 0, 0.1, 1)';
             wheel.style.transform = `rotate(${targetRotation}deg)`;
             currentRotation = targetRotation;
-
             setTimeout(() => {
                 isSpinning = false;
                 const prize = prizes[prizeIndex];
                 if (prize.code === "RETRY") {
                     document.getElementById('spin-btn').disabled = false;
                     document.getElementById('spin-btn').style.opacity = "1";
-                    document.getElementById('spin-btn').innerText = "Girar Novamente!";
-                } else if (prize.code) {
-                    showWinPopup(prize);
-                } else {
-                    closeRoulette();
-                }
+                } else if (prize.code) showWinPopup(prize);
+                else closeRoulette();
             }, 8200);
-        }
-
-        function calculatePrize() {
-            let rand = Math.random();
-            let cumulative = 0;
-            for(let i=0; i<prizes.length; i++) {
-                cumulative += prizes[i].prob;
-                if(rand <= cumulative) return i;
-            }
-            return 0;
         }
 
         dragArea.addEventListener('mousedown', handleStart);
@@ -830,91 +785,55 @@
         window.addEventListener('touchmove', handleMove, {passive: false});
         window.addEventListener('touchend', handleEnd);
 
-        /* --- RESTO DAS FUNÇÕES ORIGINAIS --- */
+        /* --- CRONÔMETRO SINCRONIZADO --- */
         function startCountdown() {
             const targetDate = new Date('2026-01-01T00:00:00').getTime();
             function update() {
-                const now = new Date().getTime();
-                const diff = targetDate - now;
-                if (diff <= 0) { updateDisplay('00', '00', '00', '00'); return; }
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                updateDisplay(d.toString().padStart(2, '0'), h.toString().padStart(2, '0'), m.toString().padStart(2, '0'), s.toString().padStart(2, '0'));
+                const now = new Date().getTime(), diff = targetDate - now;
+                if (diff <= 0) return;
+                const d = Math.floor(diff / 86400000).toString().padStart(2, '0'),
+                      h = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0'),
+                      m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0'),
+                      s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                const map = {days: d, 'modal-days': d, hours: h, 'modal-hours': h, minutes: m, 'modal-mins': m, seconds: s, 'modal-segs': s};
+                for (let id in map) { const el = document.getElementById(id); if(el) el.innerText = map[id]; }
             }
-            function updateDisplay(d, h, m, s) {
-                const ids = ['days', 'modal-days', 'hours', 'modal-hours', 'minutes', 'modal-mins', 'seconds', 'modal-segs'];
-                const values = [d, d, h, h, m, m, s, s];
-                ids.forEach((id, index) => {
-                    const el = document.getElementById(id);
-                    if(el) el.innerText = values[index];
-                });
-            }
-            setInterval(update, 1000);
-            update();
+            setInterval(update, 1000); update();
         }
 
         window.setActiveBairro = (element) => {
-            const allItems = document.querySelectorAll('.neighborhood-entry-premium');
-            allItems.forEach(item => item.classList.remove('active-bairro'));
+            document.querySelectorAll('.neighborhood-entry-premium').forEach(item => item.classList.remove('active-bairro'));
             element.classList.add('active-bairro');
         };
 
         window.toggleFaq = (btn) => {
-            const item = btn.parentElement;
-            const content = btn.nextElementSibling;
-            const allItems = document.querySelectorAll('.faq-item-luxury');
-            const isOpen = content.style.maxHeight !== '0px' && content.style.maxHeight !== '';
-            allItems.forEach(i => {
+            const content = btn.nextElementSibling, isOpen = content.style.maxHeight !== '0px' && content.style.maxHeight !== '';
+            document.querySelectorAll('.faq-item-luxury').forEach(i => {
                 i.classList.remove('faq-active');
-                const c = i.querySelector('.faq-content');
-                if(c) c.style.maxHeight = '0px';
-                const s = i.querySelector('.faq-btn svg');
-                if(s) s.style.transform = 'rotate(0deg)';
+                i.querySelector('.faq-content').style.maxHeight = '0px';
+                i.querySelector('.faq-btn svg').style.transform = 'rotate(0deg)';
             });
             if (!isOpen) {
-                item.classList.add('faq-active');
+                btn.parentElement.classList.add('faq-active');
                 content.style.maxHeight = content.scrollHeight + 'px';
                 btn.querySelector('svg').style.transform = 'rotate(180deg)';
             }
         };
 
-        window.openPromoModal = () => { 
-            document.getElementById('promo-modal-overlay').style.display = 'flex'; 
-            toggleScroll(true);
-        };
-        window.closePromoModal = (e) => { 
-            document.getElementById('promo-modal-overlay').style.display = 'none'; 
-            toggleScroll(false);
-        };
+        window.openPromoModal = () => { document.getElementById('promo-modal-overlay').style.display = 'flex'; toggleScroll(true); };
+        window.closePromoModal = () => { document.getElementById('promo-modal-overlay').style.display = 'none'; toggleScroll(false); };
         window.copyPromoCoupon = () => {
             const text = document.getElementById('coupon-code').innerText;
             const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            const status = document.getElementById('copy-status'); status.innerText = "COPIADO COM SUCESSO! ✅"; status.style.color = "#10b981";
-            setTimeout(() => { status.innerText = "Toque para copiar"; status.style.color = "#2563EB"; }, 2000);
+            document.getElementById('copy-status').innerText = "COPIADO! ✅";
+            setTimeout(() => { document.getElementById('copy-status').innerText = "Toque para copiar"; }, 2000);
         };
-
         window.spinWheel = () => { if(!isSpinning) triggerSpin(2); };
-
-        window.closeRoulette = () => { 
-            document.getElementById('roulette-overlay').style.display = 'none'; 
-            toggleScroll(false);
-            try { sessionStorage.setItem('encanto_roulette_clean', 'true'); } catch(e){} 
-        };
-
-        window.toggleNotificationPanel = () => { 
-            const p = document.getElementById('notification-panel'); 
-            const o = document.getElementById('notification-overlay'); 
-            if (p.classList.contains('translate-x-full')) { 
-                p.classList.remove('translate-x-full'); 
-                o.classList.remove('hidden'); 
-                toggleScroll(true);
-            } else { 
-                p.classList.add('translate-x-full'); 
-                o.classList.add('hidden'); 
-                toggleScroll(false);
-            } 
+        window.closeRoulette = () => { document.getElementById('roulette-overlay').style.display = 'none'; toggleScroll(false); sessionStorage.setItem('encanto_roulette_clean', 'true'); };
+        window.toggleNotificationPanel = () => {
+            const p = document.getElementById('notification-panel'), o = document.getElementById('notification-overlay');
+            if (p.classList.contains('translate-x-full')) { p.classList.remove('translate-x-full'); o.classList.remove('hidden'); toggleScroll(true); }
+            else { p.classList.add('translate-x-full'); o.classList.add('hidden'); toggleScroll(false); }
         };
 
         const prizes = [ { label: "NADA", color: "#475569", prob: 0.25, code: null }, { label: "5% OFF", color: "#3b82f6", prob: 0.30, code: "VEM5" }, { label: "GIRAR +", color: "#1e293b", prob: 0.20, code: "RETRY" }, { label: "10% OFF", color: "#2563eb", prob: 0.15, code: "VEM10" }, { label: "FRETE VIP", color: "#10b981", prob: 0.09, code: "FRETE0" }, { label: "50% OFF", color: "#FACC15", prob: 0.01, code: "RARO50" } ];
@@ -922,43 +841,36 @@
             const container = document.getElementById('wheel-segments'); if(!container) return;
             const sliceDeg = 360 / prizes.length;
             prizes.forEach((p, i) => {
-                const angle = i * sliceDeg; const rStart = (angle - 90) * Math.PI / 180; const rEnd = (angle + sliceDeg - 90) * Math.PI / 180;
+                const angle = i * sliceDeg, rStart = (angle - 90) * Math.PI / 180, rEnd = (angle + sliceDeg - 90) * Math.PI / 180;
                 const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 path.setAttribute("d", `M 50 50 L ${50 + 50 * Math.cos(rStart)} ${50 + 50 * Math.sin(rStart)} A 50 50 0 0 1 ${50 + 50 * Math.cos(rEnd)} ${50 + 50 * Math.sin(rEnd)} Z`);
-                path.setAttribute("fill", p.color); path.setAttribute("stroke", "rgba(255,255,255,0.1)"); container.appendChild(path);
-                const textAngle = angle + (sliceDeg / 2); const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                const textDist = 39; const tx = 50 + textDist * Math.cos((textAngle - 90) * Math.PI / 180); const ty = 50 + textDist * Math.sin((textAngle - 90) * Math.PI / 180);
-                text.setAttribute("x", tx); text.setAttribute("y", ty); text.setAttribute("class", "prize-text"); text.setAttribute("text-anchor", "middle"); text.setAttribute("dominant-baseline", "middle"); text.setAttribute("transform", `rotate(${textAngle}, ${tx}, ${ty}) rotate(90, ${tx}, ${ty})`);
-                if(p.color === "#FACC15") text.setAttribute("fill", "#0f172a"); text.textContent = "   " + p.label; container.appendChild(text);
+                path.setAttribute("fill", p.color); container.appendChild(path);
+                const textAngle = angle + (sliceDeg / 2), text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                const textDist = 39, tx = 50 + textDist * Math.cos((textAngle - 90) * Math.PI / 180), ty = 50 + textDist * Math.sin((textAngle - 90) * Math.PI / 180);
+                text.setAttribute("x", tx); text.setAttribute("y", ty); text.setAttribute("class", "prize-text"); text.setAttribute("text-anchor", "middle"); text.setAttribute("dominant-baseline", "middle");
+                text.setAttribute("transform", `rotate(${textAngle}, ${tx}, ${ty}) rotate(90, ${tx}, ${ty})`);
+                text.textContent = "   " + p.label; container.appendChild(text);
             });
         }
 
         function showWinPopup(prize) {
-            const modal = document.getElementById('roulette-modal');
-            modal.innerHTML = `<div class="py-4 text-center"><div class="text-6xl mb-6">🎈</div><h3 class="text-3xl font-black text-white brand-font mb-2 uppercase">GANHOU!</h3><p class="text-blue-100 font-bold mb-6 text-center">${prize.label}</p><div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8 relative text-center"><span id="win-coupon-code" class="text-3xl font-black text-yellow-400 tracking-widest uppercase">${prize.code}</span></div><button onclick="copyWinCoupon('win-coupon-code', this)" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl uppercase tracking-widest text-sm mb-3">Copiar Cupom</button><button onclick="closeRoulette()" class="text-white/50 text-[10px] font-bold uppercase">Entrar no Site</button></div>`;
+            document.getElementById('roulette-modal').innerHTML = `<div class="py-4 text-center"><div class="text-6xl mb-6">🎈</div><h3 class="text-3xl font-black text-white brand-font mb-2 uppercase">GANHOU!</h3><p class="text-blue-100 font-bold mb-6">${prize.label}</p><div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8"><span id="win-coupon-code" class="text-3xl font-black text-yellow-400 tracking-widest uppercase">${prize.code}</span></div><button onclick="copyWinCoupon('win-coupon-code', this)" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl text-sm mb-3">Copiar Cupom</button><button onclick="closeRoulette()" class="text-white/50 text-[10px] font-bold uppercase">Sair</button></div>`;
         }
-        window.copyWinCoupon = (elementId, btn) => { const text = document.getElementById(elementId).innerText; const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); btn.innerText = "COPIADO! ✅"; setTimeout(() => { closeRoulette(); }, 1000); };
+        window.copyWinCoupon = (id, btn) => { const el = document.createElement('textarea'); el.value = document.getElementById(id).innerText; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); btn.innerText = "COPIADO! ✅"; setTimeout(closeRoulette, 1000); };
 
         function setupSlider() {
             const track = document.getElementById('infinite-catalog'); if (!track) return;
-            let isPaused = false; let scrollSpeed = 0.9; let setWidth = 0;
-            const initInfinite = () => { const items = Array.from(track.children); items.forEach(item => track.appendChild(item.cloneNode(true))); items.forEach(item => track.insertBefore(item.cloneNode(true), track.firstChild)); updateMetrics(); track.scrollLeft = setWidth; };
-            const updateMetrics = () => { setWidth = track.scrollWidth / 3; };
-            function animate() { if (!isPaused) { track.scrollLeft += scrollSpeed; if (track.scrollLeft >= setWidth * 2) track.scrollLeft -= setWidth; else if (track.scrollLeft <= 1) track.scrollLeft += setWidth; } requestAnimationFrame(animate); }
-            track.addEventListener('mousedown', () => isPaused = true); window.addEventListener('mouseup', () => setTimeout(() => isPaused = false, 1000));
+            const initInfinite = () => { const items = Array.from(track.children); items.forEach(item => track.appendChild(item.cloneNode(true))); items.forEach(item => track.insertBefore(item.cloneNode(true), track.firstChild)); };
+            let isPaused = false, scrollSpeed = 0.9, setWidth = track.scrollWidth / 3;
+            function animate() { if (!isPaused) { track.scrollLeft += scrollSpeed; if (track.scrollLeft >= setWidth * 2) track.scrollLeft -= setWidth; } requestAnimationFrame(animate); }
             track.addEventListener('touchstart', () => isPaused = true); track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1000));
-            window.addEventListener('resize', updateMetrics); initInfinite(); window.onload = () => { updateMetrics(); track.scrollLeft = setWidth; }; requestAnimationFrame(animate); }
+            initInfinite(); animate();
+        }
 
         document.addEventListener('DOMContentLoaded', () => { 
             setupSlider(); drawWheel(); startCountdown(); 
             if(!sessionStorage.getItem('encanto_roulette_clean')) { 
-                setTimeout(() => { 
-                    const overlay = document.getElementById('roulette-overlay'); 
-                    if(overlay) { 
-                        overlay.style.display = 'flex'; 
-                        toggleScroll(true);
-                    } 
-                }, 1200); 
+                setTimeout(() => { document.getElementById('roulette-overlay').style.display = 'flex'; toggleScroll(true); }, 1200); 
             } 
         });
     </script>
