@@ -41,6 +41,7 @@
         .border-primary { border-color: var(--brand-blue); }
         .bg-secondary { background-color: var(--brand-yellow); }
 
+        /* ESTILO UNIFORME PARA TÍTULOS DE SEÇÃO */
         .section-header-premium {
             font-family: 'Baloo 2', cursive;
             color: var(--brand-blue);
@@ -53,6 +54,7 @@
             display: block;
         }
 
+        /* --- SLIDER 13 ITENS (VELOCIDADE 0.9) --- */
         .infinite-slider-track {
             display: flex;
             gap: 12px;
@@ -90,6 +92,7 @@
         }
         .card-title { color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; text-align: center; padding: 0 10px; }
 
+        /* --- ROLETA INTERATIVA --- */
         #roulette-overlay {
             z-index: 9999;
             background: rgba(15, 23, 42, 0.95);
@@ -136,6 +139,7 @@
         
         .prize-text { font-size: 4px; font-weight: 900; fill: white; letter-spacing: 0.1px; }
 
+        /* --- COUNTDOWN STYLES --- */
         .countdown-box {
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(8px);
@@ -394,7 +398,6 @@
             <div class="relative z-10">
                 <div class="inline-block bg-yellow-400 text-slate-900 text-[10px] font-black px-4 py-1 rounded-full uppercase mb-2">Presente de Boas-Vindas</div>
                 <h3 class="text-xl font-black text-white brand-font mb-1 uppercase tracking-tight">Gire e Ganhe!</h3>
-                <!-- ATUALIZADO: Frase personalizada -->
                 <p class="text-blue-100/70 text-[10px] font-medium mb-2">Só a Encanto Festas proporciona isso :)</p>
                 
                 <div class="wheel-outer" id="wheel-drag-area">
@@ -479,12 +482,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="18" x="5" y="3" rx="2"/><line x1="8" x2="16" y1="7" y2="7"/><path d="M16 11h.01"/><path d="M12 11h.01"/><path d="M8 11h.01"/><path d="M12 15h.01"/><path d="M8 15h.01"/><path d="M12 19h.01"/><path d="M8 19h.01"/></svg>
                     Fazer Orçamento / Reservar
                 </button>
-                <!-- ATUALIZADO: Texto abaixo do botão -->
                 <p class="text-blue-100/60 text-[10px] font-black uppercase tracking-[0.2em] -mt-1 drop-shadow-sm">é muito fácil</p>
             </div>
         </section>
 
-        <!-- CATÁLOGO (mt-8 para uniformidade) -->
+        <!-- CATÁLOGO -->
         <section class="mt-8 pb-4"> 
             <h3 class="section-header-premium">Nossos brinquedos</h3>
             <div class="infinite-slider-container">
@@ -506,7 +508,7 @@
             </div>
         </section>
 
-        <!-- CONTAGEM REGRESSIVA (mt-8 para uniformidade) -->
+        <!-- CONTAGEM REGRESSIVA (SUBIU PARA mt-8) -->
         <section class="mt-8 px-5 mb-10"> 
             <h3 class="section-header-premium">Promoção</h3>
             <div class="promo-card rounded-[2.2rem] p-6 relative overflow-hidden flex flex-col md:flex-row items-center gap-6">
@@ -535,7 +537,7 @@
             </div>
         </section>
 
-        <!-- PRESENÇA (mt-8 para uniformidade) -->
+        <!-- PRESENÇA (SUBIU PARA mt-8) -->
         <section class="mt-8 px-6 mb-10"> 
             <h3 class="section-header-premium">Presença em São Chico</h3>
             <div class="trust-container">
@@ -587,17 +589,18 @@
             </div>
         </section>
 
-        <!-- AVALIAÇÕES (mt-8 para uniformidade) -->
+        <!-- AVALIAÇÕES (SUBIU PARA mt-8) -->
         <section class="mt-8 px-6 mb-10"> 
             <h3 class="section-header-premium">Avaliações</h3>
             <div class="premium-card-wrapper !px-0">
-                <div class="iframe-embed-container" style="height: 380px;">
+                <!-- AJUSTADO: Altura reduzida para 300px para ficar justo aos comentários -->
+                <div class="iframe-embed-container" style="height: 300px;">
                     <iframe src="https://widget.taggbox.com/310470?website=1" style="width:100%;height:100%;overflow:hidden;border:none;"></iframe>
                 </div>
             </div>
         </section>
 
-        <!-- CONTATO (mt-8 para uniformidade) -->
+        <!-- CONTATO (SUBIU PARA mt-8) -->
         <section class="mt-8 px-6 mb-10"> 
             <h3 class="section-header-premium">Contato</h3>
             <div class="map-wrapper">
@@ -638,7 +641,7 @@
             </div>
         </section>
 
-        <!-- FAQ (mt-8 para uniformidade) -->
+        <!-- FAQ -->
         <section class="mt-8 px-6 mb-16"> 
             <h3 class="section-header-premium">Possíveis perguntas</h3>
             <div class="space-y-3">
