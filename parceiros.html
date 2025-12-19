@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Parceiros - Encanto Festas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-blue: #1E3A8A;
+            --brand-blue-light: #EFF6FF;
+            --brand-yellow: #FACC15;
+            --brand-white: #FFFFFF;
+            --brand-bg: #F8FAFC;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--brand-bg);
+            color: #0F172A;
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, h4, .brand-font { 
+            font-family: 'Baloo 2', cursive; 
+        }
+
+        /* Cartão com Estética de Luxo e Cores Azuis */
+        .user-card {
+            background: var(--brand-white);
+            border-radius: 1.5rem;
+            padding: 1.25rem;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.05);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid #DBEAFE; 
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--brand-blue);
+            opacity: 0.8;
+        }
+
+        .user-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 5px 15px rgba(30, 58, 138, 0.1);
+        }
+
+        .avatar-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--brand-blue-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1.5px solid #BFDBFE;
+            color: var(--brand-blue);
+            overflow: hidden;
+        }
+
+        .nav-chip {
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            transition: all 0.3s;
+            background: white;
+            color: #64748B;
+            border: 1px solid #E2E8F0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-chip.active {
+            background: var(--brand-blue);
+            color: white;
+            border-color: var(--brand-blue);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+        }
+
+        .contact-btn {
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .btn-blue { background: var(--brand-blue); color: white; }
+        .btn-ghost { background: transparent; border: 1.5px solid #DBEAFE; color: var(--brand-blue); }
+
+        /* Selo Oficial Minimalista com Coroa */
+        .gold-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #FFFBEB;
+            border: 1px solid #FEF08A;
+            color: #854D0E;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 8px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .partner-verify {
+            font-size: 9px;
+            font-weight: 700;
+            color: #10B981;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-reveal { animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="pt-4">
+
+    <!-- Barra de Filtros com Estilo Minimalista -->
+    <nav class="sticky top-0 z-50 bg-[#F8FAFC]/95 backdrop-blur-lg pb-4 pt-2">
+        <div class="flex overflow-x-auto gap-3 px-6 scrollbar-hide">
+            <button class="nav-chip active" onclick="filterPartners('all', this)">Tudo</button>
+            <button class="nav-chip" onclick="filterPartners('salao', this)">Salões</button>
+            <button class="nav-chip" onclick="filterPartners('decoracao', this)">Decoração</button>
+            <button class="nav-chip" onclick="filterPartners('mesas', this)">Mobiliário</button>
+            <button class="nav-chip" onclick="filterPartners('som', this)">Som & Luz</button>
+        </div>
+    </nav>
+
+    <!-- Header de Contexto de Marketing -->
+    <div class="px-6 mb-6">
+        <h2 class="text-2xl font-black text-slate-800 leading-tight uppercase">Saiba <span class="text-blue-800 italic">Empresas Confiáveis</span> para sua festa!</h2>
+        <p class="text-[11px] font-medium text-slate-400 mt-1 uppercase tracking-widest">A seleção oficial da Encanto Festas</p>
+    </div>
+
+    <!-- Área dos Usuários/Parceiros -->
+    <main class="px-6 pb-20 space-y-4" id="partner-grid">
+        <!-- Renderizado via JavaScript -->
+    </main>
+
+    <!-- Footer Uniforme -->
+    <footer class="py-12 px-8 text-center border-t border-slate-100 bg-white">
+        <span class="text-2xl font-black brand-font text-blue-900 leading-none">Encanto <span class="text-yellow-500">Festas</span></span>
+        <div class="flex justify-center gap-1 mt-2">
+            <div class="w-8 h-1 bg-blue-800 rounded-full"></div>
+            <div class="w-2 h-1 bg-yellow-400 rounded-full"></div>
+        </div>
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[4px] mt-4">Rede de Excelência</p>
+    </footer>
+
+    <script>
+        const partners = [
+            // Membros Principais
+            { 
+                name: "Michele Salgados", 
+                category: "outros", 
+                isGold: true, 
+                desc: "Salgados artesanais de luxo para eventos.", 
+                img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8qjIrJoT8nz2pjOl5zC_dpaZ3PfMGhBNhcA&s", 
+                insta: "@michelesalgados" 
+            },
+            { 
+                name: "Juju Bolos", 
+                category: "outros", 
+                isGold: true, 
+                desc: "Confeitaria artística e design exclusivo.", 
+                img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS__-3j7LDcTIyxmUc_n-8SKmTj-NjBN_QnAg&s", 
+                insta: "@juju.bolos" 
+            },
+            { 
+                name: "Flavia Mendes", 
+                category: "decoracao", 
+                isGold: true, 
+                desc: "Ambientação artesanal de alto padrão.", 
+                img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBQp5RNecNH4bDUr2cbVLSfZs4AHjgqmLqzg&s", 
+                insta: "@flaviamendesdecor" 
+            },
+            
+            // Sugestões e Outros
+            { name: "India Thami", category: "mesas", desc: "Locação de mobiliário selecionado.", svg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15V8a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v7"/><path d="M2 20h20"/><path d="M5 20v-5"/><path d="M19 20v-5"/></svg>` },
+            { name: "Joice Decorações", category: "mesas", desc: "Composições temáticas impecáveis.", svg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v19"/><path d="M5 8h14"/><path d="M15 21a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6z"/></svg>` },
+            { name: "Festa na Mesa", category: "decoracao", desc: "Pocket parties com toque sofisticado.", svg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>` },
+            { name: "Ivina Alugue e Decora", category: "decoracao", desc: "Acervo de peças luxuosas e raras.", svg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>` },
+            
+            // Salões
+            { name: "Consulado Garden", category: "salao", loc: "Rocio Grande", desc: "Ambiente Garden com infraestrutura completa.", type: "venue" },
+            { name: "WIP Festas", category: "salao", loc: "Ubatuba", desc: "Espaço moderno e climatizado para festas.", type: "venue" },
+            { name: "Vitória Eventos", category: "salao", loc: "Centro", desc: "O cenário ideal para momentos inesquecíveis.", type: "venue" },
+            { name: "Clube 21", category: "salao", loc: "Enseada", desc: "Tradição e amplitude de frente para o mar.", type: "venue" },
+            { name: "Chama no Var", category: "salao", loc: "Iperoba", desc: "Charme rústico e acolhedor para convidados.", type: "venue" },
+            
+            // Som
+            { name: "Begpromosom", category: "som", desc: "Dj e sonorização de alta fidelidade.", svg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h20"/><path d="M19 11v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9"/><path d="M11 22V11"/><path d="M15 22V11"/><path d="M18 5a3 3 0 0 0-3-3H9a3 3 0 0 0-3 3"/></svg>` },
+            { name: "Celso Áudio e Vídeo", category: "som", desc: "Tecnologia audiovisual de última geração.", svg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="6" rx="2" ry="2"/><path d="M21 9l-6 3 6 3V9z"/></svg>` }
+        ];
+
+        function renderPartners(filter = 'all') {
+            const grid = document.getElementById('partner-grid');
+            grid.innerHTML = '';
+            
+            const list = filter === 'all' ? partners : partners.filter(p => p.category === filter);
+
+            list.forEach((p, i) => {
+                const card = document.createElement('div');
+                card.className = "user-card animate-reveal";
+                card.style.animationDelay = `${i * 0.08}s`;
+
+                if (p.type === 'venue') {
+                    card.innerHTML = `
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="avatar-box">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-base font-black text-slate-900 leading-none">${p.name}</h4>
+                                        <div class="partner-verify mt-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                            Empresa Aprovada
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-slate-500 font-medium leading-relaxed">${p.desc}</p>
+                            <div class="grid grid-cols-2 gap-3 pt-1">
+                                <button class="contact-btn btn-blue">Ver no Mapa</button>
+                                <button class="contact-btn btn-ghost">WhatsApp</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const avatarContent = p.img 
+                        ? `<img src="${p.img}" class="w-full h-full object-cover rounded-full" alt="${p.name}">` 
+                        : (p.svg || '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>');
+
+                    card.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <div class="avatar-box">
+                                ${avatarContent}
+                            </div>
+                            <div class="flex-grow">
+                                ${p.isGold ? `
+                                    <div class="gold-badge">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7z"/></svg>
+                                        Parceiro Oficial
+                                    </div>` : ''}
+                                <h4 class="text-base font-black text-slate-900 leading-tight">${p.name}</h4>
+                                <p class="text-[10px] font-medium text-slate-400 mb-3">${p.desc}</p>
+                                <div class="flex gap-2">
+                                    <button class="h-8 px-4 bg-blue-50 text-blue-700 text-[9px] font-black uppercase rounded-lg border border-blue-100">Contatar</button>
+                                    <button class="h-8 px-4 bg-slate-50 text-slate-400 text-[9px] font-black uppercase rounded-lg border border-slate-100">Instagram</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        window.filterPartners = (cat, el) => {
+            document.querySelectorAll('.nav-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderPartners(cat);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => renderPartners());
+    </script>
+</body>
+</html>
