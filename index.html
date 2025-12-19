@@ -183,12 +183,31 @@
             cursor: pointer;
         }
         .coupon-code-text { font-family: 'Baloo 2', cursive; font-size: 2.2rem; font-weight: 800; color: #2563EB; letter-spacing: 5px; }
-        .timer-strip { display: flex; justify-content: center; gap: 16px; margin-bottom: 32px; }
-        .timer-val { font-size: 22px; font-weight: 900; color: #1E293B; font-family: 'Baloo 2', cursive; }
-        .timer-lab { font-size: 8px; font-weight: 800; color: #94A3B8; text-transform: uppercase; }
+        
+        .timer-premium-stack {
+            background: #f1f5f9;
+            border-radius: 2rem;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+        .timer-bottom-grid {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .timer-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 45px;
+        }
+        .timer-val-sub { font-size: 18px; font-weight: 800; color: #475569; line-height: 1; font-family: 'Baloo 2', cursive; }
+        .timer-label-sub { font-size: 8px; font-weight: 800; color: #94A3B8; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+
         .btn-close-luxury { background: #2563EB; color: white; width: 100%; padding: 18px; border-radius: 1.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* --- SOCIAL PROOF DESIGN (LEGIBILIDADE MÁXIMA) --- */
+        /* --- SOCIAL PROOF DESIGN --- */
         .trust-container {
             background: white;
             border-radius: 2.5rem;
@@ -213,11 +232,10 @@
             border-radius: 1.5rem;
             margin-bottom: 12px;
             border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .neighborhood-entry-premium:first-child {
-            border-color: #FACC15;
-            background: #fffef5;
-        }
+        
         .rank-number-box {
             width: 32px;
             height: 32px;
@@ -230,10 +248,34 @@
             font-weight: 900;
             font-size: 14px;
             margin-right: 15px;
+            transition: all 0.3s ease;
         }
-        .neighborhood-entry-premium:first-child .rank-number-box {
+
+        .neighborhood-entry-premium.active-bairro {
+            border-color: #FACC15;
+            background: #fffef5;
+            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.15);
+        }
+        .neighborhood-entry-premium.active-bairro .rank-number-box {
             background: #FACC15;
             color: #1e3a8a;
+        }
+
+        /* --- MAP SECTION STYLE --- */
+        .map-wrapper {
+            background: white;
+            border-radius: 2.5rem;
+            padding: 12px; /* Reduzido para focar no mapa */
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+        .map-iframe-container {
+            border-radius: 1.8rem;
+            overflow: hidden;
+            width: 100%;
+            height: 500px; /* Aspecto vertical/retrato */
+            border: 1px solid #f1f5f9;
         }
     </style>
 </head>
@@ -271,14 +313,25 @@
                     <span id="coupon-code" class="coupon-code-text">CASTELO20</span>
                     <div id="copy-status" class="text-[9px] font-black text-blue-600 uppercase tracking-widest mt-3 opacity-60">Toque para copiar</div>
                 </div>
-                <div class="timer-strip">
-                    <div class="timer-block"><span id="modal-days" class="timer-val">00</span><span class="timer-lab">Dias</span></div>
-                    <div class="timer-val opacity-20">:</div>
-                    <div class="timer-block"><span id="modal-hours" class="timer-val">00</span><span class="timer-lab">Horas</span></div>
-                    <div class="timer-val opacity-20">:</div>
-                    <div class="timer-block"><span id="modal-mins" class="timer-val">00</span><span class="timer-lab">Minutos</span></div>
-                    <div class="timer-val opacity-20">:</div>
-                    <div class="timer-block"><span id="modal-segs" class="timer-val text-blue-600">00</span><span class="timer-lab">Segundos</span></div>
+                <div class="timer-premium-stack">
+                    <div class="timer-bottom-grid">
+                        <div class="timer-unit">
+                            <span id="modal-days" class="timer-val-sub">00</span>
+                            <span class="timer-label-sub">Dias</span>
+                        </div>
+                        <div class="timer-unit">
+                            <span id="modal-hours" class="timer-val-sub">00</span>
+                            <span class="timer-label-sub">Horas</span>
+                        </div>
+                        <div class="timer-unit">
+                            <span id="modal-mins" class="timer-val-sub">00</span>
+                            <span class="timer-label-sub">Min</span>
+                        </div>
+                        <div class="timer-unit">
+                            <span id="modal-segs" class="timer-val-sub">00</span>
+                            <span class="timer-label-sub">Seg</span>
+                        </div>
+                    </div>
                 </div>
                 <button onclick="closePromoModal(null)" class="btn-close-luxury">Fechar</button>
             </div>
@@ -366,15 +419,14 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: CONFIANÇA E EXPERIÊNCIA (DADOS ATUALIZADOS) -->
-        <section class="px-6 mb-16">
+        <!-- SEÇÃO: PROVA SOCIAL E RANKING DE BAIRROS -->
+        <section class="px-6 mb-10">
             <div class="trust-container">
                 <div class="text-center mb-8">
                     <span class="bg-blue-100 text-blue-700 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] mb-3 inline-block">Nossa Trajetória</span>
                     <h3 class="text-2xl font-black brand-font text-slate-800 leading-tight uppercase tracking-tight">Presença em sao chico</h3>
                 </div>
 
-                <!-- Contador de Festas - Legibilidade Alta -->
                 <div class="experience-counter-box">
                     <div class="text-white/80 text-[11px] font-bold uppercase tracking-[0.3em] mb-2">Aluguéis Realizados</div>
                     <div class="text-7xl font-black text-yellow-400 brand-font tracking-tighter mb-2">524</div>
@@ -385,27 +437,22 @@
                     </div>
                 </div>
 
-                <!-- Ranking de Bairros -->
                 <div class="mt-6">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 text-center">Top 3 Bairros com mais aluguéis:</p>
-                    
-                    <div class="space-y-4">
-                        <!-- Top 1 - Rocio Grande -->
-                        <div class="neighborhood-entry-premium shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 text-center">Top 3 bairros mais alugados:</p>
+                    <div class="space-y-4" id="neighborhood-ranking">
+                        <div class="neighborhood-entry-premium active-bairro" onclick="setActiveBairro(this)">
                             <div class="flex items-center">
                                 <div class="rank-number-box">01</div>
                                 <span class="text-sm font-black text-slate-800 uppercase tracking-tight">Rocio Grande</span>
                             </div>
                             <div class="text-right">
-                                <span class="text-xl font-black text-blue-600 brand-font">63</span>
+                                <span class="text-xl font-black text-blue-600 brand-font">67</span>
                                 <span class="block text-[8px] font-bold text-slate-400 uppercase">Locações</span>
                             </div>
                         </div>
-
-                        <!-- Top 2 - Ubatuba -->
-                        <div class="neighborhood-entry-premium">
+                        <div class="neighborhood-entry-premium" onclick="setActiveBairro(this)">
                             <div class="flex items-center">
-                                <div class="rank-number-box bg-slate-200 text-slate-600">02</div>
+                                <div class="rank-number-box">02</div>
                                 <span class="text-sm font-black text-slate-800 uppercase tracking-tight">Ubatuba</span>
                             </div>
                             <div class="text-right">
@@ -413,22 +460,35 @@
                                 <span class="block text-[8px] font-bold text-slate-400 uppercase">Locações</span>
                             </div>
                         </div>
-
-                        <!-- Top 3 - Ervino -->
-                        <div class="neighborhood-entry-premium">
+                        <div class="neighborhood-entry-premium" onclick="setActiveBairro(this)">
                             <div class="flex items-center">
-                                <div class="rank-number-box bg-slate-200 text-slate-600">03</div>
+                                <div class="rank-number-box">03</div>
                                 <span class="text-sm font-black text-slate-800 uppercase tracking-tight">Ervino</span>
                             </div>
                             <div class="text-right">
-                                <span class="text-xl font-black text-blue-600 brand-font">41</span>
+                                <span class="text-xl font-black text-blue-600 brand-font">42</span>
                                 <span class="block text-[8px] font-bold text-slate-400 uppercase">Locações</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <p class="text-center mt-10 text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Levando alegria para todos os cantos</p>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: APENAS MAPA -->
+        <section class="px-6 mb-16">
+            <div class="map-wrapper">
+                <div class="map-iframe-container">
+                    <iframe 
+                        width="100%" 
+                        height="100%" 
+                        frameborder="0" 
+                        scrolling="no" 
+                        marginheight="0" 
+                        marginwidth="0" 
+                        src="https://maps.google.com/maps?q=Encanto%20Festas,%20S%C3%A3o%20Francisco%20do%20Sul&t=&z=15&ie=UTF8&iwloc=&output=embed">
+                    </iframe>
+                </div>
             </div>
         </section>
     </main>
@@ -464,6 +524,12 @@
             setInterval(update, 1000);
             update();
         }
+
+        window.setActiveBairro = (element) => {
+            const allItems = document.querySelectorAll('.neighborhood-entry-premium');
+            allItems.forEach(item => item.classList.remove('active-bairro'));
+            element.classList.add('active-bairro');
+        };
 
         window.openPromoModal = () => { document.getElementById('promo-modal-overlay').style.display = 'flex'; document.body.style.overflow = 'hidden'; };
         window.closePromoModal = (e) => { document.getElementById('promo-modal-overlay').style.display = 'none'; document.body.style.overflow = ''; };
