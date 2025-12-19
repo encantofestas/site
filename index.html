@@ -21,6 +21,13 @@
             -webkit-tap-highlight-color: transparent;
             scroll-behavior: smooth;
         }
+
+        /* Bloqueio de scroll global para popups */
+        body.modal-active {
+            overflow: hidden !important;
+            height: 100vh !important;
+        }
+
         h1, h2, h3, h4, .brand-font { font-family: 'Baloo 2', cursive; }
         
         :root {
@@ -403,7 +410,8 @@
         <div class="luxury-modal" onclick="event.stopPropagation()">
             <div class="promo-header-premium">
                 <div class="luxury-badge-top">Exclusivo</div>
-                <h3 class="text-3xl font-black brand-font uppercase leading-none mb-2">CUPOM</h3>
+                <!-- ATUALIZADO: Nome para CUPOM DE DESCONTO e sutil redução de fonte -->
+                <h3 class="text-2xl font-black brand-font uppercase leading-none mb-2">CUPOM DE DESCONTO</h3>
                 <p class="text-blue-100 text-[11px] font-medium opacity-80 uppercase tracking-widest">Aproveite agora mesmo</p>
             </div>
             <div class="ticket-body">
@@ -507,6 +515,7 @@
                         <div class="savings-tag">Economize R$ 30,00</div>
                     </div>
                     <div class="flex gap-2.5 justify-center md:justify-start">
+                        <!-- ATUALIZADO: Legendas em Branco -->
                         <div class="flex flex-col items-center"><div id="days" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-white tracking-widest">Dias</span></div>
                         <div class="flex flex-col items-center"><div id="hours" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-white tracking-widest">Horas</span></div>
                         <div class="flex flex-col items-center"><div id="minutes" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-white tracking-widest">Mins</span></div>
@@ -627,7 +636,6 @@
         <section class="px-6 mb-16">
             <h3 class="section-header-premium">Possíveis perguntas</h3>
             <div class="space-y-3">
-                <!-- FAQ 1: Período -->
                 <div class="faq-item-luxury">
                     <button onclick="toggleFaq(this)" class="faq-btn">
                         <span>Qual o período de locação?</span>
@@ -640,7 +648,6 @@
                     </div>
                 </div>
 
-                <!-- FAQ 2: Entrega -->
                 <div class="faq-item-luxury">
                     <button onclick="toggleFaq(this)" class="faq-btn">
                         <span>Qual o horário de entrega?</span>
@@ -653,7 +660,6 @@
                     </div>
                 </div>
 
-                <!-- FAQ 3: Bairros -->
                 <div class="faq-item-luxury">
                     <button onclick="toggleFaq(this)" class="faq-btn">
                         <span>Quais bairros vocês atendem?</span>
@@ -666,7 +672,6 @@
                     </div>
                 </div>
 
-                <!-- FAQ 4: Pagamento -->
                 <div class="faq-item-luxury">
                     <button onclick="toggleFaq(this)" class="faq-btn">
                         <span>Quais as formas de pagamento?</span>
@@ -679,7 +684,6 @@
                     </div>
                 </div>
 
-                <!-- FAQ 5: Higienização -->
                 <div class="faq-item-luxury">
                     <button onclick="toggleFaq(this)" class="faq-btn">
                         <span>Os brinquedos são higienizados?</span>
@@ -714,10 +718,14 @@
                 updateDisplay(d.toString().padStart(2, '0'), h.toString().padStart(2, '0'), m.toString().padStart(2, '0'), s.toString().padStart(2, '0'));
             }
             function updateDisplay(d, h, m, s) {
-                if(document.getElementById('days')) document.getElementById('days').innerText = d;
-                if(document.getElementById('hours')) document.getElementById('hours').innerText = h;
-                if(document.getElementById('minutes')) document.getElementById('minutes').innerText = m;
-                if(document.getElementById('seconds')) document.getElementById('seconds').innerText = s;
+                // Sincronização rigorosa de todos os IDs
+                const ids = ['days', 'modal-days', 'hours', 'modal-hours', 'minutes', 'modal-mins', 'seconds', 'modal-segs'];
+                const values = [d, d, h, h, m, m, s, s];
+                
+                ids.forEach((id, index) => {
+                    const el = document.getElementById(id);
+                    if(el) el.innerText = values[index];
+                });
             }
             setInterval(update, 1000);
             update();
@@ -732,9 +740,7 @@
         window.toggleFaq = (btn) => {
             const item = btn.parentElement;
             const content = btn.nextElementSibling;
-            const icon = btn.querySelector('svg');
             const allItems = document.querySelectorAll('.faq-item-luxury');
-            
             const isOpen = content.style.maxHeight !== '0px' && content.style.maxHeight !== '';
             
             allItems.forEach(i => {
@@ -748,17 +754,17 @@
             if (!isOpen) {
                 item.classList.add('faq-active');
                 content.style.maxHeight = content.scrollHeight + 'px';
-                icon.style.transform = 'rotate(180deg)';
+                btn.querySelector('svg').style.transform = 'rotate(180deg)';
             }
         };
 
         window.openPromoModal = () => { 
             document.getElementById('promo-modal-overlay').style.display = 'flex'; 
-            document.body.style.overflow = 'hidden'; 
+            document.body.classList.add('modal-active'); // Bloqueia scroll
         };
         window.closePromoModal = (e) => { 
             document.getElementById('promo-modal-overlay').style.display = 'none'; 
-            document.body.style.overflow = ''; 
+            document.body.classList.remove('modal-active'); // Libera scroll
         };
         window.copyPromoCoupon = () => {
             const text = document.getElementById('coupon-code').innerText;
@@ -770,7 +776,7 @@
         window.closeRoulette = () => { 
             const overlay = document.getElementById('roulette-overlay'); 
             if(overlay) overlay.style.display = 'none'; 
-            document.body.style.overflow = ''; 
+            document.body.classList.remove('modal-active'); 
             try { sessionStorage.setItem('encanto_roulette_clean', 'true'); } catch(e){} 
         };
 
@@ -780,11 +786,11 @@
             if (p.classList.contains('translate-x-full')) { 
                 p.classList.remove('translate-x-full'); 
                 o.classList.remove('hidden'); 
-                document.body.style.overflow = 'hidden'; 
+                document.body.classList.add('modal-active'); 
             } else { 
                 p.classList.add('translate-x-full'); 
                 o.classList.add('hidden'); 
-                document.body.style.overflow = ''; 
+                document.body.classList.remove('modal-active'); 
             } 
         };
 
@@ -816,6 +822,7 @@
             modal.innerHTML = `<div class="py-4 text-center"><div class="text-6xl mb-6">🎈</div><h3 class="text-3xl font-black text-white brand-font mb-2 uppercase">GANHOU!</h3><p class="text-blue-100 font-bold mb-6 text-center">${prize.label}</p><div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8 relative text-center"><span id="win-coupon-code" class="text-3xl font-black text-yellow-400 tracking-widest uppercase">${prize.code}</span></div><button onclick="copyToClipboard('win-coupon-code', this)" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl uppercase tracking-widest text-sm mb-3">Copiar Cupom</button><button onclick="closeRoulette()" class="text-white/50 text-[10px] font-bold uppercase">Entrar no Site</button></div>`;
         }
         window.copyToClipboard = (elementId, btn) => { const text = document.getElementById(elementId).innerText; const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); btn.innerText = "COPIADO! ✅"; setTimeout(() => { closeRoulette(); }, 1000); };
+
         function setupSlider() {
             const track = document.getElementById('infinite-catalog'); if (!track) return;
             let isPaused = false; let scrollSpeed = 0.9; let setWidth = 0;
@@ -833,7 +840,7 @@
                     const overlay = document.getElementById('roulette-overlay'); 
                     if(overlay) { 
                         overlay.style.display = 'flex'; 
-                        document.body.style.overflow = 'hidden'; 
+                        document.body.classList.add('modal-active'); 
                     } 
                 }, 1200); 
             } 
