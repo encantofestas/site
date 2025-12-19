@@ -99,12 +99,7 @@
         #wheel { width: 100%; height: 100%; transition: transform 8s cubic-bezier(0.1, 0, 0, 1); }
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 35px; z-index: 40; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
         
-        .prize-text { 
-            font-size: 5px; 
-            font-weight: 900; 
-            fill: white; 
-            letter-spacing: 0.1px; 
-        }
+        .prize-text { font-size: 5px; font-weight: 900; fill: white; letter-spacing: 0.1px; }
 
         /* --- COUNTDOWN STYLES --- */
         .countdown-box {
@@ -139,7 +134,7 @@
             letter-spacing: 0.05em;
         }
 
-        /* --- NOVO PROMO POPUP STYLES (MARKETING LUXURY) --- */
+        /* --- PROMO POPUP STYLES --- */
         #promo-modal-overlay {
             z-index: 10000;
             background: rgba(15, 23, 42, 0.95);
@@ -165,7 +160,6 @@
             background: linear-gradient(180deg, #2563EB 0%, #1E40AF 100%);
             padding: 40px 24px;
             color: white;
-            position: relative;
         }
         .luxury-badge-top {
             background: #FACC15;
@@ -178,73 +172,69 @@
             letter-spacing: 2px;
             display: inline-block;
             margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(250, 204, 21, 0.3);
         }
-        .ticket-body {
-            padding: 32px 24px;
-            background: white;
-        }
+        .ticket-body { padding: 32px 24px; background: white; }
         .luxury-coupon-container {
             background: #F8FAFC;
             border: 2px solid #E2E8F0;
             padding: 24px 16px;
             border-radius: 2rem;
-            margin: 8px 0 24px 0;
+            margin-bottom: 24px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
         }
-        .luxury-coupon-container:active { transform: scale(0.96); border-color: #2563EB; }
-        
-        .coupon-code-text {
-            font-family: 'Baloo 2', cursive;
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #2563EB;
-            letter-spacing: 5px;
-            line-height: 1;
-            display: block;
-        }
-        
-        .timer-strip {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-        .timer-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .timer-val {
-            font-size: 22px;
-            font-weight: 900;
-            color: #1E293B;
-            font-family: 'Baloo 2', cursive;
-        }
-        .timer-lab {
-            font-size: 8px;
-            font-weight: 800;
-            color: #94A3B8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .coupon-code-text { font-family: 'Baloo 2', cursive; font-size: 2.2rem; font-weight: 800; color: #2563EB; letter-spacing: 5px; }
+        .timer-strip { display: flex; justify-content: center; gap: 16px; margin-bottom: 32px; }
+        .timer-val { font-size: 22px; font-weight: 900; color: #1E293B; font-family: 'Baloo 2', cursive; }
+        .timer-lab { font-size: 8px; font-weight: 800; color: #94A3B8; text-transform: uppercase; }
+        .btn-close-luxury { background: #2563EB; color: white; width: 100%; padding: 18px; border-radius: 1.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
 
-        .btn-close-luxury {
-            background: #1E293B;
-            color: white;
-            width: 100%;
-            padding: 18px;
-            border-radius: 1.5rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 2px;
-            transition: all 0.2s ease;
-            box-shadow: 0 10px 25px rgba(30, 41, 59, 0.2);
+        /* --- SOCIAL PROOF DESIGN (LEGIBILIDADE MÁXIMA) --- */
+        .trust-container {
+            background: white;
+            border-radius: 2.5rem;
+            padding: 40px 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
         }
-        .btn-close-luxury:active { transform: scale(0.98); opacity: 0.9; }
+        .experience-counter-box {
+            background: #1e3a8a;
+            border-radius: 2rem;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px -10px rgba(30, 58, 138, 0.25);
+        }
+        .neighborhood-entry-premium {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 18px 22px;
+            border-radius: 1.5rem;
+            margin-bottom: 12px;
+            border: 2px solid transparent;
+        }
+        .neighborhood-entry-premium:first-child {
+            border-color: #FACC15;
+            background: #fffef5;
+        }
+        .rank-number-box {
+            width: 32px;
+            height: 32px;
+            background: #2563EB;
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            margin-right: 15px;
+        }
+        .neighborhood-entry-premium:first-child .rank-number-box {
+            background: #FACC15;
+            color: #1e3a8a;
+        }
     </style>
 </head>
 <body class="text-gray-700 flex flex-col min-h-screen bg-slate-50">
@@ -256,24 +246,18 @@
                 <div class="inline-block bg-yellow-400 text-slate-900 text-[10px] font-black px-4 py-1 rounded-full uppercase mb-2">Presente de Boas-Vindas</div>
                 <h3 class="text-xl font-black text-white brand-font mb-1 uppercase tracking-tight">Gire e Ganhe!</h3>
                 <p class="text-blue-100/70 text-[10px] font-medium mb-2">Sua diversão começa com desconto</p>
-                
                 <div class="wheel-outer">
                     <img class="wheel-pointer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Cpath d='M12 21l-8-12h16l-8 12z'/%3E%3C/svg%3E" alt="Ponteiro">
-                    <svg id="wheel" viewBox="0 0 100 100">
-                        <g id="wheel-segments"></g>
-                    </svg>
+                    <svg id="wheel" viewBox="0 0 100 100"><g id="wheel-segments"></g></svg>
                     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white border-4 border-blue-600 rounded-full z-20 shadow-xl flex items-center justify-center text-[8px] font-black text-blue-600 uppercase">Girar</div>
                 </div>
-
-                <button id="spin-btn" onclick="spinWheel()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all transform uppercase tracking-widest text-sm mb-4">
-                    Tentar a Sorte!
-                </button>
+                <button id="spin-btn" onclick="spinWheel()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all transform uppercase tracking-widest text-sm mb-4">Tentar a Sorte!</button>
                 <button onclick="closeRoulette()" class="text-blue-100/40 text-[10px] font-bold uppercase tracking-widest hover:text-white">Entrar sem desconto</button>
             </div>
         </div>
     </div>
 
-    <!-- POPUP DE PROMOÇÃO (REDESENHADO PREMIUM) -->
+    <!-- POPUP DE PROMOÇÃO -->
     <div id="promo-modal-overlay" onclick="closePromoModal(event)">
         <div class="luxury-modal" onclick="event.stopPropagation()">
             <div class="promo-header-premium">
@@ -281,43 +265,28 @@
                 <h3 class="text-3xl font-black brand-font uppercase leading-none mb-2">Reserva VIP</h3>
                 <p class="text-blue-100 text-[11px] font-medium opacity-80 uppercase tracking-widest">Aproveite agora mesmo</p>
             </div>
-            
             <div class="ticket-body">
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Código de Desconto</p>
-                
                 <div class="luxury-coupon-container" onclick="copyPromoCoupon()">
                     <span id="coupon-code" class="coupon-code-text">CASTELO20</span>
                     <div id="copy-status" class="text-[9px] font-black text-blue-600 uppercase tracking-widest mt-3 opacity-60">Toque para copiar</div>
                 </div>
-
                 <div class="timer-strip">
-                    <div class="timer-block">
-                        <span id="modal-hours" class="timer-val">00</span>
-                        <span class="timer-lab">Horas</span>
-                    </div>
+                    <div class="timer-block"><span id="modal-days" class="timer-val">00</span><span class="timer-lab">Dias</span></div>
                     <div class="timer-val opacity-20">:</div>
-                    <div class="timer-block">
-                        <span id="modal-mins" class="timer-val">00</span>
-                        <span class="timer-lab">Minutos</span>
-                    </div>
+                    <div class="timer-block"><span id="modal-hours" class="timer-val">00</span><span class="timer-lab">Horas</span></div>
                     <div class="timer-val opacity-20">:</div>
-                    <div class="timer-block">
-                        <span id="modal-segs" class="timer-val text-blue-600">00</span>
-                        <span class="timer-lab">Segundos</span>
-                    </div>
+                    <div class="timer-block"><span id="modal-mins" class="timer-val">00</span><span class="timer-lab">Minutos</span></div>
+                    <div class="timer-val opacity-20">:</div>
+                    <div class="timer-block"><span id="modal-segs" class="timer-val text-blue-600">00</span><span class="timer-lab">Segundos</span></div>
                 </div>
-
-                <button onclick="closePromoModal(null)" class="btn-close-luxury">
-                    Fechar
-                </button>
-                
-                <p class="mt-6 text-[9px] text-slate-300 font-bold uppercase tracking-widest">O desconto será aplicado no carrinho</p>
+                <button onclick="closePromoModal(null)" class="btn-close-luxury">Fechar</button>
             </div>
         </div>
     </div>
 
     <!-- NOTIFICAÇÕES -->
-    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden fixed inset-0 bg-black/40 z-[80] backdrop-blur-sm"></div>
+    <div id="notification-overlay" onclick="toggleNotificationPanel()" class="hidden inset-0 bg-black/40 z-[80] backdrop-blur-sm fixed"></div>
     <div id="notification-panel" class="transform translate-x-full transition-transform duration-300 fixed right-0 top-0 bottom-0 z-[100] w-full max-w-xs">
         <div class="h-full flex flex-col bg-blue-600">
             <div class="bg-blue-700 p-5 flex justify-between items-center border-b border-blue-800">
@@ -334,21 +303,12 @@
         <!-- Hero Section -->
         <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-14 text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
-            
             <div class="inline-flex items-center gap-1.5 bg-blue-800/40 backdrop-blur-md text-blue-50 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest mb-6 border border-white/10 shadow-sm">
-                <svg class="w-3.5 h-3.5 text-blue-100" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                </svg>
+                <svg class="w-3.5 h-3.5 text-blue-100" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
                 São Francisco do Sul
             </div>
-
-            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-3">
-                Brinquedos que transformam <span class="text-yellow-300">sua festa</span>
-            </h1>
-            <p class="text-blue-50 mb-10 max-w-lg mx-auto text-sm md:text-base font-normal opacity-90">
-                Você escolhe, a gente entrega e monta. Simples assim
-            </p>
-            
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-3">Brinquedos que transformam <span class="text-yellow-300">sua festa</span></h1>
+            <p class="text-blue-50 mb-10 max-w-lg mx-auto text-sm md:text-base font-normal opacity-90">Você escolhe, a gente entrega e monta. Simples assim</p>
             <div class="flex flex-col items-center justify-center gap-4">
                 <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-extrabold py-4 px-8 rounded-full shadow-2xl active:scale-95 transition-all transform hover:scale-105 text-xs md:text-sm uppercase tracking-wider flex items-center gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="18" x="5" y="3" rx="2"/><line x1="8" x2="16" y1="7" y2="7"/><path d="M16 11h.01"/><path d="M12 11h.01"/><path d="M8 11h.01"/><path d="M12 15h.01"/><path d="M8 15h.01"/><path d="M12 19h.01"/><path d="M8 19h.01"/></svg>
@@ -378,56 +338,97 @@
             </div>
         </section>
 
-        <!-- CONTAGEM REGRESSIVA (DESIGN SLIM LUXURY) -->
+        <!-- CONTAGEM REGRESSIVA -->
         <section class="px-5 mb-10">
             <div class="promo-card rounded-[2.2rem] p-6 relative overflow-hidden flex flex-col md:flex-row items-center gap-6">
-                <!-- Imagem Compacta -->
                 <div class="w-24 h-24 flex-shrink-0 relative">
                     <div class="w-full h-full rounded-2xl overflow-hidden border-2 border-white/20 shadow-inner">
                         <img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp" alt="Castelinho" class="w-full h-full object-cover">
                     </div>
                 </div>
-
                 <div class="flex-grow text-center md:text-left">
                     <h2 class="text-xl font-extrabold brand-font text-white leading-tight uppercase tracking-tight mb-2">Castelinho</h2>
-                    
-                    <!-- Preço Final Único e Economia -->
                     <div class="flex flex-col md:flex-row items-center md:items-center gap-2 md:gap-4 mb-5">
                         <span class="text-yellow-400 font-black text-4xl tracking-tighter drop-shadow-lg">R$ 304,00</span>
                         <div class="savings-tag">Economize R$ 76,00</div>
                     </div>
-                    
-                    <!-- Cronômetro Slim -->
                     <div class="flex gap-2.5 justify-center md:justify-start">
-                        <div class="flex flex-col items-center">
-                            <div id="days" class="countdown-box">00</div>
-                            <span class="text-[7px] uppercase font-bold mt-1.5 text-blue-100/60 tracking-widest">Dias</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div id="hours" class="countdown-box">00</div>
-                            <span class="text-[7px] uppercase font-bold mt-1.5 text-blue-100/60 tracking-widest">Horas</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div id="minutes" class="countdown-box">00</div>
-                            <span class="text-[7px] uppercase font-bold mt-1.5 text-blue-100/60 tracking-widest">Mins</span>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div id="seconds" class="countdown-box text-white">00</div>
-                            <span class="text-[7px] uppercase font-bold mt-1.5 text-white tracking-widest">Segs</span>
-                        </div>
+                        <div class="flex flex-col items-center"><div id="days" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-blue-100/60 tracking-widest">Dias</span></div>
+                        <div class="flex flex-col items-center"><div id="hours" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-blue-100/60 tracking-widest">Horas</span></div>
+                        <div class="flex flex-col items-center"><div id="minutes" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-blue-100/60 tracking-widest">Mins</span></div>
+                        <div class="flex flex-col items-center"><div id="seconds" class="countdown-box text-white">00</div><span class="text-[7px] uppercase font-bold mt-1.5 text-white tracking-widest">Segs</span></div>
+                    </div>
+                </div>
+                <div class="w-full md:w-auto text-center">
+                    <button onclick="openPromoModal()" class="w-full md:px-10 bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all text-sm uppercase tracking-widest block mb-2">Pegar promoção</button>
+                    <p class="text-[9px] text-blue-100/60 font-medium uppercase tracking-tighter">Válido apenas enquanto o cronômetro estiver ativo</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: CONFIANÇA E EXPERIÊNCIA (DADOS ATUALIZADOS) -->
+        <section class="px-6 mb-16">
+            <div class="trust-container">
+                <div class="text-center mb-8">
+                    <span class="bg-blue-100 text-blue-700 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] mb-3 inline-block">Nossa Trajetória</span>
+                    <h3 class="text-2xl font-black brand-font text-slate-800 leading-tight uppercase tracking-tight">Presença em sao chico</h3>
+                </div>
+
+                <!-- Contador de Festas - Legibilidade Alta -->
+                <div class="experience-counter-box">
+                    <div class="text-white/80 text-[11px] font-bold uppercase tracking-[0.3em] mb-2">Aluguéis Realizados</div>
+                    <div class="text-7xl font-black text-yellow-400 brand-font tracking-tighter mb-2">524</div>
+                    <div class="flex items-center justify-center gap-2">
+                        <div class="h-px w-8 bg-blue-400"></div>
+                        <span class="text-blue-100 text-[10px] font-black uppercase tracking-widest">Festas Encantadas</span>
+                        <div class="h-px w-8 bg-blue-400"></div>
                     </div>
                 </div>
 
-                <div class="w-full md:w-auto text-center">
-                    <!-- BOTÃO PEGAR PROMOÇÃO -->
-                    <button onclick="openPromoModal()" class="w-full md:px-10 bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all text-sm uppercase tracking-widest block mb-2">
-                        Pegar promoção
-                    </button>
-                    <!-- AVISO DE VALIDADE -->
-                    <p class="text-[9px] text-blue-100/60 font-medium uppercase tracking-tighter">
-                        Válido apenas enquanto o cronômetro estiver ativo
-                    </p>
+                <!-- Ranking de Bairros -->
+                <div class="mt-6">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 text-center">Top 3 Bairros com mais aluguéis:</p>
+                    
+                    <div class="space-y-4">
+                        <!-- Top 1 - Rocio Grande -->
+                        <div class="neighborhood-entry-premium shadow-sm">
+                            <div class="flex items-center">
+                                <div class="rank-number-box">01</div>
+                                <span class="text-sm font-black text-slate-800 uppercase tracking-tight">Rocio Grande</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xl font-black text-blue-600 brand-font">63</span>
+                                <span class="block text-[8px] font-bold text-slate-400 uppercase">Locações</span>
+                            </div>
+                        </div>
+
+                        <!-- Top 2 - Ubatuba -->
+                        <div class="neighborhood-entry-premium">
+                            <div class="flex items-center">
+                                <div class="rank-number-box bg-slate-200 text-slate-600">02</div>
+                                <span class="text-sm font-black text-slate-800 uppercase tracking-tight">Ubatuba</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xl font-black text-blue-600 brand-font">63</span>
+                                <span class="block text-[8px] font-bold text-slate-400 uppercase">Locações</span>
+                            </div>
+                        </div>
+
+                        <!-- Top 3 - Ervino -->
+                        <div class="neighborhood-entry-premium">
+                            <div class="flex items-center">
+                                <div class="rank-number-box bg-slate-200 text-slate-600">03</div>
+                                <span class="text-sm font-black text-slate-800 uppercase tracking-tight">Ervino</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xl font-black text-blue-600 brand-font">41</span>
+                                <span class="block text-[8px] font-bold text-slate-400 uppercase">Locações</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
+                <p class="text-center mt-10 text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Levando alegria para todos os cantos</p>
             </div>
         </section>
     </main>
@@ -435,224 +436,85 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        
-        try {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            signInAnonymously(auth);
-        } catch(e) { console.warn("Firebase offline"); }
+        try { const app = initializeApp(firebaseConfig); const auth = getAuth(app); signInAnonymously(auth); } catch(e) { console.warn("Firebase offline"); }
 
-        // --- CONTAGEM REGRESSIVA (TERMINA EM 01/01/2026) ---
         function startCountdown() {
             const targetDate = new Date('2026-01-01T00:00:00').getTime();
-
             function update() {
                 const now = new Date().getTime();
                 const diff = targetDate - now;
-
-                if (diff <= 0) {
-                    updateDisplay('00', '00', '00', '00');
-                    return;
-                }
-
+                if (diff <= 0) { updateDisplay('00', '00', '00', '00'); return; }
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-                updateDisplay(
-                    d.toString().padStart(2, '0'),
-                    h.toString().padStart(2, '0'),
-                    m.toString().padStart(2, '0'),
-                    s.toString().padStart(2, '0')
-                );
+                updateDisplay(d.toString().padStart(2, '0'), h.toString().padStart(2, '0'), m.toString().padStart(2, '0'), s.toString().padStart(2, '0'));
             }
-
             function updateDisplay(d, h, m, s) {
                 if(document.getElementById('days')) document.getElementById('days').innerText = d;
                 if(document.getElementById('hours')) document.getElementById('hours').innerText = h;
                 if(document.getElementById('minutes')) document.getElementById('minutes').innerText = m;
                 if(document.getElementById('seconds')) document.getElementById('seconds').innerText = s;
-                
+                if(document.getElementById('modal-days')) document.getElementById('modal-days').innerText = d;
                 if(document.getElementById('modal-hours')) document.getElementById('modal-hours').innerText = h;
                 if(document.getElementById('modal-mins')) document.getElementById('modal-mins').innerText = m;
                 if(document.getElementById('modal-segs')) document.getElementById('modal-segs').innerText = s;
             }
-
             setInterval(update, 1000);
             update();
         }
 
-        // --- PROMO MODAL LOGIC ---
-        window.openPromoModal = () => {
-            document.getElementById('promo-modal-overlay').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        };
-
-        window.closePromoModal = (e) => {
-            document.getElementById('promo-modal-overlay').style.display = 'none';
-            document.body.style.overflow = '';
-        };
-
+        window.openPromoModal = () => { document.getElementById('promo-modal-overlay').style.display = 'flex'; document.body.style.overflow = 'hidden'; };
+        window.closePromoModal = (e) => { document.getElementById('promo-modal-overlay').style.display = 'none'; document.body.style.overflow = ''; };
         window.copyPromoCoupon = () => {
             const text = document.getElementById('coupon-code').innerText;
-            const el = document.createElement('textarea');
-            el.value = text;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            
-            const status = document.getElementById('copy-status');
-            status.innerText = "COPIADO COM SUCESSO! ✅";
-            status.style.color = "#10b981";
-            setTimeout(() => {
-                status.innerText = "Toque para copiar";
-                status.style.color = "#2563EB";
-            }, 2000);
+            const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            const status = document.getElementById('copy-status'); status.innerText = "COPIADO COM SUCESSO! ✅"; status.style.color = "#10b981";
+            setTimeout(() => { status.innerText = "Toque para copiar"; status.style.color = "#2563EB"; }, 2000);
         };
 
-        // --- ROLETA ---
-        const prizes = [
-            { label: "NADA", color: "#475569", prob: 0.25, code: null },
-            { label: "5% OFF", color: "#3b82f6", prob: 0.30, code: "VEM5" },
-            { label: "GIRAR +", color: "#1e293b", prob: 0.20, code: "RETRY" },
-            { label: "10% OFF", color: "#2563eb", prob: 0.15, code: "VEM10" },
-            { label: "FRETE VIP", color: "#10b981", prob: 0.09, code: "FRETE0" },
-            { label: "50% OFF", color: "#FACC15", prob: 0.01, code: "RARO50" }
-        ];
-
+        const prizes = [ { label: "NADA", color: "#475569", prob: 0.25, code: null }, { label: "5% OFF", color: "#3b82f6", prob: 0.30, code: "VEM5" }, { label: "GIRAR +", color: "#1e293b", prob: 0.20, code: "RETRY" }, { label: "10% OFF", color: "#2563eb", prob: 0.15, code: "VEM10" }, { label: "FRETE VIP", color: "#10b981", prob: 0.09, code: "FRETE0" }, { label: "50% OFF", color: "#FACC15", prob: 0.01, code: "RARO50" } ];
         function drawWheel() {
-            const container = document.getElementById('wheel-segments');
-            if(!container) return;
+            const container = document.getElementById('wheel-segments'); if(!container) return;
             const sliceDeg = 360 / prizes.length;
             prizes.forEach((p, i) => {
-                const angle = i * sliceDeg;
-                const rStart = (angle - 90) * Math.PI / 180;
-                const rEnd = (angle + sliceDeg - 90) * Math.PI / 180;
+                const angle = i * sliceDeg; const rStart = (angle - 90) * Math.PI / 180; const rEnd = (angle + sliceDeg - 90) * Math.PI / 180;
                 const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 path.setAttribute("d", `M 50 50 L ${50 + 50 * Math.cos(rStart)} ${50 + 50 * Math.sin(rStart)} A 50 50 0 0 1 ${50 + 50 * Math.cos(rEnd)} ${50 + 50 * Math.sin(rEnd)} Z`);
-                path.setAttribute("fill", p.color);
-                path.setAttribute("stroke", "rgba(255,255,255,0.1)");
-                container.appendChild(path);
-                
-                const textAngle = angle + (sliceDeg / 2);
-                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                const textDist = 39; 
-                const tx = 50 + textDist * Math.cos((textAngle - 90) * Math.PI / 180);
-                const ty = 50 + textDist * Math.sin((textAngle - 90) * Math.PI / 180);
-                text.setAttribute("x", tx); text.setAttribute("y", ty);
-                text.setAttribute("class", "prize-text");
-                text.setAttribute("text-anchor", "middle");
-                text.setAttribute("dominant-baseline", "middle");
-                text.setAttribute("transform", `rotate(${textAngle}, ${tx}, ${ty}) rotate(90, ${tx}, ${ty})`);
-                if(p.color === "#FACC15") text.setAttribute("fill", "#0f172a");
-                
-                text.textContent = "   " + p.label;
-                container.appendChild(text);
+                path.setAttribute("fill", p.color); path.setAttribute("stroke", "rgba(255,255,255,0.1)"); container.appendChild(path);
+                const textAngle = angle + (sliceDeg / 2); const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                const textDist = 39; const tx = 50 + textDist * Math.cos((textAngle - 90) * Math.PI / 180); const ty = 50 + textDist * Math.sin((textAngle - 90) * Math.PI / 180);
+                text.setAttribute("x", tx); text.setAttribute("y", ty); text.setAttribute("class", "prize-text"); text.setAttribute("text-anchor", "middle"); text.setAttribute("dominant-baseline", "middle"); text.setAttribute("transform", `rotate(${textAngle}, ${tx}, ${ty}) rotate(90, ${tx}, ${ty})`);
+                if(p.color === "#FACC15") text.setAttribute("fill", "#0f172a"); text.textContent = "   " + p.label; container.appendChild(text);
             });
         }
-
         let currentRotation = 0;
         window.spinWheel = () => {
-            const btn = document.getElementById('spin-btn');
-            const wheel = document.getElementById('wheel');
-            btn.disabled = true; btn.style.opacity = "0.5";
-            let rand = Math.random();
-            let prizeIndex = 0;
-            let cumulative = 0;
-            for(let i=0; i<prizes.length; i++) { cumulative += prizes[i].prob; if(rand <= cumulative) { prizeIndex = i; break; } }
-            const spins = 12; const sliceDeg = 360 / prizes.length;
-            const newRotation = (spins * 360) + (360 - (prizeIndex * sliceDeg)) - (sliceDeg / 2);
-            currentRotation += newRotation;
-            wheel.style.transform = `rotate(${currentRotation}deg)`;
-            setTimeout(() => {
-                const prize = prizes[prizeIndex];
-                if (prize.code === "RETRY") {
-                    btn.disabled = false; btn.style.opacity = "1"; btn.innerText = "Girar Novamente!";
-                } else if (prize.code) { showWinPopup(prize); } 
-                else { closeRoulette(); }
-            }, 8200); 
+            const btn = document.getElementById('spin-btn'); const wheel = document.getElementById('wheel'); btn.disabled = true; btn.style.opacity = "0.5";
+            let rand = Math.random(); let prizeIndex = 0; let cumulative = 0; for(let i=0; i<prizes.length; i++) { cumulative += prizes[i].prob; if(rand <= cumulative) { prizeIndex = i; break; } }
+            const spins = 12; const sliceDeg = 360 / prizes.length; const newRotation = (spins * 360) + (360 - (prizeIndex * sliceDeg)) - (sliceDeg / 2);
+            currentRotation += newRotation; wheel.style.transform = `rotate(${currentRotation}deg)`;
+            setTimeout(() => { const prize = prizes[prizeIndex]; if (prize.code === "RETRY") { btn.disabled = false; btn.style.opacity = "1"; btn.innerText = "Girar Novamente!"; } else if (prize.code) { showWinPopup(prize); } else { closeRoulette(); } }, 8200); 
         };
-
         function showWinPopup(prize) {
             const modal = document.getElementById('roulette-modal');
-            modal.innerHTML = `
-                <div class="py-4 text-center">
-                    <div class="text-6xl mb-6">🎈</div>
-                    <h3 class="text-3xl font-black text-white brand-font mb-2 uppercase">GANHOU!</h3>
-                    <p class="text-blue-100 font-bold mb-6 text-center">${prize.label}</p>
-                    <div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8 relative text-center">
-                        <span id="win-coupon-code" class="text-3xl font-black text-yellow-400 tracking-widest uppercase">${prize.code}</span>
-                    </div>
-                    <button onclick="copyToClipboard('win-coupon-code', this)" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl uppercase tracking-widest text-sm mb-3">Copiar Cupom</button>
-                    <button onclick="closeRoulette()" class="text-white/50 text-[10px] font-bold uppercase">Entrar no Site</button>
-                </div>
-            `;
+            modal.innerHTML = `<div class="py-4 text-center"><div class="text-6xl mb-6">🎈</div><h3 class="text-3xl font-black text-white brand-font mb-2 uppercase">GANHOU!</h3><p class="text-blue-100 font-bold mb-6 text-center">${prize.label}</p><div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8 relative text-center"><span id="win-coupon-code" class="text-3xl font-black text-yellow-400 tracking-widest uppercase">${prize.code}</span></div><button onclick="copyToClipboard('win-coupon-code', this)" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl uppercase tracking-widest text-sm mb-3">Copiar Cupom</button><button onclick="closeRoulette()" class="text-white/50 text-[10px] font-bold uppercase">Entrar no Site</button></div>`;
         }
-
-        window.copyToClipboard = (elementId, btn) => {
-            const text = document.getElementById(elementId).innerText;
-            const el = document.createElement('textarea'); el.value = text;
-            document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            btn.innerText = "COPIADO! ✅"; 
-            setTimeout(() => { closeRoulette(); }, 1000);
-        };
-
-        window.closeRoulette = () => {
-            const overlay = document.getElementById('roulette-overlay');
-            if(overlay) overlay.style.display = 'none';
-            document.body.style.overflow = '';
-            try { sessionStorage.setItem('encanto_roulette_clean', 'true'); } catch(e){}
-        };
-
-        // --- SLIDER INFINITO ---
+        window.copyToClipboard = (elementId, btn) => { const text = document.getElementById(elementId).innerText; const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); btn.innerText = "COPIADO! ✅"; setTimeout(() => { closeRoulette(); }, 1000); };
+        window.closeRoulette = () => { const overlay = document.getElementById('roulette-overlay'); if(overlay) overlay.style.display = 'none'; document.body.style.overflow = ''; try { sessionStorage.setItem('encanto_roulette_clean', 'true'); } catch(e){} };
         function setupSlider() {
-            const track = document.getElementById('infinite-catalog');
-            if (!track) return;
+            const track = document.getElementById('infinite-catalog'); if (!track) return;
             let isPaused = false; let scrollSpeed = 0.9; let setWidth = 0;
-            const initInfinite = () => {
-                const items = Array.from(track.children);
-                items.forEach(item => track.appendChild(item.cloneNode(true)));
-                items.forEach(item => track.insertBefore(item.cloneNode(true), track.firstChild));
-                updateMetrics(); track.scrollLeft = setWidth;
-            };
+            const initInfinite = () => { const items = Array.from(track.children); items.forEach(item => track.appendChild(item.cloneNode(true))); items.forEach(item => track.insertBefore(item.cloneNode(true), track.firstChild)); updateMetrics(); track.scrollLeft = setWidth; };
             const updateMetrics = () => { setWidth = track.scrollWidth / 3; };
-            function animate() {
-                if (!isPaused) {
-                    track.scrollLeft += scrollSpeed;
-                    if (track.scrollLeft >= setWidth * 2) track.scrollLeft -= setWidth;
-                    else if (track.scrollLeft <= 1) track.scrollLeft += setWidth;
-                }
-                requestAnimationFrame(animate);
-            }
-            track.addEventListener('mousedown', () => isPaused = true);
-            window.addEventListener('mouseup', () => setTimeout(() => isPaused = false, 1000));
-            track.addEventListener('touchstart', () => isPaused = true);
-            track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1000));
-            window.addEventListener('resize', updateMetrics);
-            initInfinite(); window.onload = () => { updateMetrics(); track.scrollLeft = setWidth; };
-            requestAnimationFrame(animate);
+            function animate() { if (!isPaused) { track.scrollLeft += scrollSpeed; if (track.scrollLeft >= setWidth * 2) track.scrollLeft -= setWidth; else if (track.scrollLeft <= 1) track.scrollLeft += setWidth; } requestAnimationFrame(animate); }
+            track.addEventListener('mousedown', () => isPaused = true); window.addEventListener('mouseup', () => setTimeout(() => isPaused = false, 1000));
+            track.addEventListener('touchstart', () => isPaused = true); track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 1000));
+            window.addEventListener('resize', updateMetrics); initInfinite(); window.onload = () => { updateMetrics(); track.scrollLeft = setWidth; }; requestAnimationFrame(animate);
         }
-
-        window.toggleNotificationPanel = () => {
-            const p = document.getElementById('notification-panel');
-            const o = document.getElementById('notification-overlay');
-            if (p.classList.contains('translate-x-full')) { p.classList.remove('translate-x-full'); o.classList.remove('hidden'); }
-            else { p.classList.add('translate-x-full'); o.classList.add('hidden'); }
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            setupSlider(); drawWheel(); startCountdown();
-            if(!sessionStorage.getItem('encanto_roulette_clean')) {
-                setTimeout(() => {
-                    const overlay = document.getElementById('roulette-overlay');
-                    if(overlay) { overlay.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-                }, 1200);
-            }
-        });
+        window.toggleNotificationPanel = () => { const p = document.getElementById('notification-panel'); const o = document.getElementById('notification-overlay'); if (p.classList.contains('translate-x-full')) { p.classList.remove('translate-x-full'); o.classList.remove('hidden'); } else { p.classList.add('translate-x-full'); o.classList.add('hidden'); } };
+        document.addEventListener('DOMContentLoaded', () => { setupSlider(); drawWheel(); startCountdown(); if(!sessionStorage.getItem('encanto_roulette_clean')) { setTimeout(() => { const overlay = document.getElementById('roulette-overlay'); if(overlay) { overlay.style.display = 'flex'; document.body.style.overflow = 'hidden'; } }, 1200); } });
     </script>
 </body>
 </html>
