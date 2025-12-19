@@ -22,7 +22,6 @@
             scroll-behavior: smooth;
         }
 
-        /* Bloqueio de scroll global para popups */
         body.modal-active {
             overflow: hidden !important;
             height: 100vh !important;
@@ -42,7 +41,6 @@
         .border-primary { border-color: var(--brand-blue); }
         .bg-secondary { background-color: var(--brand-yellow); }
 
-        /* ESTILO UNIFORME PARA TÍTULOS DE SEÇÃO */
         .section-header-premium {
             font-family: 'Baloo 2', cursive;
             color: var(--brand-blue);
@@ -55,7 +53,6 @@
             display: block;
         }
 
-        /* --- SLIDER 13 ITENS (VELOCIDADE 0.9) --- */
         .infinite-slider-track {
             display: flex;
             gap: 12px;
@@ -93,7 +90,6 @@
         }
         .card-title { color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; text-align: center; padding: 0 10px; }
 
-        /* --- ROLETA INTERATIVA --- */
         #roulette-overlay {
             z-index: 9999;
             background: rgba(15, 23, 42, 0.95);
@@ -138,9 +134,8 @@
         }
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 35px; z-index: 40; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
         
-        .prize-text { font-size: 5px; font-weight: 900; fill: white; letter-spacing: 0.1px; }
+        .prize-text { font-size: 4px; font-weight: 900; fill: white; letter-spacing: 0.1px; }
 
-        /* --- COUNTDOWN STYLES --- */
         .countdown-box {
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(8px);
@@ -399,18 +394,18 @@
             <div class="relative z-10">
                 <div class="inline-block bg-yellow-400 text-slate-900 text-[10px] font-black px-4 py-1 rounded-full uppercase mb-2">Presente de Boas-Vindas</div>
                 <h3 class="text-xl font-black text-white brand-font mb-1 uppercase tracking-tight">Gire e Ganhe!</h3>
-                <p class="text-blue-100/70 text-[10px] font-medium mb-2">Arraste a roleta forte para girar!</p>
+                <!-- ATUALIZADO: Frase personalizada -->
+                <p class="text-blue-100/70 text-[10px] font-medium mb-2">Só a Encanto Festas proporciona isso :)</p>
                 
                 <div class="wheel-outer" id="wheel-drag-area">
                     <img class="wheel-pointer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Cpath d='M12 21l-8-12h16l-8 12z'/%3E%3C/svg%3E" alt="Ponteiro">
                     <svg id="wheel" viewBox="0 0 100 100"><g id="wheel-segments"></g></svg>
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border-4 border-blue-600 rounded-full z-20 shadow-xl flex flex-col items-center justify-center pointer-events-none">
-                        <span class="text-[7px] font-black text-blue-600 uppercase leading-none">Puxe</span>
-                        <span class="text-[10px] font-black text-blue-600 uppercase">Forte</span>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border-4 border-blue-600 rounded-full z-20 shadow-xl overflow-hidden pointer-events-none">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" class="w-full h-full object-contain" alt="Logo">
                     </div>
                 </div>
 
-                <button id="spin-btn" onclick="spinWheel()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all transform uppercase tracking-widest text-sm mb-4">Ou clique aqui</button>
+                <button id="spin-btn" onclick="spinWheel()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all transform uppercase tracking-widest text-sm mb-4">Girar</button>
                 <button onclick="closeRoulette()" class="text-blue-100/40 text-[10px] font-bold uppercase tracking-widest hover:text-white">Entrar sem desconto</button>
             </div>
         </div>
@@ -484,11 +479,12 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="18" x="5" y="3" rx="2"/><line x1="8" x2="16" y1="7" y2="7"/><path d="M16 11h.01"/><path d="M12 11h.01"/><path d="M8 11h.01"/><path d="M12 15h.01"/><path d="M8 15h.01"/><path d="M12 19h.01"/><path d="M8 19h.01"/></svg>
                     Fazer Orçamento / Reservar
                 </button>
+                <!-- ATUALIZADO: Texto abaixo do botão -->
                 <p class="text-blue-100/60 text-[10px] font-black uppercase tracking-[0.2em] -mt-1 drop-shadow-sm">é muito fácil</p>
             </div>
         </section>
 
-        <!-- CATÁLOGO -->
+        <!-- CATÁLOGO (mt-8 para uniformidade) -->
         <section class="mt-8 pb-4"> 
             <h3 class="section-header-premium">Nossos brinquedos</h3>
             <div class="infinite-slider-container">
@@ -510,7 +506,7 @@
             </div>
         </section>
 
-        <!-- CONTAGEM REGRESSIVA (SUBIU PARA mt-8) -->
+        <!-- CONTAGEM REGRESSIVA (mt-8 para uniformidade) -->
         <section class="mt-8 px-5 mb-10"> 
             <h3 class="section-header-premium">Promoção</h3>
             <div class="promo-card rounded-[2.2rem] p-6 relative overflow-hidden flex flex-col md:flex-row items-center gap-6">
@@ -539,7 +535,7 @@
             </div>
         </section>
 
-        <!-- PRESENÇA (SUBIU PARA mt-8) -->
+        <!-- PRESENÇA (mt-8 para uniformidade) -->
         <section class="mt-8 px-6 mb-10"> 
             <h3 class="section-header-premium">Presença em São Chico</h3>
             <div class="trust-container">
@@ -591,18 +587,17 @@
             </div>
         </section>
 
-        <!-- AVALIAÇÕES (SUBIU PARA mt-8) -->
+        <!-- AVALIAÇÕES (mt-8 para uniformidade) -->
         <section class="mt-8 px-6 mb-10"> 
             <h3 class="section-header-premium">Avaliações</h3>
             <div class="premium-card-wrapper !px-0">
-                <!-- AJUSTADO: Altura reduzida para 380px para ficar justo aos comentários -->
                 <div class="iframe-embed-container" style="height: 380px;">
                     <iframe src="https://widget.taggbox.com/310470?website=1" style="width:100%;height:100%;overflow:hidden;border:none;"></iframe>
                 </div>
             </div>
         </section>
 
-        <!-- CONTATO (SUBIU PARA mt-8) -->
+        <!-- CONTATO (mt-8 para uniformidade) -->
         <section class="mt-8 px-6 mb-10"> 
             <h3 class="section-header-premium">Contato</h3>
             <div class="map-wrapper">
@@ -643,7 +638,7 @@
             </div>
         </section>
 
-        <!-- FAQ (SUBIU PARA mt-8) -->
+        <!-- FAQ (mt-8 para uniformidade) -->
         <section class="mt-8 px-6 mb-16"> 
             <h3 class="section-header-premium">Possíveis perguntas</h3>
             <div class="space-y-3">
@@ -762,7 +757,7 @@
             isSpinning = true;
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('spin-btn').style.opacity = "0.5";
-            const prizeIndex = Math.floor(Math.random() * prizes.length); 
+            const prizeIndex = calculatePrize();
             const extraSpins = 5 + Math.floor(initialVelocity * 5);
             const targetRotation = currentRotation + (extraSpins * 360) + (360 - (currentRotation % 360)) + (360 - (prizeIndex * (360/prizes.length))) - (180/prizes.length);
             wheel.style.transition = 'transform 8s cubic-bezier(0.1, 0, 0.1, 1)';
@@ -779,6 +774,24 @@
             }, 8200);
         }
 
+        const prizes = [ 
+            { label: "NADA", color: "#475569", prob: 0.25, code: null }, 
+            { label: "5% OFF", color: "#3b82f6", prob: 0.30, code: "FIVEHUND" }, 
+            { label: "GIRAR +", color: "#1e293b", prob: 0.20, code: "RETRY" }, 
+            { label: "10% OFF", color: "#2563eb", prob: 0.15, code: "DEZZOFF" }, 
+            { label: "FRETE VIP", color: "#10b981", prob: 0.09, code: "MEUCLUB" }, 
+            { label: "30% OFF", color: "#FACC15", prob: 0.01, code: "MEGAPROMO30" } 
+        ];
+
+        function calculatePrize() {
+            let rand = Math.random(), cumulative = 0;
+            for(let i=0; i<prizes.length; i++) {
+                cumulative += prizes[i].prob;
+                if(rand <= cumulative) return i;
+            }
+            return 0;
+        }
+
         dragArea.addEventListener('mousedown', handleStart);
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('mouseup', handleEnd);
@@ -786,7 +799,27 @@
         window.addEventListener('touchmove', handleMove, {passive: false});
         window.addEventListener('touchend', handleEnd);
 
-        /* --- CRONÔMETRO SINCRONIZADO --- */
+        function drawWheel() {
+            const container = document.getElementById('wheel-segments'); if(!container) return;
+            const sliceDeg = 360 / prizes.length;
+            prizes.forEach((p, i) => {
+                const angle = i * sliceDeg, rStart = (angle - 90) * Math.PI / 180, rEnd = (angle + sliceDeg - 90) * Math.PI / 180;
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", `M 50 50 L ${50 + 50 * Math.cos(rStart)} ${50 + 50 * Math.sin(rStart)} A 50 50 0 0 1 ${50 + 50 * Math.cos(rEnd)} ${50 + 50 * Math.sin(rEnd)} Z`);
+                path.setAttribute("fill", p.color); container.appendChild(path);
+                
+                const textAngle = angle + (sliceDeg / 2); 
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                const textDist = 32; 
+                const tx = 50 + textDist * Math.cos((textAngle - 90) * Math.PI / 180); 
+                const ty = 50 + textDist * Math.sin((textAngle - 90) * Math.PI / 180);
+                
+                text.setAttribute("x", tx); text.setAttribute("y", ty); text.setAttribute("class", "prize-text"); text.setAttribute("text-anchor", "middle"); text.setAttribute("dominant-baseline", "middle");
+                text.setAttribute("transform", `rotate(${textAngle}, ${tx}, ${ty}) rotate(90, ${tx}, ${ty})`);
+                text.textContent = "   " + p.label; container.appendChild(text);
+            });
+        }
+
         function startCountdown() {
             const targetDate = new Date('2026-01-01T00:00:00').getTime();
             function update() {
@@ -836,23 +869,6 @@
             if (p.classList.contains('translate-x-full')) { p.classList.remove('translate-x-full'); o.classList.remove('hidden'); toggleScroll(true); }
             else { p.classList.add('translate-x-full'); o.classList.add('hidden'); toggleScroll(false); }
         };
-
-        const prizes = [ { label: "NADA", color: "#475569", prob: 0.25, code: null }, { label: "5% OFF", color: "#3b82f6", prob: 0.30, code: "VEM5" }, { label: "GIRAR +", color: "#1e293b", prob: 0.20, code: "RETRY" }, { label: "10% OFF", color: "#2563eb", prob: 0.15, code: "VEM10" }, { label: "FRETE VIP", color: "#10b981", prob: 0.09, code: "FRETE0" }, { label: "50% OFF", color: "#FACC15", prob: 0.01, code: "RARO50" } ];
-        function drawWheel() {
-            const container = document.getElementById('wheel-segments'); if(!container) return;
-            const sliceDeg = 360 / prizes.length;
-            prizes.forEach((p, i) => {
-                const angle = i * sliceDeg, rStart = (angle - 90) * Math.PI / 180, rEnd = (angle + sliceDeg - 90) * Math.PI / 180;
-                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                path.setAttribute("d", `M 50 50 L ${50 + 50 * Math.cos(rStart)} ${50 + 50 * Math.sin(rStart)} A 50 50 0 0 1 ${50 + 50 * Math.cos(rEnd)} ${50 + 50 * Math.sin(rEnd)} Z`);
-                path.setAttribute("fill", p.color); container.appendChild(path);
-                const textAngle = angle + (sliceDeg / 2), text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                const textDist = 39, tx = 50 + textDist * Math.cos((textAngle - 90) * Math.PI / 180), ty = 50 + textDist * Math.sin((textAngle - 90) * Math.PI / 180);
-                text.setAttribute("x", tx); text.setAttribute("y", ty); text.setAttribute("class", "prize-text"); text.setAttribute("text-anchor", "middle"); text.setAttribute("dominant-baseline", "middle");
-                text.setAttribute("transform", `rotate(${textAngle}, ${tx}, ${ty}) rotate(90, ${tx}, ${ty})`);
-                text.textContent = "   " + p.label; container.appendChild(text);
-            });
-        }
 
         function showWinPopup(prize) {
             document.getElementById('roulette-modal').innerHTML = `<div class="py-4 text-center"><div class="text-6xl mb-6">🎈</div><h3 class="text-3xl font-black text-white brand-font mb-2 uppercase">GANHOU!</h3><p class="text-blue-100 font-bold mb-6">${prize.label}</p><div class="bg-white/10 border-2 border-white/20 border-dashed rounded-2xl p-6 mb-8"><span id="win-coupon-code" class="text-3xl font-black text-yellow-400 tracking-widest uppercase">${prize.code}</span></div><button onclick="copyWinCoupon('win-coupon-code', this)" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl text-sm mb-3">Copiar Cupom</button><button onclick="closeRoulette()" class="text-white/50 text-[10px] font-bold uppercase">Sair</button></div>`;
