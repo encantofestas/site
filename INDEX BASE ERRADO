@@ -1,0 +1,360 @@
+---
+---
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Encanto Festas - Locação de Brinquedos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================================================================
+           ESTILOS GERAIS - PADRÃO LUXO ENCANTO FESTAS
+           ========================================================================================= */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
+        }
+
+        body.modal-active {
+            overflow: hidden !important;
+            height: 100vh !important;
+            position: fixed;
+            width: 100%;
+        }
+
+        h1, h2, h3, h4, .brand-font { font-family: 'Baloo 2', cursive; }
+        
+        :root {
+            --brand-blue: #2563EB;
+            --brand-yellow: #FACC15;
+        }
+
+        /* ESTILO UNIFORME PARA TÍTULOS DE SEÇÃO */
+        .section-header-premium {
+            font-family: 'Baloo 2', cursive;
+            color: var(--brand-blue);
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 1.25rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.2rem;
+            display: block;
+        }
+
+        /* --- SLIDER DE BRINQUEDOS (INFINITO) --- */
+        .infinite-slider-track {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 10px 10px 20px 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .slider-card {
+            flex: 0 0 220px; 
+            min-width: 220px;
+            height: 150px; 
+            background: white;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+        .slider-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 12px;
+        }
+        .card-title { color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; text-align: center; padding: 0 10px; }
+
+        /* --- ROLETA INTERATIVA --- */
+        #roulette-overlay {
+            z-index: 9999;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .roulette-modal-content {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 3rem;
+            width: 92%;
+            max-width: 380px;
+            padding: 1.5rem;
+            color: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .wheel-outer {
+            position: relative;
+            width: min(270px, 72vw);
+            height: min(270px, 72vw);
+            margin: 1rem auto;
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            background: #0f172a;
+            box-shadow: 0 0 40px rgba(37, 99, 235, 0.2);
+            cursor: grab;
+        }
+        #wheel { width: 100%; height: 100%; transition: transform 8s cubic-bezier(0.1, 0, 0.1, 1); }
+        .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 35px; z-index: 40; }
+        .prize-text { font-size: 4px; font-weight: 900; fill: white; }
+
+        /* --- PROMOÇÃO --- */
+        .countdown-box {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-family: 'Baloo 2', cursive;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: white;
+        }
+        .promo-card { background: var(--brand-blue); box-shadow: 0 10px 40px -10px rgba(37, 99, 235, 0.4); }
+
+        /* --- MAPA E CONTATO --- */
+        .map-wrapper { border-radius: 2rem; overflow: hidden; border: 1px solid #e2e8f0; height: 250px; margin-bottom: 20px; }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 15px;
+            border-radius: 1.2rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .contact-item:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="text-gray-700 flex flex-col min-h-screen bg-slate-50">
+    {% include header.html %}
+
+    <!-- ROLETA DE BOAS VINDAS -->
+    <div id="roulette-overlay">
+        <div id="roulette-modal" class="roulette-modal-content text-center">
+            <div class="inline-block bg-yellow-400 text-slate-900 text-[10px] font-black px-4 py-1 rounded-full uppercase mb-2">Presente de Boas-Vindas</div>
+            <h3 class="text-xl font-black text-white brand-font mb-1 uppercase tracking-tight">Gire e Ganhe!</h3>
+            <p class="text-blue-100/70 text-[10px] font-medium mb-4">Só a Encanto Festas proporciona isso :)</p>
+            
+            <div class="wheel-outer" id="wheel-drag-area">
+                <img class="wheel-pointer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Cpath d='M12 21l-8-12h16l-8 12z'/%3E%3C/svg%3E" alt="Ponteiro">
+                <svg id="wheel" viewBox="0 0 100 100"><g id="wheel-segments"></g></svg>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border-4 border-blue-600 rounded-full z-20 shadow-xl overflow-hidden pointer-events-none">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" class="w-full h-full object-contain" alt="Logo">
+                </div>
+            </div>
+
+            <button id="spin-btn" onclick="spinWheel()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all transform uppercase tracking-widest text-sm mb-4">Girar</button>
+            <button onclick="closeRoulette()" class="text-blue-100/40 text-[10px] font-bold uppercase tracking-widest hover:text-white">Entrar sem desconto</button>
+        </div>
+    </div>
+
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="bg-gradient-to-b from-blue-600 to-blue-500 text-white rounded-b-[2.5rem] shadow-xl px-6 py-14 text-center relative overflow-hidden">
+            <div class="inline-flex items-center gap-1.5 bg-blue-800/40 backdrop-blur-md text-blue-50 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest mb-6 border border-white/10 shadow-sm">
+                <svg class="w-3.5 h-3.5 text-blue-100" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                São Francisco do Sul
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-3">Brinquedos que transformam <span class="text-yellow-300">sua festa</span></h1>
+            <p class="text-blue-50 mb-10 max-w-lg mx-auto text-sm md:text-base font-normal opacity-90">Você escolhe, a gente entrega e monta. Simples assim!</p>
+            <div class="flex flex-col items-center justify-center gap-4">
+                <button onclick="window.location.href='calendario.html'" class="bg-white text-blue-600 font-extrabold py-4 px-8 rounded-full shadow-2xl active:scale-95 transition-all transform hover:scale-105 text-xs md:text-sm uppercase tracking-wider flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="18" x="5" y="3" rx="2"/><line x1="8" x2="16" y1="7" y2="7"/><path d="M16 11h.01"/><path d="M12 11h.01"/><path d="M8 11h.01"/><path d="M12 15h.01"/><path d="M8 15h.01"/><path d="M12 19h.01"/><path d="M8 19h.01"/></svg>
+                    Fazer Orçamento / Reservar
+                </button>
+            </div>
+        </section>
+
+        <!-- CATÁLOGO -->
+        <section class="mt-12 pb-4"> 
+            <h3 class="section-header-premium">Nossos brinquedos</h3>
+            <div id="infinite-catalog" class="infinite-slider-track scrollbar-hide">
+                <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/a720b1e6ac30fc028c9396ed923e43d0436a8b5c/minibaby.webp"><div class="card-overlay"><span class="card-title brand-font">Mini Baby Inflável</span></div></div>
+                <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/f0ea7af4a6e04cd75b86a553e57b76b013d87efc/aero.webp"><div class="card-overlay"><span class="card-title brand-font">Air Hockey</span></div></div>
+                <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/camap.webp"><div class="card-overlay"><span class="card-title brand-font">Cama Pequena</span></div></div>
+                <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/castelinho.webp"><div class="card-overlay"><span class="card-title brand-font">Castelinho</span></div></div>
+                <div class="slider-card" onclick="window.location.href='calendario.html'"><img src="https://raw.githubusercontent.com/encantofestas/site/78939e16b69f2e4811df38913e62da278996635e/piscina.webp"><div class="card-overlay"><span class="card-title brand-font">Piscina Bolinhas</span></div></div>
+            </div>
+        </section>
+
+        <!-- PROMOÇÃO -->
+        <section class="mt-12 px-5 mb-10"> 
+            <h3 class="section-header-premium">Promoção do Mês</h3>
+            <div class="promo-card rounded-[2.2rem] p-6 relative overflow-hidden flex flex-col md:flex-row items-center gap-6">
+                <div class="flex-grow text-center md:text-left">
+                    <h2 class="text-xl font-extrabold brand-font text-white leading-tight uppercase tracking-tight mb-2">Castelinho Inflável</h2>
+                    <div class="flex flex-col md:flex-row items-center md:items-center gap-2 md:gap-4 mb-5">
+                        <span class="text-yellow-400 font-black text-4xl tracking-tighter drop-shadow-lg">R$ 180,00</span>
+                    </div>
+                    <div class="flex gap-2.5 justify-center md:justify-start">
+                        <div class="flex flex-col items-center"><div id="days" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1 text-white">Dias</span></div>
+                        <div class="flex flex-col items-center"><div id="hours" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1 text-white">Horas</span></div>
+                        <div class="flex flex-col items-center"><div id="minutes" class="countdown-box">00</div><span class="text-[7px] uppercase font-bold mt-1 text-white">Mins</span></div>
+                        <div class="flex flex-col items-center"><div id="seconds" class="countdown-box text-white">00</div><span class="text-[7px] uppercase font-bold mt-1 text-white">Segs</span></div>
+                    </div>
+                </div>
+                <button class="w-full md:w-auto md:px-10 bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all text-sm uppercase tracking-widest">Aproveitar agora</button>
+            </div>
+        </section>
+
+        <!-- CONTATO -->
+        <section class="mt-12 px-6 mb-16"> 
+            <h3 class="section-header-premium">Onde nos encontrar</h3>
+            <div class="map-wrapper">
+                <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=Encanto%20Festas%20S%C3%A3o%20Francisco%20do%20Sul&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+            </div>
+            <div class="grid grid-cols-1 gap-3">
+                <a href="https://wa.me/5547992277324" target="_blank" class="contact-item">
+                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
+                    <span class="font-bold text-slate-700">(47) 99227-7324</span>
+                </a>
+                <a href="https://instagram.com/encantofestas.sc" target="_blank" class="contact-item">
+                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                    </div>
+                    <span class="font-bold text-slate-700">@encantofestas.sc</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="mt-12 px-6 mb-20"> 
+            <h3 class="section-header-premium">Dúvidas Frequentes</h3>
+            <div class="space-y-3">
+                <div class="faq-item-luxury">
+                    <button onclick="toggleFaq(this)" class="faq-btn">
+                        <span>Qual o período de locação?</span>
+                        <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div class="faq-content">
+                        <div class="faq-content-inner">O tempo padrão de locação é de até 6 horas de festa. Para períodos maiores ou locações por diária completa, entre em contato conosco para orçamentos personalizados.</div>
+                    </div>
+                </div>
+                <div class="faq-item-luxury">
+                    <button onclick="toggleFaq(this)" class="faq-btn">
+                        <span>Como funciona o pagamento?</span>
+                        <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div class="faq-content">
+                        <div class="faq-content-inner">Aceitamos Pix, Crédito ou Dinheiro. Para garantir a data, solicitamos um sinal de R$ 25 no agendamento, e o restante é pago no dia da montagem.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        try { const app = initializeApp(firebaseConfig); const auth = getAuth(app); signInAnonymously(auth); } catch(e) {}
+
+        /* --- LÓGICA DA ROLETA --- */
+        let isSpinning = false, currentRotation = 0;
+        const prizes = [ 
+            { label: "NADA", color: "#475569", code: null }, 
+            { label: "5% OFF", color: "#3b82f6", code: "CINCO" }, 
+            { label: "10% OFF", color: "#2563eb", code: "DEZ" }, 
+            { label: "FRETE VIP", color: "#10b981", code: "VIP" } 
+        ];
+
+        function drawWheel() {
+            const container = document.getElementById('wheel-segments'); if(!container) return;
+            const sliceDeg = 360 / prizes.length;
+            prizes.forEach((p, i) => {
+                const angle = i * sliceDeg, rStart = (angle - 90) * Math.PI / 180, rEnd = (angle + sliceDeg - 90) * Math.PI / 180;
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", `M 50 50 L ${50 + 50 * Math.cos(rStart)} ${50 + 50 * Math.sin(rStart)} A 50 50 0 0 1 ${50 + 50 * Math.cos(rEnd)} ${50 + 50 * Math.sin(rEnd)} Z`);
+                path.setAttribute("fill", p.color); container.appendChild(path);
+                const textAngle = angle + (sliceDeg / 2);
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                const tx = 50 + 30 * Math.cos((textAngle - 90) * Math.PI / 180), ty = 50 + 30 * Math.sin((textAngle - 90) * Math.PI / 180);
+                text.setAttribute("x", tx); text.setAttribute("y", ty); text.setAttribute("class", "prize-text"); text.setAttribute("text-anchor", "middle");
+                text.setAttribute("transform", `rotate(${textAngle}, ${tx}, ${ty})`);
+                text.textContent = p.label; container.appendChild(text);
+            });
+        }
+
+        window.spinWheel = () => {
+            if (isSpinning) return;
+            isSpinning = true;
+            const wheel = document.getElementById('wheel');
+            const spins = 5 * 360;
+            const stopAt = Math.floor(Math.random() * 360);
+            currentRotation += spins + stopAt;
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+            setTimeout(() => { isSpinning = false; }, 8500);
+        };
+
+        window.closeRoulette = () => { 
+            document.getElementById('roulette-overlay').style.display = 'none'; 
+            document.body.classList.remove('modal-active');
+            sessionStorage.setItem('roulette_seen', 'true');
+        };
+
+        window.toggleFaq = (btn) => {
+            const content = btn.nextElementSibling;
+            const isOpen = content.style.maxHeight !== '0px' && content.style.maxHeight !== '';
+            content.style.maxHeight = isOpen ? '0px' : content.scrollHeight + 'px';
+            btn.querySelector('svg').style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        };
+
+        function startCountdown() {
+            const target = new Date('2026-01-01T00:00:00').getTime();
+            setInterval(() => {
+                const now = new Date().getTime(), diff = target - now;
+                if (diff < 0) return;
+                document.getElementById('days').innerText = Math.floor(diff / 86400000).toString().padStart(2, '0');
+                document.getElementById('hours').innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                document.getElementById('minutes').innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                document.getElementById('seconds').innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            drawWheel(); startCountdown();
+            if(!sessionStorage.getItem('roulette_seen')) {
+                setTimeout(() => {
+                    document.getElementById('roulette-overlay').style.display = 'flex';
+                    document.body.classList.add('modal-active');
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>
