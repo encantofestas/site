@@ -3,135 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Encanto Festas - Notificações Premium</title>
+    <title>Encanto Festas - Notificações</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-deep: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --accent: #3b82f6;
+        }
+
         html, body {
             overflow-x: hidden;
             width: 100%;
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
+            background: radial-gradient(circle at top right, #1e3a8a, #0f172a);
             background-attachment: fixed;
             -webkit-tap-highlight-color: transparent;
             margin: 0;
             padding: 0;
-            color: #f8fafc;
+            color: #f1f5f9;
         }
-        h1, h2, h3, h4, .brand-font {
+
+        h1, h2, h3, .brand-font {
             font-family: 'Baloo 2', cursive;
+            line-height: 1.2;
         }
         
-        /* Glassmorphism effects */
         .glass-header {
-            background: rgba(30, 58, 138, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .notification-card {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: slideUp 0.5s ease-out forwards;
-            opacity: 0;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.4s ease-out forwards;
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
 
-        .notification-card:active {
-            transform: scale(0.97);
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
+        @keyframes fadeIn {
+            from { transform: translateY(10px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
 
-        /* Modal Animation */
         .modal-view {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             transform: translateY(100%);
         }
         .modal-view.active {
             transform: translateY(0%);
         }
 
-        /* Estilo para Scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
+        .btn-read {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+
+        .btn-read:active {
+            background: var(--accent);
+            transform: scale(0.95);
         }
+
+        /* Esconder scrollbar mas manter funcionalidade */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- CABEÇALHO PRINCIPAL -->
-    <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
-        <div class="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
-            
-            <div class="flex items-center gap-3">
-                <div class="relative">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
-                        alt="Logo Encanto Festas" 
-                        class="w-10 h-10 rounded-full border-2 border-yellow-400 object-cover shadow-lg">
-                </div>
-                <span class="text-white text-2xl font-bold brand-font tracking-tight">
+    <!-- CABEÇALHO -->
+    <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-14">
+        <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
+                    class="w-8 h-8 rounded-full border border-yellow-400/50 shadow-sm">
+                <span class="text-lg font-bold brand-font tracking-tight text-white">
                     Encanto<span class="text-yellow-400">Festas</span>
                 </span>
             </div>
             
-            <button id="notifBtn" class="bg-white/10 text-white p-3 relative rounded-2xl hover:bg-white/20 transition-all outline-none active:scale-90">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button id="notifBtn" class="relative p-2 text-white/80 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
                 </svg>
-                <span id="notifBadge" class="hidden absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-blue-900 animate-pulse"></span>
+                <span id="notifBadge" class="hidden absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-slate-900 animate-pulse"></span>
             </button>
         </div>
     </header>
 
-    <!-- Conteúdo Base (Placeholder) -->
-    <main class="pt-24 px-6 text-center">
-        <h1 class="text-3xl font-bold brand-font mb-4">Bem-vindo ao Encanto!</h1>
-        <p class="text-blue-100 opacity-80">As melhores festas começam aqui.</p>
+    <!-- CONTEÚDO PRINCIPAL (Mínimo) -->
+    <main class="pt-24 px-6 max-w-xl mx-auto text-center">
+        <h1 class="text-2xl font-bold brand-font mb-2">Festas Encantadas</h1>
+        <p class="text-sm text-slate-400">Tudo o que precisa para o seu evento.</p>
     </main>
 
     <!-- MODAL DE NOTIFICAÇÕES -->
-    <div id="notifModal" class="fixed inset-0 z-50 bg-[#0f172a] modal-view hidden flex-col">
-        <!-- Header do Modal -->
-        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-[#1e293b] sticky top-0 z-10 shadow-xl">
-            <div class="flex items-center gap-4">
-                <button id="closeNotif" class="p-2 bg-white/5 hover:bg-white/10 rounded-xl transition-colors text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    <div id="notifModal" class="fixed inset-0 z-50 bg-[#0f172a] modal-view hidden flex flex-col">
+        <!-- Header Modal -->
+        <div class="px-5 py-4 border-b border-white/5 flex justify-between items-center bg-[#1e293b]/50 backdrop-blur-md">
+            <div class="flex items-center gap-3">
+                <button id="closeNotif" class="p-1.5 text-white/60 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
-                <h2 class="text-2xl font-bold brand-font text-white">Suas Notificações</h2>
+                <h2 class="text-lg font-bold brand-font">Notificações</h2>
             </div>
-            <button id="markAllRead" class="text-xs font-bold uppercase tracking-widest text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 px-3 py-2 rounded-lg">
-                Limpar Tudo
+            <button id="markAllRead" class="text-[10px] font-bold uppercase tracking-wider text-blue-400 hover:text-blue-300">
+                Limpar
             </button>
         </div>
 
-        <!-- Lista de Notificações -->
-        <div id="notifContainer" class="flex-1 overflow-y-auto p-5 space-y-5 bg-[#0f172a]">
-            <!-- Skeleton Loading -->
-            <div class="animate-pulse space-y-4">
-                <div class="h-32 bg-white/5 rounded-3xl"></div>
-                <div class="h-32 bg-white/5 rounded-3xl"></div>
+        <!-- Lista -->
+        <div id="notifContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
+            <!-- Loader Silencioso -->
+            <div class="flex flex-col gap-3 opacity-20">
+                <div class="h-24 bg-white/10 rounded-2xl"></div>
+                <div class="h-24 bg-white/10 rounded-2xl"></div>
             </div>
-        </div>
-
-        <!-- Rodapé Marketing -->
-        <div class="p-6 bg-[#1e293b] border-t border-white/10">
-            <button class="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-4 rounded-2xl font-bold shadow-2xl shadow-blue-900/40 active:scale-95 transition-all text-lg brand-font tracking-wide">
-                Explorar Ofertas Mágicas ✨
-            </button>
         </div>
     </div>
 
     <script>
-        // Link do seu GitHub (Substituir pelo Real)
+        // Configuração
         const NOTIF_URL = 'https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/notificacoes.json';
         
         const notifBtn = document.getElementById('notifBtn');
@@ -170,28 +167,24 @@
                 if (response && response.ok) {
                     notifications = await response.json();
                 } else {
-                    // MOCK DATA PARA TESTE
                     notifications = [
-                        { id: 1, titulo: "Promoção Relâmpago! ⚡", mensagem: "Insuflável Castelo Mágico com 30% OFF apenas hoje!", tipo: "alerta", lida: false, data: "Agora mesmo" },
-                        { id: 2, titulo: "Nova Decoração 🌸", mensagem: "O tema Jardim Encantado acaba de chegar ao nosso catálogo.", tipo: "info", lida: true, data: "Há 1 hora" },
-                        { id: 3, titulo: "Agendamento Confirmado", mensagem: "Tudo pronto para a festa do Lucas no próximo sábado!", tipo: "sucesso", lida: false, data: "Há 3 horas" }
+                        { id: 1, titulo: "Promoção 30% OFF! ⚡", mensagem: "Insuflável Castelo Mágico com desconto exclusivo para hoje.", tipo: "alerta", lida: false, data: "Agora" },
+                        { id: 2, titulo: "Tema Jardim Encantado 🌸", mensagem: "Novas decorações disponíveis no nosso catálogo.", tipo: "info", lida: true, data: "1h" },
+                        { id: 3, titulo: "Reserva Confirmada ✨", mensagem: "Tudo pronto para a festa de sábado. Até já!", tipo: "sucesso", lida: false, data: "3h" }
                     ];
                 }
                 renderNotifications();
-            } catch (error) {
-                notifContainer.innerHTML = `<div class="text-center py-20 text-blue-300">Ops! Erro ao carregar.</div>`;
+            } catch (e) {
+                notifContainer.innerHTML = `<p class="text-center py-10 text-xs text-slate-500">Erro ao carregar.</p>`;
             }
         }
 
         function renderNotifications() {
             if (notifications.length === 0) {
                 notifContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-20 text-blue-300/40">
-                        <div class="bg-white/5 p-8 rounded-full mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-30"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                        </div>
-                        <p class="text-xl font-bold brand-font">Sem novidades</p>
-                        <p class="text-sm opacity-60">Fique atento para as próximas surpresas!</p>
+                    <div class="flex flex-col items-center justify-center py-20 opacity-30">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-3"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                        <p class="text-sm font-medium">Sem notificações</p>
                     </div>
                 `;
                 return;
@@ -200,27 +193,26 @@
             const temNovas = notifications.some(n => !n.lida);
             temNovas ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
 
-            notifContainer.innerHTML = notifications.map((n, index) => {
-                const icon = n.tipo === 'alerta' ? '🔥' : n.tipo === 'sucesso' ? '✨' : '🎈';
-                const opacity = n.lida ? 'opacity-60' : 'opacity-100';
-                const border = n.lida ? 'border-white/5' : 'border-blue-500/30 bg-gradient-to-br from-[#1e293b] to-[#0f172a]';
+            notifContainer.innerHTML = notifications.map((n, idx) => {
+                const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
+                const isReadClass = n.lida ? 'opacity-40 grayscale-[0.5]' : '';
                 
                 return `
-                    <div class="notification-card p-5 rounded-[2rem] border ${border} ${opacity} shadow-2xl shadow-black/20" style="animation-delay: ${index * 0.1}s">
-                        <div class="flex gap-4">
-                            <div class="w-14 h-14 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-3xl shadow-inner">
+                    <div class="notification-card p-4 rounded-2xl bg-slate-800/40 border border-white/5 ${isReadClass}" style="animation-delay: ${idx * 0.05}s">
+                        <div class="flex gap-3">
+                            <div class="w-10 h-10 shrink-0 rounded-xl bg-white/5 flex items-center justify-center text-xl">
                                 ${icon}
                             </div>
                             <div class="flex-1 min-w-0">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h3 class="font-bold text-white text-lg leading-tight truncate pr-4">${n.titulo}</h3>
-                                    <span class="text-[10px] font-bold text-blue-400 bg-blue-400/10 px-2 py-1 rounded-md uppercase tracking-tighter shrink-0">${n.data}</span>
+                                <div class="flex justify-between items-baseline gap-2 mb-0.5">
+                                    <h3 class="font-bold text-sm text-white truncate">${n.titulo}</h3>
+                                    <span class="text-[9px] font-medium text-slate-500 shrink-0">${n.data}</span>
                                 </div>
-                                <p class="text-sm text-blue-100/70 mb-4 line-clamp-2 leading-snug">${n.mensagem}</p>
+                                <p class="text-xs text-slate-400 mb-3 leading-snug">${n.mensagem}</p>
                                 
-                                <button onclick="markAsRead(${n.id})" class="flex items-center gap-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-xl transition-all active:scale-90 shadow-lg shadow-blue-600/20">
-                                    <span>Ler Notificação</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+                                <button onclick="markAsRead(${n.id})" class="btn-read text-[10px] font-bold px-3 py-1.5 rounded-lg text-blue-400 flex items-center gap-1.5 active:bg-blue-500 active:text-white transition-all">
+                                    <span>Lido</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                                 </button>
                             </div>
                         </div>
@@ -230,9 +222,9 @@
         }
 
         window.markAsRead = (id) => {
-            const index = notifications.findIndex(n => n.id === id);
-            if (index !== -1) {
-                notifications[index].lida = true;
+            const idx = notifications.findIndex(n => n.id === id);
+            if (idx !== -1) {
+                notifications[idx].lida = true;
                 renderNotifications();
             }
         };
