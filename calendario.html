@@ -31,27 +31,29 @@
         .bg-secondary { background-color: #FACC15; }
         .text-secondary { color: #CA8A04; }
         
-        /* Animação "Vai e Volta" Bouncy */
+        /* Animação "Vai e Volta" (Bounce) Profissional */
         @keyframes bounce-click {
             0% { transform: scale(1); }
-            40% { transform: scale(0.8); }
-            70% { transform: scale(1.05); }
+            50% { transform: scale(0.85); }
             100% { transform: scale(1); }
         }
 
         .click-bounce:active {
-            animation: bounce-click 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: bounce-click 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
+        /* Garantir que o link mude de cor e anime corretamente */
         .nav-item {
-            transition: color 0.3s ease;
+            transition: color 0.2s ease;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .nav-item:active {
             color: #2563EB !important;
         }
 
         .floating-fab {
-            box-shadow: 0 8px 25px rgba(250, 204, 21, 0.5);
+            box-shadow: 0 8px 25px rgba(250, 204, 21, 0.4);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -63,14 +65,14 @@
         /* Popup Slide */
         #custom-popup {
             transform: translateY(100%);
-            transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
         }
         body.popup-open #custom-popup {
             transform: translateY(0);
         }
         .popup-overlay {
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.3s ease;
             pointer-events: none;
         }
         body.popup-open .popup-overlay {
@@ -78,14 +80,8 @@
             pointer-events: auto;
         }
 
-        /* Menu Grid Style */
         .menu-card {
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            transition: transform 0.1s ease, background-color 0.2s ease;
         }
     </style>
 </head>
@@ -124,39 +120,48 @@
     <!-- [/LOCK] -->
 
     <main class="flex-grow w-full">
-        <!-- Área de conteúdo limpa -->
+        <!-- Main content -->
     </main>
 
     <div class="popup-overlay fixed inset-0 bg-black/60 z-[55]" onclick="togglePopup()"></div>
 
-    <div id="custom-popup" class="fixed inset-x-0 bottom-0 z-[60] bg-white rounded-t-[3rem] shadow-2xl h-[65vh] overflow-y-auto">
+    <div id="custom-popup" class="fixed inset-x-0 bottom-0 z-[60] bg-white rounded-t-[3rem] shadow-2xl h-[55vh] overflow-y-auto">
         <div class="sticky top-0 bg-white pt-5 pb-3 z-10" onclick="togglePopup()">
             <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto cursor-pointer active:bg-gray-300 transition-colors"></div>
         </div>
-        <div id="popup-content-area" class="px-8 pb-16">
+        <div id="popup-content-area" class="px-8 pb-12">
             <!-- Conteúdo carregado via Script -->
         </div>
     </div>
 
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-100 z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full max-w-7xl mx-auto">
+            <!-- Início -->
             <a href="index.html" class="nav-item click-bounce flex flex-col items-center justify-center text-gray-400">
                 <svg class="w-6 h-6"><use href="#icon-house"></use></svg>
                 <span class="text-[10px] font-semibold mt-1">Início</span>
             </a>
+            
+            <!-- Parceiros -->
             <a href="parceiros.html" class="nav-item click-bounce flex flex-col items-center justify-center text-gray-400">
                 <svg class="w-6 h-6"><use href="#icon-handshake"></use></svg>
                 <span class="text-[10px] font-semibold mt-1">Parceiros</span>
             </a>
+
+            <!-- Botão Central -->
             <div class="relative flex justify-center">
                 <button onclick="togglePopup()" class="floating-fab click-bounce absolute -top-8 bg-secondary text-blue-900 w-16 h-16 rounded-full flex items-center justify-center border-4 border-white">
                     <svg class="w-9 h-9"><use href="#icon-plus"></use></svg>
                 </button>
             </div>
+
+            <!-- Catálogo -->
             <a href="catalogo.html" class="nav-item click-bounce flex flex-col items-center justify-center text-gray-400">
                 <svg class="w-6 h-6"><use href="#icon-book-open"></use></svg>
                 <span class="text-[10px] font-semibold mt-1">Catálogo</span>
             </a>
+
+            <!-- Perfil -->
             <a href="perfil.html" class="nav-item click-bounce flex flex-col items-center justify-center text-gray-400">
                 <svg class="w-6 h-6"><use href="#icon-user-round"></use></svg>
                 <span class="text-[10px] font-semibold mt-1">Perfil</span>
@@ -166,41 +171,41 @@
 
     <script>
         const POPUP_CONTENT = `
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-extrabold brand-font text-primary">Ações Rápidas</h2>
-                <p class="text-gray-400 text-sm">O que deseja fazer agora?</p>
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-extrabold brand-font text-primary">Ações Rápidas</h2>
+                <p class="text-gray-400 text-xs">O que deseja fazer agora?</p>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-3">
                 <!-- Fazer Reserva -->
-                <button class="menu-card click-bounce p-6 bg-blue-50 rounded-[2.5rem] border border-blue-100">
-                    <div class="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-200 mb-3">
-                        <svg class="w-7 h-7 text-white"><use href="#icon-calendar"></use></svg>
+                <button class="menu-card click-bounce p-4 bg-blue-50 rounded-[2rem] border border-blue-100 flex flex-col items-center">
+                    <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-200 mb-2">
+                        <svg class="w-6 h-6 text-white"><use href="#icon-calendar"></use></svg>
                     </div>
-                    <span class="font-bold text-sm text-blue-900">Fazer Reserva</span>
+                    <span class="font-bold text-xs text-blue-900">Fazer Reserva</span>
                 </button>
 
                 <!-- Encanto Escola -->
-                <button class="menu-card click-bounce p-6 bg-purple-50 rounded-[2.5rem] border border-purple-100">
-                    <div class="w-14 h-14 bg-purple-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-purple-200 mb-3">
-                        <svg class="w-7 h-7 text-white"><use href="#icon-school"></use></svg>
+                <button class="menu-card click-bounce p-4 bg-purple-50 rounded-[2rem] border border-purple-100 flex flex-col items-center">
+                    <div class="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-purple-200 mb-2">
+                        <svg class="w-6 h-6 text-white"><use href="#icon-school"></use></svg>
                     </div>
-                    <span class="font-bold text-sm text-purple-900">Encanto Escola</span>
+                    <span class="font-bold text-xs text-purple-900">Encanto Escola</span>
                 </button>
 
                 <!-- Convide e Ganhe -->
-                <button class="menu-card click-bounce p-6 bg-yellow-50 rounded-[2.5rem] border border-yellow-100">
-                    <div class="w-14 h-14 bg-secondary text-blue-900 rounded-full flex items-center justify-center shadow-lg shadow-yellow-200 mb-3">
-                        <svg class="w-7 h-7"><use href="#icon-gift"></use></svg>
+                <button class="menu-card click-bounce p-4 bg-yellow-50 rounded-[2rem] border border-yellow-100 flex flex-col items-center">
+                    <div class="w-12 h-12 bg-secondary text-blue-900 rounded-full flex items-center justify-center shadow-lg shadow-yellow-200 mb-2">
+                        <svg class="w-6 h-6"><use href="#icon-gift"></use></svg>
                     </div>
-                    <span class="font-bold text-sm text-yellow-900">Convide Ganhe</span>
+                    <span class="font-bold text-xs text-yellow-900 text-center leading-tight">Convide e Ganhe</span>
                 </button>
 
                 <!-- WhatsApp -->
-                <button class="menu-card click-bounce p-6 bg-green-50 rounded-[2.5rem] border border-green-100">
-                    <div class="w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-200 mb-3">
-                        <svg class="w-7 h-7 text-white"><use href="#icon-whatsapp"></use></svg>
+                <button class="menu-card click-bounce p-4 bg-green-50 rounded-[2rem] border border-green-100 flex flex-col items-center">
+                    <div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-200 mb-2">
+                        <svg class="w-6 h-6 text-white"><use href="#icon-whatsapp"></use></svg>
                     </div>
-                    <span class="font-bold text-sm text-green-900">WhatsApp</span>
+                    <span class="font-bold text-xs text-green-900 text-center">WhatsApp</span>
                 </button>
             </div>
         `;
