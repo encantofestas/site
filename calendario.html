@@ -30,7 +30,6 @@
             line-height: 1.2;
         }
         
-        /* Cabeçalho principal azul */
         .glass-header {
             background: #2563eb; 
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
@@ -40,7 +39,7 @@
         .notification-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             animation: fadeIn 0.4s ease-out forwards;
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -53,14 +52,12 @@
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             transform: translateY(100%);
             background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%);
-            /* Impede o fundo branco de aparecer no "bounce" do scroll */
             background-attachment: fixed;
         }
         .modal-view.active {
             transform: translateY(0%);
         }
 
-        /* Truncagem de texto com reticências */
         .line-clamp-title {
             display: -webkit-box;
             -webkit-line-clamp: 1;
@@ -76,7 +73,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Estado expandido ao clicar */
         .expanded .line-clamp-msg, 
         .expanded .line-clamp-title {
             display: block;
@@ -100,7 +96,6 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- Cabeçalho (Sempre Azul) -->
     <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
         <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -115,7 +110,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
                 </svg>
-                <!-- Badge (Pontinho Vermelho) -->
                 <span id="notifBadge" class="hidden absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-blue-600 animate-pulse"></span>
             </button>
         </div>
@@ -123,9 +117,7 @@
 
     <main class="pt-24"></main>
 
-    <!-- Modal de Notificações -->
     <div id="notifModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
-        <!-- Header do Modal Compacto -->
         <div class="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
             <div class="flex items-center gap-4">
                 <button id="closeNotif" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
@@ -138,9 +130,7 @@
             </button>
         </div>
 
-        <!-- Lista de Notificações -->
         <div id="notifContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-10">
-            <!-- Skeleton placeholder -->
             <div id="loadingState" class="flex flex-col gap-4 opacity-10">
                 <div class="h-28 bg-white rounded-3xl"></div>
                 <div class="h-28 bg-white rounded-3xl"></div>
@@ -158,8 +148,8 @@
         const markAllReadBtn = document.getElementById('markAllRead');
 
         let notifications = [];
+        let hasError = false;
 
-        // Função para calcular tempo relativo (ex: há 3 min atrás)
         function getRelativeTime(dateString) {
             if (!dateString) return "agora mesmo";
             const now = new Date();
@@ -178,7 +168,6 @@
             return past.toLocaleDateString('pt-PT');
         }
 
-        // Verifica o ficheiro assim que a página carrega para mostrar o badge
         window.addEventListener('DOMContentLoaded', () => {
             fetchNotifications(false);
         });
@@ -187,7 +176,13 @@
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
-            renderNotifications();
+            
+            // Se houve erro anteriormente ou a lista está vazia, tenta carregar de novo
+            if (hasError || notifications.length === 0) {
+                fetchNotifications(true);
+            } else {
+                renderNotifications();
+            }
         });
 
         closeNotif.addEventListener('click', () => {
@@ -206,22 +201,24 @@
 
         async function fetchNotifications(shouldRender = true) {
             try {
-                const response = await fetch(NOTIF_URL);
+                // Adiciona timestamp para evitar cache do ficheiro
+                const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
                 if (response.ok) {
                     notifications = await response.json();
+                    hasError = false;
                     updateBadge();
                     if (shouldRender) renderNotifications();
                 } else {
-                    throw new Error();
+                    throw new Error('Não encontrado');
                 }
             } catch (e) {
-                console.error("Erro ao carregar notificações:", e);
-                // Exibe mensagem de erro marketing se o fetch falhar
+                hasError = true;
                 if (shouldRender) {
                     notifContainer.innerHTML = `
                         <div class="flex flex-col items-center justify-center py-20 text-white/70 text-center px-6">
                             <p class="text-lg font-bold brand-font text-white opacity-90 mb-1">Ocorreu um erro</p>
                             <p class="text-xs opacity-70">Estamos corrigindo isso o mais breve possível</p>
+                            <p class="text-[9px] mt-4 opacity-40">Verifique se o ficheiro notificacoes.json existe e está correto.</p>
                         </div>
                     `;
                 }
@@ -233,7 +230,6 @@
         }
 
         function updateBadge() {
-            // Só mostra o badge se houver notificações não lidas
             const unreadCount = notifications.filter(n => !n.lida).length;
             if (unreadCount > 0) {
                 notifBadge.classList.remove('hidden');
@@ -243,7 +239,6 @@
         }
 
         function renderNotifications() {
-            // Filtra para mostrar apenas as não lidas (elas somem ao clicar em lida)
             const unread = notifications.filter(n => !n.lida);
 
             if (unread.length === 0) {
@@ -261,6 +256,9 @@
 
             notifContainer.innerHTML = unread.map((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
+                // Fallbacks se o JSON tiver campos vazios ""
+                const titulo = (n.titulo && n.titulo.trim() !== "") ? n.titulo : 'Encanto Festas';
+                const mensagem = (n.mensagem && n.mensagem.trim() !== "") ? n.mensagem : 'Nova atualização mágica para si!';
                 
                 return `
                     <div id="card-${n.id}" class="notification-card p-4 rounded-[1.25rem] text-white shadow-lg" style="animation-delay: ${idx * 0.05}s">
@@ -270,9 +268,9 @@
                             </div>
                             
                             <div class="flex-1 min-w-0" onclick="toggleExpand(this)">
-                                <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${n.titulo || 'Encanto Festas'}</h3>
+                                <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${titulo}</h3>
                                 <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg cursor-pointer">
-                                    ${n.mensagem || 'Nova atualização disponível para si.'}
+                                    ${mensagem}
                                 </p>
                                 
                                 <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight">
@@ -292,7 +290,6 @@
         window.markAsRead = (id) => {
             const idx = notifications.findIndex(n => n.id === id);
             if (idx !== -1) {
-                // Remove visualmente ao mudar o estado e re-renderizar
                 notifications[idx].lida = true;
                 renderNotifications();
                 updateBadge();
