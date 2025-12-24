@@ -111,6 +111,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
                 </svg>
+                <!-- O badge será exibido via JS se houver notificações não lidas -->
                 <span id="notifBadge" class="hidden absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-blue-600 animate-pulse"></span>
             </button>
         </div>
@@ -169,11 +170,17 @@
             return past.toLocaleDateString('pt-PT');
         }
 
+        // 1. CARREGAR AO INICIAR A PÁGINA (Para saber se tem notificações antes de clicar)
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchNotifications(false); // Carrega os dados silenciosamente
+        });
+
         notifBtn.addEventListener('click', () => {
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
-            fetchNotifications();
+            // Atualiza a renderização ao abrir
+            renderNotifications();
         });
 
         closeNotif.addEventListener('click', () => {
@@ -190,7 +197,7 @@
             updateBadge();
         });
 
-        async function fetchNotifications() {
+        async function fetchNotifications(shouldRender = true) {
             try {
                 const response = await fetch(NOTIF_URL);
                 if (response.ok) {
@@ -200,15 +207,15 @@
                 }
             } catch (e) {
                 const now = new Date();
-                // Mock de exemplo (apenas não lidas para demonstração do sumiço)
                 notifications = [
                     { id: 1, titulo: "Promoção Exclusiva de Natal ⚡", mensagem: "Aproveite 30% de desconto em todos os nossos insufláveis temáticos apenas hoje. Não perca esta oportunidade mágica!", tipo: "alerta", lida: false, data: new Date(now.getTime() - 5 * 60000).toISOString() },
                     { id: 2, titulo: "Novo Tema Disponível: Safari 🦁", mensagem: "O tema mais pedido do ano acaba de chegar! Confira os novos painéis, suportes de doces e balões personalizados para uma festa selvagem.", tipo: "info", lida: false, data: new Date(now.getTime() - 120 * 60000).toISOString() },
                     { id: 3, titulo: "Confirmação de Reserva ✨", mensagem: "A sua reserva para o evento do próximo sábado foi processada com sucesso.", tipo: "sucesso", lida: false, data: new Date(now.getTime() - 26 * 3600000).toISOString() }
                 ];
             }
-            renderNotifications();
-            updateBadge();
+            
+            updateBadge(); // Atualiza o pontinho vermelho
+            if (shouldRender) renderNotifications();
         }
 
         function toggleExpand(element) {
@@ -216,8 +223,9 @@
         }
 
         function updateBadge() {
-            const hasUnread = notifications.some(n => !n.lida);
-            if (hasUnread) {
+            // Verifica se existe pelo menos uma notificação não lida
+            const unreadCount = notifications.filter(n => !n.lida).length;
+            if (unreadCount > 0) {
                 notifBadge.classList.remove('hidden');
             } else {
                 notifBadge.classList.add('hidden');
@@ -225,7 +233,6 @@
         }
 
         function renderNotifications() {
-            // FILTRA APENAS AS NÃO LIDAS PARA QUE ELAS "SUMAM" AO MARCAR
             const unreadNotifications = notifications.filter(n => !n.lida);
 
             if (unreadNotifications.length === 0) {
@@ -274,7 +281,6 @@
         window.markAsRead = (id) => {
             const idx = notifications.findIndex(n => n.id === id);
             if (idx !== -1) {
-                // Ao marcar como lida, o renderNotifications filtrará este item para fora da vista
                 notifications[idx].lida = true;
                 renderNotifications();
                 updateBadge();
