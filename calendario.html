@@ -24,35 +24,47 @@
             min-height: 100vh;
             min-height: 100dvh;
         }
+        
+        /* Cores de Marca */
         .bg-primary { background-color: #2563EB; }
         .text-primary { color: #2563EB; }
         .bg-secondary { background-color: #FACC15; }
         .text-secondary { color: #CA8A04; }
         
-        #bottom-nav {
-            padding-bottom: env(safe-area-inset-bottom);
-            height: calc(4rem + env(safe-area-inset-bottom));
+        /* Animações de Marketing / Feedback Visual */
+        .nav-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .nav-item:active {
+            transform: scale(0.85); /* Efeito de clique profundo */
+            color: #2563EB !important;
+        }
+        .nav-item:active svg {
+            filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.3));
+        }
+
         .floating-fab {
             box-shadow: 0 4px 15px rgba(250, 204, 21, 0.4);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .floating-fab:active {
+            transform: scale(0.9) translateY(2px);
+            box-shadow: 0 2px 5px rgba(250, 204, 21, 0.2);
+            background-color: #f5d547;
         }
 
-        .nav-item-active {
-            color: #2563EB;
-            pointer-events: none;
-            cursor: default;
+        #bottom-nav {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(4.5rem + env(safe-area-inset-bottom));
         }
 
+        /* Popup Slide */
         #custom-popup {
             transform: translateY(100%);
             transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
         }
         body.popup-open #custom-popup {
             transform: translateY(0);
-        }
-        body.popup-open {
-            overflow: hidden;
         }
         .popup-overlay {
             opacity: 0;
@@ -67,12 +79,14 @@
 </head>
 <body class="text-gray-800 min-h-screen-safe flex flex-col">
 
-    <!-- [LOCK: COFRE DE ÍCONES] - FONTE ÚNICA DE VERDADE. NÃO ALTERAR OS PATHS ABAIXO -->
+    <!-- [LOCK: COFRE DE ÍCONES] - VERSÃO DEFINITIVA CORRIGIDA -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <!-- Início (Casa) -->
         <symbol id="icon-house" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
             <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
         </symbol>
+        <!-- Parceiros (Aperto de mão) -->
         <symbol id="icon-handshake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m11 17 2 2a1 1 0 1 0 3-3"/>
             <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/>
@@ -80,16 +94,20 @@
             <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/>
             <path d="M3 4h8"/>
         </symbol>
+        <!-- Botão Central (Mais) -->
         <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12h14"/><path d="M12 5v14"/>
         </symbol>
+        <!-- Catálogo (Livro) -->
         <symbol id="icon-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 7v14"/>
             <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>
         </symbol>
+        <!-- Perfil (Usuário) -->
         <symbol id="icon-user-round" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>
         </symbol>
+        <!-- Extras -->
         <symbol id="icon-whatsapp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
         </symbol>
@@ -99,50 +117,57 @@
     </svg>
     <!-- [/LOCK: COFRE DE ÍCONES] -->
 
-    <main class="flex-grow w-full pt-6 pb-28">
-        <!-- Conteúdo principal -->
+    <!-- ÁREA DE CONTEÚDO -->
+    <main class="flex-grow w-full pt-6 pb-32">
+        <!-- O conteúdo principal pode ser inserido aqui -->
     </main>
 
+    <!-- OVERLAY DO POPUP -->
     <div class="popup-overlay fixed inset-0 bg-black/60 z-[55]" onclick="togglePopup()"></div>
 
-    <div id="custom-popup" class="fixed inset-x-0 bottom-0 z-[60] bg-white rounded-t-[2.5rem] shadow-2xl h-[85vh] overflow-y-auto">
+    <!-- POPUP CENTRAL DINÂMICO -->
+    <div id="custom-popup" class="fixed inset-x-0 bottom-0 z-[60] bg-white rounded-t-[2.5rem] shadow-2xl h-[80vh] overflow-y-auto">
         <div class="sticky top-0 bg-white pt-4 pb-2 z-10" onclick="togglePopup()">
-            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto cursor-pointer"></div>
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto cursor-pointer active:bg-gray-300 transition-colors"></div>
         </div>
-        <div id="popup-content-area" class="px-6 pb-12"></div>
+        <div id="popup-content-area" class="px-6 pb-12">
+            <!-- Conteúdo carregado via Script -->
+        </div>
     </div>
 
+    <!-- BARRA DE NAVEGAÇÃO INFERIOR -->
     <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-100 z-50 flex items-start">
         <div class="grid grid-cols-5 w-full h-full max-w-7xl mx-auto">
+            
             <!-- Início -->
-            <a href="index.html" class="flex flex-col items-center justify-center text-gray-400">
+            <a href="index.html" class="nav-item flex flex-col items-center justify-center text-gray-400">
                 <svg class="w-6 h-6"><use href="#icon-house"></use></svg>
-                <span class="text-[10px] mt-1">Início</span>
+                <span class="text-[10px] font-semibold mt-1">Início</span>
             </a>
             
             <!-- Parceiros -->
-            <a href="#" class="flex flex-col items-center justify-center text-gray-400">
+            <a href="parceiros.html" class="nav-item flex flex-col items-center justify-center text-gray-400">
                 <svg class="w-6 h-6"><use href="#icon-handshake"></use></svg>
-                <span class="text-[10px] mt-1">Parceiros</span>
+                <span class="text-[10px] font-semibold mt-1">Parceiros</span>
             </a>
 
-            <!-- Botão Central -->
+            <!-- Botão Central (Mais) -->
             <div class="relative flex justify-center">
-                <button onclick="togglePopup()" class="floating-fab absolute -top-6 bg-secondary text-blue-900 w-14 h-14 rounded-full flex items-center justify-center border-4 border-gray-50 active:scale-90">
-                    <svg class="w-7 h-7"><use href="#icon-plus"></use></svg>
+                <button onclick="togglePopup()" class="floating-fab absolute -top-7 bg-secondary text-blue-900 w-16 h-16 rounded-full flex items-center justify-center border-4 border-white active:scale-90">
+                    <svg class="w-8 h-8"><use href="#icon-plus"></use></svg>
                 </button>
             </div>
 
             <!-- Catálogo -->
-            <a href="#" class="flex flex-col items-center justify-center text-gray-400">
+            <a href="catalogo.html" class="nav-item flex flex-col items-center justify-center text-gray-400">
                 <svg class="w-6 h-6"><use href="#icon-book-open"></use></svg>
-                <span class="text-[10px] mt-1">Catálogo</span>
+                <span class="text-[10px] font-semibold mt-1">Catálogo</span>
             </a>
 
             <!-- Perfil -->
-            <a href="#" class="flex flex-col items-center justify-center text-gray-400">
+            <a href="perfil.html" class="nav-item flex flex-col items-center justify-center text-gray-400">
                 <svg class="w-6 h-6"><use href="#icon-user-round"></use></svg>
-                <span class="text-[10px] mt-1">Perfil</span>
+                <span class="text-[10px] font-semibold mt-1">Perfil</span>
             </a>
         </div>
     </nav>
@@ -154,27 +179,27 @@
                 <p class="text-gray-400 text-sm">O que deseja fazer hoje?</p>
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <button class="flex flex-col items-center gap-3 p-6 bg-blue-50 rounded-[2rem] border border-blue-100 active:scale-95 transition-all">
+                <button class="flex flex-col items-center gap-3 p-6 bg-blue-50 rounded-[2.5rem] border border-blue-100 active:scale-90 transition-all">
                     <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-200">
                         <svg class="w-6 h-6 text-white"><use href="#icon-plus"></use></svg>
                     </div>
                     <span class="font-bold text-sm text-blue-900">Novo Aluguel</span>
                 </button>
-                <button class="flex flex-col items-center gap-3 p-6 bg-yellow-50 rounded-[2rem] border border-yellow-100 active:scale-95 transition-all">
+                <button class="flex flex-col items-center gap-3 p-6 bg-yellow-50 rounded-[2.5rem] border border-yellow-100 active:scale-90 transition-all">
                     <div class="w-12 h-12 bg-secondary text-blue-900 rounded-full flex items-center justify-center shadow-lg shadow-yellow-200">
                         <svg class="w-6 h-6"><use href="#icon-user-round"></use></svg>
                     </div>
                     <span class="font-bold text-sm text-yellow-900">Meus Convites</span>
                 </button>
-                <button class="flex flex-col items-center gap-3 p-6 bg-green-50 rounded-[2rem] border border-green-100 active:scale-95 transition-all">
+                <button class="flex flex-col items-center gap-3 p-6 bg-green-50 rounded-[2.5rem] border border-green-100 active:scale-90 transition-all">
                     <div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-200">
-                        <svg class="w-6 h-6"><use href="#icon-whatsapp"></use></svg>
+                        <svg class="w-6 h-6 text-white"><use href="#icon-whatsapp"></use></svg>
                     </div>
                     <span class="font-bold text-sm text-green-900">WhatsApp</span>
                 </button>
-                <button class="flex flex-col items-center gap-3 p-6 bg-purple-50 rounded-[2rem] border border-purple-100 active:scale-95 transition-all">
+                <button class="flex flex-col items-center gap-3 p-6 bg-purple-50 rounded-[2.5rem] border border-purple-100 active:scale-90 transition-all">
                     <div class="w-12 h-12 bg-purple-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-purple-200">
-                        <svg class="w-6 h-6"><use href="#icon-bag"></use></svg>
+                        <svg class="w-6 h-6 text-white"><use href="#icon-bag"></use></svg>
                     </div>
                     <span class="font-bold text-sm text-purple-900">Minha Sacola</span>
                 </button>
