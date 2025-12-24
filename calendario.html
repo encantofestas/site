@@ -39,7 +39,7 @@
         .notification-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             animation: fadeIn 0.4s ease-out forwards;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -111,7 +111,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
                 </svg>
-                <!-- Indicador visual: Só aparece se houver notificações não lidas -->
                 <span id="notifBadge" class="hidden absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-blue-600 animate-pulse"></span>
             </button>
         </div>
@@ -136,7 +135,6 @@
 
         <!-- Lista de Notificações -->
         <div id="notifContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
-            <!-- Skeleton Loader (Visível apenas durante o fetch) -->
             <div id="loadingState" class="flex flex-col gap-4 opacity-10">
                 <div class="h-28 bg-white rounded-3xl"></div>
                 <div class="h-28 bg-white rounded-3xl"></div>
@@ -155,7 +153,6 @@
 
         let notifications = [];
 
-        // Função para converter data em tempo relativo
         function getRelativeTime(dateString) {
             if (!dateString) return "agora mesmo";
             const now = new Date();
@@ -172,7 +169,6 @@
             return past.toLocaleDateString('pt-PT');
         }
 
-        // Abrir modal e carregar dados
         notifBtn.addEventListener('click', () => {
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
@@ -180,7 +176,6 @@
             fetchNotifications();
         });
 
-        // Fechar modal
         closeNotif.addEventListener('click', () => {
             notifModal.classList.remove('active');
             setTimeout(() => {
@@ -189,7 +184,6 @@
             }, 400);
         });
 
-        // Limpar Tudo: Esvazia a lista e mostra mensagem de vazio
         markAllReadBtn.addEventListener('click', () => {
             notifications = [];
             renderNotifications();
@@ -205,12 +199,12 @@
                     throw new Error();
                 }
             } catch (e) {
-                // Mock de dados para demonstração caso o fetch falhe
                 const now = new Date();
+                // Mock de exemplo (apenas não lidas para demonstração do sumiço)
                 notifications = [
                     { id: 1, titulo: "Promoção Exclusiva de Natal ⚡", mensagem: "Aproveite 30% de desconto em todos os nossos insufláveis temáticos apenas hoje. Não perca esta oportunidade mágica!", tipo: "alerta", lida: false, data: new Date(now.getTime() - 5 * 60000).toISOString() },
-                    { id: 2, titulo: "Novo Tema Disponível: Safari 🦁", mensagem: "O tema mais pedido do ano acaba de chegar! Confira os novos painéis, suportes de doces e balões personalizados para uma festa selvagem.", tipo: "info", lida: true, data: new Date(now.getTime() - 120 * 60000).toISOString() },
-                    { id: 3, titulo: "Confirmação de Reserva ✨", mensagem: "A sua reserva para o evento do próximo sábado foi processada com sucesso. A nossa equipa entrará em contacto para os detalhes finais da montagem.", tipo: "sucesso", lida: false, data: new Date(now.getTime() - 26 * 3600000).toISOString() }
+                    { id: 2, titulo: "Novo Tema Disponível: Safari 🦁", mensagem: "O tema mais pedido do ano acaba de chegar! Confira os novos painéis, suportes de doces e balões personalizados para uma festa selvagem.", tipo: "info", lida: false, data: new Date(now.getTime() - 120 * 60000).toISOString() },
+                    { id: 3, titulo: "Confirmação de Reserva ✨", mensagem: "A sua reserva para o evento do próximo sábado foi processada com sucesso.", tipo: "sucesso", lida: false, data: new Date(now.getTime() - 26 * 3600000).toISOString() }
                 ];
             }
             renderNotifications();
@@ -221,7 +215,6 @@
             element.closest('.notification-card').classList.toggle('expanded');
         }
 
-        // Atualiza a visibilidade do badge no cabeçalho
         function updateBadge() {
             const hasUnread = notifications.some(n => !n.lida);
             if (hasUnread) {
@@ -232,8 +225,10 @@
         }
 
         function renderNotifications() {
-            // Caso a lista esteja vazia (ex: após clicar em Limpar Tudo)
-            if (notifications.length === 0) {
+            // FILTRA APENAS AS NÃO LIDAS PARA QUE ELAS "SUMAM" AO MARCAR
+            const unreadNotifications = notifications.filter(n => !n.lida);
+
+            if (unreadNotifications.length === 0) {
                 notifContainer.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white animate-pulse">
                         <div class="p-6 bg-white/10 rounded-full mb-6">
@@ -246,12 +241,11 @@
                 return;
             }
 
-            notifContainer.innerHTML = notifications.map((n, idx) => {
+            notifContainer.innerHTML = unreadNotifications.map((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
-                const unreadStyle = !n.lida ? 'bg-white/15 border-blue-400/30 shadow-lg' : 'bg-white/5 opacity-60';
                 
                 return `
-                    <div id="card-${n.id}" class="notification-card p-4 rounded-[1.25rem] text-white ${unreadStyle}" style="animation-delay: ${idx * 0.05}s">
+                    <div id="card-${n.id}" class="notification-card p-4 rounded-[1.25rem] text-white shadow-lg" style="animation-delay: ${idx * 0.05}s">
                         <div class="flex gap-3">
                             <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner">
                                 ${icon}
@@ -280,6 +274,7 @@
         window.markAsRead = (id) => {
             const idx = notifications.findIndex(n => n.id === id);
             if (idx !== -1) {
+                // Ao marcar como lida, o renderNotifications filtrará este item para fora da vista
                 notifications[idx].lida = true;
                 renderNotifications();
                 updateBadge();
