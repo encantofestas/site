@@ -111,7 +111,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
                 </svg>
-                <!-- O badge será exibido via JS se houver notificações não lidas -->
                 <span id="notifBadge" class="hidden absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-blue-600 animate-pulse"></span>
             </button>
         </div>
@@ -121,15 +120,15 @@
 
     <!-- Modal de Notificações -->
     <div id="notifModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
-        <!-- Header do Modal -->
-        <div class="px-5 py-5 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
+        <!-- Header do Modal - Ajustado verticalmente (py-3 em vez de py-5) -->
+        <div class="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
             <div class="flex items-center gap-4">
                 <button id="closeNotif" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
-                <h2 class="text-xl font-bold brand-font text-white">Notificações</h2>
+                <h2 class="text-lg font-bold brand-font text-white">Notificações</h2>
             </div>
-            <button id="markAllRead" class="text-[11px] font-bold uppercase tracking-widest text-blue-200 hover:text-white transition-colors outline-none">
+            <button id="markAllRead" class="text-[10px] font-bold uppercase tracking-widest text-blue-200 hover:text-white transition-colors outline-none">
                 Limpar Tudo
             </button>
         </div>
@@ -170,16 +169,14 @@
             return past.toLocaleDateString('pt-PT');
         }
 
-        // 1. CARREGAR AO INICIAR A PÁGINA (Para saber se tem notificações antes de clicar)
         window.addEventListener('DOMContentLoaded', () => {
-            fetchNotifications(false); // Carrega os dados silenciosamente
+            fetchNotifications(false);
         });
 
         notifBtn.addEventListener('click', () => {
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
-            // Atualiza a renderização ao abrir
             renderNotifications();
         });
 
@@ -214,7 +211,7 @@
                 ];
             }
             
-            updateBadge(); // Atualiza o pontinho vermelho
+            updateBadge();
             if (shouldRender) renderNotifications();
         }
 
@@ -223,7 +220,6 @@
         }
 
         function updateBadge() {
-            // Verifica se existe pelo menos uma notificação não lida
             const unreadCount = notifications.filter(n => !n.lida).length;
             if (unreadCount > 0) {
                 notifBadge.classList.remove('hidden');
