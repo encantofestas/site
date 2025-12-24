@@ -96,6 +96,7 @@
 </head>
 <body class="min-h-screen">
 
+    <!-- Cabeçalho Principal -->
     <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
         <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -110,6 +111,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
                 </svg>
+                <!-- Indicador visual: Só aparece se houver notificações não lidas -->
                 <span id="notifBadge" class="hidden absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-blue-600 animate-pulse"></span>
             </button>
         </div>
@@ -117,7 +119,9 @@
 
     <main class="pt-24"></main>
 
+    <!-- Modal de Notificações -->
     <div id="notifModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
+        <!-- Header do Modal -->
         <div class="px-5 py-5 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
             <div class="flex items-center gap-4">
                 <button id="closeNotif" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
@@ -130,8 +134,10 @@
             </button>
         </div>
 
+        <!-- Lista de Notificações -->
         <div id="notifContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
-            <div class="flex flex-col gap-4 opacity-10">
+            <!-- Skeleton Loader (Visível apenas durante o fetch) -->
+            <div id="loadingState" class="flex flex-col gap-4 opacity-10">
                 <div class="h-28 bg-white rounded-3xl"></div>
                 <div class="h-28 bg-white rounded-3xl"></div>
             </div>
@@ -149,6 +155,7 @@
 
         let notifications = [];
 
+        // Função para converter data em tempo relativo
         function getRelativeTime(dateString) {
             if (!dateString) return "agora mesmo";
             const now = new Date();
@@ -165,6 +172,7 @@
             return past.toLocaleDateString('pt-PT');
         }
 
+        // Abrir modal e carregar dados
         notifBtn.addEventListener('click', () => {
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
@@ -172,6 +180,7 @@
             fetchNotifications();
         });
 
+        // Fechar modal
         closeNotif.addEventListener('click', () => {
             notifModal.classList.remove('active');
             setTimeout(() => {
@@ -180,10 +189,11 @@
             }, 400);
         });
 
+        // Limpar Tudo: Esvazia a lista e mostra mensagem de vazio
         markAllReadBtn.addEventListener('click', () => {
-            notifications = notifications.map(n => ({ ...n, lida: true }));
+            notifications = [];
             renderNotifications();
-            notifBadge.classList.add('hidden');
+            updateBadge();
         });
 
         async function fetchNotifications() {
@@ -195,6 +205,7 @@
                     throw new Error();
                 }
             } catch (e) {
+                // Mock de dados para demonstração caso o fetch falhe
                 const now = new Date();
                 notifications = [
                     { id: 1, titulo: "Promoção Exclusiva de Natal ⚡", mensagem: "Aproveite 30% de desconto em todos os nossos insufláveis temáticos apenas hoje. Não perca esta oportunidade mágica!", tipo: "alerta", lida: false, data: new Date(now.getTime() - 5 * 60000).toISOString() },
@@ -203,18 +214,33 @@
                 ];
             }
             renderNotifications();
+            updateBadge();
         }
 
         function toggleExpand(element) {
             element.closest('.notification-card').classList.toggle('expanded');
         }
 
+        // Atualiza a visibilidade do badge no cabeçalho
+        function updateBadge() {
+            const hasUnread = notifications.some(n => !n.lida);
+            if (hasUnread) {
+                notifBadge.classList.remove('hidden');
+            } else {
+                notifBadge.classList.add('hidden');
+            }
+        }
+
         function renderNotifications() {
+            // Caso a lista esteja vazia (ex: após clicar em Limpar Tudo)
             if (notifications.length === 0) {
                 notifContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-4"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                        <p class="text-base font-medium text-center">Tudo em dia!<br>Sem novas notificações.</p>
+                    <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white animate-pulse">
+                        <div class="p-6 bg-white/10 rounded-full mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                        </div>
+                        <p class="text-xl font-bold brand-font text-center">Tudo em dia!</p>
+                        <p class="text-sm text-center">Não tens notificações de momento.</p>
                     </div>
                 `;
                 return;
@@ -222,7 +248,7 @@
 
             notifContainer.innerHTML = notifications.map((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
-                const unreadStyle = !n.lida ? 'bg-white/15 border-blue-400/30' : 'bg-white/5 opacity-60';
+                const unreadStyle = !n.lida ? 'bg-white/15 border-blue-400/30 shadow-lg' : 'bg-white/5 opacity-60';
                 
                 return `
                     <div id="card-${n.id}" class="notification-card p-4 rounded-[1.25rem] text-white ${unreadStyle}" style="animation-delay: ${idx * 0.05}s">
@@ -240,7 +266,7 @@
                                 <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight">
                                     <span>${getRelativeTime(n.data)}</span>
                                     <button onclick="event.stopPropagation(); markAsRead(${n.id})" 
-                                        class="dot-separator text-blue-300 hover:text-white transition-colors uppercase active:scale-95">
+                                        class="dot-separator text-blue-300 hover:text-white transition-colors uppercase active:scale-95 outline-none">
                                         Marcar lida
                                     </button>
                                 </div>
@@ -249,9 +275,6 @@
                     </div>
                 `;
             }).join('');
-
-            const temNovas = notifications.some(n => !n.lida);
-            temNovas ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
         }
 
         window.markAsRead = (id) => {
@@ -259,6 +282,7 @@
             if (idx !== -1) {
                 notifications[idx].lida = true;
                 renderNotifications();
+                updateBadge();
             }
         };
     </script>
