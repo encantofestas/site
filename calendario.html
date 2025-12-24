@@ -37,12 +37,14 @@
         }
 
         .notification-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
             animation: fadeIn 0.4s ease-out forwards;
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             will-change: transform, opacity;
+            user-select: none;
+            touch-action: pan-y; /* Permite scroll vertical mas bloqueia o scroll horizontal nativo durante o swipe */
         }
 
         @keyframes fadeIn {
@@ -51,13 +53,9 @@
         }
 
         .slide-out-right {
-            animation: slideOutRight 0.5s forwards cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(110%) !important;
+            opacity: 0 !important;
             pointer-events: none;
-        }
-
-        @keyframes slideOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
         }
 
         .modal-view {
@@ -111,7 +109,6 @@
     <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
         <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
             
-            <!-- Link para Index.html ao clicar na logo ou nome -->
             <a href="index.html" class="flex items-center gap-3 active:scale-95 transition-transform outline-none">
                 <div class="relative">
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
@@ -166,6 +163,11 @@
 
         let notifications = [];
         let hasError = false;
+
+        // Variáveis para Swipe
+        let touchStartX = 0;
+        let touchMoveX = 0;
+        let currentCard = null;
 
         function getRelativeTime(dateString) {
             if (!dateString) return "agora mesmo";
@@ -277,7 +279,12 @@
                 const mensagem = (n.mensagem && n.mensagem.trim() !== "") ? n.mensagem : 'Nova atualização mágica para si!';
                 
                 return `
-                    <div id="card-${n.id}" class="notification-card p-4 rounded-[1.25rem] text-white shadow-lg" style="animation-delay: ${idx * 0.05}s">
+                    <div id="card-${n.id}" 
+                         class="notification-card p-4 rounded-[1.25rem] text-white shadow-lg" 
+                         style="animation-delay: ${idx * 0.05}s"
+                         ontouchstart="handleTouchStart(event, ${n.id})"
+                         ontouchmove="handleTouchMove(event)"
+                         ontouchend="handleTouchEnd(event, ${n.id})">
                         <div class="flex gap-3">
                             <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner">
                                 ${icon}
@@ -303,6 +310,46 @@
             }).join('');
         }
 
+        // LÓGICA DE SWIPE
+        window.handleTouchStart = (e, id) => {
+            touchStartX = e.touches[0].clientX;
+            currentCard = document.getElementById(`card-${id}`);
+            currentCard.style.transition = 'none'; // Desativa transição durante o arrasto
+        };
+
+        window.handleTouchMove = (e) => {
+            if (!currentCard) return;
+            touchMoveX = e.touches[0].clientX;
+            const diff = touchMoveX - touchStartX;
+            
+            // Só permite arrastar para a direita
+            if (diff > 0) {
+                currentCard.style.transform = `translateX(${diff}px)`;
+                currentCard.style.opacity = 1 - (diff / window.innerWidth);
+            }
+        };
+
+        window.handleTouchEnd = (e, id) => {
+            if (!currentCard) return;
+            const diff = touchMoveX - touchStartX;
+            const threshold = window.innerWidth * 0.4; // 40% da tela para descartar
+
+            currentCard.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+
+            if (diff > threshold) {
+                // Confirmar descarte
+                markAsRead(id);
+            } else {
+                // Resetar posição
+                currentCard.style.transform = `translateX(0)`;
+                currentCard.style.opacity = `1`;
+            }
+            
+            currentCard = null;
+            touchStartX = 0;
+            touchMoveX = 0;
+        };
+
         window.markAsRead = (id) => {
             const card = document.getElementById(`card-${id}`);
             if (card) {
@@ -314,7 +361,7 @@
                         renderNotifications();
                         updateBadge();
                     }
-                }, 500);
+                }, 400);
             }
         };
     </script>
