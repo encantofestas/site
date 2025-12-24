@@ -1,10 +1,18 @@
 [
   {
     "id": 1,
-    "titulo": "Bem-vindo à Encanto Festas! ✨",
-    "mensagem": "Obrigado pela visita! Estamos fazendo melhorias, então algumas funções podem não funcionar no momento.",
+    "titulo": "Promoção 3666% OFF! ⚡",
+    "mensagem": "Insuflável Castelo Mágico com desconto exclusivo para hoje.",
     "tipo": "alerta",
     "lida": false,
-    "data": "2025-12-08T20:55:00Z"
+    "data": "2025-12-24T20:10:00Z"
+  },
+  {
+    "id": 2,
+    "titulo": "Reserva Confirmada 66✨",
+    "mensagem": "Tudo pronto para a sua festa.",
+    "tipo": "sucesso",
+    "lida": true,
+    "data": "2025-12-23T15:30:00Z"
   }
 ]
