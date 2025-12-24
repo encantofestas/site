@@ -44,7 +44,12 @@
             position: relative;
             will-change: transform, opacity;
             user-select: none;
-            touch-action: pan-y; /* Permite scroll vertical mas bloqueia o scroll horizontal nativo durante o swipe */
+            touch-action: pan-y;
+            cursor: grab;
+        }
+
+        .notification-card:active {
+            cursor: grabbing;
         }
 
         @keyframes fadeIn {
@@ -164,17 +169,18 @@
         let notifications = [];
         let hasError = false;
 
-        // Variáveis para Swipe
-        let touchStartX = 0;
-        let touchMoveX = 0;
-        let currentCard = null;
+        // Variáveis globais para Swipe (Rato e Toque)
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+        let activeCard = null;
+        let activeId = null;
 
         function getRelativeTime(dateString) {
             if (!dateString) return "agora mesmo";
             const now = new Date();
             const past = new Date(dateString);
             if (isNaN(past.getTime())) return "agora mesmo";
-            
             const diffInSeconds = Math.floor((now - past) / 1000);
             if (diffInSeconds < 60) return "agora mesmo";
             const diffInMinutes = Math.floor(diffInSeconds / 60);
@@ -189,13 +195,16 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             fetchNotifications(false);
+            
+            // Listeners globais para arrastar com o rato (Desktop)
+            window.addEventListener('mousemove', handleDragging);
+            window.addEventListener('mouseup', endDragging);
         });
 
         notifBtn.addEventListener('click', () => {
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
-            
             if (hasError || notifications.length === 0) {
                 fetchNotifications(true);
             } else {
@@ -242,7 +251,10 @@
         }
 
         function toggleExpand(element) {
-            element.closest('.notification-card').classList.toggle('expanded');
+            // Só expande se não estivermos a arrastar
+            if (Math.abs(currentX - startX) < 5) {
+                element.closest('.notification-card').classList.toggle('expanded');
+            }
         }
 
         function updateBadge() {
@@ -253,6 +265,61 @@
                 notifBadge.classList.add('hidden');
             }
         }
+
+        // --- LÓGICA DE ARRASTAR UNIFICADA ---
+
+        function startDragging(x, id) {
+            isDragging = true;
+            startX = x;
+            currentX = x;
+            activeId = id;
+            activeCard = document.getElementById(`card-${id}`);
+            if (activeCard) {
+                activeCard.style.transition = 'none';
+            }
+        }
+
+        function handleDragging(e) {
+            if (!isDragging || !activeCard) return;
+            
+            currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const diff = currentX - startX;
+
+            if (diff > 0) {
+                activeCard.style.transform = `translateX(${diff}px)`;
+                activeCard.style.opacity = 1 - (diff / (window.innerWidth * 0.8));
+            }
+        }
+
+        function endDragging() {
+            if (!isDragging || !activeCard) return;
+            
+            const diff = currentX - startX;
+            const threshold = window.innerWidth * 0.35; // 35% de arraste para apagar
+
+            activeCard.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+
+            if (diff > threshold) {
+                markAsRead(activeId);
+            } else {
+                activeCard.style.transform = 'translateX(0)';
+                activeCard.style.opacity = '1';
+            }
+
+            isDragging = false;
+            activeCard = null;
+            activeId = null;
+        }
+
+        // Funções chamadas via HTML
+        window.handleTouchStart = (e, id) => startDragging(e.touches[0].clientX, id);
+        window.handleTouchMove = (e) => handleDragging(e);
+        window.handleTouchEnd = () => endDragging();
+        
+        window.handleMouseDown = (e, id) => {
+            e.preventDefault(); // Impede seleção de texto ao arrastar no desktop
+            startDragging(e.clientX, id);
+        };
 
         function renderNotifications() {
             const unread = notifications.filter(n => !n.lida);
@@ -282,24 +349,25 @@
                     <div id="card-${n.id}" 
                          class="notification-card p-4 rounded-[1.25rem] text-white shadow-lg" 
                          style="animation-delay: ${idx * 0.05}s"
+                         onmousedown="handleMouseDown(event, ${n.id})"
                          ontouchstart="handleTouchStart(event, ${n.id})"
                          ontouchmove="handleTouchMove(event)"
-                         ontouchend="handleTouchEnd(event, ${n.id})">
+                         ontouchend="handleTouchEnd(event)">
                         <div class="flex gap-3">
-                            <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner">
+                            <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">
                                 ${icon}
                             </div>
                             
                             <div class="flex-1 min-w-0" onclick="toggleExpand(this)">
-                                <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${titulo}</h3>
-                                <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg cursor-pointer">
+                                <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title pointer-events-none">${titulo}</h3>
+                                <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg cursor-pointer pointer-events-none">
                                     ${mensagem}
                                 </p>
                                 
-                                <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight">
+                                <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight pointer-events-none">
                                     <span>${getRelativeTime(n.data)}</span>
                                     <button onclick="event.stopPropagation(); markAsRead(${n.id})" 
-                                        class="dot-separator text-blue-300 hover:text-white transition-colors uppercase active:scale-95 outline-none">
+                                        class="dot-separator text-blue-300 hover:text-white transition-colors uppercase active:scale-95 outline-none pointer-events-auto">
                                         Marcar lida
                                     </button>
                                 </div>
@@ -309,46 +377,6 @@
                 `;
             }).join('');
         }
-
-        // LÓGICA DE SWIPE
-        window.handleTouchStart = (e, id) => {
-            touchStartX = e.touches[0].clientX;
-            currentCard = document.getElementById(`card-${id}`);
-            currentCard.style.transition = 'none'; // Desativa transição durante o arrasto
-        };
-
-        window.handleTouchMove = (e) => {
-            if (!currentCard) return;
-            touchMoveX = e.touches[0].clientX;
-            const diff = touchMoveX - touchStartX;
-            
-            // Só permite arrastar para a direita
-            if (diff > 0) {
-                currentCard.style.transform = `translateX(${diff}px)`;
-                currentCard.style.opacity = 1 - (diff / window.innerWidth);
-            }
-        };
-
-        window.handleTouchEnd = (e, id) => {
-            if (!currentCard) return;
-            const diff = touchMoveX - touchStartX;
-            const threshold = window.innerWidth * 0.4; // 40% da tela para descartar
-
-            currentCard.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-
-            if (diff > threshold) {
-                // Confirmar descarte
-                markAsRead(id);
-            } else {
-                // Resetar posição
-                currentCard.style.transform = `translateX(0)`;
-                currentCard.style.opacity = `1`;
-            }
-            
-            currentCard = null;
-            touchStartX = 0;
-            touchMoveX = 0;
-        };
 
         window.markAsRead = (id) => {
             const card = document.getElementById(`card-${id}`);
