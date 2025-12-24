@@ -41,11 +41,24 @@
             animation: fadeIn 0.4s ease-out forwards;
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            will-change: transform, opacity;
         }
 
         @keyframes fadeIn {
             from { transform: translateY(8px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Animação de deslizar para a direita ao marcar como lida */
+        .slide-out-right {
+            animation: slideOutRight 0.5s forwards cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
 
         .modal-view {
@@ -177,7 +190,6 @@
             setTimeout(() => notifModal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
             
-            // Se houve erro anteriormente ou a lista está vazia, tenta carregar de novo
             if (hasError || notifications.length === 0) {
                 fetchNotifications(true);
             } else {
@@ -201,7 +213,6 @@
 
         async function fetchNotifications(shouldRender = true) {
             try {
-                // Adiciona timestamp para evitar cache do ficheiro
                 const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
                 if (response.ok) {
                     notifications = await response.json();
@@ -218,7 +229,6 @@
                         <div class="flex flex-col items-center justify-center py-20 text-white/70 text-center px-6">
                             <p class="text-lg font-bold brand-font text-white opacity-90 mb-1">Ocorreu um erro</p>
                             <p class="text-xs opacity-70">Estamos corrigindo isso o mais breve possível</p>
-                            <p class="text-[9px] mt-4 opacity-40">Verifique se o ficheiro notificacoes.json existe e está correto.</p>
                         </div>
                     `;
                 }
@@ -256,7 +266,6 @@
 
             notifContainer.innerHTML = unread.map((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
-                // Fallbacks se o JSON tiver campos vazios ""
                 const titulo = (n.titulo && n.titulo.trim() !== "") ? n.titulo : 'Encanto Festas';
                 const mensagem = (n.mensagem && n.mensagem.trim() !== "") ? n.mensagem : 'Nova atualização mágica para si!';
                 
@@ -288,11 +297,20 @@
         }
 
         window.markAsRead = (id) => {
-            const idx = notifications.findIndex(n => n.id === id);
-            if (idx !== -1) {
-                notifications[idx].lida = true;
-                renderNotifications();
-                updateBadge();
+            const card = document.getElementById(`card-${id}`);
+            if (card) {
+                // Ativa a animação de deslizar para a direita
+                card.classList.add('slide-out-right');
+                
+                // Aguarda o fim da animação (500ms) para remover do estado e re-renderizar
+                setTimeout(() => {
+                    const idx = notifications.findIndex(n => n.id === id);
+                    if (idx !== -1) {
+                        notifications[idx].lida = true;
+                        renderNotifications();
+                        updateBadge();
+                    }
+                }, 500);
             }
         };
     </script>
