@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Encanto Festas - Dashboard Premium</title>
+    <title>Encanto Festas - Gestão Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,7 @@
             overflow-x: hidden;
             width: 100%;
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             -webkit-tap-highlight-color: transparent;
             margin: 0;
             padding: 0;
@@ -32,36 +32,30 @@
             box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
         }
 
-        /* Animação de Surgimento (Scale) */
-        .modal-animate {
-            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        /* Animações */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        .animate-scale { animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade { animation: fadeIn 0.2s ease-out forwards; }
+        .animate-slide-full { animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Scrollbar estilizada */
-        .custom-scroll::-webkit-scrollbar {
-            width: 5px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+        /* Estilo para esconder itens da agenda após o 5º */
+        .agenda-item-extra { display: none; }
+        .agenda-expanded .agenda-item-extra { display: block; }
     </style>
 </head>
-<body class="min-h-screen text-slate-800">
+<body class="min-h-screen">
 
     <!-- CABEÇALHO -->
     <header class="fixed top-0 left-0 right-0 w-full header-gradient header-shadow z-50 h-14 border-b border-white/10">
@@ -79,13 +73,13 @@
             </a>
             
             <div class="flex items-center gap-2">
-                <button onclick="toggleModal('modal-agenda')" class="flex items-center gap-2 text-white px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/20 group">
+                <button onclick="openAgenda()" class="flex items-center gap-2 text-white px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/20 group">
                     <svg class="group-hover:rotate-12 transition-transform" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                     <span class="font-bold text-xs uppercase tracking-widest hidden sm:inline">Agenda</span>
                 </button>
 
-                <button onclick="toggleModal('modal-notificacoes')" class="text-white p-2 relative hover:bg-white/15 rounded-full transition-all group">
-                    <svg class="group-hover:shake" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+                <button onclick="openNotifications()" class="text-white p-2 relative hover:bg-white/15 rounded-full transition-all group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
                     <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-blue-600 animate-pulse"></span>
                 </button>
             </div>
@@ -94,177 +88,228 @@
 
     <div class="h-14"></div>
 
-    <main class="p-8 max-w-4xl mx-auto">
-        <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
-            <h2 class="brand-font text-3xl text-blue-900 mb-2">Painel de Controlo</h2>
-            <p class="text-slate-500 mb-6">Seja bem-vindo de volta à Encanto Festas. Aqui está o resumo das suas operações.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="p-6 bg-blue-50 rounded-2xl border border-blue-100">
-                    <p class="text-blue-900 font-bold">Total de Eventos</p>
-                    <p class="text-4xl font-black text-blue-600">24</p>
-                </div>
-                <div class="p-6 bg-yellow-50 rounded-2xl border border-yellow-100">
-                    <p class="text-yellow-900 font-bold">Reservas Pendentes</p>
-                    <p class="text-4xl font-black text-yellow-600">03</p>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- OVERLAY MODAL (Geral) -->
-    <div id="modal-container" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onclick="closeAllModals()"></div>
+    <!-- MODAL AGENDA (CARD CENTERED) -->
+    <div id="modal-agenda" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade" onclick="closeModals()"></div>
         
-        <!-- MODAL NOTIFICAÇÕES -->
-        <div id="modal-notificacoes" class="hidden glass-card w-full max-w-md rounded-[2.5rem] shadow-2xl relative flex flex-col overflow-hidden modal-animate">
-            <div class="p-6 flex justify-between items-center border-b border-slate-100 bg-white/50">
+        <div class="glass-card w-full max-w-lg rounded-[2.5rem] shadow-2xl relative flex flex-col overflow-hidden animate-scale max-h-[85vh]">
+            <div class="p-8 pb-4 flex justify-between items-start sticky top-0 bg-white z-10 border-b border-slate-50">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-800">Atualizações</h3>
-                    <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider">Centro de Notificações</p>
+                    <h3 class="text-2xl font-black text-blue-900 brand-font leading-none">Minha Agenda</h3>
+                    <p class="text-xs text-slate-500 mt-2 font-medium uppercase tracking-widest">Controle de Locações</p>
                 </div>
-                <button onclick="closeAllModals()" class="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto p-4 space-y-3 max-h-[60vh] custom-scroll">
-                <!-- Notificação 1 -->
-                <div class="group p-4 rounded-3xl bg-blue-50/50 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all cursor-pointer">
-                    <div class="flex gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/><path d="M2 12h20"/><path d="m5 7 3 5-3 5"/><path d="m19 7-3 5 3 5"/></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between items-start">
-                                <h4 class="font-bold text-slate-900 text-sm">Reserva Confirmada</h4>
-                                <span class="text-[10px] text-slate-400 font-medium">5m atrás</span>
-                            </div>
-                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">O Buffet Premium para o dia 24/12 acaba de ser pago e confirmado.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Notificação 2 -->
-                <div class="group p-4 rounded-3xl bg-white border border-slate-100 hover:border-blue-100 transition-all cursor-pointer">
-                    <div class="flex gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-white shrink-0 shadow-lg shadow-yellow-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between items-start">
-                                <h4 class="font-bold text-slate-900 text-sm">Novo Lead Gerado</h4>
-                                <span class="text-[10px] text-slate-400 font-medium">2h atrás</span>
-                            </div>
-                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Maria Alice solicitou orçamento para festa infantil em Janeiro.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 border-t border-slate-100 bg-slate-50">
-                <button class="w-full py-3 bg-white text-blue-600 text-xs font-bold rounded-2xl border border-blue-100 hover:bg-blue-600 hover:text-white transition-all">LIMPAR TUDO</button>
-            </div>
-        </div>
-
-        <!-- MODAL AGENDA -->
-        <div id="modal-agenda" class="hidden glass-card w-full max-w-lg rounded-[2.5rem] shadow-2xl relative flex flex-col overflow-hidden modal-animate">
-            <div class="p-8 pb-4 flex justify-between items-start">
-                <div>
-                    <h3 class="text-2xl font-black text-blue-900 brand-font">Próximos Eventos</h3>
-                    <p class="text-sm text-slate-500">Organize as suas entregas e locações</p>
-                </div>
-                <button onclick="closeAllModals()" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                <button onclick="closeModals()" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-600"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
 
-            <div class="px-8 py-4 flex-1 overflow-y-auto max-h-[65vh] space-y-4 custom-scroll">
-                <!-- Item de Agenda 1 -->
-                <div class="group relative bg-white border border-slate-100 p-5 rounded-[2rem] hover:shadow-xl hover:shadow-blue-900/5 transition-all">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 bg-blue-600 rounded-3xl flex flex-col items-center justify-center text-white shrink-0">
-                            <span class="text-[10px] font-bold uppercase opacity-80 leading-none">Dez</span>
-                            <span class="text-xl font-black">24</span>
+            <div id="agenda-list-container" class="px-6 py-4 flex-1 overflow-y-auto custom-scroll space-y-3">
+                <!-- Items da Agenda (Mock Data) -->
+                <!-- Item 1 -->
+                <div class="bg-white border border-slate-100 p-4 rounded-3xl flex items-center gap-4 hover:border-blue-200 transition-colors shadow-sm">
+                    <div class="w-12 h-12 bg-blue-600 rounded-2xl flex flex-col items-center justify-center text-white shrink-0">
+                        <span class="text-[9px] font-bold uppercase leading-none">Hoje</span>
+                        <span class="text-lg font-black">24</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-900 text-sm">Ana Carolina Oliveira</h4>
+                        <p class="text-[11px] text-slate-500 flex items-center gap-1 mt-1">
+                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            (11) 98234-***
+                        </p>
+                    </div>
+                </div>
+                <!-- Item 2 -->
+                <div class="bg-white border border-slate-100 p-4 rounded-3xl flex items-center gap-4 hover:border-blue-200 transition-colors shadow-sm">
+                    <div class="w-12 h-12 bg-blue-500 rounded-2xl flex flex-col items-center justify-center text-white shrink-0">
+                        <span class="text-[9px] font-bold uppercase leading-none">Dez</span>
+                        <span class="text-lg font-black">26</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-900 text-sm">Marcos Paulo Reis</h4>
+                        <p class="text-[11px] text-slate-500 flex items-center gap-1 mt-1">(21) 99341-***</p>
+                    </div>
+                </div>
+                <!-- Item 3 -->
+                <div class="bg-white border border-slate-100 p-4 rounded-3xl flex items-center gap-4 hover:border-blue-200 transition-colors shadow-sm">
+                    <div class="w-12 h-12 bg-blue-500 rounded-2xl flex flex-col items-center justify-center text-white shrink-0">
+                        <span class="text-[9px] font-bold uppercase leading-none">Dez</span>
+                        <span class="text-lg font-black">27</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-900 text-sm">Juliana Mendes</h4>
+                        <p class="text-[11px] text-slate-500 flex items-center gap-1 mt-1">(11) 97722-***</p>
+                    </div>
+                </div>
+                <!-- Item 4 -->
+                <div class="bg-white border border-slate-100 p-4 rounded-3xl flex items-center gap-4 hover:border-blue-200 transition-colors shadow-sm">
+                    <div class="w-12 h-12 bg-blue-500 rounded-2xl flex flex-col items-center justify-center text-white shrink-0">
+                        <span class="text-[9px] font-bold uppercase leading-none">Dez</span>
+                        <span class="text-lg font-black">28</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-900 text-sm">Ricardo M. Fontes</h4>
+                        <p class="text-[11px] text-slate-500 flex items-center gap-1 mt-1">(21) 99122-***</p>
+                    </div>
+                </div>
+                <!-- Item 5 -->
+                <div class="bg-white border border-slate-100 p-4 rounded-3xl flex items-center gap-4 hover:border-blue-200 transition-colors shadow-sm">
+                    <div class="w-12 h-12 bg-blue-500 rounded-2xl flex flex-col items-center justify-center text-white shrink-0">
+                        <span class="text-[9px] font-bold uppercase leading-none">Dez</span>
+                        <span class="text-lg font-black">30</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-900 text-sm">Clara Souza Silva</h4>
+                        <p class="text-[11px] text-slate-500 flex items-center gap-1 mt-1">(11) 98833-***</p>
+                    </div>
+                </div>
+
+                <!-- ITENS EXTRAS (Ocultos por padrão) -->
+                <div class="agenda-item-extra space-y-3">
+                    <div class="bg-white border border-slate-100 p-4 rounded-3xl flex items-center gap-4 shadow-sm">
+                        <div class="w-12 h-12 bg-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-600 shrink-0">
+                            <span class="text-[9px] font-bold uppercase leading-none">Jan</span>
+                            <span class="text-lg font-black">02</span>
                         </div>
                         <div class="flex-1">
-                            <div class="flex items-center justify-between">
-                                <h4 class="font-bold text-slate-900 text-lg leading-tight">Ana Carolina Oliveira</h4>
-                                <span class="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Festa Natal</span>
-                            </div>
-                            <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-                                <span class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                    <svg class="text-blue-500" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                                    (11) 98234-***
-                                </span>
-                                <span class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                    <svg class="text-blue-500" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    14:00h
-                                </span>
-                            </div>
+                            <h4 class="font-bold text-slate-900 text-sm">Festa da Marina</h4>
+                            <p class="text-[11px] text-slate-500 flex items-center gap-1 mt-1">(13) 99121-***</p>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-slate-100 p-4 rounded-3xl flex items-center gap-4 shadow-sm">
+                        <div class="w-12 h-12 bg-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-600 shrink-0">
+                            <span class="text-[9px] font-bold uppercase leading-none">Jan</span>
+                            <span class="text-lg font-black">05</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 text-sm">Evento Corporativo</h4>
+                            <p class="text-[11px] text-slate-500 flex items-center gap-1 mt-1">(11) 97766-***</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Item de Agenda 2 -->
-                <div class="group relative bg-white border border-slate-100 p-5 rounded-[2rem] hover:shadow-xl hover:shadow-blue-900/5 transition-all opacity-80">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 bg-slate-200 rounded-3xl flex flex-col items-center justify-center text-slate-600 shrink-0">
-                            <span class="text-[10px] font-bold uppercase opacity-80 leading-none">Dez</span>
-                            <span class="text-xl font-black">28</span>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between">
-                                <h4 class="font-bold text-slate-900 text-lg leading-tight">Ricardo M. Fontes</h4>
-                                <span class="bg-slate-100 text-slate-500 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Reunião</span>
-                            </div>
-                            <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-                                <span class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                    <svg class="text-slate-400" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                                    (21) 99122-***
-                                </span>
-                                <span class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                    <svg class="text-slate-400" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    10:30h
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Botão Ver Mais -->
+                <button id="btn-show-more" onclick="expandAgenda()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 font-bold text-sm hover:border-blue-400 hover:text-blue-500 transition-all active:scale-[0.98]">
+                    EXIBIR MAIS EVENTOS (+2)
+                </button>
             </div>
 
-            <div class="p-6 bg-blue-900">
-                <button class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-black rounded-[1.5rem] transition-all transform hover:-translate-y-1 shadow-lg active:scale-95 tracking-wide">
-                    VER CALENDÁRIO COMPLETO
+            <div class="p-6 bg-slate-50 border-t border-slate-100">
+                <button class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-lg active:scale-95 tracking-wide">
+                    NOVO AGENDAMENTO
                 </button>
             </div>
         </div>
     </div>
 
-    <script>
-        function toggleModal(id) {
-            const container = document.getElementById('modal-container');
-            const targetModal = document.getElementById(id);
-            
-            // Fecha todos primeiro
-            document.getElementById('modal-notificacoes').classList.add('hidden');
-            document.getElementById('modal-agenda').classList.add('hidden');
+    <!-- MODAL NOTIFICAÇÕES (FULL SCREEN) -->
+    <div id="modal-notificacoes" class="fixed inset-0 z-[100] hidden bg-blue-900 flex-col animate-slide-full overflow-hidden">
+        <!-- Header Notificações -->
+        <div class="p-6 flex justify-between items-center bg-blue-950/50 backdrop-blur-md border-b border-white/10">
+            <div>
+                <h3 class="text-white text-3xl font-black brand-font tracking-tight">Notificações</h3>
+                <p class="text-blue-300 text-xs font-bold uppercase tracking-widest mt-1">Mantenha-se atualizado</p>
+            </div>
+            <button onclick="closeModals()" class="w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
 
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                container.classList.add('flex');
-                targetModal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            } else {
-                closeAllModals();
-            }
+        <!-- Lista de Notificações em Full Screen -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scroll">
+            
+            <!-- Grupo de Data -->
+            <div>
+                <span class="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Recentes</span>
+                <div class="space-y-4">
+                    <!-- Item 1 -->
+                    <div class="bg-white/5 border border-white/10 p-5 rounded-[2rem] flex items-start gap-4 group hover:bg-white/10 transition-all">
+                        <div class="w-14 h-14 bg-yellow-400 rounded-3xl flex items-center justify-center text-blue-900 shadow-xl shadow-yellow-400/20 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/><path d="M2 12h20"/><path d="m5 7 3 5-3 5"/><path d="m19 7-3 5 3 5"/></svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-white font-bold text-lg">Pagamento Confirmado</h4>
+                                <span class="text-blue-400 text-[10px] font-bold">2m atrás</span>
+                            </div>
+                            <p class="text-blue-100/70 text-sm mt-1 leading-relaxed">O valor de R$ 1.200,00 referente à locação de Ana Carolina foi creditado.</p>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="bg-white/5 border border-white/10 p-5 rounded-[2rem] flex items-start gap-4 group hover:bg-white/10 transition-all">
+                        <div class="w-14 h-14 bg-blue-500 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-blue-500/20 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-white font-bold text-lg">Novo Cadastro</h4>
+                                <span class="text-blue-400 text-[10px] font-bold">1h atrás</span>
+                            </div>
+                            <p class="text-blue-100/70 text-sm mt-1 leading-relaxed">Maria Eduarda acabou de se cadastrar no sistema como cliente.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grupo de Data Antiga -->
+            <div class="pt-4">
+                <span class="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4 block">Ontem</span>
+                <div class="bg-white/5 border border-white/5 p-5 rounded-[2rem] opacity-60 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-slate-700 rounded-2xl flex items-center justify-center text-white shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <p class="text-white text-sm font-medium">Backup automático concluído com sucesso.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Notificações (Full Screen) -->
+        <div class="p-8 bg-blue-950/80 border-t border-white/5 backdrop-blur-xl">
+            <button class="w-full py-5 bg-white text-blue-900 font-black rounded-3xl text-lg transition-all active:scale-95 shadow-2xl">
+                LIMPAR TODAS AS NOTIFICAÇÕES
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function openAgenda() {
+            closeModals();
+            const modal = document.getElementById('modal-agenda');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
         }
 
-        function closeAllModals() {
-            const container = document.getElementById('modal-container');
-            container.classList.add('hidden');
-            container.classList.remove('flex');
+        function openNotifications() {
+            closeModals();
+            const modal = document.getElementById('modal-notificacoes');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModals() {
+            document.getElementById('modal-agenda').classList.add('hidden');
+            document.getElementById('modal-agenda').classList.remove('flex');
+            document.getElementById('modal-notificacoes').classList.add('hidden');
+            document.getElementById('modal-notificacoes').classList.remove('flex');
             document.body.style.overflow = 'auto';
+        }
+
+        function expandAgenda() {
+            const container = document.getElementById('agenda-list-container');
+            const btn = document.getElementById('btn-show-more');
+            
+            container.classList.toggle('agenda-expanded');
+            
+            if (container.classList.contains('agenda-expanded')) {
+                btn.innerText = "VER MENOS";
+            } else {
+                btn.innerText = "EXIBIR MAIS EVENTOS (+2)";
+            }
         }
     </script>
 
