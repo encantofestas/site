@@ -48,13 +48,25 @@
 
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         .agenda-item-extra { display: none; }
         .agenda-expanded .agenda-item-extra { display: block; }
 
         /* Estilo para notificações lidas */
-        .notif-lida { opacity: 0.4; filter: grayscale(1); }
+        .notif-lida { opacity: 0.6; filter: saturate(0.5); }
+        
+        /* Efeito de brilho em itens novos */
+        .notif-nova::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #2563eb;
+            border-radius: 4px 0 0 4px;
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -63,6 +75,7 @@
     <header class="fixed top-0 left-0 right-0 w-full header-gradient header-shadow z-50 h-14 border-b border-white/10">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             
+            <!-- Logo -->
             <a href="index.html" class="flex items-center gap-2.5 hover:opacity-90 transition-all active:scale-95">
                 <div class="relative">
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
@@ -131,36 +144,37 @@
     </div>
 
     <!-- MODAL NOTIFICAÇÕES (FULL SCREEN) -->
-    <div id="modal-notificacoes" class="fixed inset-0 z-[100] hidden bg-[#0f172a] flex-col animate-slide-full overflow-hidden">
+    <div id="modal-notificacoes" class="fixed inset-0 z-[100] hidden bg-slate-50 flex-col animate-slide-full overflow-hidden">
         
-        <!-- Header -->
-        <div class="p-5 flex justify-between items-center bg-[#1e293b]/80 backdrop-blur-xl border-b border-white/5">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+        <!-- Header Marketing Blue -->
+        <div class="p-5 flex justify-between items-center bg-blue-600 text-white border-b border-blue-700 shadow-md">
+            <div class="flex items-center gap-4">
+                <div class="w-11 h-11 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 </div>
                 <div>
-                    <h3 class="text-white text-lg font-bold brand-font">Notificações</h3>
-                    <p class="text-blue-400 text-[9px] font-bold uppercase tracking-widest">Centro de Atualizações</p>
+                    <h3 class="text-xl font-black brand-font leading-none">Novidades da Encanto</h3>
+                    <p class="text-blue-100 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Gestão de Diversão</p>
                 </div>
             </div>
-            <button onclick="closeModals()" class="w-10 h-10 flex items-center justify-center bg-white/5 text-white rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <button onclick="closeModals()" class="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
         </div>
 
-        <!-- Lista Dinâmica -->
-        <div id="notif-list" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll">
-            <!-- Sincronizando -->
-            <div class="flex flex-col items-center justify-center h-full text-slate-500 gap-3">
-                <div class="w-8 h-8 border-2 border-blue-500 border-t-transparent animate-spin rounded-full"></div>
-                <p class="text-[10px] font-bold uppercase tracking-[0.2em]">Sincronizando...</p>
+        <!-- Lista Dinâmica Estilizada -->
+        <div id="notif-list" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll bg-slate-50">
+            <!-- Loading State -->
+            <div class="flex flex-col items-center justify-center h-full text-blue-900/30 gap-4">
+                <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent animate-spin rounded-full"></div>
+                <p class="text-xs font-black uppercase tracking-widest">Sincronizando Reservas...</p>
             </div>
         </div>
 
-        <div class="p-6 bg-[#1e293b]/90 border-t border-white/5">
-            <button onclick="marcarTodasComoLidas()" class="w-full py-4 bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 font-bold rounded-2xl text-[10px] uppercase tracking-[0.2em] border border-white/5 transition-all">
-                Marcar tudo como lido
+        <!-- Footer com Botão de Limpar -->
+        <div class="p-6 bg-white border-t border-slate-200">
+            <button onclick="marcarTodasComoLidas()" class="w-full py-4 bg-slate-100 hover:bg-blue-600 hover:text-white text-blue-700 font-black rounded-2xl text-xs uppercase tracking-[0.2em] transition-all active:scale-95 shadow-sm border border-slate-200">
+                MARCAR TUDO COMO LIDO
             </button>
         </div>
     </div>
@@ -170,7 +184,7 @@
 
         async function fetchNotificacoes() {
             try {
-                // Puxa do ficheiro notificacoes.json no mesmo directório
+                // Puxa do ficheiro notificacoes.json
                 const response = await fetch('notificacoes.json');
                 if (!response.ok) throw new Error('Falha ao carregar JSON');
                 notificacoesData = await response.json();
@@ -179,8 +193,11 @@
                 console.error("Erro:", error);
                 document.getElementById('notif-list').innerHTML = `
                     <div class="text-center py-20 px-10">
-                        <p class="text-red-400 text-xs font-bold uppercase tracking-widest">Erro ao carregar notificações</p>
-                        <p class="text-slate-500 text-[10px] mt-2 italic">Certifique-se de que o ficheiro notificacoes.json existe.</p>
+                        <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                        </div>
+                        <p class="text-slate-800 font-bold uppercase text-sm">Problema na Conexão</p>
+                        <p class="text-slate-500 text-xs mt-2">Não foi possível carregar as suas notificações do servidor.</p>
                     </div>
                 `;
             }
@@ -192,7 +209,12 @@
             list.innerHTML = '';
 
             if (notificacoesData.length === 0) {
-                list.innerHTML = `<p class="text-slate-500 text-center py-10 text-xs uppercase font-bold tracking-widest">Nenhuma notificação</p>`;
+                list.innerHTML = `
+                    <div class="text-center py-20 opacity-40">
+                        <svg class="mx-auto mb-4" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <p class="text-slate-900 font-bold uppercase text-xs tracking-widest">Tudo em dia por aqui!</p>
+                    </div>
+                `;
                 badge.classList.add('hidden');
                 return;
             }
@@ -203,33 +225,51 @@
 
             notificacoesData.forEach(n => {
                 const item = document.createElement('div');
-                item.className = `bg-white/5 border border-white/5 p-3.5 rounded-2xl flex items-center gap-3.5 transition-all ${n.lida ? 'notif-lida' : ''}`;
+                item.className = `relative bg-white border border-slate-200 p-4 rounded-3xl flex items-start gap-4 shadow-sm transition-all hover:shadow-md ${n.lida ? 'notif-lida' : 'notif-nova'}`;
                 
-                let iconColor = "bg-blue-500/20 text-blue-500";
-                if(n.tipo === 'sucesso') iconColor = "bg-emerald-500/20 text-emerald-500";
-                if(n.tipo === 'alerta') iconColor = "bg-amber-500/20 text-amber-500";
-                if(n.tipo === 'info') iconColor = "bg-sky-500/20 text-sky-500";
+                let iconSVG = '';
+                let iconClass = '';
+
+                // Ícones Estilo Brinquedos/Locação
+                switch(n.tipo) {
+                    case 'alerta':
+                        iconClass = 'bg-amber-100 text-amber-600';
+                        iconSVG = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+                        break;
+                    case 'sucesso':
+                        iconClass = 'bg-emerald-100 text-emerald-600';
+                        iconSVG = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
+                        break;
+                    case 'info':
+                        iconClass = 'bg-blue-100 text-blue-600';
+                        iconSVG = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+                        break;
+                    default:
+                        iconClass = 'bg-slate-100 text-slate-600';
+                        iconSVG = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+                }
 
                 item.innerHTML = `
-                    <div class="w-9 h-9 ${iconColor} rounded-xl flex items-center justify-center shrink-0">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <div class="w-10 h-10 ${iconClass} rounded-2xl flex items-center justify-center shrink-0 shadow-inner">
+                        ${iconSVG}
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-baseline mb-0.5">
-                            <h4 class="text-slate-100 font-bold text-sm truncate">${n.titulo}</h4>
-                            <span class="text-slate-500 text-[9px] shrink-0 font-medium ml-2">${n.data || ''}</span>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-slate-900 font-extrabold text-sm leading-tight">${n.titulo}</h4>
+                            <span class="text-slate-400 text-[10px] font-bold whitespace-nowrap ml-2">${n.data || ''}</span>
                         </div>
-                        <p class="text-slate-400 text-xs leading-snug truncate">${n.mensagem || ''}</p>
+                        <p class="text-slate-600 text-xs mt-1.5 leading-relaxed font-medium">
+                            ${n.mensagem || ''}
+                        </p>
+                        ${!n.lida ? `
+                        <div class="mt-3 flex justify-end">
+                            <button onclick="marcarLida(${n.id})" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 rounded-xl text-[10px] font-black transition-all border border-blue-100 uppercase tracking-tighter active:scale-90">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                Marcar Lido
+                            </button>
+                        </div>
+                        ` : ''}
                     </div>
-                    ${!n.lida ? `
-                        <button onclick="marcarLida(${n.id})" class="w-8 h-8 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        </button>
-                    ` : `
-                        <div class="w-8 h-8 flex items-center justify-center text-slate-600 shrink-0">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
-                        </div>
-                    `}
                 `;
                 list.appendChild(item);
             });
