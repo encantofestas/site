@@ -57,7 +57,6 @@
             transform: translateY(0%);
         }
 
-        /* Estilos para truncagem e expansão */
         .line-clamp-title {
             display: -webkit-box;
             -webkit-line-clamp: 1;
@@ -96,7 +95,6 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- Cabeçalho Principal -->
     <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
         <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -118,9 +116,7 @@
 
     <main class="pt-24"></main>
 
-    <!-- Modal de Notificações -->
     <div id="notifModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
-        <!-- Header do Modal - Ajustado verticalmente (py-3 em vez de py-5) -->
         <div class="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
             <div class="flex items-center gap-4">
                 <button id="closeNotif" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
@@ -133,7 +129,6 @@
             </button>
         </div>
 
-        <!-- Lista de Notificações -->
         <div id="notifContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
             <div id="loadingState" class="flex flex-col gap-4 opacity-10">
                 <div class="h-28 bg-white rounded-3xl"></div>
@@ -157,6 +152,8 @@
             if (!dateString) return "agora mesmo";
             const now = new Date();
             const past = new Date(dateString);
+            if (isNaN(past.getTime())) return dateString; // Caso o formato de data seja apenas texto
+            
             const diffInSeconds = Math.floor((now - past) / 1000);
             if (diffInSeconds < 60) return "agora mesmo";
             const diffInMinutes = Math.floor(diffInSeconds / 60);
@@ -196,23 +193,25 @@
 
         async function fetchNotifications(shouldRender = true) {
             try {
+                // Tentativa de puxar dados reais do JSON
                 const response = await fetch(NOTIF_URL);
                 if (response.ok) {
                     notifications = await response.json();
+                    updateBadge();
+                    if (shouldRender) renderNotifications();
                 } else {
-                    throw new Error();
+                    throw new Error('Ficheiro não encontrado');
                 }
             } catch (e) {
-                const now = new Date();
-                notifications = [
-                    { id: 1, titulo: "Promoção Exclusiva de Natal ⚡", mensagem: "Aproveite 30% de desconto em todos os nossos insufláveis temáticos apenas hoje. Não perca esta oportunidade mágica!", tipo: "alerta", lida: false, data: new Date(now.getTime() - 5 * 60000).toISOString() },
-                    { id: 2, titulo: "Novo Tema Disponível: Safari 🦁", mensagem: "O tema mais pedido do ano acaba de chegar! Confira os novos painéis, suportes de doces e balões personalizados para uma festa selvagem.", tipo: "info", lida: false, data: new Date(now.getTime() - 120 * 60000).toISOString() },
-                    { id: 3, titulo: "Confirmação de Reserva ✨", mensagem: "A sua reserva para o evento do próximo sábado foi processada com sucesso.", tipo: "sucesso", lida: false, data: new Date(now.getTime() - 26 * 3600000).toISOString() }
-                ];
+                console.error("Erro ao carregar notificações:", e);
+                // Exibe a mensagem de erro solicitada caso o fetch falhe
+                notifContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-20 text-white/70 text-center px-6">
+                        <p class="text-lg font-bold brand-font text-white opacity-90 mb-1">Ocorreu um erro</p>
+                        <p class="text-xs opacity-70">Estamos corrigindo isso o mais breve possível</p>
+                    </div>
+                `;
             }
-            
-            updateBadge();
-            if (shouldRender) renderNotifications();
         }
 
         function toggleExpand(element) {
@@ -231,16 +230,15 @@
         function renderNotifications() {
             const unreadNotifications = notifications.filter(n => !n.lida);
 
-            if (unreadNotifications.length === 0) {
-                notifContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white animate-pulse">
-                        <div class="p-6 bg-white/10 rounded-full mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                        </div>
-                        <p class="text-xl font-bold brand-font text-center">Tudo em dia!</p>
-                        <p class="text-sm text-center">Não tens notificações de momento.</p>
-                    </div>
-                `;
+            if (unreadNotifications.length === 0 && notifications.length > 0) {
+                // Se o JSON carregou mas todas estão lidas ou marcadas como lidas
+                renderEmptyState();
+                return;
+            }
+
+            if (notifications.length === 0) {
+                // Se a lista está vazia
+                renderEmptyState();
                 return;
             }
 
@@ -255,9 +253,9 @@
                             </div>
                             
                             <div class="flex-1 min-w-0" onclick="toggleExpand(this)">
-                                <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${n.titulo || 'Sem Título'}</h3>
+                                <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${n.titulo || 'Notificação'}</h3>
                                 <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg cursor-pointer">
-                                    ${n.mensagem || 'Sem conteúdo.'}
+                                    ${n.mensagem || ''}
                                 </p>
                                 
                                 <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight">
@@ -272,6 +270,18 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        function renderEmptyState() {
+            notifContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white animate-pulse">
+                    <div class="p-6 bg-white/10 rounded-full mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    </div>
+                    <p class="text-xl font-bold brand-font text-center">Tudo em dia!</p>
+                    <p class="text-sm text-center">Não tens notificações de momento.</p>
+                </div>
+            `;
         }
 
         window.markAsRead = (id) => {
