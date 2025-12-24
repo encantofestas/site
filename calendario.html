@@ -37,14 +37,14 @@
         }
 
         .notification-card {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
             animation: fadeIn 0.4s ease-out forwards;
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             will-change: transform, opacity;
             user-select: none;
-            touch-action: pan-y;
+            touch-action: pan-y; 
             cursor: grab;
         }
 
@@ -58,8 +58,9 @@
         }
 
         .slide-out-right {
-            transform: translateX(110%) !important;
+            transform: translateX(120%) !important;
             opacity: 0 !important;
+            transition: transform 0.4s ease-in, opacity 0.4s ease-in !important;
             pointer-events: none;
         }
 
@@ -111,6 +112,7 @@
 </head>
 <body class="min-h-screen">
 
+    <!-- CABEÇALHO -->
     <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
         <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
             
@@ -136,6 +138,7 @@
 
     <main class="pt-24"></main>
 
+    <!-- MODAL DE NOTIFICAÇÕES -->
     <div id="notifModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
         <div class="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
             <div class="flex items-center gap-4">
@@ -150,6 +153,7 @@
         </div>
 
         <div id="notifContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-10">
+            <!-- Loading state visual -->
             <div id="loadingState" class="flex flex-col gap-4 opacity-10">
                 <div class="h-28 bg-white rounded-3xl"></div>
                 <div class="h-28 bg-white rounded-3xl"></div>
@@ -169,12 +173,12 @@
         let notifications = [];
         let hasError = false;
 
-        // Variáveis globais para Swipe (Rato e Toque)
-        let isDragging = false;
+        // Gestão de Swipe
+        let isPanning = false;
         let startX = 0;
         let currentX = 0;
-        let activeCard = null;
-        let activeId = null;
+        let activeElement = null;
+        let activeNotifId = null;
 
         function getRelativeTime(dateString) {
             if (!dateString) return "agora mesmo";
@@ -195,21 +199,13 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             fetchNotifications(false);
-            
-            // Listeners globais para arrastar com o rato (Desktop)
-            window.addEventListener('mousemove', handleDragging);
-            window.addEventListener('mouseup', endDragging);
         });
 
         notifBtn.addEventListener('click', () => {
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
-            if (hasError || notifications.length === 0) {
-                fetchNotifications(true);
-            } else {
-                renderNotifications();
-            }
+            fetchNotifications(true);
         });
 
         closeNotif.addEventListener('click', () => {
@@ -250,13 +246,6 @@
             }
         }
 
-        function toggleExpand(element) {
-            // Só expande se não estivermos a arrastar
-            if (Math.abs(currentX - startX) < 5) {
-                element.closest('.notification-card').classList.toggle('expanded');
-            }
-        }
-
         function updateBadge() {
             const unreadCount = notifications.filter(n => !n.lida).length;
             if (unreadCount > 0) {
@@ -266,60 +255,56 @@
             }
         }
 
-        // --- LÓGICA DE ARRASTAR UNIFICADA ---
+        // --- LÓGICA DE SWIPE (COLADO AO DEDO) ---
+        function initPointerEvents(el, id) {
+            el.onpointerdown = (e) => {
+                isPanning = true;
+                startX = e.clientX;
+                currentX = startX;
+                activeElement = el;
+                activeNotifId = id;
+                el.style.transition = 'none'; // Remove delay para seguir o dedo instantaneamente
+                el.setPointerCapture(e.pointerId);
+            };
 
-        function startDragging(x, id) {
-            isDragging = true;
-            startX = x;
-            currentX = x;
-            activeId = id;
-            activeCard = document.getElementById(`card-${id}`);
-            if (activeCard) {
-                activeCard.style.transition = 'none';
-            }
+            el.onpointermove = (e) => {
+                if (!isPanning || activeElement !== el) return;
+                currentX = e.clientX;
+                const diff = currentX - startX;
+
+                // Só permite arrastar para a direita (marketing UX positivo)
+                if (diff > 0) {
+                    el.style.transform = `translateX(${diff}px)`;
+                    el.style.opacity = Math.max(0, 1 - (diff / (window.innerWidth * 0.7)));
+                }
+            };
+
+            el.onpointerup = (e) => handleSwipeEnd(e);
+            el.onpointercancel = (e) => handleSwipeEnd(e);
         }
 
-        function handleDragging(e) {
-            if (!isDragging || !activeCard) return;
-            
-            currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-            const diff = currentX - startX;
-
-            if (diff > 0) {
-                activeCard.style.transform = `translateX(${diff}px)`;
-                activeCard.style.opacity = 1 - (diff / (window.innerWidth * 0.8));
-            }
-        }
-
-        function endDragging() {
-            if (!isDragging || !activeCard) return;
+        function handleSwipeEnd(e) {
+            if (!isPanning || !activeElement) return;
+            isPanning = false;
             
             const diff = currentX - startX;
-            const threshold = window.innerWidth * 0.35; // 35% de arraste para apagar
+            const threshold = window.innerWidth * 0.35; // 35% de largura para descartar
 
-            activeCard.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            // Reativa a transição para o movimento final
+            activeElement.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
 
             if (diff > threshold) {
-                markAsRead(activeId);
+                // Confirmar descarte (arrastou o suficiente)
+                markAsRead(activeNotifId);
             } else {
-                activeCard.style.transform = 'translateX(0)';
-                activeCard.style.opacity = '1';
+                // Voltar para a posição original (não arrastou o suficiente)
+                activeElement.style.transform = 'translateX(0)';
+                activeElement.style.opacity = '1';
             }
-
-            isDragging = false;
-            activeCard = null;
-            activeId = null;
+            
+            activeElement.releasePointerCapture(e.pointerId);
+            activeElement = null;
         }
-
-        // Funções chamadas via HTML
-        window.handleTouchStart = (e, id) => startDragging(e.touches[0].clientX, id);
-        window.handleTouchMove = (e) => handleDragging(e);
-        window.handleTouchEnd = () => endDragging();
-        
-        window.handleMouseDown = (e, id) => {
-            e.preventDefault(); // Impede seleção de texto ao arrastar no desktop
-            startDragging(e.clientX, id);
-        };
 
         function renderNotifications() {
             const unread = notifications.filter(n => !n.lida);
@@ -340,42 +325,56 @@
                 return;
             }
 
-            notifContainer.innerHTML = unread.map((n, idx) => {
+            notifContainer.innerHTML = ''; 
+
+            unread.forEach((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
                 const titulo = (n.titulo && n.titulo.trim() !== "") ? n.titulo : 'Encanto Festas';
-                const mensagem = (n.mensagem && n.mensagem.trim() !== "") ? n.mensagem : 'Nova atualização mágica para si!';
+                const mensagem = (n.mensagem && n.mensagem.trim() !== "") ? n.mensagem : 'Nova atualização mágica!';
                 
-                return `
-                    <div id="card-${n.id}" 
-                         class="notification-card p-4 rounded-[1.25rem] text-white shadow-lg" 
-                         style="animation-delay: ${idx * 0.05}s"
-                         onmousedown="handleMouseDown(event, ${n.id})"
-                         ontouchstart="handleTouchStart(event, ${n.id})"
-                         ontouchmove="handleTouchMove(event)"
-                         ontouchend="handleTouchEnd(event)">
-                        <div class="flex gap-3">
-                            <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">
-                                ${icon}
-                            </div>
-                            
-                            <div class="flex-1 min-w-0" onclick="toggleExpand(this)">
-                                <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title pointer-events-none">${titulo}</h3>
-                                <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg cursor-pointer pointer-events-none">
-                                    ${mensagem}
-                                </p>
-                                
-                                <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight pointer-events-none">
-                                    <span>${getRelativeTime(n.data)}</span>
-                                    <button onclick="event.stopPropagation(); markAsRead(${n.id})" 
-                                        class="dot-separator text-blue-300 hover:text-white transition-colors uppercase active:scale-95 outline-none pointer-events-auto">
-                                        Marcar lida
-                                    </button>
-                                </div>
+                const card = document.createElement('div');
+                card.id = `card-${n.id}`;
+                card.className = "notification-card p-4 rounded-[1.25rem] text-white shadow-lg";
+                card.style.animationDelay = `${idx * 0.05}s`;
+                
+                card.innerHTML = `
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">
+                            ${icon}
+                        </div>
+                        <div class="flex-1 min-w-0 pointer-events-none">
+                            <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${titulo}</h3>
+                            <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">
+                                ${mensagem}
+                            </p>
+                            <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight">
+                                <span>${getRelativeTime(n.data)}</span>
+                                <button class="mark-btn dot-separator text-blue-300 hover:text-white transition-colors uppercase active:scale-95 outline-none pointer-events-auto" style="cursor:pointer">
+                                    Marcar lida
+                                </button>
                             </div>
                         </div>
                     </div>
                 `;
-            }).join('');
+
+                initPointerEvents(card, n.id);
+
+                // Diferencia clique de arrasto para expansão
+                card.onclick = (e) => {
+                    if (e.target.classList.contains('mark-btn')) {
+                        e.stopPropagation();
+                        markAsRead(n.id);
+                        return;
+                    }
+                    // Só expande se o movimento foi pequeno (clique real)
+                    const moveDistance = Math.abs(currentX - startX);
+                    if (moveDistance < 10) {
+                        card.classList.toggle('expanded');
+                    }
+                };
+
+                notifContainer.appendChild(card);
+            });
         }
 
         window.markAsRead = (id) => {
