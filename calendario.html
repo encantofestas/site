@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Encanto Festas - Sistema de Gestão</title>
+    <title>Encanto Festas - Dashboard Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,7 @@
             overflow-x: hidden;
             width: 100%;
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
             -webkit-tap-highlight-color: transparent;
             margin: 0;
             padding: 0;
@@ -24,78 +24,69 @@
         
         .header-gradient {
             background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-
-        .modal-gradient {
-            background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .header-shadow {
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
         }
 
-        .glass-border {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        /* Animação de Surgimento (Scale) */
+        .modal-animate {
+            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Animação suave para os modais */
-        .modal-enter {
-            animation: slideUp 0.3s ease-out forwards;
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Ocultar scrollbar mas manter funcionalidade */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        /* Scrollbar estilizada */
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen text-slate-800">
 
-    <!-- CABEÇALHO PRINCIPAL -->
-    <header class="fixed top-0 left-0 right-0 w-full header-gradient header-shadow glass-border z-50 h-14">
+    <!-- CABEÇALHO -->
+    <header class="fixed top-0 left-0 right-0 w-full header-gradient header-shadow z-50 h-14 border-b border-white/10">
         <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             
-            <a href="index.html" class="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition-all active:scale-95">
+            <a href="index.html" class="flex items-center gap-2.5 hover:opacity-90 transition-all active:scale-95">
                 <div class="relative">
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
                         alt="Logo Encanto Festas" 
-                        class="w-9 h-9 rounded-full border-2 border-yellow-400 object-cover shadow-sm">
+                        class="w-9 h-9 rounded-full border-2 border-yellow-400 object-cover shadow-md">
                 </div>
                 <span class="text-white text-xl font-bold brand-font tracking-tight">
                     Encanto<span class="text-yellow-300">Festas</span>
                 </span>
             </a>
             
-            <div class="flex items-center gap-1.5">
-                <!-- Botão Agenda -->
-                <button onclick="toggleModal('modal-agenda')" class="flex items-center gap-2 text-white px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all border border-white/10 active:scale-95">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                        <line x1="16" x2="16" y1="2" y2="6"/>
-                        <line x1="8" x2="8" y1="2" y2="6"/>
-                        <line x1="3" x2="21" y1="10" y2="10"/>
-                    </svg>
-                    <span class="font-bold text-xs uppercase tracking-wider hidden sm:inline">Agenda</span>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleModal('modal-agenda')" class="flex items-center gap-2 text-white px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/20 group">
+                    <svg class="group-hover:rotate-12 transition-transform" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                    <span class="font-bold text-xs uppercase tracking-widest hidden sm:inline">Agenda</span>
                 </button>
 
-                <!-- Notificações -->
-                <button onclick="toggleModal('modal-notificacoes')" class="text-white p-2 relative hover:bg-white/15 rounded-full transition-all active:scale-90">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M10.268 21a2 2 0 0 0 3.464 0"/>
-                        <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>
-                    </svg>
-                    <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-yellow-400 rounded-full border-2 border-blue-700"></span>
+                <button onclick="toggleModal('modal-notificacoes')" class="text-white p-2 relative hover:bg-white/15 rounded-full transition-all group">
+                    <svg class="group-hover:shake" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+                    <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-blue-600 animate-pulse"></span>
                 </button>
             </div>
         </div>
@@ -103,114 +94,177 @@
 
     <div class="h-14"></div>
 
-    <main class="p-6">
-        <h2 class="brand-font text-2xl text-blue-900 mb-4">Bem-vindo ao Painel</h2>
-        <p class="text-gray-600">Selecione uma opção no menu superior para gerir as suas festas.</p>
-    </main>
-
-    <!-- MODAL NOTIFICAÇÕES (MOBILE FULL) -->
-    <div id="modal-notificacoes" class="fixed inset-0 z-[100] hidden">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="toggleModal('modal-notificacoes')"></div>
-        <div class="absolute bottom-0 left-0 right-0 top-12 bg-blue-900 modal-gradient rounded-t-[32px] shadow-2xl flex flex-col modal-enter overflow-hidden">
-            <!-- Header Modal -->
-            <div class="p-6 flex justify-between items-center border-b border-white/10">
-                <h3 class="text-white text-2xl font-bold brand-font">Notificações</h3>
-                <button onclick="toggleModal('modal-notificacoes')" class="bg-white/10 p-2 rounded-full text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-            </div>
-            <!-- Lista de Notificações -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
-                <div class="bg-white/10 border border-white/10 p-4 rounded-2xl flex gap-4 items-start">
-                    <div class="bg-yellow-400/20 p-2 rounded-xl text-yellow-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/><path d="M2 12h20"/><path d="m5 7 3 5-3 5"/><path d="m19 7-3 5 3 5"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-white font-semibold text-sm">Nova Reserva Confirmada!</p>
-                        <p class="text-blue-100 text-xs mt-1">Festa de Aniversário - Buffet Premium</p>
-                        <span class="text-white/40 text-[10px] block mt-2">Há 5 minutos</span>
-                    </div>
+    <main class="p-8 max-w-4xl mx-auto">
+        <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
+            <h2 class="brand-font text-3xl text-blue-900 mb-2">Painel de Controlo</h2>
+            <p class="text-slate-500 mb-6">Seja bem-vindo de volta à Encanto Festas. Aqui está o resumo das suas operações.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-6 bg-blue-50 rounded-2xl border border-blue-100">
+                    <p class="text-blue-900 font-bold">Total de Eventos</p>
+                    <p class="text-4xl font-black text-blue-600">24</p>
                 </div>
-                <div class="bg-white/5 border border-white/5 p-4 rounded-2xl flex gap-4 items-start opacity-70">
-                    <div class="bg-blue-400/20 p-2 rounded-xl text-blue-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-white font-semibold text-sm">Pagamento Recebido</p>
-                        <p class="text-blue-100 text-xs mt-1">Referente à locação de Maria Silva.</p>
-                        <span class="text-white/40 text-[10px] block mt-2">Há 2 horas</span>
-                    </div>
+                <div class="p-6 bg-yellow-50 rounded-2xl border border-yellow-100">
+                    <p class="text-yellow-900 font-bold">Reservas Pendentes</p>
+                    <p class="text-4xl font-black text-yellow-600">03</p>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <!-- MODAL AGENDA (LOCAÇÕES FUTURAS) -->
-    <div id="modal-agenda" class="fixed inset-0 z-[100] hidden">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="toggleModal('modal-agenda')"></div>
-        <div class="absolute bottom-0 left-0 right-0 top-12 bg-white rounded-t-[32px] shadow-2xl flex flex-col modal-enter overflow-hidden">
-            <!-- Header Modal -->
-            <div class="p-6 flex justify-between items-center border-b border-gray-100 bg-blue-50">
+    <!-- OVERLAY MODAL (Geral) -->
+    <div id="modal-container" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onclick="closeAllModals()"></div>
+        
+        <!-- MODAL NOTIFICAÇÕES -->
+        <div id="modal-notificacoes" class="hidden glass-card w-full max-w-md rounded-[2.5rem] shadow-2xl relative flex flex-col overflow-hidden modal-animate">
+            <div class="p-6 flex justify-between items-center border-b border-slate-100 bg-white/50">
                 <div>
-                    <h3 class="text-blue-900 text-2xl font-bold brand-font">Próximas Locações</h3>
-                    <p class="text-blue-600/70 text-sm font-medium">Cronograma atualizado</p>
+                    <h3 class="text-xl font-bold text-slate-800">Atualizações</h3>
+                    <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider">Centro de Notificações</p>
                 </div>
-                <button onclick="toggleModal('modal-agenda')" class="bg-blue-100 p-2 rounded-full text-blue-900">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                <button onclick="closeAllModals()" class="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <!-- Lista de Locações -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
-                <!-- Card Locação 1 -->
-                <div class="p-4 rounded-2xl border border-gray-100 bg-white shadow-sm hover:border-blue-200 transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">24 DEZ</span>
-                        <span class="text-blue-600 font-bold text-sm italic">Faltam 2 dias</span>
-                    </div>
-                    <h4 class="text-gray-900 font-bold text-lg">Ana Carolina Oliveira</h4>
-                    <div class="flex flex-col gap-1 mt-2">
-                        <div class="flex items-center gap-2 text-gray-500 text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                            <span>(11) 98234-***</span>
+            
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 max-h-[60vh] custom-scroll">
+                <!-- Notificação 1 -->
+                <div class="group p-4 rounded-3xl bg-blue-50/50 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all cursor-pointer">
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/><path d="M2 12h20"/><path d="m5 7 3 5-3 5"/><path d="m19 7-3 5 3 5"/></svg>
                         </div>
-                        <div class="flex items-center gap-2 text-gray-500 text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                            <span>Sábado, às 14:00h</span>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-slate-900 text-sm">Reserva Confirmada</h4>
+                                <span class="text-[10px] text-slate-400 font-medium">5m atrás</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">O Buffet Premium para o dia 24/12 acaba de ser pago e confirmado.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Card Locação 2 -->
-                <div class="p-4 rounded-2xl border border-gray-100 bg-white shadow-sm opacity-90">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="bg-gray-400 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">28 DEZ</span>
-                    </div>
-                    <h4 class="text-gray-900 font-bold text-lg">Ricardo M. Fontes</h4>
-                    <div class="flex flex-col gap-1 mt-2">
-                        <div class="flex items-center gap-2 text-gray-500 text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                            <span>(21) 99122-***</span>
+                <!-- Notificação 2 -->
+                <div class="group p-4 rounded-3xl bg-white border border-slate-100 hover:border-blue-100 transition-all cursor-pointer">
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-white shrink-0 shadow-lg shadow-yellow-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
                         </div>
-                        <div class="flex items-center gap-2 text-gray-500 text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                            <span>Quarta, às 10:30h</span>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-slate-900 text-sm">Novo Lead Gerado</h4>
+                                <span class="text-[10px] text-slate-400 font-medium">2h atrás</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Maria Alice solicitou orçamento para festa infantil em Janeiro.</p>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-100 bg-slate-50">
+                <button class="w-full py-3 bg-white text-blue-600 text-xs font-bold rounded-2xl border border-blue-100 hover:bg-blue-600 hover:text-white transition-all">LIMPAR TUDO</button>
+            </div>
+        </div>
+
+        <!-- MODAL AGENDA -->
+        <div id="modal-agenda" class="hidden glass-card w-full max-w-lg rounded-[2.5rem] shadow-2xl relative flex flex-col overflow-hidden modal-animate">
+            <div class="p-8 pb-4 flex justify-between items-start">
+                <div>
+                    <h3 class="text-2xl font-black text-blue-900 brand-font">Próximos Eventos</h3>
+                    <p class="text-sm text-slate-500">Organize as suas entregas e locações</p>
+                </div>
+                <button onclick="closeAllModals()" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-600"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="px-8 py-4 flex-1 overflow-y-auto max-h-[65vh] space-y-4 custom-scroll">
+                <!-- Item de Agenda 1 -->
+                <div class="group relative bg-white border border-slate-100 p-5 rounded-[2rem] hover:shadow-xl hover:shadow-blue-900/5 transition-all">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-blue-600 rounded-3xl flex flex-col items-center justify-center text-white shrink-0">
+                            <span class="text-[10px] font-bold uppercase opacity-80 leading-none">Dez</span>
+                            <span class="text-xl font-black">24</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-bold text-slate-900 text-lg leading-tight">Ana Carolina Oliveira</h4>
+                                <span class="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Festa Natal</span>
+                            </div>
+                            <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                                <span class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                    <svg class="text-blue-500" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                    (11) 98234-***
+                                </span>
+                                <span class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                    <svg class="text-blue-500" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    14:00h
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item de Agenda 2 -->
+                <div class="group relative bg-white border border-slate-100 p-5 rounded-[2rem] hover:shadow-xl hover:shadow-blue-900/5 transition-all opacity-80">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-slate-200 rounded-3xl flex flex-col items-center justify-center text-slate-600 shrink-0">
+                            <span class="text-[10px] font-bold uppercase opacity-80 leading-none">Dez</span>
+                            <span class="text-xl font-black">28</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-bold text-slate-900 text-lg leading-tight">Ricardo M. Fontes</h4>
+                                <span class="bg-slate-100 text-slate-500 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Reunião</span>
+                            </div>
+                            <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                                <span class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                    <svg class="text-slate-400" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                    (21) 99122-***
+                                </span>
+                                <span class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                    <svg class="text-slate-400" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    10:30h
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 bg-blue-900">
+                <button class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-blue-900 font-black rounded-[1.5rem] transition-all transform hover:-translate-y-1 shadow-lg active:scale-95 tracking-wide">
+                    VER CALENDÁRIO COMPLETO
+                </button>
             </div>
         </div>
     </div>
 
     <script>
         function toggleModal(id) {
-            const modal = document.getElementById(id);
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; // Trava o scroll do fundo
+            const container = document.getElementById('modal-container');
+            const targetModal = document.getElementById(id);
+            
+            // Fecha todos primeiro
+            document.getElementById('modal-notificacoes').classList.add('hidden');
+            document.getElementById('modal-agenda').classList.add('hidden');
+
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                container.classList.add('flex');
+                targetModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
             } else {
-                modal.classList.add('hidden');
-                document.body.style.overflow = 'auto'; // Destrava o scroll
+                closeAllModals();
             }
+        }
+
+        function closeAllModals() {
+            const container = document.getElementById('modal-container');
+            container.classList.add('hidden');
+            container.classList.remove('flex');
+            document.body.style.overflow = 'auto';
         }
     </script>
 
