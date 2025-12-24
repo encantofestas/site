@@ -71,7 +71,7 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- CABEÇALHO AZUL (TELA INICIAL) -->
+    <!-- CABEÇALHO AZUL -->
     <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
         <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -82,7 +82,7 @@
                 </span>
             </div>
             
-            <button id="notifBtn" class="relative p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90">
+            <button id="notifBtn" class="relative p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
                 </svg>
@@ -91,27 +91,23 @@
         </div>
     </header>
 
-    <!-- CONTEÚDO VAZIO -->
     <main class="pt-24"></main>
 
-    <!-- MODAL DE NOTIFICAÇÕES (AZUL PROFUNDO) -->
+    <!-- MODAL DE NOTIFICAÇÕES -->
     <div id="notifModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
-        <!-- Header do Modal -->
         <div class="px-5 py-5 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
             <div class="flex items-center gap-4">
-                <button id="closeNotif" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg">
+                <button id="closeNotif" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
                 <h2 class="text-xl font-bold brand-font text-white">Notificações</h2>
             </div>
-            <button id="markAllRead" class="text-[11px] font-bold uppercase tracking-widest text-blue-200 hover:text-white transition-colors">
+            <button id="markAllRead" class="text-[11px] font-bold uppercase tracking-widest text-blue-200 hover:text-white transition-colors outline-none">
                 Limpar
             </button>
         </div>
 
-        <!-- Lista de Notificações -->
         <div id="notifContainer" class="flex-1 overflow-y-auto p-5 space-y-4 no-scrollbar">
-            <!-- Loader Silencioso -->
             <div class="flex flex-col gap-4 opacity-10">
                 <div class="h-28 bg-white rounded-3xl"></div>
                 <div class="h-28 bg-white rounded-3xl"></div>
@@ -120,7 +116,6 @@
     </div>
 
     <script>
-        // O URL agora aponta para o ficheiro local/relativo
         const NOTIF_URL = 'notificacoes.json';
         
         const notifBtn = document.getElementById('notifBtn');
@@ -131,6 +126,30 @@
         const markAllReadBtn = document.getElementById('markAllRead');
 
         let notifications = [];
+
+        // Função para calcular o tempo relativo
+        function getRelativeTime(dateString) {
+            if (!dateString) return "agora mesmo";
+            
+            const now = new Date();
+            const past = new Date(dateString);
+            const diffInSeconds = Math.floor((now - past) / 1000);
+
+            if (diffInSeconds < 60) return "agora mesmo";
+            
+            const diffInMinutes = Math.floor(diffInSeconds / 60);
+            if (diffInMinutes < 60) return `há ${diffInMinutes} min atrás`;
+            
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            if (diffInHours < 24) return `há ${diffInHours} horas atrás`;
+            
+            const diffInDays = Math.floor(diffInHours / 24);
+            if (diffInDays === 1) return "ontem";
+            if (diffInDays < 7) return `há ${diffInDays} dias atrás`;
+            
+            // Caso seja mais antigo que uma semana, mostra a data formatada
+            return past.toLocaleDateString('pt-PT');
+        }
 
         notifBtn.addEventListener('click', () => {
             notifModal.classList.remove('hidden');
@@ -158,36 +177,58 @@
                 const response = await fetch(NOTIF_URL);
                 if (response.ok) {
                     notifications = await response.json();
-                    renderNotifications();
                 } else {
-                    throw new Error('Erro de carregamento');
+                    throw new Error();
                 }
             } catch (e) {
-                console.error("Erro ao carregar notificações:", e);
+                // Mock para teste com datas reais para ver o cálculo a funcionar
+                const now = new Date();
+                notifications = [
+                    { 
+                        id: 1, 
+                        titulo: "Promoção 30% OFF! ⚡", 
+                        mensagem: "Insuflável Castelo Mágico com desconto exclusivo para hoje.", 
+                        tipo: "alerta", 
+                        lida: false, 
+                        data: new Date(now.getTime() - 3 * 60000).toISOString() // há 3 min
+                    },
+                    { 
+                        id: 2, 
+                        titulo: "Tema Jardim Encantado 🌸", 
+                        mensagem: "Novas decorações disponíveis no nosso catálogo online.", 
+                        tipo: "info", 
+                        lida: true, 
+                        data: new Date(now.getTime() - 2 * 3600000).toISOString() // há 2 horas
+                    },
+                    { 
+                        id: 3, 
+                        titulo: "Reserva Confirmada ✨", 
+                        mensagem: "Tudo pronto para a sua festa de sábado. Até já!", 
+                        tipo: "sucesso", 
+                        lida: false, 
+                        data: new Date(now.getTime() - 26 * 3600000).toISOString() // ontem
+                    },
+                    { 
+                        id: 4, 
+                        titulo: "Novo Equipamento", 
+                        mensagem: "Chegou a nova máquina de pipocas profissional.", 
+                        tipo: "info", 
+                        lida: false, 
+                        data: new Date(now.getTime() - 3 * 86400000).toISOString() // há 3 dias
+                    }
+                ];
+                
                 notifContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-20 text-white/50 text-center px-6">
-                        <p class="text-lg font-bold brand-font text-white opacity-90 mb-1">Ocorreu um erro</p>
-                        <p class="text-xs opacity-70">Estamos corrigindo isso o mais breve possível</p>
+                    <div class="px-4 py-2 mb-4 bg-yellow-400/20 rounded-xl text-[10px] text-white/60 text-center">
+                        Ocorreu um erro ao ler o ficheiro real. Estamos corrigindo isso o mais breve possível. (Exibindo demonstração)
                     </div>
                 `;
             }
+            renderNotifications();
         }
 
         function renderNotifications() {
-            if (notifications.length === 0) {
-                notifContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-4"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                        <p class="text-base font-medium">Sem notificações novas</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const temNovas = notifications.some(n => !n.lida);
-            temNovas ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
-
-            notifContainer.innerHTML = notifications.map((n, idx) => {
+            const listContent = notifications.map((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
                 const opacityClass = n.lida ? 'opacity-40 grayscale-[0.3]' : 'bg-white/10';
                 
@@ -201,16 +242,28 @@
                             <div class="flex-1 min-w-0">
                                 <h3 class="font-bold text-[15px] leading-tight mb-1 truncate">${n.titulo || 'Sem Título'}</h3>
                                 <p class="text-sm text-blue-50/80 mb-2 leading-relaxed">${n.mensagem || 'Sem mensagem disponível.'}</p>
-                                <span class="text-[10px] font-semibold text-white/30 uppercase tracking-tighter">${n.data || 'Agora'}</span>
+                                <span class="text-[10px] font-semibold text-white/30 uppercase tracking-tighter">${getRelativeTime(n.data)}</span>
                             </div>
 
-                            <button onclick="markAsRead(${n.id})" class="shrink-0 text-[11px] font-bold text-blue-200 hover:text-white transition-all py-1 active:scale-95">
+                            <button onclick="markAsRead(${n.id})" class="shrink-0 text-[11px] font-bold text-blue-200 hover:text-white transition-all py-1 active:scale-95 outline-none">
                                 Marcar lida
                             </button>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            // Mantém a mensagem de erro se ela existir no container antes de renderizar
+            const errorMsg = notifContainer.querySelector('.bg-yellow-400\\/20')?.outerHTML || '';
+            notifContainer.innerHTML = errorMsg + (listContent || `
+                <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-4"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    <p class="text-base font-medium">Sem notificações novas</p>
+                </div>
+            `);
+
+            const temNovas = notifications.some(n => !n.lida);
+            temNovas ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
         }
 
         window.markAsRead = (id) => {
@@ -221,6 +274,5 @@
             }
         };
     </script>
-
 </body>
 </html>
