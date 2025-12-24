@@ -31,7 +31,7 @@
         .bg-secondary { background-color: #FACC15; }
         .text-secondary { color: #CA8A04; }
         
-        /* Animação "Vai e Volta" (Bounce) Profissional */
+        /* Animação "Vai e Volta" (Bounce) Profissional - Sem Forwards para resetar sempre */
         @keyframes bounce-click {
             0% { transform: scale(1); }
             50% { transform: scale(0.85); }
@@ -39,7 +39,7 @@
         }
 
         .click-bounce:active {
-            animation: bounce-click 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: bounce-click 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Garantir que o link mude de cor e anime corretamente */
@@ -125,7 +125,7 @@
 
     <div class="popup-overlay fixed inset-0 bg-black/60 z-[55]" onclick="togglePopup()"></div>
 
-    <div id="custom-popup" class="fixed inset-x-0 bottom-0 z-[60] bg-white rounded-t-[3rem] shadow-2xl h-[55vh] overflow-y-auto">
+    <div id="custom-popup" class="fixed inset-x-0 bottom-0 z-[60] bg-white rounded-t-[3rem] shadow-2xl h-[52vh] overflow-y-auto">
         <div class="sticky top-0 bg-white pt-5 pb-3 z-10" onclick="togglePopup()">
             <div class="w-16 h-1.5 bg-gray-200 rounded-full mx-auto cursor-pointer active:bg-gray-300 transition-colors"></div>
         </div>
@@ -177,7 +177,7 @@
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <!-- Fazer Reserva -->
-                <button class="menu-card click-bounce p-4 bg-blue-50 rounded-[2rem] border border-blue-100 flex flex-col items-center">
+                <button onclick="window.location.href='catalogo.html'" class="menu-card click-bounce p-4 bg-blue-50 rounded-[2rem] border border-blue-100 flex flex-col items-center">
                     <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-200 mb-2">
                         <svg class="w-6 h-6 text-white"><use href="#icon-calendar"></use></svg>
                     </div>
@@ -185,7 +185,7 @@
                 </button>
 
                 <!-- Encanto Escola -->
-                <button class="menu-card click-bounce p-4 bg-purple-50 rounded-[2rem] border border-purple-100 flex flex-col items-center">
+                <button onclick="window.location.href='encantoescola.html'" class="menu-card click-bounce p-4 bg-purple-50 rounded-[2rem] border border-purple-100 flex flex-col items-center">
                     <div class="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-purple-200 mb-2">
                         <svg class="w-6 h-6 text-white"><use href="#icon-school"></use></svg>
                     </div>
@@ -193,15 +193,15 @@
                 </button>
 
                 <!-- Convide e Ganhe -->
-                <button class="menu-card click-bounce p-4 bg-yellow-50 rounded-[2rem] border border-yellow-100 flex flex-col items-center">
+                <button onclick="window.location.href='convideeganhe.html'" class="menu-card click-bounce p-4 bg-yellow-50 rounded-[2rem] border border-yellow-100 flex flex-col items-center">
                     <div class="w-12 h-12 bg-secondary text-blue-900 rounded-full flex items-center justify-center shadow-lg shadow-yellow-200 mb-2">
                         <svg class="w-6 h-6"><use href="#icon-gift"></use></svg>
                     </div>
-                    <span class="font-bold text-xs text-yellow-900 text-center leading-tight">Convide e Ganhe</span>
+                    <span class="font-bold text-xs text-yellow-900 text-center leading-tight">Convide Ganhe</span>
                 </button>
 
                 <!-- WhatsApp -->
-                <button class="menu-card click-bounce p-4 bg-green-50 rounded-[2rem] border border-green-100 flex flex-col items-center">
+                <button onclick="window.location.href='https://wa.me/5547992277324?text=olá,%20quero%20fazer%20uma%20reserva'" class="menu-card click-bounce p-4 bg-green-50 rounded-[2rem] border border-green-100 flex flex-col items-center">
                     <div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-green-200 mb-2">
                         <svg class="w-6 h-6 text-white"><use href="#icon-whatsapp"></use></svg>
                     </div>
