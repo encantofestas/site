@@ -177,17 +177,18 @@
     <header id="mainHeader" class="fixed top-0 left-0 right-0 w-full glass-header z-[50] h-16">
         <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
             
-            <a href="index.html" class="flex items-center gap-3 active:scale-95 transition-transform outline-none text-decoration-none group">
+            <!-- Link da Logo: gap reduzido para gap-2 para ficar mais próximo da logo -->
+            <a href="index.html" class="flex items-center gap-2 active:scale-95 transition-transform outline-none text-decoration-none group">
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
                     class="w-10 h-10 rounded-full border-2 border-yellow-400 shadow-sm transition-transform group-hover:rotate-12"
                     alt="Logo Encanto Festas">
                 
-                <!-- Nome com cores fixas e subtítulo blocado e alinhado -->
+                <!-- Bloco de texto centralizado: ml-0 para ficar bem rente à logo -->
                 <div class="inline-flex flex-col items-start leading-none -mt-1.5">
                     <div class="text-xl font-bold brand-font tracking-tight">
                         <span class="text-white">Encanto</span><span class="text-yellow-400">Festas</span>
                     </div>
-                    <!-- Subtítulo em linha única com tracking (letter-spacing) para preencher de ponta a ponta -->
+                    <!-- Subtítulo blocado perfeitamente e encostado -->
                     <span class="text-[7.5px] font-black text-white/90 uppercase -mt-0.5 tracking-[0.16em] w-full text-justify" style="text-align-last: justify;">
                         LOCAÇÃO DE BRINQUEDOS
                     </span>
@@ -198,7 +199,7 @@
                 <div class="relative">
                     <button id="agendaBtn" class="p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 flex items-center justify-center outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y2="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                         </svg>
                     </button>
 
