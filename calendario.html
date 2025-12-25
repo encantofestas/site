@@ -108,6 +108,11 @@
             margin: 0 6px;
             opacity: 0.5;
         }
+
+        .loading-overlay {
+            background: rgba(30, 58, 138, 0.8);
+            backdrop-filter: blur(4px);
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -126,12 +131,20 @@
                 </span>
             </a>
             
-            <button id="notifBtn" class="relative p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
-                </svg>
-                <span id="notifBadge" class="hidden absolute top-2 right-2 w-2.5 h-2.5 bg-yellow-400 rounded-full border-2 border-blue-600 animate-pulse"></span>
-            </button>
+            <div class="flex items-center gap-2">
+                <a href="agenda.html" id="agendaBtn" class="p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 outline-none flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                </a>
+
+                <button id="notifBtn" class="relative p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 outline-none flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                    </svg>
+                    <span id="notifBadge" class="hidden absolute top-2 right-2 w-2.5 h-2.5 bg-yellow-400 rounded-full border-2 border-blue-600 animate-pulse"></span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -158,7 +171,19 @@
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Config
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
         const NOTIF_URL = 'notificacoes.json';
         const notifBtn = document.getElementById('notifBtn');
         const notifModal = document.getElementById('notifModal');
@@ -168,11 +193,71 @@
         const markAllReadBtn = document.getElementById('markAllRead');
 
         let notifications = [];
+        let readIds = []; // IDs persistidos no Firestore
+        let user = null;
         let isPanning = false;
         let startX = 0;
         let diffX = 0;
         let activeCard = null;
         let activeId = null;
+
+        // Inicialização Auth e Listener de Dados
+        const initApp = async () => {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+
+            onAuthStateChanged(auth, (u) => {
+                if (u) {
+                    user = u;
+                    setupRealtimePersistence();
+                }
+            });
+        };
+
+        const setupRealtimePersistence = () => {
+            if (!user) return;
+            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'notifications_state');
+            
+            // Listener em tempo real para os IDs lidos
+            onSnapshot(stateRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    readIds = docSnap.data().readIds || [];
+                } else {
+                    // Cria o documento se não existir
+                    setDoc(stateRef, { readIds: [] });
+                }
+                fetchNotifications(false);
+            }, (error) => console.error("Erro Firestore:", error));
+        };
+
+        const persistReadId = async (id) => {
+            if (!user) return;
+            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'notifications_state');
+            try {
+                await updateDoc(stateRef, {
+                    readIds: arrayUnion(id)
+                });
+            } catch (e) {
+                // Se o doc não existir ainda
+                await setDoc(stateRef, { readIds: [id] });
+            }
+        };
+
+        const persistAllAsRead = async () => {
+            if (!user || notifications.length === 0) return;
+            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'notifications_state');
+            const allIds = notifications.map(n => n.id);
+            try {
+                await updateDoc(stateRef, {
+                    readIds: arrayUnion(...allIds)
+                });
+            } catch (e) {
+                await setDoc(stateRef, { readIds: allIds });
+            }
+        };
 
         function getRelativeTime(dateString) {
             if (!dateString) return "agora mesmo";
@@ -191,10 +276,6 @@
             return past.toLocaleDateString('pt-PT');
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchNotifications(false);
-        });
-
         notifBtn.addEventListener('click', () => {
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
@@ -211,9 +292,7 @@
         });
 
         markAllReadBtn.addEventListener('click', () => {
-            notifications = [];
-            renderNotifications();
-            updateBadge();
+            persistAllAsRead();
         });
 
         async function fetchNotifications(shouldRender = true) {
@@ -221,7 +300,8 @@
                 const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
                 if (response.ok) {
                     const data = await response.json();
-                    notifications = data;
+                    // Filtra apenas as que o utilizador AINDA NÃO LEU (não estão no Firestore)
+                    notifications = data.filter(n => !readIds.includes(n.id));
                 } else {
                     throw new Error('Falha no fetch');
                 }
@@ -229,10 +309,11 @@
                 console.warn("Ficheiro real não encontrado ou erro no JSON. Usando dados de demonstração.");
                 if (notifications.length === 0) {
                     const now = new Date();
-                    notifications = [
+                    const demoData = [
                         { id: 101, titulo: "Promoção Exclusiva! ⚡", mensagem: "Insufláveis com 30% de desconto hoje. Clique para conferir as nossas ofertas imperdíveis de Natal!", tipo: "alerta", lida: false, data: new Date(now.getTime() - 120000).toISOString(), link: "promocoes.html" },
                         { id: 102, titulo: "Reserva Confirmada ✨", mensagem: "A sua festa de sábado está garantida. Veja aqui o resumo da sua reserva e os horários de montagem.", tipo: "sucesso", lida: false, data: new Date(now.getTime() - 3600000).toISOString(), link: "reservas.html" }
                     ];
+                    notifications = demoData.filter(n => !readIds.includes(n.id));
                 }
             }
 
@@ -242,8 +323,7 @@
         }
 
         function updateBadge() {
-            const unreadCount = notifications.filter(n => !n.lida).length;
-            unreadCount > 0 ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
+            notifications.length > 0 ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
         }
 
         function initSwipeEvents(card, id) {
@@ -281,7 +361,7 @@
                 activeCard.style.transform = `translateX(120%)`;
                 activeCard.style.opacity = `0`;
                 const idToMark = activeId;
-                setTimeout(() => markAsReadSilently(idToMark), 400);
+                setTimeout(() => persistReadId(idToMark), 400);
             } else {
                 activeCard.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease';
                 activeCard.style.transform = 'translateX(0)';
@@ -293,11 +373,9 @@
         }
 
         function renderNotifications() {
-            const unread = notifications.filter(n => !n.lida);
-            
-            if (unread.length === 0) {
+            if (notifications.length === 0) {
                 notifContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white animate-pulse">
+                    <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white">
                         <div class="w-20 h-20 bg-white/10 rounded-full mb-6 flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
@@ -311,7 +389,7 @@
             }
 
             notifContainer.innerHTML = ''; 
-            unread.forEach((n, idx) => {
+            notifications.forEach((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
                 const titulo = (n.titulo && n.titulo.trim() !== "") ? n.titulo : 'Encanto Festas';
                 const mensagem = (n.mensagem && n.mensagem.trim() !== "") ? n.mensagem : 'Tens uma nova atualização mágica para ver!';
@@ -342,25 +420,20 @@
 
                 initSwipeEvents(card, n.id);
 
-                // LÓGICA DE CLIQUE COM LINK
                 card.onclick = (e) => {
-                    // Se clicar no botão de lida, não faz mais nada
                     if (e.target.classList.contains('mark-btn')) {
                         e.stopPropagation();
                         markAsReadDirectly(n.id);
                         return;
                     }
 
-                    // Verifica se foi um clique (não arraste)
                     if (Math.abs(diffX) < 10) {
                         const isExpanded = card.classList.contains('expanded');
                         const hasLink = n.link && n.link.trim() !== "";
 
                         if (!isExpanded) {
-                            // PRIMEIRO CLIQUE: Expande
                             card.classList.add('expanded');
                         } else if (hasLink) {
-                            // SEGUNDO CLIQUE (Se expandido): Abre link
                             window.location.href = n.link;
                         }
                     }
@@ -376,18 +449,13 @@
                 card.style.transform = '';
                 card.style.opacity = '';
                 card.classList.add('dismissing');
-                setTimeout(() => markAsReadSilently(id), 450);
+                setTimeout(() => persistReadId(id), 450);
             }
         }
 
-        function markAsReadSilently(id) {
-            const idx = notifications.findIndex(n => n.id === id);
-            if (idx !== -1) {
-                notifications[idx].lida = true;
-                renderNotifications();
-                updateBadge();
-            }
-        }
+        // Inicia o processo
+        initApp();
+
     </script>
 </body>
 </html>
