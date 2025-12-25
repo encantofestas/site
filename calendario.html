@@ -108,11 +108,6 @@
             margin: 0 6px;
             opacity: 0.5;
         }
-
-        .loading-overlay {
-            background: rgba(30, 58, 138, 0.8);
-            backdrop-filter: blur(4px);
-        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -132,12 +127,14 @@
             </a>
             
             <div class="flex items-center gap-2">
+                <!-- Botão de Agenda -->
                 <a href="agenda.html" id="agendaBtn" class="p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 outline-none flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
                 </a>
 
+                <!-- Botão de Notificações (Abre normalmente sempre) -->
                 <button id="notifBtn" class="relative p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 outline-none flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
@@ -192,7 +189,8 @@
         const notifBadge = document.getElementById('notifBadge');
         const markAllReadBtn = document.getElementById('markAllRead');
 
-        let notifications = [];
+        let rawNotifications = []; // Todas as notificações do JSON
+        let activeNotifications = []; // Apenas as não lidas pelo utilizador
         let readIds = []; // IDs persistidos no Firestore
         let user = null;
         let isPanning = false;
@@ -201,7 +199,7 @@
         let activeCard = null;
         let activeId = null;
 
-        // Inicialização Auth e Listener de Dados
+        // Início da Autenticação
         const initApp = async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
@@ -219,64 +217,74 @@
 
         const setupRealtimePersistence = () => {
             if (!user) return;
-            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'notifications_state');
+            // Caminho seguindo a Regra 1: artifacts/{appId}/users/{userId}/private_data/{docId}
+            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
             
             // Listener em tempo real para os IDs lidos
             onSnapshot(stateRef, (docSnap) => {
                 if (docSnap.exists()) {
                     readIds = docSnap.data().readIds || [];
                 } else {
-                    // Cria o documento se não existir
                     setDoc(stateRef, { readIds: [] });
                 }
-                fetchNotifications(false);
+                processNotifications();
             }, (error) => console.error("Erro Firestore:", error));
         };
 
         const persistReadId = async (id) => {
             if (!user) return;
-            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'notifications_state');
+            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
             try {
-                await updateDoc(stateRef, {
-                    readIds: arrayUnion(id)
-                });
+                await updateDoc(stateRef, { readIds: arrayUnion(id) });
             } catch (e) {
-                // Se o doc não existir ainda
                 await setDoc(stateRef, { readIds: [id] });
             }
         };
 
         const persistAllAsRead = async () => {
-            if (!user || notifications.length === 0) return;
-            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'notifications_state');
-            const allIds = notifications.map(n => n.id);
+            if (!user || activeNotifications.length === 0) return;
+            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
+            const allCurrentIds = activeNotifications.map(n => n.id);
             try {
-                await updateDoc(stateRef, {
-                    readIds: arrayUnion(...allIds)
-                });
+                await updateDoc(stateRef, { readIds: arrayUnion(...allCurrentIds) });
             } catch (e) {
-                await setDoc(stateRef, { readIds: allIds });
+                await setDoc(stateRef, { readIds: allCurrentIds });
             }
         };
 
-        function getRelativeTime(dateString) {
-            if (!dateString) return "agora mesmo";
-            const now = new Date();
-            const past = new Date(dateString);
-            if (isNaN(past.getTime())) return "agora mesmo";
-            const diffInSeconds = Math.floor((now - past) / 1000);
-            if (diffInSeconds < 60) return "agora mesmo";
-            const diffInMinutes = Math.floor(diffInSeconds / 60);
-            if (diffInMinutes < 60) return `há ${diffInMinutes} min atrás`;
-            const diffInHours = Math.floor(diffInMinutes / 60);
-            if (diffInHours < 24) return `há ${diffInHours} horas atrás`;
-            const diffInDays = Math.floor(diffInHours / 24);
-            if (diffInDays === 1) return "ontem";
-            if (diffInDays < 7) return `há ${diffInDays} dias atrás`;
-            return past.toLocaleDateString('pt-PT');
+        // Função para carregar e filtrar notificações
+        async function processNotifications() {
+            try {
+                const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
+                if (response.ok) {
+                    rawNotifications = await response.json();
+                } else {
+                    throw new Error('Falha no fetch');
+                }
+            } catch (e) {
+                // Fallback de demonstração caso o JSON não exista
+                if (rawNotifications.length === 0) {
+                    rawNotifications = [
+                        { id: 101, titulo: "Promoção Exclusiva! ⚡", mensagem: "Insufláveis com 30% de desconto hoje.", tipo: "alerta", data: new Date().toISOString(), link: "promocoes.html" },
+                        { id: 102, titulo: "Reserva Confirmada ✨", mensagem: "A sua festa está garantida.", tipo: "sucesso", data: new Date().toISOString(), link: "reservas.html" }
+                    ];
+                }
+            }
+
+            // A MÁGICA: Filtramos apenas o que o utilizador NÃO leu (IDs que não estão no readIds do Firestore)
+            activeNotifications = rawNotifications.filter(n => !readIds.includes(n.id));
+            activeNotifications.sort((a, b) => new Date(b.data) - new Date(a.data));
+            
+            updateBadge();
+            renderNotifications();
+        }
+
+        function updateBadge() {
+            activeNotifications.length > 0 ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
         }
 
         notifBtn.addEventListener('click', () => {
+            // O botão abre o modal normalmente
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
@@ -291,40 +299,7 @@
             }, 400);
         });
 
-        markAllReadBtn.addEventListener('click', () => {
-            persistAllAsRead();
-        });
-
-        async function fetchNotifications(shouldRender = true) {
-            try {
-                const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    // Filtra apenas as que o utilizador AINDA NÃO LEU (não estão no Firestore)
-                    notifications = data.filter(n => !readIds.includes(n.id));
-                } else {
-                    throw new Error('Falha no fetch');
-                }
-            } catch (e) {
-                console.warn("Ficheiro real não encontrado ou erro no JSON. Usando dados de demonstração.");
-                if (notifications.length === 0) {
-                    const now = new Date();
-                    const demoData = [
-                        { id: 101, titulo: "Promoção Exclusiva! ⚡", mensagem: "Insufláveis com 30% de desconto hoje. Clique para conferir as nossas ofertas imperdíveis de Natal!", tipo: "alerta", lida: false, data: new Date(now.getTime() - 120000).toISOString(), link: "promocoes.html" },
-                        { id: 102, titulo: "Reserva Confirmada ✨", mensagem: "A sua festa de sábado está garantida. Veja aqui o resumo da sua reserva e os horários de montagem.", tipo: "sucesso", lida: false, data: new Date(now.getTime() - 3600000).toISOString(), link: "reservas.html" }
-                    ];
-                    notifications = demoData.filter(n => !readIds.includes(n.id));
-                }
-            }
-
-            notifications.sort((a, b) => new Date(b.data) - new Date(a.data));
-            updateBadge();
-            if (shouldRender) renderNotifications();
-        }
-
-        function updateBadge() {
-            notifications.length > 0 ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
-        }
+        markAllReadBtn.addEventListener('click', persistAllAsRead);
 
         function initSwipeEvents(card, id) {
             card.onpointerdown = (e) => {
@@ -343,8 +318,6 @@
                 if (diffX > 0) {
                     card.style.transform = `translateX(${diffX}px)`;
                     card.style.opacity = Math.max(0.1, 1 - (diffX / (window.innerWidth * 0.8)));
-                } else {
-                    card.style.transform = `translateX(0px)`;
                 }
             };
 
@@ -360,8 +333,7 @@
                 activeCard.style.transition = 'transform 0.4s ease-in, opacity 0.4s ease-in';
                 activeCard.style.transform = `translateX(120%)`;
                 activeCard.style.opacity = `0`;
-                const idToMark = activeId;
-                setTimeout(() => persistReadId(idToMark), 400);
+                persistReadId(activeId);
             } else {
                 activeCard.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease';
                 activeCard.style.transform = 'translateX(0)';
@@ -369,11 +341,10 @@
             }
             activeCard.releasePointerCapture(e.pointerId);
             activeCard = null;
-            activeId = null;
         }
 
         function renderNotifications() {
-            if (notifications.length === 0) {
+            if (activeNotifications.length === 0) {
                 notifContainer.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white">
                         <div class="w-20 h-20 bg-white/10 rounded-full mb-6 flex items-center justify-center">
@@ -382,18 +353,15 @@
                             </svg>
                         </div>
                         <p class="text-xl font-bold brand-font text-center">Tudo em dia!</p>
-                        <p class="text-sm text-center">Não tens notificações de momento.</p>
+                        <p class="text-sm text-center">Não tens notificações novas.</p>
                     </div>
                 `;
                 return;
             }
 
             notifContainer.innerHTML = ''; 
-            notifications.forEach((n, idx) => {
+            activeNotifications.forEach((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
-                const titulo = (n.titulo && n.titulo.trim() !== "") ? n.titulo : 'Encanto Festas';
-                const mensagem = (n.mensagem && n.mensagem.trim() !== "") ? n.mensagem : 'Tens uma nova atualização mágica para ver!';
-                
                 const card = document.createElement('div');
                 card.id = `card-${n.id}`;
                 card.className = "notification-card p-4 rounded-[1.25rem] text-white shadow-lg";
@@ -404,14 +372,12 @@
                             ${icon}
                         </div>
                         <div class="flex-1 min-w-0 pointer-events-none">
-                            <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${titulo}</h3>
-                            <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">
-                                ${mensagem}
-                            </p>
+                            <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${n.titulo || 'Encanto Festas'}</h3>
+                            <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">${n.mensagem}</p>
                             <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight">
-                                <span>${getRelativeTime(n.data)}</span>
+                                <span>Nova</span>
                                 <button class="mark-btn dot-separator text-blue-300 hover:text-white transition-colors uppercase active:scale-95 outline-none pointer-events-auto" style="cursor:pointer">
-                                    Marcar lida
+                                    Arquivar
                                 </button>
                             </div>
                         </div>
@@ -423,17 +389,16 @@
                 card.onclick = (e) => {
                     if (e.target.classList.contains('mark-btn')) {
                         e.stopPropagation();
-                        markAsReadDirectly(n.id);
+                        card.classList.add('dismissing');
+                        setTimeout(() => persistReadId(n.id), 450);
                         return;
                     }
 
                     if (Math.abs(diffX) < 10) {
                         const isExpanded = card.classList.contains('expanded');
-                        const hasLink = n.link && n.link.trim() !== "";
-
                         if (!isExpanded) {
                             card.classList.add('expanded');
-                        } else if (hasLink) {
+                        } else if (n.link) {
                             window.location.href = n.link;
                         }
                     }
@@ -443,19 +408,7 @@
             });
         }
 
-        function markAsReadDirectly(id) {
-            const card = document.getElementById(`card-${id}`);
-            if (card) {
-                card.style.transform = '';
-                card.style.opacity = '';
-                card.classList.add('dismissing');
-                setTimeout(() => persistReadId(id), 450);
-            }
-        }
-
-        // Inicia o processo
         initApp();
-
     </script>
 </body>
 </html>
