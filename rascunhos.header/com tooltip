@@ -87,11 +87,12 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Estilo do Tooltip de Marketing */
+        /* Estilo do Tooltip de Marketing Corrigido */
         #marketingTooltip {
             z-index: 100;
             filter: drop-shadow(0 10px 25px rgba(0,0,0,0.2));
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: calc(100vw - 40px);
         }
 
         @keyframes popIn {
@@ -107,10 +108,9 @@
             border-bottom: 10px solid #ffffff;
             position: absolute;
             top: -10px;
-            right: 22px;
+            right: 12px;
         }
 
-        /* Divisor de mês fixo (Sticky) */
         .month-divider {
             position: sticky;
             top: -1px; 
@@ -156,25 +156,25 @@
                 </span>
             </a>
             
-            <div class="flex items-center gap-2 relative">
-                <!-- Botão de Agenda -->
-                <button id="agendaBtn" class="p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 flex items-center justify-center outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                    </svg>
-                </button>
+            <div class="flex items-center gap-2">
+                <div class="relative">
+                    <button id="agendaBtn" class="p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 flex items-center justify-center outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                    </button>
 
-                <!-- Tooltip de Marketing -->
-                <div id="marketingTooltip" class="absolute top-14 right-0 w-64 bg-white rounded-2xl p-4 shadow-2xl hidden">
-                    <div class="tooltip-arrow"></div>
-                    <div class="flex flex-col gap-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl">📅</span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Nova Função</span>
+                    <div id="marketingTooltip" class="absolute top-14 -right-2 w-72 bg-white rounded-2xl p-4 shadow-2xl hidden">
+                        <div class="tooltip-arrow"></div>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">📅</span>
+                                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Nova Função</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-slate-800 leading-tight">As tuas Reservas em um só lugar!</h4>
+                            <p class="text-[12px] text-slate-500 leading-snug">Agora podes conferir todos os detalhes e datas dos teus agendamentos aqui.</p>
+                            <button id="closeMarketing" class="mt-2 w-full py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl active:scale-95 transition-all shadow-md shadow-blue-200">Entendido!</button>
                         </div>
-                        <h4 class="text-sm font-bold text-slate-800 leading-tight">Suas Reservas em um só lugar!</h4>
-                        <p class="text-[12px] text-slate-500 leading-snug">Agora você pode conferir todos os detalhes e datas dos seus agendamentos aqui.</p>
-                        <button id="closeMarketing" class="mt-2 w-full py-2 bg-blue-600 text-white text-xs font-bold rounded-xl active:scale-95 transition-all shadow-md shadow-blue-200">Entendido!</button>
                     </div>
                 </div>
 
@@ -188,7 +188,7 @@
         </div>
     </header>
 
-    <!-- Área Principal (Vazia) -->
+    <!-- Área Principal -->
     <main class="pt-24 px-5 max-w-xl mx-auto"></main>
 
     <!-- MODAL DE NOTIFICAÇÕES -->
@@ -264,7 +264,7 @@
         };
 
         function handleMarketingTooltip() {
-            const hasSeen = localStorage.getItem('encanto_marketing_v1');
+            const hasSeen = localStorage.getItem('encanto_marketing_v2');
             const tooltip = getEl('marketingTooltip');
             const overlay = getEl('tooltipOverlay');
             const closeBtn = getEl('closeMarketing');
@@ -280,7 +280,7 @@
                     tooltip.classList.add('hidden');
                     overlay.classList.add('hidden');
                     document.body.style.overflow = '';
-                    localStorage.setItem('encanto_marketing_v1', 'true');
+                    localStorage.setItem('encanto_marketing_v2', 'true');
                 };
             }
         }
@@ -451,7 +451,7 @@
                 `;
                 card.onclick = (e) => {
                     if (e.target.classList.contains('mark-btn')) {
-                        e.stopPropagation(); card.classList.add('dismissing'); setTimeout(() => persistReadId(n.id), 450); return;
+                        e.stopPropagation(); if(card) card.classList.add('dismissing'); setTimeout(() => persistReadId(n.id), 450); return;
                     }
                     const msgPara = card.querySelector('.line-clamp-msg');
                     if (msgPara) {
@@ -474,13 +474,27 @@
             }
         }
 
+        // Função para limpar todas as notificações
+        async function markAllNotificationsAsRead() {
+            const newIds = rawNotifications.map(n => Number(n.id));
+            readIds = [...new Set([...readIds, ...newIds])];
+            localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
+            updateNotifUI();
+            
+            if (user && db) {
+                const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
+                try { await updateDoc(stateRef, { readIds: readIds }); } catch (e) { await setDoc(stateRef, { readIds: readIds }); }
+            }
+        }
+
         const setupUIListeners = () => {
             const btns = {
                 notif: getEl('notifBtn'),
                 agenda: getEl('agendaBtn'),
                 closeNotif: getEl('closeNotif'),
                 closeAgenda: getEl('closeAgenda'),
-                viewMore: getEl('viewMoreAgenda')
+                viewMore: getEl('viewMoreAgenda'),
+                markAll: getEl('markAllRead') // Adicionado o botão de limpar tudo
             };
 
             const modals = {
@@ -520,6 +534,10 @@
 
             if (btns.viewMore) {
                 btns.viewMore.onclick = () => { agendaVisibleLimit += 5; renderAgenda(); };
+            }
+
+            if (btns.markAll) {
+                btns.markAll.onclick = () => markAllNotificationsAsRead();
             }
         };
 
