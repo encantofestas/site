@@ -190,7 +190,9 @@
 
         let rawNotifications = []; 
         let activeNotifications = []; 
-        let readIds = []; 
+        // Inicializa lidos a partir do LocalStorage para resposta imediata
+        let readIds = JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'); 
+        
         let isPanning = false;
         let startX = 0;
         let diffX = 0;
@@ -198,6 +200,7 @@
         let activeId = null;
 
         const initApp = async () => {
+            // Carrega JSON imediatamente
             await processNotifications();
 
             if (fbConfigRaw) {
@@ -207,11 +210,14 @@
                     auth = getAuth(app);
                     db = getFirestore(app);
 
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
+                    const initAuth = async () => {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    };
+                    await initAuth();
 
                     onAuthStateChanged(auth, (u) => {
                         if (u) {
@@ -227,29 +233,39 @@
 
         const setupRealtimePersistence = () => {
             if (!user || !db) return;
-            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
+            // Seguindo a REGRA 1 rigorosamente
+            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
             
             onSnapshot(stateRef, (docSnap) => {
                 if (docSnap.exists()) {
-                    readIds = docSnap.data().readIds || [];
+                    const cloudReadIds = docSnap.data().readIds || [];
+                    // Sincroniza LocalStorage com Cloud
+                    const merged = [...new Set([...readIds, ...cloudReadIds])];
+                    readIds = merged;
+                    localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
                 } else {
-                    setDoc(stateRef, { readIds: [] });
+                    setDoc(stateRef, { readIds: readIds });
                 }
                 updateViewWithPersistence();
             }, (error) => console.error("Firestore Error:", error));
         };
 
         const persistReadId = async (id) => {
-            if (!user || !db) {
+            // Salva Localmente Primeiro (Instantâneo)
+            if (!readIds.includes(id)) {
                 readIds.push(id);
-                updateViewWithPersistence();
-                return;
+                localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
             }
-            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
-            try {
-                await updateDoc(stateRef, { readIds: arrayUnion(id) });
-            } catch (e) {
-                await setDoc(stateRef, { readIds: [id] });
+            updateViewWithPersistence();
+
+            // Salva na Nuvem
+            if (user && db) {
+                const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
+                try {
+                    await updateDoc(stateRef, { readIds: arrayUnion(id) });
+                } catch (e) {
+                    await setDoc(stateRef, { readIds: readIds });
+                }
             }
         };
 
@@ -257,17 +273,19 @@
             if (activeNotifications.length === 0) return;
             const allCurrentIds = activeNotifications.map(n => n.id);
             
-            if (!user || !db) {
-                readIds = [...readIds, ...allCurrentIds];
-                updateViewWithPersistence();
-                return;
-            }
+            // Local
+            readIds = [...new Set([...readIds, ...allCurrentIds])];
+            localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
+            updateViewWithPersistence();
 
-            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
-            try {
-                await updateDoc(stateRef, { readIds: arrayUnion(...allCurrentIds) });
-            } catch (e) {
-                await setDoc(stateRef, { readIds: allCurrentIds });
+            // Cloud
+            if (user && db) {
+                const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
+                try {
+                    await updateDoc(stateRef, { readIds: arrayUnion(...allCurrentIds) });
+                } catch (e) {
+                    await setDoc(stateRef, { readIds: readIds });
+                }
             }
         };
 
@@ -282,7 +300,7 @@
             } catch (e) {
                 if (rawNotifications.length === 0) {
                     rawNotifications = [
-                        { id: 101, titulo: "Bem-vindo! 🎈", mensagem: "Explore as nossas novidades.", tipo: "info", data: new Date().toISOString() }
+                        { id: 101, titulo: "Encanto Festas 🎈", mensagem: "Bem-vindo ao nosso portal de notificações!", tipo: "info", data: new Date().toISOString() }
                     ];
                 }
             }
@@ -290,7 +308,7 @@
         }
 
         function updateViewWithPersistence() {
-            // Filtro rigoroso: ID lido nunca mais aparece
+            // Filtro absoluto: se o ID está na lista de lidos, não renderiza
             activeNotifications = rawNotifications.filter(n => !readIds.includes(n.id));
             activeNotifications.sort((a, b) => new Date(b.data) - new Date(a.data));
             updateBadge();
