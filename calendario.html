@@ -39,7 +39,7 @@
         .item-card {
             transition: transform 0.25s ease-out, opacity 0.25s ease-out;
             animation: fadeIn 0.4s ease-out forwards;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             will-change: transform, opacity;
@@ -90,6 +90,16 @@
         .date-badge {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(4px);
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
     </style>
 </head>
@@ -154,12 +164,14 @@
                 </button>
                 <h2 class="text-lg font-bold brand-font text-white">Próximas Reservas</h2>
             </div>
-            <div id="agendaCount" class="text-[10px] font-bold text-yellow-400 bg-white/10 px-2 py-1 rounded-full uppercase">...</div>
+            <div id="agendaCount" class="text-[10px] font-bold text-yellow-400 bg-white/10 px-2 py-1 rounded-full uppercase tracking-wider">Aguarde...</div>
         </div>
         <div id="agendaContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-10">
-            <div class="flex flex-col items-center justify-center py-20 text-white opacity-40">
-                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white mb-4"></div>
-                <p class="text-sm">A carregar agendamentos...</p>
+            <!-- Loading State -->
+            <div id="agendaLoading" class="flex flex-col gap-4 py-4">
+                <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
+                <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
+                <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
             </div>
         </div>
         <div id="agendaPagination" class="px-5 py-4 border-t border-white/10 hidden bg-blue-900/40">
@@ -182,6 +194,7 @@
         let rawNotifications = [];
         let agendaData = [];
         let agendaVisibleLimit = 5;
+        let isLoadingAgenda = false;
 
         const els = {
             notifBtn: document.getElementById('notifBtn'),
@@ -201,8 +214,6 @@
 
         const init = async () => {
             fetchNotifications();
-            fetchAgenda();
-            
             if (fbConfigRaw) {
                 try {
                     const app = initializeApp(JSON.parse(fbConfigRaw));
@@ -210,24 +221,24 @@
                     db = getFirestore(app);
                     await signInAnonymously(auth);
                     onAuthStateChanged(auth, u => { 
-                        if (u) { 
-                            user = u; 
-                            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
-                            onSnapshot(stateRef, (docSnap) => {
-                                if (docSnap.exists()) {
-                                    const cloudIds = (docSnap.data().readIds || []).map(id => Number(id));
-                                    readIds = [...new Set([...readIds, ...cloudIds])];
-                                    localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
-                                    updateNotifUI();
-                                }
-                            });
-                        } 
+                        if (u) { user = u; setupPersistenceListener(); } 
                     });
                 } catch (e) { console.warn("Firebase Offline"); }
             }
         };
 
-        // --- AGENDA LOGIC ---
+        const setupPersistenceListener = () => {
+            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
+            onSnapshot(stateRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const cloudIds = (docSnap.data().readIds || []).map(id => Number(id));
+                    readIds = [...new Set([...readIds, ...cloudIds])];
+                    localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
+                    updateNotifUI();
+                }
+            });
+        };
+
         function parseSheetDate(dateStr) {
             if (!dateStr) return new Date();
             if (dateStr.includes('-') && dateStr.includes('T')) return new Date(dateStr);
@@ -237,6 +248,11 @@
         }
 
         async function fetchAgenda() {
+            if (isLoadingAgenda) return;
+            isLoadingAgenda = true;
+            els.agendaContainer.innerHTML = document.getElementById('agendaLoading').outerHTML;
+            els.agendaCount.innerText = 'Consultando...';
+
             try {
                 const res = await fetch(AGENDA_API);
                 const data = await res.json();
@@ -252,7 +268,7 @@
                 renderAgenda();
             } catch (e) {
                 els.agendaContainer.innerHTML = `<p class="text-white/50 text-center py-10">Erro ao carregar agenda.</p>`;
-            }
+            } finally { isLoadingAgenda = false; }
         }
 
         function formatPhone(phone) {
@@ -265,22 +281,51 @@
         function renderAgenda() {
             const visibleItems = agendaData.slice(0, agendaVisibleLimit);
             if (visibleItems.length === 0) {
-                els.agendaContainer.innerHTML = `<p class="text-white/20 text-center py-20">Nenhuma reserva futura.</p>`;
+                els.agendaContainer.innerHTML = `<div class="text-center py-20 opacity-20 text-white brand-font text-xl">Nenhuma reserva futura.</div>`;
                 return;
             }
 
+            const today = new Date(); today.setHours(0,0,0,0);
+            const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+
             els.agendaContainer.innerHTML = visibleItems.map((item, idx) => {
                 const date = parseSheetDate(item.EVENTO || item.dia || item.data);
+                const checkDate = new Date(date); checkDate.setHours(0,0,0,0);
+                
+                let dateBadgeHtml = "";
+                if (checkDate.getTime() === today.getTime()) {
+                    dateBadgeHtml = `<span class="text-[11px] font-black text-white">HOJE</span>`;
+                } else if (checkDate.getTime() === tomorrow.getTime()) {
+                    dateBadgeHtml = `
+                        <span class="text-[10px] font-black text-white leading-none uppercase">AMA</span>
+                        <span class="text-[10px] font-black text-white leading-none uppercase">NHÃ</span>
+                    `;
+                } else {
+                    dateBadgeHtml = `
+                        <span class="text-[10px] uppercase font-bold opacity-70 leading-none">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span>
+                        <span class="text-xl font-bold brand-font leading-none">${date.getDate()}</span>
+                    `;
+                }
+
+                // Processar itens locados para lista vertical
+                const itensRaw = item["ITENS LOCADOS"] || 'Equipamentos Diversos';
+                const itensList = itensRaw.split(',').map(i => i.trim()).join('<br>');
+
                 return `
-                    <div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex items-center gap-4">
-                        <div class="date-badge flex flex-col items-center justify-center w-14 h-14 rounded-2xl shrink-0">
-                            <span class="text-[10px] uppercase font-bold opacity-70 leading-none">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span>
-                            <span class="text-xl font-bold brand-font leading-none">${date.getDate()}</span>
+                    <div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex flex-col gap-3">
+                        <div class="flex items-center gap-4">
+                            <div class="date-badge flex flex-col items-center justify-center w-14 h-14 rounded-2xl shrink-0">
+                                ${dateBadgeHtml}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-sm leading-tight mb-0.5 truncate">${item.NOME || 'Cliente Encanto'}</h3>
+                                <p class="text-[12px] text-blue-100/70 font-medium">${formatPhone(item.WHATSAPP || item.telefone)}</p>
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-sm leading-tight mb-0.5 truncate">${item.NOME || 'Cliente Encanto'}</h3>
-                            <p class="text-[12px] text-blue-100/70 font-medium">${formatPhone(item.WHATSAPP || item.telefone)}</p>
-                            <p class="text-[10px] text-yellow-400 mt-0.5 truncate italic">"${item["ITENS LOCADOS"] || 'Brinquedos'}"</p>
+                        <div class="pt-2 border-t border-white/5">
+                            <p class="text-[11px] text-yellow-100/90 italic leading-relaxed">
+                                ${itensList}
+                            </p>
                         </div>
                     </div>
                 `;
@@ -327,53 +372,31 @@
                         </div>
                     </div>
                 `;
-
-                // LOGICA DE CLIQUE ATUALIZADA
                 card.onclick = (e) => {
-                    // Se clicar no botão "Marcar lido", removemos da lista
                     if (e.target.classList.contains('mark-btn')) {
-                        e.stopPropagation();
-                        card.classList.add('dismissing');
-                        setTimeout(() => persistReadId(n.id), 450);
-                        return;
+                        e.stopPropagation(); card.classList.add('dismissing'); setTimeout(() => persistReadId(n.id), 450); return;
                     }
-
-                    // Se clicar no card, verificamos se precisa expandir ou abrir link
                     const msgPara = card.querySelector('.line-clamp-msg');
                     const isTruncated = msgPara.scrollHeight > msgPara.clientHeight;
-                    const isExpanded = card.classList.contains('expanded');
-
-                    if (isTruncated && !isExpanded) {
-                        // Se for grande e não estiver expandido, abre a mensagem
-                        card.classList.add('expanded');
-                        // NOTA: Não chamamos persistReadId aqui para a notificação NÃO fechar
-                    } else {
-                        // Se já estiver aberta ou for pequena, abre o link fictício/real
-                        if (n.link) window.location.href = n.link;
-                    }
+                    if (isTruncated && !card.classList.contains('expanded')) { card.classList.add('expanded'); }
+                    else if (n.link) window.location.href = n.link;
                 };
-
                 els.notifContainer.appendChild(card);
             });
         }
 
         async function persistReadId(id) {
             const nid = Number(id);
-            if (!readIds.includes(nid)) { 
-                readIds.push(nid); 
-                localStorage.setItem('encanto_read_ids', JSON.stringify(readIds)); 
-            }
+            if (!readIds.includes(nid)) { readIds.push(nid); localStorage.setItem('encanto_read_ids', JSON.stringify(readIds)); }
             updateNotifUI();
             if (user && db) {
                 const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
-                try { await updateDoc(stateRef, { readIds: arrayUnion(nid) }); }
-                catch (e) { await setDoc(stateRef, { readIds }); }
+                try { await updateDoc(stateRef, { readIds: arrayUnion(nid) }); } catch (e) { await setDoc(stateRef, { readIds }); }
             }
         }
 
-        // --- HANDLERS ---
         els.notifBtn.onclick = () => { els.notifModal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => els.notifModal.classList.add('active'), 10); };
-        els.agendaBtn.onclick = () => { els.agendaModal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => els.agendaModal.classList.add('active'), 10); renderAgenda(); };
+        els.agendaBtn.onclick = () => { els.agendaModal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => { els.agendaModal.classList.add('active'); fetchAgenda(); }, 10); };
         els.closeNotif.onclick = () => { els.notifModal.classList.remove('active'); setTimeout(() => { els.notifModal.classList.add('hidden'); document.body.style.overflow = ''; }, 400); };
         els.closeAgenda.onclick = () => { els.agendaModal.classList.remove('active'); setTimeout(() => { els.agendaModal.classList.add('hidden'); document.body.style.overflow = ''; }, 400); };
 
