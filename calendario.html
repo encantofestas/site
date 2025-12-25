@@ -156,13 +156,14 @@
             100% { transform: scale(1); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
         }
 
+        /* Divisor de mês ajustado para colar no topo */
         .month-divider {
             position: sticky;
-            top: -1px; 
+            top: 0; 
             z-index: 20;
             background: #1e3a8a; 
             margin: 0 -1rem 0.5rem -1rem;
-            padding: 0.5rem 1.25rem;
+            padding: 0.75rem 1.25rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff !important; 
             font-weight: 800;
@@ -173,7 +174,7 @@
 
         .search-area {
             background: #1e3a8a;
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             flex-shrink: 0;
         }
@@ -202,18 +203,15 @@
     <header id="mainHeader" class="fixed top-0 left-0 right-0 w-full glass-header z-[50] h-16">
         <div class="max-w-xl mx-auto px-3 h-full flex justify-between items-center">
             
-            <!-- Link da Logo -->
             <a href="index.html" class="flex items-center gap-2 active:scale-95 transition-transform outline-none text-decoration-none group">
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
                     class="w-10 h-10 rounded-full border-2 border-yellow-400 shadow-sm transition-transform group-hover:rotate-12"
                     alt="Logo Encanto Festas">
                 
-                <!-- Bloco de texto centralizado -->
                 <div class="inline-flex flex-col items-start leading-none -mt-1.5 ml-0.5">
                     <div class="text-xl font-bold brand-font tracking-tight">
                         <span class="text-white">Encanto</span><span class="text-yellow-400">Festas</span>
                     </div>
-                    <!-- Subtítulo: -mt-[3px] para "colar" visualmente no nome principal conforme pedido -->
                     <span class="text-[7.2px] font-black text-white/90 uppercase -mt-[3.5px] tracking-[0.15em] w-full text-justify ml-[2px]" style="text-align-last: justify;">
                         LOCAÇÃO DE BRINQUEDOS
                     </span>
@@ -302,8 +300,9 @@
                 </div>
             </div>
         </div>
-        <div id="agendaContainer" class="flex-1 overflow-y-auto p-4 pt-4 space-y-4 no-scrollbar pb-10">
-            <div id="agendaLoading" class="flex flex-col gap-4">
+        <!-- pt-0 para garantir que o divisor cole na barra de pesquisa -->
+        <div id="agendaContainer" class="flex-1 overflow-y-auto p-4 pt-0 space-y-4 no-scrollbar pb-10">
+            <div id="agendaLoading" class="flex flex-col gap-4 mt-4">
                 <div class="skeleton-card"><div class="shimmer-overlay"></div></div>
                 <div class="skeleton-card"><div class="shimmer-overlay"></div></div>
                 <div class="skeleton-card"><div class="shimmer-overlay"></div></div>
@@ -386,14 +385,17 @@
             isLoadingAgenda = true;
             const container = getEl('agendaContainer');
             const countEl = getEl('agendaCount');
+            
             if (countEl) countEl.innerText = 'Consultando...';
+            // Skeleton com mt-4 para não colar no topo enquanto carrega
             container.innerHTML = `
-                <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-4 mt-4">
                     <div class="skeleton-card"><div class="shimmer-overlay"></div></div>
                     <div class="skeleton-card"><div class="shimmer-overlay"></div></div>
                     <div class="skeleton-card"><div class="shimmer-overlay"></div></div>
                 </div>
             `;
+
             try {
                 const res = await fetch(AGENDA_API);
                 const data = await res.json();
@@ -431,16 +433,20 @@
             const container = getEl('agendaContainer');
             const countEl = getEl('agendaCount');
             if (!container) return;
+
             const filtered = searchQuery.trim() === "" ? agendaData : agendaData.filter(item => {
                 const nome = (item.NOME || '').toLowerCase();
                 return nome.includes(searchQuery.toLowerCase());
             });
+
             if (countEl) countEl.innerText = searchQuery ? `${filtered.length} ENCONTRADOS` : `${agendaData.length} RESERVAS`;
             const visibleItems = filtered.slice(0, searchQuery ? 100 : agendaVisibleLimit);
+            
             if (visibleItems.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 opacity-30 text-white brand-font text-xl">${searchQuery ? 'Sem resultados.' : 'Sem reservas futuras.'}</div>`;
                 return;
             }
+
             const today = new Date(); today.setHours(0,0,0,0);
             const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
             let lastMonthYear = "";
@@ -449,12 +455,14 @@
                 const date = parseSheetDate(item.EVENTO || item.dia || item.data);
                 const checkDate = new Date(date); checkDate.setHours(0,0,0,0);
                 const monthYearKey = `${date.getMonth()}-${date.getFullYear()}`;
+                
                 if (monthYearKey !== lastMonthYear) {
                     const monthName = date.toLocaleDateString('pt-PT', { month: 'long' });
                     const isThisMonth = date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
                     html += `<div class="month-divider">${isThisMonth ? 'ESTE MÊS' : monthName}</div>`;
                     lastMonthYear = monthYearKey;
                 }
+
                 let dateBadgeHtml = "";
                 if (checkDate.getTime() === today.getTime()) {
                     dateBadgeHtml = `<span class="text-[11px] font-black text-[#1e3a8a]">HOJE</span>`;
@@ -463,10 +471,25 @@
                 } else {
                     dateBadgeHtml = `<span class="text-[10px] uppercase font-bold opacity-70 leading-none text-[#1e3a8a]/80">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span><span class="text-xl font-bold brand-font leading-none text-[#1e3a8a]">${date.getDate()}</span>`;
                 }
+
                 const itensRaw = item["ITENS LOCADOS"] || 'Equipamentos Diversos';
                 const itensList = itensRaw.split(',').map(i => i.trim()).join('<br>');
                 const bairro = item.BAIRRO || item.bairro || '';
-                html += `<div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex flex-col gap-3"><div class="flex items-center gap-4"><div class="date-badge">${dateBadgeHtml}</div><div class="flex-1 min-w-0"><h3 class="font-bold text-sm leading-tight mb-0.5 truncate flex items-center gap-1.5">${item.NOME || 'Cliente Encanto'} ${bairro ? `<span class="text-[10px] font-medium text-slate-400 whitespace-nowrap opacity-90 tracking-tight">(${bairro})</span>` : ''}</h3><p class="text-[12px] text-blue-100/70 font-medium">${formatPhone(item.WHATSAPP || item.telefone)}</p></div></div><div class="pt-2 border-t border-white/5"><p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">${itensList}</p></div></div>`;
+
+                html += `
+                    <div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex flex-col gap-3">
+                        <div class="flex items-center gap-4">
+                            <div class="date-badge">${dateBadgeHtml}</div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-sm leading-tight mb-0.5 truncate flex items-center gap-1.5">${item.NOME || 'Cliente Encanto'} ${bairro ? `<span class="text-[10px] font-medium text-slate-400 whitespace-nowrap opacity-90 tracking-tight">(${bairro})</span>` : ''}</h3>
+                                <p class="text-[12px] text-blue-100/70 font-medium">${formatPhone(item.WHATSAPP || item.telefone)}</p>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-white/5">
+                            <p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">${itensList}</p>
+                        </div>
+                    </div>
+                `;
             });
             container.innerHTML = html;
             const pagination = getEl('agendaPagination');
