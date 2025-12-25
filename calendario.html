@@ -69,9 +69,11 @@
             transform: translateY(100%);
             background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%);
             background-attachment: fixed;
+            visibility: hidden; /* Evita cliques fantasmas quando fechado */
         }
         .modal-view.active {
             transform: translateY(0%);
+            visibility: visible;
         }
 
         .line-clamp-title {
@@ -127,14 +129,12 @@
             </a>
             
             <div class="flex items-center gap-2">
-                <!-- Botão de Agenda -->
                 <a href="agenda.html" id="agendaBtn" class="p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 outline-none flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
                 </a>
 
-                <!-- Botão de Notificações (Abre normalmente sempre) -->
                 <button id="notifBtn" class="relative p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 outline-none flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
@@ -172,14 +172,15 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Config
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // Variáveis de Ambiente Seguras
+        const fbConfigRaw = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        let db = null;
+        let auth = null;
+        let user = null;
 
         const NOTIF_URL = 'notificacoes.json';
         const notifBtn = document.getElementById('notifBtn');
@@ -189,50 +190,67 @@
         const notifBadge = document.getElementById('notifBadge');
         const markAllReadBtn = document.getElementById('markAllRead');
 
-        let rawNotifications = []; // Todas as notificações do JSON
-        let activeNotifications = []; // Apenas as não lidas pelo utilizador
-        let readIds = []; // IDs persistidos no Firestore
-        let user = null;
+        let rawNotifications = []; 
+        let activeNotifications = []; 
+        let readIds = []; 
         let isPanning = false;
         let startX = 0;
         let diffX = 0;
         let activeCard = null;
         let activeId = null;
 
-        // Início da Autenticação
+        // INICIALIZAÇÃO RESILIENTE
         const initApp = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
+            // Primeiro: Carregamos as notificações do JSON imediatamente para o botão funcionar logo
+            await processNotifications();
 
-            onAuthStateChanged(auth, (u) => {
-                if (u) {
-                    user = u;
-                    setupRealtimePersistence();
+            // Segundo: Tentamos ligar ao Firebase para a persistência
+            if (fbConfigRaw) {
+                try {
+                    const firebaseConfig = JSON.parse(fbConfigRaw);
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
+                    onAuthStateChanged(auth, (u) => {
+                        if (u) {
+                            user = u;
+                            setupRealtimePersistence();
+                        }
+                    });
+                } catch (err) {
+                    console.warn("Firebase não disponível, operando em modo offline.");
                 }
-            });
+            }
         };
 
         const setupRealtimePersistence = () => {
-            if (!user) return;
-            // Caminho seguindo a Regra 1: artifacts/{appId}/users/{userId}/private_data/{docId}
+            if (!user || !db) return;
             const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
             
-            // Listener em tempo real para os IDs lidos
             onSnapshot(stateRef, (docSnap) => {
                 if (docSnap.exists()) {
                     readIds = docSnap.data().readIds || [];
                 } else {
                     setDoc(stateRef, { readIds: [] });
                 }
-                processNotifications();
+                updateViewWithPersistence();
             }, (error) => console.error("Erro Firestore:", error));
         };
 
         const persistReadId = async (id) => {
-            if (!user) return;
+            if (!user || !db) {
+                // Modo offline: apenas removemos da vista atual
+                readIds.push(id);
+                updateViewWithPersistence();
+                return;
+            }
             const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
             try {
                 await updateDoc(stateRef, { readIds: arrayUnion(id) });
@@ -242,9 +260,16 @@
         };
 
         const persistAllAsRead = async () => {
-            if (!user || activeNotifications.length === 0) return;
-            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
+            if (activeNotifications.length === 0) return;
             const allCurrentIds = activeNotifications.map(n => n.id);
+            
+            if (!user || !db) {
+                readIds = [...readIds, ...allCurrentIds];
+                updateViewWithPersistence();
+                return;
+            }
+
+            const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'private_data', 'notification_state');
             try {
                 await updateDoc(stateRef, { readIds: arrayUnion(...allCurrentIds) });
             } catch (e) {
@@ -252,29 +277,27 @@
             }
         };
 
-        // Função para carregar e filtrar notificações
         async function processNotifications() {
             try {
                 const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
                 if (response.ok) {
                     rawNotifications = await response.json();
                 } else {
-                    throw new Error('Falha no fetch');
+                    throw new Error();
                 }
             } catch (e) {
-                // Fallback de demonstração caso o JSON não exista
                 if (rawNotifications.length === 0) {
                     rawNotifications = [
-                        { id: 101, titulo: "Promoção Exclusiva! ⚡", mensagem: "Insufláveis com 30% de desconto hoje.", tipo: "alerta", data: new Date().toISOString(), link: "promocoes.html" },
-                        { id: 102, titulo: "Reserva Confirmada ✨", mensagem: "A sua festa está garantida.", tipo: "sucesso", data: new Date().toISOString(), link: "reservas.html" }
+                        { id: 101, titulo: "Bem-vindo! 🎈", mensagem: "Estamos felizes por ter você aqui. Explore nossas novidades!", tipo: "info", data: new Date().toISOString() }
                     ];
                 }
             }
+            updateViewWithPersistence();
+        }
 
-            // A MÁGICA: Filtramos apenas o que o utilizador NÃO leu (IDs que não estão no readIds do Firestore)
+        function updateViewWithPersistence() {
             activeNotifications = rawNotifications.filter(n => !readIds.includes(n.id));
             activeNotifications.sort((a, b) => new Date(b.data) - new Date(a.data));
-            
             updateBadge();
             renderNotifications();
         }
@@ -283,12 +306,19 @@
             activeNotifications.length > 0 ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
         }
 
-        notifBtn.addEventListener('click', () => {
-            // O botão abre o modal normalmente
+        // EVENTOS DE CLIQUE (Unificados para Mobile)
+        const openModal = () => {
             notifModal.classList.remove('hidden');
-            setTimeout(() => notifModal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
-            renderNotifications();
+            setTimeout(() => {
+                notifModal.classList.add('active');
+                renderNotifications();
+            }, 10);
+        };
+
+        notifBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
         });
 
         closeNotif.addEventListener('click', () => {
@@ -344,6 +374,7 @@
         }
 
         function renderNotifications() {
+            if (!notifContainer) return;
             if (activeNotifications.length === 0) {
                 notifContainer.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white">
