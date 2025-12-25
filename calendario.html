@@ -69,7 +69,7 @@
             transform: translateY(100%);
             background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%);
             background-attachment: fixed;
-            visibility: hidden; /* Evita cliques fantasmas quando fechado */
+            visibility: hidden;
         }
         .modal-view.active {
             transform: translateY(0%);
@@ -168,13 +168,11 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Variáveis de Ambiente Seguras
         const fbConfigRaw = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
@@ -199,12 +197,9 @@
         let activeCard = null;
         let activeId = null;
 
-        // INICIALIZAÇÃO RESILIENTE
         const initApp = async () => {
-            // Primeiro: Carregamos as notificações do JSON imediatamente para o botão funcionar logo
             await processNotifications();
 
-            // Segundo: Tentamos ligar ao Firebase para a persistência
             if (fbConfigRaw) {
                 try {
                     const firebaseConfig = JSON.parse(fbConfigRaw);
@@ -225,7 +220,7 @@
                         }
                     });
                 } catch (err) {
-                    console.warn("Firebase não disponível, operando em modo offline.");
+                    console.warn("Firebase offline mode.");
                 }
             }
         };
@@ -241,12 +236,11 @@
                     setDoc(stateRef, { readIds: [] });
                 }
                 updateViewWithPersistence();
-            }, (error) => console.error("Erro Firestore:", error));
+            }, (error) => console.error("Firestore Error:", error));
         };
 
         const persistReadId = async (id) => {
             if (!user || !db) {
-                // Modo offline: apenas removemos da vista atual
                 readIds.push(id);
                 updateViewWithPersistence();
                 return;
@@ -288,7 +282,7 @@
             } catch (e) {
                 if (rawNotifications.length === 0) {
                     rawNotifications = [
-                        { id: 101, titulo: "Bem-vindo! 🎈", mensagem: "Estamos felizes por ter você aqui. Explore nossas novidades!", tipo: "info", data: new Date().toISOString() }
+                        { id: 101, titulo: "Bem-vindo! 🎈", mensagem: "Explore as nossas novidades.", tipo: "info", data: new Date().toISOString() }
                     ];
                 }
             }
@@ -296,6 +290,7 @@
         }
 
         function updateViewWithPersistence() {
+            // Filtro rigoroso: ID lido nunca mais aparece
             activeNotifications = rawNotifications.filter(n => !readIds.includes(n.id));
             activeNotifications.sort((a, b) => new Date(b.data) - new Date(a.data));
             updateBadge();
@@ -306,19 +301,14 @@
             activeNotifications.length > 0 ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
         }
 
-        // EVENTOS DE CLIQUE (Unificados para Mobile)
-        const openModal = () => {
+        notifBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             notifModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             setTimeout(() => {
                 notifModal.classList.add('active');
                 renderNotifications();
             }, 10);
-        };
-
-        notifBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal();
         });
 
         closeNotif.addEventListener('click', () => {
@@ -408,7 +398,7 @@
                             <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight">
                                 <span>Nova</span>
                                 <button class="mark-btn dot-separator text-blue-300 hover:text-white transition-colors uppercase active:scale-95 outline-none pointer-events-auto" style="cursor:pointer">
-                                    Arquivar
+                                    Marcar lido
                                 </button>
                             </div>
                         </div>
