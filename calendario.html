@@ -57,7 +57,6 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        /* Animação Premium de saída para a direita */
         .dismissing {
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease !important;
             transform: translateX(120%) !important;
@@ -152,9 +151,9 @@
         </div>
 
         <div id="notifContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-10">
-            <div id="loadingState" class="flex flex-col gap-4 opacity-10">
-                <div class="h-28 bg-white rounded-3xl"></div>
-                <div class="h-28 bg-white rounded-3xl"></div>
+            <div id="loadingState" class="flex flex-col items-center justify-center py-10 opacity-30 text-white">
+                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white mb-2"></div>
+                <p class="text-xs">A carregar...</p>
             </div>
         </div>
     </div>
@@ -169,8 +168,6 @@
         const markAllReadBtn = document.getElementById('markAllRead');
 
         let notifications = [];
-        let hasError = false;
-
         let isPanning = false;
         let startX = 0;
         let diffX = 0;
@@ -202,7 +199,7 @@
             notifModal.classList.remove('hidden');
             setTimeout(() => notifModal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
-            fetchNotifications(true);
+            renderNotifications();
         });
 
         closeNotif.addEventListener('click', () => {
@@ -223,25 +220,25 @@
             try {
                 const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
                 if (response.ok) {
-                    notifications = await response.json();
-                    notifications.sort((a, b) => new Date(b.data) - new Date(a.data));
-                    hasError = false;
-                    updateBadge();
-                    if (shouldRender) renderNotifications();
+                    const data = await response.json();
+                    notifications = data;
                 } else {
-                    throw new Error();
+                    throw new Error('Falha no fetch');
                 }
             } catch (e) {
-                hasError = true;
-                if (shouldRender) {
-                    notifContainer.innerHTML = `
-                        <div class="flex flex-col items-center justify-center py-20 text-white/70 text-center px-6">
-                            <p class="text-lg font-bold brand-font text-white opacity-90 mb-1">Ocorreu um erro</p>
-                            <p class="text-xs opacity-70">Estamos corrigindo isso o mais breve possível</p>
-                        </div>
-                    `;
+                console.warn("Ficheiro real não encontrado ou erro no JSON. Usando dados de demonstração.");
+                if (notifications.length === 0) {
+                    const now = new Date();
+                    notifications = [
+                        { id: 101, titulo: "Promoção Exclusiva! ⚡", mensagem: "Insufláveis com 30% de desconto hoje. Clique para conferir as nossas ofertas imperdíveis de Natal!", tipo: "alerta", lida: false, data: new Date(now.getTime() - 120000).toISOString(), link: "promocoes.html" },
+                        { id: 102, titulo: "Reserva Confirmada ✨", mensagem: "A sua festa de sábado está garantida. Veja aqui o resumo da sua reserva e os horários de montagem.", tipo: "sucesso", lida: false, data: new Date(now.getTime() - 3600000).toISOString(), link: "reservas.html" }
+                    ];
                 }
             }
+
+            notifications.sort((a, b) => new Date(b.data) - new Date(a.data));
+            updateBadge();
+            if (shouldRender) renderNotifications();
         }
 
         function updateBadge() {
@@ -297,9 +294,10 @@
 
         function renderNotifications() {
             const unread = notifications.filter(n => !n.lida);
+            
             if (unread.length === 0) {
                 notifContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white">
+                    <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white animate-pulse">
                         <div class="w-20 h-20 bg-white/10 rounded-full mb-6 flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
@@ -311,9 +309,13 @@
                 `;
                 return;
             }
+
             notifContainer.innerHTML = ''; 
             unread.forEach((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
+                const titulo = (n.titulo && n.titulo.trim() !== "") ? n.titulo : 'Encanto Festas';
+                const mensagem = (n.mensagem && n.mensagem.trim() !== "") ? n.mensagem : 'Tens uma nova atualização mágica para ver!';
+                
                 const card = document.createElement('div');
                 card.id = `card-${n.id}`;
                 card.className = "notification-card p-4 rounded-[1.25rem] text-white shadow-lg";
@@ -324,9 +326,9 @@
                             ${icon}
                         </div>
                         <div class="flex-1 min-w-0 pointer-events-none">
-                            <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${n.titulo || 'Encanto Festas'}</h3>
+                            <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${titulo}</h3>
                             <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">
-                                ${n.mensagem || 'Nova atualização mágica!'}
+                                ${mensagem}
                             </p>
                             <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight">
                                 <span>${getRelativeTime(n.data)}</span>
@@ -337,32 +339,43 @@
                         </div>
                     </div>
                 `;
+
                 initSwipeEvents(card, n.id);
+
+                // LÓGICA DE CLIQUE COM LINK
                 card.onclick = (e) => {
+                    // Se clicar no botão de lida, não faz mais nada
                     if (e.target.classList.contains('mark-btn')) {
                         e.stopPropagation();
                         markAsReadDirectly(n.id);
                         return;
                     }
+
+                    // Verifica se foi um clique (não arraste)
                     if (Math.abs(diffX) < 10) {
-                        card.classList.toggle('expanded');
+                        const isExpanded = card.classList.contains('expanded');
+                        const hasLink = n.link && n.link.trim() !== "";
+
+                        if (!isExpanded) {
+                            // PRIMEIRO CLIQUE: Expande
+                            card.classList.add('expanded');
+                        } else if (hasLink) {
+                            // SEGUNDO CLIQUE (Se expandido): Abre link
+                            window.location.href = n.link;
+                        }
                     }
                 };
+
                 notifContainer.appendChild(card);
             });
         }
 
-        // FUNÇÃO ATUALIZADA: Agora garante a limpeza de estilos manuais para a animação disparar
         function markAsReadDirectly(id) {
             const card = document.getElementById(`card-${id}`);
             if (card) {
-                // Limpa transformações manuais do swipe para não bugar a classe de animação
                 card.style.transform = '';
                 card.style.opacity = '';
-                
-                // Adiciona a classe que faz deslizar suavemente para a direita
                 card.classList.add('dismissing');
-                
                 setTimeout(() => markAsReadSilently(id), 450);
             }
         }
