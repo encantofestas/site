@@ -37,7 +37,7 @@
         }
 
         .notification-card {
-            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out;
             animation: fadeIn 0.4s ease-out forwards;
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -57,9 +57,9 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        /* Classe para saída suave após soltar */
+        /* Animação Premium de saída para a direita */
         .dismissing {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease !important;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease !important;
             transform: translateX(120%) !important;
             opacity: 0 !important;
             pointer-events: none;
@@ -171,7 +171,6 @@
         let notifications = [];
         let hasError = false;
 
-        // Gestão Unificada de Gesto
         let isPanning = false;
         let startX = 0;
         let diffX = 0;
@@ -225,17 +224,12 @@
                 const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
                 if (response.ok) {
                     notifications = await response.json();
-                    
-                    // Ordenar por data: Mais recente primeiro
-                    notifications.sort((a, b) => {
-                        return new Date(b.data) - new Date(a.data);
-                    });
-
+                    notifications.sort((a, b) => new Date(b.data) - new Date(a.data));
                     hasError = false;
                     updateBadge();
                     if (shouldRender) renderNotifications();
                 } else {
-                    throw new Error('Não encontrado');
+                    throw new Error();
                 }
             } catch (e) {
                 hasError = true;
@@ -255,7 +249,6 @@
             unreadCount > 0 ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
         }
 
-        // INICIALIZAÇÃO DE EVENTOS DE PONTEIRO (SWIPE 1:1)
         function initSwipeEvents(card, id) {
             card.onpointerdown = (e) => {
                 isPanning = true;
@@ -263,17 +256,13 @@
                 activeCard = card;
                 activeId = id;
                 diffX = 0;
-                
-                card.style.transition = 'none'; // Segue o dedo sem atraso
+                card.style.transition = 'none'; 
                 card.setPointerCapture(e.pointerId);
             };
 
             card.onpointermove = (e) => {
                 if (!isPanning || activeCard !== card) return;
-                
                 diffX = e.clientX - startX;
-
-                // Só permite arrastar para a direita (marketing UX)
                 if (diffX > 0) {
                     card.style.transform = `translateX(${diffX}px)`;
                     card.style.opacity = Math.max(0.1, 1 - (diffX / (window.innerWidth * 0.8)));
@@ -289,26 +278,18 @@
         function endSwipe(e) {
             if (!isPanning || !activeCard) return;
             isPanning = false;
-
-            const threshold = window.innerWidth * 0.35; // 35% da tela para confirmar saída
-
+            const threshold = window.innerWidth * 0.35;
             if (diffX > threshold) {
-                // SUCESSO: Arrastou o suficiente
                 activeCard.style.transition = 'transform 0.4s ease-in, opacity 0.4s ease-in';
                 activeCard.style.transform = `translateX(120%)`;
                 activeCard.style.opacity = `0`;
-                
                 const idToMark = activeId;
-                setTimeout(() => {
-                    markAsReadSilently(idToMark);
-                }, 400);
+                setTimeout(() => markAsReadSilently(idToMark), 400);
             } else {
-                // RESET: Volta para a posição original
                 activeCard.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease';
                 activeCard.style.transform = 'translateX(0)';
                 activeCard.style.opacity = '1';
             }
-
             activeCard.releasePointerCapture(e.pointerId);
             activeCard = null;
             activeId = null;
@@ -316,7 +297,6 @@
 
         function renderNotifications() {
             const unread = notifications.filter(n => !n.lida);
-
             if (unread.length === 0) {
                 notifContainer.innerHTML = `
                     <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white">
@@ -331,17 +311,13 @@
                 `;
                 return;
             }
-
             notifContainer.innerHTML = ''; 
-
             unread.forEach((n, idx) => {
                 const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
-                
                 const card = document.createElement('div');
                 card.id = `card-${n.id}`;
                 card.className = "notification-card p-4 rounded-[1.25rem] text-white shadow-lg";
                 card.style.animationDelay = `${idx * 0.05}s`;
-                
                 card.innerHTML = `
                     <div class="flex gap-3">
                         <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">
@@ -361,11 +337,7 @@
                         </div>
                     </div>
                 `;
-
-                // Ativa a lógica de seguir o dedo
                 initSwipeEvents(card, n.id);
-
-                // Diferencia clique de arrasto
                 card.onclick = (e) => {
                     if (e.target.classList.contains('mark-btn')) {
                         e.stopPropagation();
@@ -376,21 +348,25 @@
                         card.classList.toggle('expanded');
                     }
                 };
-
                 notifContainer.appendChild(card);
             });
         }
 
-        // Função para sumir com animação ao clicar no botão
+        // FUNÇÃO ATUALIZADA: Agora garante a limpeza de estilos manuais para a animação disparar
         function markAsReadDirectly(id) {
             const card = document.getElementById(`card-${id}`);
             if (card) {
+                // Limpa transformações manuais do swipe para não bugar a classe de animação
+                card.style.transform = '';
+                card.style.opacity = '';
+                
+                // Adiciona a classe que faz deslizar suavemente para a direita
                 card.classList.add('dismissing');
-                setTimeout(() => markAsReadSilently(id), 400);
+                
+                setTimeout(() => markAsReadSilently(id), 450);
             }
         }
 
-        // Atualiza apenas o estado sem re-renderizar o modal inteiro se não necessário
         function markAsReadSilently(id) {
             const idx = notifications.findIndex(n => n.id === id);
             if (idx !== -1) {
