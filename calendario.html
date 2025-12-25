@@ -190,8 +190,8 @@
 
         let rawNotifications = []; 
         let activeNotifications = []; 
-        // Inicializa lidos a partir do LocalStorage para resposta imediata
-        let readIds = JSON.parse(localStorage.getItem('encanto_read_ids') || '[]'); 
+        // Armazenamento local persistente
+        let readIds = JSON.parse(localStorage.getItem('encanto_read_ids') || '[]').map(id => Number(id)); 
         
         let isPanning = false;
         let startX = 0;
@@ -200,7 +200,7 @@
         let activeId = null;
 
         const initApp = async () => {
-            // Carrega JSON imediatamente
+            // Primeiro: Carrega o JSON e filtra com o que já temos no LocalStorage
             await processNotifications();
 
             if (fbConfigRaw) {
@@ -233,17 +233,17 @@
 
         const setupRealtimePersistence = () => {
             if (!user || !db) return;
-            // Seguindo a REGRA 1 rigorosamente
             const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
             
             onSnapshot(stateRef, (docSnap) => {
                 if (docSnap.exists()) {
-                    const cloudReadIds = docSnap.data().readIds || [];
-                    // Sincroniza LocalStorage com Cloud
+                    const cloudReadIds = (docSnap.data().readIds || []).map(id => Number(id));
+                    // Fusão total: Local + Cloud
                     const merged = [...new Set([...readIds, ...cloudReadIds])];
                     readIds = merged;
                     localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
                 } else {
+                    // Sincroniza o local para a nuvem se a nuvem estiver vazia
                     setDoc(stateRef, { readIds: readIds });
                 }
                 updateViewWithPersistence();
@@ -251,18 +251,17 @@
         };
 
         const persistReadId = async (id) => {
-            // Salva Localmente Primeiro (Instantâneo)
-            if (!readIds.includes(id)) {
-                readIds.push(id);
+            const numericId = Number(id);
+            if (!readIds.includes(numericId)) {
+                readIds.push(numericId);
                 localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
             }
             updateViewWithPersistence();
 
-            // Salva na Nuvem
             if (user && db) {
                 const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
                 try {
-                    await updateDoc(stateRef, { readIds: arrayUnion(id) });
+                    await updateDoc(stateRef, { readIds: arrayUnion(numericId) });
                 } catch (e) {
                     await setDoc(stateRef, { readIds: readIds });
                 }
@@ -271,14 +270,12 @@
 
         const persistAllAsRead = async () => {
             if (activeNotifications.length === 0) return;
-            const allCurrentIds = activeNotifications.map(n => n.id);
+            const allCurrentIds = activeNotifications.map(n => Number(n.id));
             
-            // Local
             readIds = [...new Set([...readIds, ...allCurrentIds])];
             localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
             updateViewWithPersistence();
 
-            // Cloud
             if (user && db) {
                 const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
                 try {
@@ -308,8 +305,8 @@
         }
 
         function updateViewWithPersistence() {
-            // Filtro absoluto: se o ID está na lista de lidos, não renderiza
-            activeNotifications = rawNotifications.filter(n => !readIds.includes(n.id));
+            // Filtro absoluto: IDs lidos são bloqueados para sempre
+            activeNotifications = rawNotifications.filter(n => !readIds.includes(Number(n.id)));
             activeNotifications.sort((a, b) => new Date(b.data) - new Date(a.data));
             updateBadge();
             renderNotifications();
@@ -436,7 +433,9 @@
                     if (Math.abs(diffX) < 10) {
                         const isExpanded = card.classList.contains('expanded');
                         if (!isExpanded) {
+                            // CRUCIAL: Ao clicar para expandir e LER, já marca como lido para sempre
                             card.classList.add('expanded');
+                            persistReadId(n.id); 
                         } else if (n.link) {
                             window.location.href = n.link;
                         }
