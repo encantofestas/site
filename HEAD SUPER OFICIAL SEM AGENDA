@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Encanto Festas - Notificações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-blue: #2563eb;
+            --deep-blue: #1e3a8a;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            color: #1e293b;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: 'Baloo 2', cursive;
+            line-height: 1.2;
+        }
+        
+        .glass-header {
+            background: #2563eb; 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notification-card {
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+            animation: fadeIn 0.4s ease-out forwards;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            will-change: transform, opacity;
+            user-select: none;
+            touch-action: pan-y; 
+            cursor: grab;
+        }
+
+        .notification-card:active {
+            cursor: grabbing;
+        }
+
+        @keyframes fadeIn {
+            from { transform: translateY(8px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .dismissing {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease !important;
+            transform: translateX(120%) !important;
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
+        .modal-view {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(100%);
+            background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%);
+            background-attachment: fixed;
+        }
+        .modal-view.active {
+            transform: translateY(0%);
+        }
+
+        .line-clamp-title {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-msg {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .expanded .line-clamp-msg, 
+        .expanded .line-clamp-title {
+            display: block;
+            overflow: visible;
+            -webkit-line-clamp: unset;
+        }
+
+        #notifContainer {
+            overscroll-behavior: contain;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .dot-separator::before {
+            content: "•";
+            margin: 0 6px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
+        <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
+            
+            <a href="index.html" class="flex items-center gap-3 active:scale-95 transition-transform outline-none">
+                <div class="relative">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
+                        class="w-9 h-9 rounded-full border-2 border-yellow-400 shadow-sm"
+                        alt="Logo Encanto Festas">
+                </div>
+                <span class="text-xl font-bold brand-font tracking-tight text-white">
+                    Encanto<span class="text-yellow-400">Festas</span>
+                </span>
+            </a>
+            
+            <button id="notifBtn" class="relative p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                </svg>
+                <span id="notifBadge" class="hidden absolute top-2 right-2 w-2.5 h-2.5 bg-yellow-400 rounded-full border-2 border-blue-600 animate-pulse"></span>
+            </button>
+        </div>
+    </header>
+
+    <main class="pt-24"></main>
+
+    <div id="notifModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
+        <div class="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
+            <div class="flex items-center gap-4">
+                <button id="closeNotif" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <h2 class="text-lg font-bold brand-font text-white">Notificações</h2>
+            </div>
+            <button id="markAllRead" class="text-[10px] font-bold uppercase tracking-widest text-blue-200 hover:text-white transition-colors outline-none">
+                Limpar Tudo
+            </button>
+        </div>
+
+        <div id="notifContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-10">
+            <div id="loadingState" class="flex flex-col items-center justify-center py-10 opacity-30 text-white">
+                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white mb-2"></div>
+                <p class="text-xs">A carregar...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const NOTIF_URL = 'notificacoes.json';
+        const notifBtn = document.getElementById('notifBtn');
+        const notifModal = document.getElementById('notifModal');
+        const closeNotif = document.getElementById('closeNotif');
+        const notifContainer = document.getElementById('notifContainer');
+        const notifBadge = document.getElementById('notifBadge');
+        const markAllReadBtn = document.getElementById('markAllRead');
+
+        let notifications = [];
+        let isPanning = false;
+        let startX = 0;
+        let diffX = 0;
+        let activeCard = null;
+        let activeId = null;
+
+        function getRelativeTime(dateString) {
+            if (!dateString) return "agora mesmo";
+            const now = new Date();
+            const past = new Date(dateString);
+            if (isNaN(past.getTime())) return "agora mesmo";
+            const diffInSeconds = Math.floor((now - past) / 1000);
+            if (diffInSeconds < 60) return "agora mesmo";
+            const diffInMinutes = Math.floor(diffInSeconds / 60);
+            if (diffInMinutes < 60) return `há ${diffInMinutes} min atrás`;
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            if (diffInHours < 24) return `há ${diffInHours} horas atrás`;
+            const diffInDays = Math.floor(diffInHours / 24);
+            if (diffInDays === 1) return "ontem";
+            if (diffInDays < 7) return `há ${diffInDays} dias atrás`;
+            return past.toLocaleDateString('pt-PT');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchNotifications(false);
+        });
+
+        notifBtn.addEventListener('click', () => {
+            notifModal.classList.remove('hidden');
+            setTimeout(() => notifModal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+            renderNotifications();
+        });
+
+        closeNotif.addEventListener('click', () => {
+            notifModal.classList.remove('active');
+            setTimeout(() => {
+                notifModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 400);
+        });
+
+        markAllReadBtn.addEventListener('click', () => {
+            notifications = [];
+            renderNotifications();
+            updateBadge();
+        });
+
+        async function fetchNotifications(shouldRender = true) {
+            try {
+                const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    notifications = data;
+                } else {
+                    throw new Error('Falha no fetch');
+                }
+            } catch (e) {
+                console.warn("Ficheiro real não encontrado ou erro no JSON. Usando dados de demonstração.");
+                if (notifications.length === 0) {
+                    const now = new Date();
+                    notifications = [
+                        { id: 101, titulo: "Promoção Exclusiva! ⚡", mensagem: "Insufláveis com 30% de desconto hoje. Clique para conferir as nossas ofertas imperdíveis de Natal!", tipo: "alerta", lida: false, data: new Date(now.getTime() - 120000).toISOString(), link: "promocoes.html" },
+                        { id: 102, titulo: "Reserva Confirmada ✨", mensagem: "A sua festa de sábado está garantida. Veja aqui o resumo da sua reserva e os horários de montagem.", tipo: "sucesso", lida: false, data: new Date(now.getTime() - 3600000).toISOString(), link: "reservas.html" }
+                    ];
+                }
+            }
+
+            notifications.sort((a, b) => new Date(b.data) - new Date(a.data));
+            updateBadge();
+            if (shouldRender) renderNotifications();
+        }
+
+        function updateBadge() {
+            const unreadCount = notifications.filter(n => !n.lida).length;
+            unreadCount > 0 ? notifBadge.classList.remove('hidden') : notifBadge.classList.add('hidden');
+        }
+
+        function initSwipeEvents(card, id) {
+            card.onpointerdown = (e) => {
+                isPanning = true;
+                startX = e.clientX;
+                activeCard = card;
+                activeId = id;
+                diffX = 0;
+                card.style.transition = 'none'; 
+                card.setPointerCapture(e.pointerId);
+            };
+
+            card.onpointermove = (e) => {
+                if (!isPanning || activeCard !== card) return;
+                diffX = e.clientX - startX;
+                if (diffX > 0) {
+                    card.style.transform = `translateX(${diffX}px)`;
+                    card.style.opacity = Math.max(0.1, 1 - (diffX / (window.innerWidth * 0.8)));
+                } else {
+                    card.style.transform = `translateX(0px)`;
+                }
+            };
+
+            card.onpointerup = (e) => endSwipe(e);
+            card.onpointercancel = (e) => endSwipe(e);
+        }
+
+        function endSwipe(e) {
+            if (!isPanning || !activeCard) return;
+            isPanning = false;
+            const threshold = window.innerWidth * 0.35;
+            if (diffX > threshold) {
+                activeCard.style.transition = 'transform 0.4s ease-in, opacity 0.4s ease-in';
+                activeCard.style.transform = `translateX(120%)`;
+                activeCard.style.opacity = `0`;
+                const idToMark = activeId;
+                setTimeout(() => markAsReadSilently(idToMark), 400);
+            } else {
+                activeCard.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease';
+                activeCard.style.transform = 'translateX(0)';
+                activeCard.style.opacity = '1';
+            }
+            activeCard.releasePointerCapture(e.pointerId);
+            activeCard = null;
+            activeId = null;
+        }
+
+        function renderNotifications() {
+            const unread = notifications.filter(n => !n.lida);
+            
+            if (unread.length === 0) {
+                notifContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-32 opacity-20 text-white animate-pulse">
+                        <div class="w-20 h-20 bg-white/10 rounded-full mb-6 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <p class="text-xl font-bold brand-font text-center">Tudo em dia!</p>
+                        <p class="text-sm text-center">Não tens notificações de momento.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            notifContainer.innerHTML = ''; 
+            unread.forEach((n, idx) => {
+                const icon = n.tipo === 'alerta' ? '⚡' : n.tipo === 'sucesso' ? '✨' : '🎈';
+                const titulo = (n.titulo && n.titulo.trim() !== "") ? n.titulo : 'Encanto Festas';
+                const mensagem = (n.mensagem && n.mensagem.trim() !== "") ? n.mensagem : 'Tens uma nova atualização mágica para ver!';
+                
+                const card = document.createElement('div');
+                card.id = `card-${n.id}`;
+                card.className = "notification-card p-4 rounded-[1.25rem] text-white shadow-lg";
+                card.style.animationDelay = `${idx * 0.05}s`;
+                card.innerHTML = `
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">
+                            ${icon}
+                        </div>
+                        <div class="flex-1 min-w-0 pointer-events-none">
+                            <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-title">${titulo}</h3>
+                            <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">
+                                ${mensagem}
+                            </p>
+                            <div class="flex items-center text-[10px] font-bold text-white/40 uppercase tracking-tight">
+                                <span>${getRelativeTime(n.data)}</span>
+                                <button class="mark-btn dot-separator text-blue-300 hover:text-white transition-colors uppercase active:scale-95 outline-none pointer-events-auto" style="cursor:pointer">
+                                    Marcar lida
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                initSwipeEvents(card, n.id);
+
+                // LÓGICA DE CLIQUE COM LINK
+                card.onclick = (e) => {
+                    // Se clicar no botão de lida, não faz mais nada
+                    if (e.target.classList.contains('mark-btn')) {
+                        e.stopPropagation();
+                        markAsReadDirectly(n.id);
+                        return;
+                    }
+
+                    // Verifica se foi um clique (não arraste)
+                    if (Math.abs(diffX) < 10) {
+                        const isExpanded = card.classList.contains('expanded');
+                        const hasLink = n.link && n.link.trim() !== "";
+
+                        if (!isExpanded) {
+                            // PRIMEIRO CLIQUE: Expande
+                            card.classList.add('expanded');
+                        } else if (hasLink) {
+                            // SEGUNDO CLIQUE (Se expandido): Abre link
+                            window.location.href = n.link;
+                        }
+                    }
+                };
+
+                notifContainer.appendChild(card);
+            });
+        }
+
+        function markAsReadDirectly(id) {
+            const card = document.getElementById(`card-${id}`);
+            if (card) {
+                card.style.transform = '';
+                card.style.opacity = '';
+                card.classList.add('dismissing');
+                setTimeout(() => markAsReadSilently(id), 450);
+            }
+        }
+
+        function markAsReadSilently(id) {
+            const idx = notifications.findIndex(n => n.id === id);
+            if (idx !== -1) {
+                notifications[idx].lida = true;
+                renderNotifications();
+                updateBadge();
+            }
+        }
+    </script>
+</body>
+</html>
