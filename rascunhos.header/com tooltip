@@ -30,12 +30,10 @@
             line-height: 1.2;
         }
         
-        /* Cabeçalho Prioritário acima do Blur */
         .glass-header {
             background: #2563eb; 
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 110; 
         }
 
         .item-card {
@@ -67,7 +65,6 @@
             background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%);
             background-attachment: fixed;
             visibility: hidden;
-            z-index: 120;
         }
         .modal-view.active {
             transform: translateY(0%);
@@ -90,9 +87,27 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .date-badge {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(4px);
+        /* Estilo do Tooltip de Marketing */
+        #marketingTooltip {
+            z-index: 100;
+            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.2));
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.8) translateY(-10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .tooltip-arrow {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #ffffff;
+            position: absolute;
+            top: -10px;
+            right: 22px;
         }
 
         /* Divisor de mês fixo (Sticky) */
@@ -121,77 +136,15 @@
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
         }
-
-        /* TOOLTIP E TUTORIAL STYLE */
-        .tutorial-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 100; /* Abaixo do header e tooltip */
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        .tutorial-backdrop.active {
-            display: block;
-            opacity: 1;
-        }
-
-        .feature-tooltip {
-            position: fixed;
-            top: 76px; 
-            right: 16px;
-            width: 290px;
-            background: white;
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-            z-index: 130;
-            display: none;
-            flex-direction: column;
-            gap: 12px;
-            transform: translateY(10px);
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .feature-tooltip.active {
-            display: flex;
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .tooltip-arrow {
-            position: absolute;
-            top: -10px;
-            right: 60px; 
-            width: 20px;
-            height: 20px;
-            background: white;
-            transform: rotate(45deg);
-            border-top-left-radius: 4px;
-        }
-
-        .pulse-highlight {
-            background: rgba(255, 255, 255, 0.3) !important;
-            animation: pulse-ring 2s infinite;
-        }
-
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
     </style>
 </head>
 <body class="min-h-screen bg-white">
 
-    <!-- Backdrop de Desfoque -->
-    <div id="tutorialBackdrop" class="tutorial-backdrop"></div>
+    <!-- Overlay de Marketing (Blur) -->
+    <div id="tooltipOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[45] hidden transition-opacity duration-300"></div>
 
     <!-- Cabeçalho Fixo -->
-    <header class="fixed top-0 left-0 right-0 w-full glass-header h-16">
+    <header id="mainHeader" class="fixed top-0 left-0 right-0 w-full glass-header z-[50] h-16">
         <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
             
             <a href="index.html" class="flex items-center gap-3 active:scale-95 transition-transform outline-none">
@@ -203,12 +156,27 @@
                 </span>
             </a>
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 relative">
+                <!-- Botão de Agenda -->
                 <button id="agendaBtn" class="p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 flex items-center justify-center outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
                 </button>
+
+                <!-- Tooltip de Marketing -->
+                <div id="marketingTooltip" class="absolute top-14 right-0 w-64 bg-white rounded-2xl p-4 shadow-2xl hidden">
+                    <div class="tooltip-arrow"></div>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">📅</span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Nova Função</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-800 leading-tight">Suas Reservas em um só lugar!</h4>
+                        <p class="text-[12px] text-slate-500 leading-snug">Agora você pode conferir todos os detalhes e datas dos seus agendamentos aqui.</p>
+                        <button id="closeMarketing" class="mt-2 w-full py-2 bg-blue-600 text-white text-xs font-bold rounded-xl active:scale-95 transition-all shadow-md shadow-blue-200">Entendido!</button>
+                    </div>
+                </div>
 
                 <button id="notifBtn" class="relative p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 flex items-center justify-center outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -220,27 +188,11 @@
         </div>
     </header>
 
-    <!-- Tooltip de Novidade -->
-    <div id="tutorialTooltip" class="feature-tooltip">
-        <div class="tooltip-arrow"></div>
-        <div class="flex items-center gap-2">
-            <div class="w-2 h-2 bg-blue-600 rounded-full animate-ping"></div>
-            <span class="text-blue-600 text-[10px] font-black uppercase tracking-widest">Marketing</span>
-        </div>
-        <h3 class="brand-font text-xl text-slate-800 leading-tight">O seu agendamento está certo? ✨</h3>
-        <p class="text-slate-500 text-[13px] leading-relaxed">
-            Agora podes ver se a tua reserva foi confirmada corretamente em tempo real! Clique no ícone de calendário.
-        </p>
-        <button id="closeTutorial" class="w-full mt-2 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow-xl shadow-blue-200 transition-all active:scale-95 outline-none">
-            Entendido, OK!
-        </button>
-    </div>
-
-    <!-- Área Principal -->
-    <main class="min-h-screen"></main>
+    <!-- Área Principal (Vazia) -->
+    <main class="pt-24 px-5 max-w-xl mx-auto"></main>
 
     <!-- MODAL DE NOTIFICAÇÕES -->
-    <div id="notifModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
+    <div id="notifModal" class="fixed inset-0 z-[100] modal-view hidden flex flex-col">
         <div class="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
             <div class="flex items-center gap-4">
                 <button id="closeNotif" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
@@ -254,7 +206,7 @@
     </div>
 
     <!-- MODAL DE AGENDA -->
-    <div id="agendaModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
+    <div id="agendaModal" class="fixed inset-0 z-[100] modal-view hidden flex flex-col">
         <div class="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
             <div class="flex items-center gap-4">
                 <button id="closeAgenda" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
@@ -277,7 +229,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const fbConfigRaw = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
@@ -292,29 +244,12 @@
         let agendaVisibleLimit = 5;
         let isLoadingAgenda = false;
 
-        const els = {
-            notifBtn: document.getElementById('notifBtn'),
-            agendaBtn: document.getElementById('agendaBtn'),
-            notifModal: document.getElementById('notifModal'),
-            agendaModal: document.getElementById('agendaModal'),
-            closeNotif: document.getElementById('closeNotif'),
-            closeAgenda: document.getElementById('closeAgenda'),
-            notifContainer: document.getElementById('notifContainer'),
-            agendaContainer: document.getElementById('agendaContainer'),
-            notifBadge: document.getElementById('notifBadge'),
-            markAllReadBtn: document.getElementById('markAllRead'),
-            viewMoreAgenda: document.getElementById('viewMoreAgenda'),
-            agendaPagination: document.getElementById('agendaPagination'),
-            agendaCount: document.getElementById('agendaCount'),
-            backdrop: document.getElementById('tutorialBackdrop'),
-            tooltip: document.getElementById('tutorialTooltip'),
-            closeTutorial: document.getElementById('closeTutorial')
-        };
+        const getEl = (id) => document.getElementById(id);
 
         const init = async () => {
             fetchNotifications();
-            checkTutorial(); // Inicia o Tutorial
-            
+            handleMarketingTooltip();
+
             if (fbConfigRaw) {
                 try {
                     const app = initializeApp(JSON.parse(fbConfigRaw));
@@ -328,27 +263,30 @@
             }
         };
 
-        // --- LÓGICA DE TUTORIAL ---
-        function checkTutorial() {
-            if (localStorage.getItem('encanto_tutorial_seen')) return;
+        function handleMarketingTooltip() {
+            const hasSeen = localStorage.getItem('encanto_marketing_v1');
+            const tooltip = getEl('marketingTooltip');
+            const overlay = getEl('tooltipOverlay');
+            const closeBtn = getEl('closeMarketing');
 
-            setTimeout(() => {
-                els.backdrop.classList.add('active');
-                els.tooltip.classList.add('active');
-                els.agendaBtn.classList.add('pulse-highlight');
-                document.body.style.overflow = 'hidden';
-            }, 800);
+            if (!hasSeen && tooltip && overlay) {
+                setTimeout(() => {
+                    overlay.classList.remove('hidden');
+                    tooltip.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                }, 1200);
+
+                closeBtn.onclick = () => {
+                    tooltip.classList.add('hidden');
+                    overlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    localStorage.setItem('encanto_marketing_v1', 'true');
+                };
+            }
         }
 
-        els.closeTutorial.onclick = () => {
-            els.backdrop.classList.remove('active');
-            els.tooltip.classList.remove('active');
-            els.agendaBtn.classList.remove('pulse-highlight');
-            document.body.style.overflow = '';
-            localStorage.setItem('encanto_tutorial_seen', 'true');
-        };
-
         const setupPersistenceListener = () => {
+            if (!user || !db) return;
             const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
             onSnapshot(stateRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -357,23 +295,18 @@
                     localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
                     updateNotifUI();
                 }
-            });
+            }, (err) => console.log("Snapshot inhibited"));
         };
-
-        function parseSheetDate(dateStr) {
-            if (!dateStr) return new Date();
-            const d = dateStr.toString();
-            if (d.includes('-') && d.includes('T')) return new Date(d);
-            const parts = d.split('/');
-            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
-            return new Date(d);
-        }
 
         async function fetchAgenda() {
             if (isLoadingAgenda) return;
             isLoadingAgenda = true;
-            els.agendaContainer.innerHTML = document.getElementById('agendaLoading').outerHTML;
-            els.agendaCount.innerText = 'Consultando...';
+            const container = getEl('agendaContainer');
+            const countEl = getEl('agendaCount');
+            const loadingHtml = getEl('agendaLoading')?.outerHTML || '';
+
+            if (container) container.innerHTML = loadingHtml;
+            if (countEl) countEl.innerText = 'Consultando...';
 
             try {
                 const res = await fetch(AGENDA_API);
@@ -384,17 +317,21 @@
                 agendaData = data.filter(item => {
                     const dateVal = item.EVENTO || item.dia || item.data;
                     return parseSheetDate(dateVal) >= today;
-                }).sort((a, b) => {
-                    const dA = parseSheetDate(a.EVENTO || a.dia);
-                    const dB = parseSheetDate(b.EVENTO || b.dia);
-                    return dA - dB;
-                });
+                }).sort((a, b) => parseSheetDate(a.EVENTO || a.dia) - parseSheetDate(b.EVENTO || b.dia));
 
-                els.agendaCount.innerText = `${agendaData.length} RESERVAS`;
+                if (countEl) countEl.innerText = `${agendaData.length} RESERVAS`;
                 renderAgenda();
             } catch (e) {
-                els.agendaContainer.innerHTML = `<p class="text-white/50 text-center py-10">Erro ao carregar agenda.</p>`;
+                if (container) container.innerHTML = `<p class="text-white/50 text-center py-10">Erro ao carregar agenda.</p>`;
             } finally { isLoadingAgenda = false; }
+        }
+
+        function parseSheetDate(dateStr) {
+            if (!dateStr) return new Date();
+            if (String(dateStr).includes('-') && String(dateStr).includes('T')) return new Date(dateStr);
+            const parts = String(dateStr).split('/');
+            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
+            return new Date(dateStr);
         }
 
         function formatPhone(phone) {
@@ -405,21 +342,26 @@
         }
 
         function renderAgenda() {
+            const container = getEl('agendaContainer');
+            if (!container) return;
+
             const visibleItems = agendaData.slice(0, agendaVisibleLimit);
             if (visibleItems.length === 0) {
-                els.agendaContainer.innerHTML = `<div class="text-center py-20 opacity-20 text-white brand-font text-xl">Nenhuma reserva futura.</div>`;
+                container.innerHTML = `<div class="text-center py-20 opacity-20 text-white brand-font text-xl">Nenhuma reserva futura.</div>`;
                 return;
             }
 
             const today = new Date(); today.setHours(0,0,0,0);
             const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-            let lastMonthYear = "", html = "";
+            
+            let lastMonthYear = "";
+            let html = "";
 
             visibleItems.forEach((item) => {
                 const date = parseSheetDate(item.EVENTO || item.dia || item.data);
                 const checkDate = new Date(date); checkDate.setHours(0,0,0,0);
-                const monthYearKey = `${date.getMonth()}-${date.getFullYear()}`;
                 
+                const monthYearKey = `${date.getMonth()}-${date.getFullYear()}`;
                 if (monthYearKey !== lastMonthYear) {
                     const monthName = date.toLocaleDateString('pt-PT', { month: 'long' });
                     const isThisMonth = date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
@@ -433,37 +375,46 @@
                 } else if (checkDate.getTime() === tomorrow.getTime()) {
                     dateBadgeHtml = `<span class="text-[10px] font-black text-white leading-none uppercase text-center">AMA<br>NHÃ</span>`;
                 } else {
-                    dateBadgeHtml = `<span class="text-[10px] uppercase font-bold text-white/70 leading-none">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span><span class="text-xl font-bold brand-font text-white leading-none">${date.getDate()}</span>`;
+                    dateBadgeHtml = `
+                        <span class="text-[10px] uppercase font-bold opacity-70 leading-none text-white/70">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span>
+                        <span class="text-xl font-bold brand-font leading-none text-white">${date.getDate()}</span>
+                    `;
                 }
 
                 const itensRaw = item["ITENS LOCADOS"] || 'Equipamentos Diversos';
-                const itensList = itensRaw.toString().split(',').map(i => i.trim()).join('<br>');
+                const itensList = itensRaw.split(',').map(i => i.trim()).join('<br>');
 
                 html += `
                     <div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex flex-col gap-3">
                         <div class="flex items-center gap-4">
-                            <div class="date-badge flex flex-col items-center justify-center w-14 h-14 rounded-2xl shrink-0">${dateBadgeHtml}</div>
+                            <div class="date-badge flex flex-col items-center justify-center w-14 h-14 rounded-2xl shrink-0">
+                                ${dateBadgeHtml}
+                            </div>
                             <div class="flex-1 min-w-0">
-                                <h3 class="font-bold text-sm leading-tight mb-0.5 truncate">${item.NOME || 'Cliente'}</h3>
+                                <h3 class="font-bold text-sm leading-tight mb-0.5 truncate">${item.NOME || 'Cliente Encanto'}</h3>
                                 <p class="text-[12px] text-blue-100/70 font-medium">${formatPhone(item.WHATSAPP || item.telefone)}</p>
                             </div>
                         </div>
-                        <div class="pt-2 border-t border-white/5"><p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">${itensList}</p></div>
-                    </div>`;
+                        <div class="pt-2 border-t border-white/5">
+                            <p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">
+                                ${itensList}
+                            </p>
+                        </div>
+                    </div>
+                `;
             });
 
-            els.agendaContainer.innerHTML = html;
-            els.agendaPagination.classList.toggle('hidden', agendaVisibleLimit >= agendaData.length);
+            container.innerHTML = html;
+            const pagination = getEl('agendaPagination');
+            if (pagination) pagination.classList.toggle('hidden', agendaVisibleLimit >= agendaData.length);
         }
-
-        els.viewMoreAgenda.onclick = () => { agendaVisibleLimit += 5; renderAgenda(); };
 
         async function fetchNotifications() {
             try {
                 const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
                 if (response.ok) rawNotifications = await response.json();
             } catch (e) {
-                rawNotifications = [{ id: 101, titulo: "Encanto Festas 🎈", mensagem: "Olá!", tipo: "info", data: new Date().toISOString() }];
+                rawNotifications = [{ id: 101, titulo: "Bem-vindo! 🎈", mensagem: "Confira as novidades no seu painel.", tipo: "info", data: new Date().toISOString() }];
             }
             updateNotifUI();
         }
@@ -471,16 +422,20 @@
         function updateNotifUI() {
             const active = rawNotifications.filter(n => !readIds.includes(Number(n.id)));
             active.sort((a, b) => new Date(b.data) - new Date(a.data));
-            els.notifBadge.classList.toggle('hidden', active.length === 0);
+            const badge = getEl('notifBadge');
+            if (badge) badge.classList.toggle('hidden', active.length === 0);
             renderNotifs(active);
         }
 
         function renderNotifs(list) {
+            const container = getEl('notifContainer');
+            if (!container) return;
+
             if (list.length === 0) {
-                els.notifContainer.innerHTML = `<div class="text-center py-20 opacity-20 text-white brand-font text-xl">Tudo em dia!</div>`;
+                container.innerHTML = `<div class="text-center py-20 opacity-20 text-white brand-font text-xl">Tudo em dia!</div>`;
                 return;
             }
-            els.notifContainer.innerHTML = '';
+            container.innerHTML = '';
             list.forEach(n => {
                 const card = document.createElement('div');
                 card.className = "item-card p-4 rounded-[1.5rem] text-white shadow-lg cursor-pointer";
@@ -492,16 +447,20 @@
                             <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">${n.mensagem}</p>
                             <button class="mark-btn text-[10px] font-bold text-blue-300 hover:text-white uppercase transition-colors pointer-events-auto">Marcar lido</button>
                         </div>
-                    </div>`;
+                    </div>
+                `;
                 card.onclick = (e) => {
                     if (e.target.classList.contains('mark-btn')) {
                         e.stopPropagation(); card.classList.add('dismissing'); setTimeout(() => persistReadId(n.id), 450); return;
                     }
                     const msgPara = card.querySelector('.line-clamp-msg');
-                    if (msgPara.scrollHeight > msgPara.clientHeight && !card.classList.contains('expanded')) { card.classList.add('expanded'); }
-                    else if (n.link) window.location.href = n.link;
+                    if (msgPara) {
+                        const isTruncated = msgPara.scrollHeight > msgPara.clientHeight;
+                        if (isTruncated && !card.classList.contains('expanded')) { card.classList.add('expanded'); }
+                        else if (n.link) window.location.href = n.link;
+                    }
                 };
-                els.notifContainer.appendChild(card);
+                container.appendChild(card);
             });
         }
 
@@ -515,11 +474,56 @@
             }
         }
 
-        els.notifBtn.onclick = () => { els.notifModal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => els.notifModal.classList.add('active'), 10); };
-        els.agendaBtn.onclick = () => { els.agendaModal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => { els.agendaModal.classList.add('active'); fetchAgenda(); }, 10); };
-        els.closeNotif.onclick = () => { els.notifModal.classList.remove('active'); setTimeout(() => { els.notifModal.classList.add('hidden'); document.body.style.overflow = ''; }, 400); };
-        els.closeAgenda.onclick = () => { els.agendaModal.classList.remove('active'); setTimeout(() => { els.agendaModal.classList.add('hidden'); document.body.style.overflow = ''; }, 400); };
+        const setupUIListeners = () => {
+            const btns = {
+                notif: getEl('notifBtn'),
+                agenda: getEl('agendaBtn'),
+                closeNotif: getEl('closeNotif'),
+                closeAgenda: getEl('closeAgenda'),
+                viewMore: getEl('viewMoreAgenda')
+            };
 
+            const modals = {
+                notif: getEl('notifModal'),
+                agenda: getEl('agendaModal')
+            };
+
+            if (btns.notif && modals.notif) {
+                btns.notif.onclick = () => { 
+                    modals.notif.classList.remove('hidden'); 
+                    document.body.style.overflow = 'hidden'; 
+                    setTimeout(() => modals.notif.classList.add('active'), 10); 
+                };
+            }
+
+            if (btns.agenda && modals.agenda) {
+                btns.agenda.onclick = () => { 
+                    modals.agenda.classList.remove('hidden'); 
+                    document.body.style.overflow = 'hidden'; 
+                    setTimeout(() => { modals.agenda.classList.add('active'); fetchAgenda(); }, 10); 
+                };
+            }
+
+            if (btns.closeNotif && modals.notif) {
+                btns.closeNotif.onclick = () => { 
+                    modals.notif.classList.remove('active'); 
+                    setTimeout(() => { modals.notif.classList.add('hidden'); document.body.style.overflow = ''; }, 400); 
+                };
+            }
+
+            if (btns.closeAgenda && modals.agenda) {
+                btns.closeAgenda.onclick = () => { 
+                    modals.agenda.classList.remove('active'); 
+                    setTimeout(() => { modals.agenda.classList.add('hidden'); document.body.style.overflow = ''; }, 400); 
+                };
+            }
+
+            if (btns.viewMore) {
+                btns.viewMore.onclick = () => { agendaVisibleLimit += 5; renderAgenda(); };
+            }
+        };
+
+        setupUIListeners();
         init();
     </script>
 </body>
