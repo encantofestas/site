@@ -225,6 +225,12 @@
                 const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
                 if (response.ok) {
                     notifications = await response.json();
+                    
+                    // Ordenar por data: Mais recente primeiro
+                    notifications.sort((a, b) => {
+                        return new Date(b.data) - new Date(a.data);
+                    });
+
                     hasError = false;
                     updateBadge();
                     if (shouldRender) renderNotifications();
