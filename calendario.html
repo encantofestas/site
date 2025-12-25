@@ -92,6 +92,23 @@
             backdrop-filter: blur(4px);
         }
 
+        /* Divisor de mês fixo (Sticky) aprimorado */
+        .month-divider {
+            position: sticky;
+            top: -1px; /* Cola no topo do container de scroll */
+            z-index: 20;
+            background: #1e3a8a; /* Cor sólida para não vazar o texto por baixo */
+            margin: 1.5rem -1rem 1rem -1rem;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            color: #ffffff !important; /* Força cor branca */
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
         .shimmer {
             background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 75%);
             background-size: 200% 100%;
@@ -167,9 +184,7 @@
             <div id="agendaCount" class="text-[10px] font-bold text-yellow-400 bg-white/10 px-2 py-1 rounded-full uppercase tracking-wider">Aguarde...</div>
         </div>
         <div id="agendaContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-10">
-            <!-- Loading State -->
             <div id="agendaLoading" class="flex flex-col gap-4 py-4">
-                <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
                 <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
                 <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
             </div>
@@ -287,11 +302,24 @@
 
             const today = new Date(); today.setHours(0,0,0,0);
             const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            let lastMonthYear = "";
+            let html = "";
 
-            els.agendaContainer.innerHTML = visibleItems.map((item, idx) => {
+            visibleItems.forEach((item, idx) => {
                 const date = parseSheetDate(item.EVENTO || item.dia || item.data);
                 const checkDate = new Date(date); checkDate.setHours(0,0,0,0);
                 
+                const monthYearKey = `${date.getMonth()}-${date.getFullYear()}`;
+                if (monthYearKey !== lastMonthYear) {
+                    const monthName = date.toLocaleDateString('pt-PT', { month: 'long' });
+                    const isThisMonth = date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+                    
+                    // DIVISOR FIXO E BRANCO
+                    html += `<div class="month-divider">${isThisMonth ? 'ESTE MÊS' : monthName}</div>`;
+                    lastMonthYear = monthYearKey;
+                }
+
                 let dateBadgeHtml = "";
                 if (checkDate.getTime() === today.getTime()) {
                     dateBadgeHtml = `<span class="text-[11px] font-black text-white">HOJE</span>`;
@@ -302,16 +330,15 @@
                     `;
                 } else {
                     dateBadgeHtml = `
-                        <span class="text-[10px] uppercase font-bold opacity-70 leading-none">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span>
-                        <span class="text-xl font-bold brand-font leading-none">${date.getDate()}</span>
+                        <span class="text-[10px] uppercase font-bold opacity-70 leading-none text-white/70">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span>
+                        <span class="text-xl font-bold brand-font leading-none text-white">${date.getDate()}</span>
                     `;
                 }
 
-                // Processar itens locados para lista vertical
                 const itensRaw = item["ITENS LOCADOS"] || 'Equipamentos Diversos';
                 const itensList = itensRaw.split(',').map(i => i.trim()).join('<br>');
 
-                return `
+                html += `
                     <div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex flex-col gap-3">
                         <div class="flex items-center gap-4">
                             <div class="date-badge flex flex-col items-center justify-center w-14 h-14 rounded-2xl shrink-0">
@@ -323,25 +350,27 @@
                             </div>
                         </div>
                         <div class="pt-2 border-t border-white/5">
-                            <p class="text-[11px] text-yellow-100/90 italic leading-relaxed">
+                            <!-- ITENS EM AMARELO -->
+                            <p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">
                                 ${itensList}
                             </p>
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
+
+            els.agendaContainer.innerHTML = html;
             els.agendaPagination.classList.toggle('hidden', agendaVisibleLimit >= agendaData.length);
         }
 
         els.viewMoreAgenda.onclick = () => { agendaVisibleLimit += 5; renderAgenda(); };
 
-        // --- NOTIFICATIONS LOGIC ---
         async function fetchNotifications() {
             try {
                 const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
                 if (response.ok) rawNotifications = await response.json();
             } catch (e) {
-                rawNotifications = [{ id: 101, titulo: "Encanto Festas 🎈", mensagem: "Bem-vindo!", tipo: "info", data: new Date().toISOString() }];
+                rawNotifications = [{ id: 101, titulo: "Bem-vindo!", mensagem: "Olá!", tipo: "info", data: new Date().toISOString() }];
             }
             updateNotifUI();
         }
