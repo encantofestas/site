@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- Configuração da cor da barra do browser (Chrome, Safari, Samsung Internet, etc) -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="msapplication-navbutton-color" content="#2563eb">
+
     <title>Encanto Festas - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,20 +18,19 @@
         :root {
             --brand-blue: #2563eb;
             --deep-blue: #1e3a8a;
+            --marketing-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            --marketing-glow: 0 0 20px rgba(245, 158, 11, 0.5);
         }
 
         html, body {
-            overflow-x: hidden;
-            width: 100%;
             font-family: 'Inter', sans-serif;
-            background-color: #ffffff;
-            -webkit-tap-highlight-color: transparent;
             margin: 0;
             padding: 0;
-            color: #1e293b;
+            background: transparent;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        h1, h2, h3, .brand-font {
+        h1, h2, h3, h4, .brand-font {
             font-family: 'Baloo 2', cursive;
             line-height: 1.2;
         }
@@ -65,11 +70,17 @@
             background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%);
             background-attachment: fixed;
             visibility: hidden;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
         }
         .modal-view.active {
             transform: translateY(0%);
             visibility: visible;
         }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .line-clamp-msg {
             display: -webkit-box;
@@ -77,71 +88,35 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-
-        .expanded .line-clamp-msg {
-            display: block;
-            overflow: visible;
+        .item-card.expanded .line-clamp-msg {
             -webkit-line-clamp: unset;
-        }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .date-badge {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(4px);
-        }
-
-        /* Divisor de mês fixo (Sticky) */
-        .month-divider {
-            position: sticky;
-            top: -1px; 
-            z-index: 20;
-            background: #1e3a8a; 
-            margin: 1.5rem -1rem 1rem -1rem;
-            padding: 0.75rem 1.25rem;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
-            color: #ffffff !important; 
-            font-weight: 800;
-            font-size: 0.75rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .shimmer {
-            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
         }
     </style>
 </head>
-<body class="min-h-screen bg-white">
+<body>
 
     <!-- Cabeçalho Fixo -->
-    <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
-        <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
+    <header id="mainHeader" class="fixed top-0 left-0 right-0 w-full glass-header z-[50] h-16">
+        <div class="max-w-xl mx-auto px-3 h-full flex justify-between items-center">
             
-            <a href="index.html" class="flex items-center gap-3 active:scale-95 transition-transform outline-none">
+            <!-- Logo e Identidade -->
+            <a href="index.html" class="flex items-center gap-2 active:scale-95 transition-transform outline-none text-decoration-none group">
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
-                    class="w-9 h-9 rounded-full border-2 border-yellow-400 shadow-sm"
+                    class="w-10 h-10 rounded-full border-2 border-yellow-400 shadow-sm transition-transform group-hover:rotate-12"
                     alt="Logo Encanto Festas">
-                <span class="text-xl font-bold brand-font tracking-tight text-white">
-                    Encanto<span class="text-yellow-400">Festas</span>
-                </span>
+                
+                <div class="inline-flex flex-col items-start leading-none -mt-1.5 ml-0.5">
+                    <div class="text-xl font-bold brand-font tracking-tight">
+                        <span class="text-white">Encanto</span><span class="text-yellow-400">Festas</span>
+                    </div>
+                    <span class="text-[7.2px] font-black text-white/90 uppercase -mt-0.5 tracking-[0.15em] w-full text-justify ml-[2px]" style="text-align-last: justify;">
+                        LOCAÇÃO DE BRINQUEDOS
+                    </span>
+                </div>
             </a>
             
             <div class="flex items-center gap-2">
-                <button id="agendaBtn" class="p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 flex items-center justify-center outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                    </svg>
-                </button>
-
+                <!-- Apenas Botão de Notificações -->
                 <button id="notifBtn" class="relative p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 flex items-center justify-center outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
@@ -152,11 +127,8 @@
         </div>
     </header>
 
-    <!-- Área Principal (Vazia para manter o foco no cabeçalho) -->
-    <main class="min-h-screen"></main>
-
     <!-- MODAL DE NOTIFICAÇÕES -->
-    <div id="notifModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
+    <div id="notifModal" class="modal-view hidden flex flex-col">
         <div class="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
             <div class="flex items-center gap-4">
                 <button id="closeNotif" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
@@ -169,28 +141,6 @@
         <div id="notifContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-10"></div>
     </div>
 
-    <!-- MODAL DE AGENDA -->
-    <div id="agendaModal" class="fixed inset-0 z-50 modal-view hidden flex flex-col">
-        <div class="px-5 py-3 border-b border-white/10 flex justify-between items-center bg-blue-900/40 backdrop-blur-xl">
-            <div class="flex items-center gap-4">
-                <button id="closeAgenda" class="p-2 text-white/70 hover:text-white transition-colors bg-white/10 rounded-lg outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
-                <h2 class="text-lg font-bold brand-font text-white">Próximas Reservas</h2>
-            </div>
-            <div id="agendaCount" class="text-[10px] font-bold text-yellow-400 bg-white/10 px-2 py-1 rounded-full uppercase tracking-wider">Aguarde...</div>
-        </div>
-        <div id="agendaContainer" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar pb-10">
-            <div id="agendaLoading" class="flex flex-col gap-4 py-4">
-                <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
-                <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
-            </div>
-        </div>
-        <div id="agendaPagination" class="px-5 py-4 border-t border-white/10 hidden bg-blue-900/40">
-            <button id="viewMoreAgenda" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-bold text-sm transition-all active:scale-95">Ver mais agendamentos</button>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -198,48 +148,45 @@
 
         const fbConfigRaw = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const AGENDA_API = 'https://script.google.com/macros/s/AKfycbz_4NqmCf3iwAzXdBTUC-o1C9d_029b6g-HP6QyD8oEaHKt5eNjSd3eWsB9EaRJo9Nj/exec';
         const NOTIF_URL = 'notificacoes.json';
 
         let db, auth, user;
         let readIds = JSON.parse(localStorage.getItem('encanto_read_ids') || '[]').map(id => Number(id)); 
         let rawNotifications = [];
-        let agendaData = [];
-        let agendaVisibleLimit = 5;
-        let isLoadingAgenda = false;
 
-        const els = {
-            notifBtn: document.getElementById('notifBtn'),
-            agendaBtn: document.getElementById('agendaBtn'),
-            notifModal: document.getElementById('notifModal'),
-            agendaModal: document.getElementById('agendaModal'),
-            closeNotif: document.getElementById('closeNotif'),
-            closeAgenda: document.getElementById('closeAgenda'),
-            notifContainer: document.getElementById('notifContainer'),
-            agendaContainer: document.getElementById('agendaContainer'),
-            notifBadge: document.getElementById('notifBadge'),
-            markAllReadBtn: document.getElementById('markAllRead'),
-            viewMoreAgenda: document.getElementById('viewMoreAgenda'),
-            agendaPagination: document.getElementById('agendaPagination'),
-            agendaCount: document.getElementById('agendaCount')
-        };
+        const getEl = (id) => document.getElementById(id);
 
         const init = async () => {
             fetchNotifications();
+
             if (fbConfigRaw) {
                 try {
-                    const app = initializeApp(JSON.parse(fbConfigRaw));
+                    const firebaseConfig = JSON.parse(fbConfigRaw);
+                    const app = initializeApp(firebaseConfig);
                     auth = getAuth(app);
                     db = getFirestore(app);
-                    await signInAnonymously(auth);
+                    
+                    // Auth FIRST
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
                     onAuthStateChanged(auth, u => { 
-                        if (u) { user = u; setupPersistenceListener(); } 
+                        if (u) { 
+                            user = u; 
+                            setupPersistenceListener(); 
+                        } 
                     });
-                } catch (e) { console.warn("Firebase Offline"); }
+                } catch (e) { 
+                    console.warn("Firebase Offline ou Erro de Configuração"); 
+                }
             }
         };
 
         const setupPersistenceListener = () => {
+            if (!user || !db) return;
             const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
             onSnapshot(stateRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -248,124 +195,19 @@
                     localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
                     updateNotifUI();
                 }
+            }, (error) => {
+                console.error("Erro ao ouvir notificações em tempo real:", error);
             });
         };
-
-        function parseSheetDate(dateStr) {
-            if (!dateStr) return new Date();
-            if (dateStr.includes('-') && dateStr.includes('T')) return new Date(dateStr);
-            const parts = dateStr.split('/');
-            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
-            return new Date(dateStr);
-        }
-
-        async function fetchAgenda() {
-            if (isLoadingAgenda) return;
-            isLoadingAgenda = true;
-            els.agendaContainer.innerHTML = document.getElementById('agendaLoading').outerHTML;
-            els.agendaCount.innerText = 'Consultando...';
-
-            try {
-                const res = await fetch(AGENDA_API);
-                const data = await res.json();
-                const today = new Date();
-                today.setHours(0,0,0,0);
-
-                agendaData = data.filter(item => {
-                    const dateVal = item.EVENTO || item.dia || item.data;
-                    return parseSheetDate(dateVal) >= today;
-                }).sort((a, b) => parseSheetDate(a.EVENTO || a.dia) - parseSheetDate(b.EVENTO || b.dia));
-
-                els.agendaCount.innerText = `${agendaData.length} RESERVAS`;
-                renderAgenda();
-            } catch (e) {
-                els.agendaContainer.innerHTML = `<p class="text-white/50 text-center py-10">Erro ao carregar agenda.</p>`;
-            } finally { isLoadingAgenda = false; }
-        }
-
-        function formatPhone(phone) {
-            if (!phone) return "(xx) xxxxx-x***";
-            let cleaned = ('' + phone).replace(/\D/g, '');
-            if (cleaned.length < 10) return phone;
-            return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7, 8)}***`;
-        }
-
-        function renderAgenda() {
-            const visibleItems = agendaData.slice(0, agendaVisibleLimit);
-            if (visibleItems.length === 0) {
-                els.agendaContainer.innerHTML = `<div class="text-center py-20 opacity-20 text-white brand-font text-xl">Nenhuma reserva futura.</div>`;
-                return;
-            }
-
-            const today = new Date(); today.setHours(0,0,0,0);
-            const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-            
-            let lastMonthYear = "";
-            let html = "";
-
-            visibleItems.forEach((item, idx) => {
-                const date = parseSheetDate(item.EVENTO || item.dia || item.data);
-                const checkDate = new Date(date); checkDate.setHours(0,0,0,0);
-                
-                const monthYearKey = `${date.getMonth()}-${date.getFullYear()}`;
-                if (monthYearKey !== lastMonthYear) {
-                    const monthName = date.toLocaleDateString('pt-PT', { month: 'long' });
-                    const isThisMonth = date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-                    
-                    html += `<div class="month-divider">${isThisMonth ? 'ESTE MÊS' : monthName}</div>`;
-                    lastMonthYear = monthYearKey;
-                }
-
-                let dateBadgeHtml = "";
-                if (checkDate.getTime() === today.getTime()) {
-                    dateBadgeHtml = `<span class="text-[11px] font-black text-white">HOJE</span>`;
-                } else if (checkDate.getTime() === tomorrow.getTime()) {
-                    dateBadgeHtml = `
-                        <span class="text-[10px] font-black text-white leading-none uppercase">AMA</span>
-                        <span class="text-[10px] font-black text-white leading-none uppercase">NHÃ</span>
-                    `;
-                } else {
-                    dateBadgeHtml = `
-                        <span class="text-[10px] uppercase font-bold opacity-70 leading-none text-white/70">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span>
-                        <span class="text-xl font-bold brand-font leading-none text-white">${date.getDate()}</span>
-                    `;
-                }
-
-                const itensRaw = item["ITENS LOCADOS"] || 'Equipamentos Diversos';
-                const itensList = itensRaw.split(',').map(i => i.trim()).join('<br>');
-
-                html += `
-                    <div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex flex-col gap-3">
-                        <div class="flex items-center gap-4">
-                            <div class="date-badge flex flex-col items-center justify-center w-14 h-14 rounded-2xl shrink-0">
-                                ${dateBadgeHtml}
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h3 class="font-bold text-sm leading-tight mb-0.5 truncate">${item.NOME || 'Cliente Encanto'}</h3>
-                                <p class="text-[12px] text-blue-100/70 font-medium">${formatPhone(item.WHATSAPP || item.telefone)}</p>
-                            </div>
-                        </div>
-                        <div class="pt-2 border-t border-white/5">
-                            <p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">
-                                ${itensList}
-                            </p>
-                        </div>
-                    </div>
-                `;
-            });
-
-            els.agendaContainer.innerHTML = html;
-            els.agendaPagination.classList.toggle('hidden', agendaVisibleLimit >= agendaData.length);
-        }
-
-        els.viewMoreAgenda.onclick = () => { agendaVisibleLimit += 5; renderAgenda(); };
 
         async function fetchNotifications() {
             try {
                 const response = await fetch(`${NOTIF_URL}?t=${new Date().getTime()}`);
-                if (response.ok) rawNotifications = await response.json();
+                if (response.ok) {
+                    rawNotifications = await response.json();
+                }
             } catch (e) {
-                rawNotifications = [{ id: 101, titulo: "Encanto Festas 🎈", mensagem: "Olá!", tipo: "info", data: new Date().toISOString() }];
+                rawNotifications = [{ id: 101, titulo: "Bem-vindo! 🎈", mensagem: "Confira as novidades no seu painel.", tipo: "info", data: new Date().toISOString() }];
             }
             updateNotifUI();
         }
@@ -373,57 +215,116 @@
         function updateNotifUI() {
             const active = rawNotifications.filter(n => !readIds.includes(Number(n.id)));
             active.sort((a, b) => new Date(b.data) - new Date(a.data));
-            els.notifBadge.classList.toggle('hidden', active.length === 0);
+            const badge = getEl('notifBadge');
+            if (badge) badge.classList.toggle('hidden', active.length === 0);
             renderNotifs(active);
         }
 
         function renderNotifs(list) {
+            const container = getEl('notifContainer');
+            if (!container) return;
+
             if (list.length === 0) {
-                els.notifContainer.innerHTML = `<div class="text-center py-20 opacity-20 text-white brand-font text-xl">Tudo em dia!</div>`;
+                container.innerHTML = `<div class="text-center py-20 opacity-20 text-white brand-font text-xl">Tudo em dia!</div>`;
                 return;
             }
-            els.notifContainer.innerHTML = '';
+            container.innerHTML = '';
             list.forEach(n => {
                 const card = document.createElement('div');
-                card.className = "item-card p-4 rounded-[1.5rem] text-white shadow-lg cursor-pointer";
+                card.className = "item-card p-4 rounded-[1.5rem] text-white shadow-lg cursor-pointer transition-all";
                 card.innerHTML = `
                     <div class="flex gap-3">
-                        <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">${n.tipo === 'alerta' ? '⚡' : '✨'}</div>
+                        <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">
+                            ${n.tipo === 'alerta' ? '⚡' : '✨'}
+                        </div>
                         <div class="flex-1 min-w-0 pointer-events-none">
                             <h3 class="font-bold text-sm leading-tight mb-1 text-white">${n.titulo}</h3>
                             <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">${n.mensagem}</p>
-                            <button class="mark-btn text-[10px] font-bold text-blue-300 hover:text-white uppercase transition-colors pointer-events-auto">Marcar lido</button>
+                            <button class="mark-btn text-[10px] font-bold text-blue-300 hover:text-white uppercase transition-colors pointer-events-auto">Marcar como lido</button>
                         </div>
                     </div>
                 `;
                 card.onclick = (e) => {
                     if (e.target.classList.contains('mark-btn')) {
-                        e.stopPropagation(); card.classList.add('dismissing'); setTimeout(() => persistReadId(n.id), 450); return;
+                        e.stopPropagation(); 
+                        card.classList.add('dismissing'); 
+                        setTimeout(() => persistReadId(n.id), 450); 
+                        return;
                     }
                     const msgPara = card.querySelector('.line-clamp-msg');
-                    const isTruncated = msgPara.scrollHeight > msgPara.clientHeight;
-                    if (isTruncated && !card.classList.contains('expanded')) { card.classList.add('expanded'); }
-                    else if (n.link) window.location.href = n.link;
+                    if (msgPara) {
+                        const isTruncated = msgPara.scrollHeight > msgPara.clientHeight;
+                        if (isTruncated && !card.classList.contains('expanded')) { 
+                            card.classList.add('expanded'); 
+                        } else if (n.link) {
+                            window.location.href = n.link;
+                        }
+                    }
                 };
-                els.notifContainer.appendChild(card);
+                container.appendChild(card);
             });
         }
 
         async function persistReadId(id) {
             const nid = Number(id);
-            if (!readIds.includes(nid)) { readIds.push(nid); localStorage.setItem('encanto_read_ids', JSON.stringify(readIds)); }
+            if (!readIds.includes(nid)) { 
+                readIds.push(nid); 
+                localStorage.setItem('encanto_read_ids', JSON.stringify(readIds)); 
+            }
             updateNotifUI();
+            
             if (user && db) {
                 const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
-                try { await updateDoc(stateRef, { readIds: arrayUnion(nid) }); } catch (e) { await setDoc(stateRef, { readIds }); }
+                try { 
+                    await updateDoc(stateRef, { readIds: arrayUnion(nid) }); 
+                } catch (e) { 
+                    await setDoc(stateRef, { readIds }); 
+                }
             }
         }
 
-        els.notifBtn.onclick = () => { els.notifModal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => els.notifModal.classList.add('active'), 10); };
-        els.agendaBtn.onclick = () => { els.agendaModal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => { els.agendaModal.classList.add('active'); fetchAgenda(); }, 10); };
-        els.closeNotif.onclick = () => { els.notifModal.classList.remove('active'); setTimeout(() => { els.notifModal.classList.add('hidden'); document.body.style.overflow = ''; }, 400); };
-        els.closeAgenda.onclick = () => { els.agendaModal.classList.remove('active'); setTimeout(() => { els.agendaModal.classList.add('hidden'); document.body.style.overflow = ''; }, 400); };
+        async function markAllNotificationsAsRead() {
+            const newIds = rawNotifications.map(n => Number(n.id));
+            readIds = [...new Set([...readIds, ...newIds])];
+            localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
+            updateNotifUI();
+            
+            if (user && db) {
+                const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
+                try { 
+                    await updateDoc(stateRef, { readIds: readIds }); 
+                } catch (e) { 
+                    await setDoc(stateRef, { readIds: readIds }); 
+                }
+            }
+        }
 
+        const setupUIListeners = () => {
+            const btnNotif = getEl('notifBtn');
+            const btnCloseNotif = getEl('closeNotif');
+            const btnMarkAll = getEl('markAllRead');
+            const modalNotif = getEl('notifModal');
+
+            if (btnNotif && modalNotif) {
+                btnNotif.onclick = () => { 
+                    modalNotif.classList.remove('hidden'); 
+                    setTimeout(() => modalNotif.classList.add('active'), 10); 
+                };
+            }
+
+            if (btnCloseNotif && modalNotif) {
+                btnCloseNotif.onclick = () => { 
+                    modalNotif.classList.remove('active'); 
+                    setTimeout(() => modalNotif.classList.add('hidden'), 400); 
+                };
+            }
+
+            if (btnMarkAll) {
+                btnMarkAll.onclick = () => markAllNotificationsAsRead();
+            }
+        };
+
+        setupUIListeners();
         init();
     </script>
 </body>
