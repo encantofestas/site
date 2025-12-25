@@ -175,21 +175,21 @@
 
     <!-- Cabeçalho Fixo -->
     <header id="mainHeader" class="fixed top-0 left-0 right-0 w-full glass-header z-[50] h-16">
-        <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
+        <div class="max-w-xl mx-auto px-3 h-full flex justify-between items-center">
             
-            <!-- Link da Logo: gap reduzido para gap-2 para ficar mais próximo da logo -->
+            <!-- Link da Logo -->
             <a href="index.html" class="flex items-center gap-2 active:scale-95 transition-transform outline-none text-decoration-none group">
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdX7GkygoIKwK06MzeweiE0GPt5I1rsz808w&s" 
                     class="w-10 h-10 rounded-full border-2 border-yellow-400 shadow-sm transition-transform group-hover:rotate-12"
                     alt="Logo Encanto Festas">
                 
-                <!-- Bloco de texto centralizado: ml-0 para ficar bem rente à logo -->
-                <div class="inline-flex flex-col items-start leading-none -mt-1.5">
+                <!-- Bloco de texto centralizado -->
+                <div class="inline-flex flex-col items-start leading-none -mt-1.5 ml-0.5">
                     <div class="text-xl font-bold brand-font tracking-tight">
                         <span class="text-white">Encanto</span><span class="text-yellow-400">Festas</span>
                     </div>
-                    <!-- Subtítulo blocado perfeitamente e encostado -->
-                    <span class="text-[7.5px] font-black text-white/90 uppercase -mt-0.5 tracking-[0.16em] w-full text-justify" style="text-align-last: justify;">
+                    <!-- Subtítulo: -mt-0.5 para aproximar o máximo possível mantendo o alinhamento de bloco -->
+                    <span class="text-[7.2px] font-black text-white/90 uppercase -mt-0.5 tracking-[0.15em] w-full text-justify ml-[2px]" style="text-align-last: justify;">
                         LOCAÇÃO DE BRINQUEDOS
                     </span>
                 </div>
@@ -197,13 +197,13 @@
             
             <div class="flex items-center gap-2">
                 <div class="relative">
+                    <!-- Botão Agenda com ícone de Calendário -->
                     <button id="agendaBtn" class="p-2.5 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all active:scale-90 flex items-center justify-center outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" x2="16" y2="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/>
                         </svg>
                     </button>
 
-                    <!-- Tooltip com Animação de Impacto e Posição Rente -->
                     <div id="marketingTooltip" class="absolute top-14 -right-1 w-72 rounded-[2rem] overflow-visible hidden flex flex-col">
                         <div class="tooltip-arrow">
                             <svg viewBox="0 0 24 12" xmlns="http://www.w3.org/2000/svg">
@@ -270,24 +270,20 @@
             </div>
             <div id="agendaCount" class="text-[10px] font-bold text-yellow-400 bg-white/10 px-2 py-1 rounded-full uppercase tracking-wider">Aguarde...</div>
         </div>
-
         <div class="search-area">
             <div class="relative max-w-xl mx-auto">
-                <input type="text" id="agendaSearch" placeholder="Procurar por nome" 
-                    class="w-full bg-white/10 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white placeholder-white/30 text-sm focus:outline-none focus:bg-white/20 focus:border-yellow-400/50 transition-all">
+                <input type="text" id="agendaSearch" placeholder="Procurar por nome" class="w-full bg-white/10 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-white placeholder-white/30 text-sm focus:outline-none focus:bg-white/20 focus:border-yellow-400/50 transition-all">
                 <div class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 </div>
             </div>
         </div>
-
         <div id="agendaContainer" class="flex-1 overflow-y-auto p-4 pt-0 space-y-3 no-scrollbar pb-10">
             <div id="agendaLoading" class="flex flex-col gap-4 py-2">
                 <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
                 <div class="w-full h-24 rounded-3xl bg-white/5 animate-pulse overflow-hidden relative"><div class="shimmer absolute inset-0"></div></div>
             </div>
         </div>
-        
         <div id="agendaPagination" class="px-5 py-4 border-t border-white/10 hidden bg-blue-900/40">
             <button id="viewMoreAgenda" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-bold text-sm transition-all active:scale-95">Ver mais agendamentos</button>
         </div>
@@ -316,16 +312,13 @@
         const init = async () => {
             fetchNotifications();
             handleMarketingTooltip();
-
             if (fbConfigRaw) {
                 try {
                     const app = initializeApp(JSON.parse(fbConfigRaw));
                     auth = getAuth(app);
                     db = getFirestore(app);
                     await signInAnonymously(auth);
-                    onAuthStateChanged(auth, u => { 
-                        if (u) { user = u; setupPersistenceListener(); } 
-                    });
+                    onAuthStateChanged(auth, u => { if (u) { user = u; setupPersistenceListener(); } });
                 } catch (e) { console.warn("Firebase Offline"); }
             }
         };
@@ -335,14 +328,12 @@
             const tooltip = getEl('marketingTooltip');
             const overlay = getEl('tooltipOverlay');
             const closeBtn = getEl('closeMarketing');
-
             if (!hasSeen && tooltip && overlay) {
                 setTimeout(() => {
                     overlay.classList.remove('hidden');
                     tooltip.classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
                 }, 800);
-
                 closeBtn.onclick = () => {
                     tooltip.classList.add('hidden');
                     overlay.classList.add('hidden');
@@ -371,21 +362,17 @@
             const container = getEl('agendaContainer');
             const countEl = getEl('agendaCount');
             const loadingHtml = getEl('agendaLoading')?.outerHTML || '';
-
             if (container) container.innerHTML = loadingHtml;
             if (countEl) countEl.innerText = 'Consultando...';
-
             try {
                 const res = await fetch(AGENDA_API);
                 const data = await res.json();
                 const today = new Date();
                 today.setHours(0,0,0,0);
-
                 agendaData = data.filter(item => {
                     const dateVal = item.EVENTO || item.dia || item.data;
                     return parseSheetDate(dateVal) >= today;
                 }).sort((a, b) => parseSheetDate(a.EVENTO || a.dia) - parseSheetDate(b.EVENTO || b.dia));
-
                 renderAgenda();
             } catch (e) {
                 if (container) container.innerHTML = `<p class="text-white/50 text-center py-10">Erro ao carregar agenda.</p>`;
@@ -411,33 +398,23 @@
             const container = getEl('agendaContainer');
             const countEl = getEl('agendaCount');
             if (!container) return;
-
-            const filtered = searchQuery.trim() === "" 
-                ? agendaData 
-                : agendaData.filter(item => {
-                    const nome = (item.NOME || '').toLowerCase();
-                    return nome.includes(searchQuery.toLowerCase());
-                });
-
+            const filtered = searchQuery.trim() === "" ? agendaData : agendaData.filter(item => {
+                const nome = (item.NOME || '').toLowerCase();
+                return nome.includes(searchQuery.toLowerCase());
+            });
             if (countEl) countEl.innerText = searchQuery ? `${filtered.length} ENCONTRADOS` : `${agendaData.length} RESERVAS`;
-
             const visibleItems = filtered.slice(0, searchQuery ? 100 : agendaVisibleLimit);
-            
             if (visibleItems.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 opacity-30 text-white brand-font text-xl">${searchQuery ? 'Sem resultados.' : 'Sem reservas futuras.'}</div>`;
                 return;
             }
-
             const today = new Date(); today.setHours(0,0,0,0);
             const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-            
             let lastMonthYear = "";
             let html = "";
-
             visibleItems.forEach((item) => {
                 const date = parseSheetDate(item.EVENTO || item.dia || item.data);
                 const checkDate = new Date(date); checkDate.setHours(0,0,0,0);
-                
                 const monthYearKey = `${date.getMonth()}-${date.getFullYear()}`;
                 if (monthYearKey !== lastMonthYear) {
                     const monthName = date.toLocaleDateString('pt-PT', { month: 'long' });
@@ -445,51 +422,22 @@
                     html += `<div class="month-divider">${isThisMonth ? 'ESTE MÊS' : monthName}</div>`;
                     lastMonthYear = monthYearKey;
                 }
-
                 let dateBadgeHtml = "";
                 if (checkDate.getTime() === today.getTime()) {
                     dateBadgeHtml = `<span class="text-[11px] font-black text-[#1e3a8a]">HOJE</span>`;
                 } else if (checkDate.getTime() === tomorrow.getTime()) {
                     dateBadgeHtml = `<span class="text-[10px] font-black text-[#1e3a8a] leading-none uppercase text-center">AMA<br>NHÃ</span>`;
                 } else {
-                    dateBadgeHtml = `
-                        <span class="text-[10px] uppercase font-bold opacity-70 leading-none text-[#1e3a8a]/80">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span>
-                        <span class="text-xl font-bold brand-font leading-none text-[#1e3a8a]">${date.getDate()}</span>
-                    `;
+                    dateBadgeHtml = `<span class="text-[10px] uppercase font-bold opacity-70 leading-none text-[#1e3a8a]/80">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span><span class="text-xl font-bold brand-font leading-none text-[#1e3a8a]">${date.getDate()}</span>`;
                 }
-
                 const itensRaw = item["ITENS LOCADOS"] || 'Equipamentos Diversos';
                 const itensList = itensRaw.split(',').map(i => i.trim()).join('<br>');
                 const bairro = item.BAIRRO || item.bairro || '';
-
-                html += `
-                    <div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex flex-col gap-3">
-                        <div class="flex items-center gap-4">
-                            <div class="date-badge">
-                                ${dateBadgeHtml}
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h3 class="font-bold text-sm leading-tight mb-0.5 truncate flex items-center gap-1.5">
-                                    ${item.NOME || 'Cliente Encanto'}
-                                    ${bairro ? `<span class="text-[10px] font-medium text-slate-400 whitespace-nowrap opacity-90 tracking-tight">(${bairro})</span>` : ''}
-                                </h3>
-                                <p class="text-[12px] text-blue-100/70 font-medium">${formatPhone(item.WHATSAPP || item.telefone)}</p>
-                            </div>
-                        </div>
-                        <div class="pt-2 border-t border-white/5">
-                            <p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">
-                                ${itensList}
-                            </p>
-                        </div>
-                    </div>
-                `;
+                html += `<div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex flex-col gap-3"><div class="flex items-center gap-4"><div class="date-badge">${dateBadgeHtml}</div><div class="flex-1 min-w-0"><h3 class="font-bold text-sm leading-tight mb-0.5 truncate flex items-center gap-1.5">${item.NOME || 'Cliente Encanto'} ${bairro ? `<span class="text-[10px] font-medium text-slate-400 whitespace-nowrap opacity-90 tracking-tight">(${bairro})</span>` : ''}</h3><p class="text-[12px] text-blue-100/70 font-medium">${formatPhone(item.WHATSAPP || item.telefone)}</p></div></div><div class="pt-2 border-t border-white/5"><p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">${itensList}</p></div></div>`;
             });
-
             container.innerHTML = html;
             const pagination = getEl('agendaPagination');
-            if (pagination) {
-                pagination.classList.toggle('hidden', searchQuery !== "" || agendaVisibleLimit >= agendaData.length);
-            }
+            if (pagination) pagination.classList.toggle('hidden', searchQuery !== "" || agendaVisibleLimit >= agendaData.length);
         }
 
         async function fetchNotifications() {
@@ -513,7 +461,6 @@
         function renderNotifs(list) {
             const container = getEl('notifContainer');
             if (!container) return;
-
             if (list.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 opacity-20 text-white brand-font text-xl">Tudo em dia!</div>`;
                 return;
@@ -522,16 +469,7 @@
             list.forEach(n => {
                 const card = document.createElement('div');
                 card.className = "item-card p-4 rounded-[1.5rem] text-white shadow-lg cursor-pointer";
-                card.innerHTML = `
-                    <div class="flex gap-3">
-                        <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">${n.tipo === 'alerta' ? '⚡' : '✨'}</div>
-                        <div class="flex-1 min-w-0 pointer-events-none">
-                            <h3 class="font-bold text-sm leading-tight mb-1 text-white">${n.titulo}</h3>
-                            <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">${n.mensagem}</p>
-                            <button class="mark-btn text-[10px] font-bold text-blue-300 hover:text-white uppercase transition-colors pointer-events-auto">Marcar lido</button>
-                        </div>
-                    </div>
-                `;
+                card.innerHTML = `<div class="flex gap-3"><div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">${n.tipo === 'alerta' ? '⚡' : '✨'}</div><div class="flex-1 min-w-0 pointer-events-none"><h3 class="font-bold text-sm leading-tight mb-1 text-white">${n.titulo}</h3><p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">${n.mensagem}</p><button class="mark-btn text-[10px] font-bold text-blue-300 hover:text-white uppercase transition-colors pointer-events-auto">Marcar lido</button></div></div>`;
                 card.onclick = (e) => {
                     if (e.target.classList.contains('mark-btn')) {
                         e.stopPropagation(); if(card) card.classList.add('dismissing'); setTimeout(() => persistReadId(n.id), 450); return;
@@ -562,7 +500,6 @@
             readIds = [...new Set([...readIds, ...newIds])];
             localStorage.setItem('encanto_read_ids', JSON.stringify(readIds));
             updateNotifUI();
-            
             if (user && db) {
                 const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
                 try { await updateDoc(stateRef, { readIds: readIds }); } catch (e) { await setDoc(stateRef, { readIds: readIds }); }
@@ -570,70 +507,31 @@
         }
 
         const setupUIListeners = () => {
-            const btns = {
-                notif: getEl('notifBtn'),
-                agenda: getEl('agendaBtn'),
-                closeNotif: getEl('closeNotif'),
-                closeAgenda: getEl('closeAgenda'),
-                viewMore: getEl('viewMoreAgenda'),
-                markAll: getEl('markAllRead')
-            };
-
-            const modals = {
-                notif: getEl('notifModal'),
-                agenda: getEl('agendaModal')
-            };
-
+            const btns = { notif: getEl('notifBtn'), agenda: getEl('agendaBtn'), closeNotif: getEl('closeNotif'), closeAgenda: getEl('closeAgenda'), viewMore: getEl('viewMoreAgenda'), markAll: getEl('markAllRead') };
+            const modals = { notif: getEl('notifModal'), agenda: getEl('agendaModal') };
             const searchInput = getEl('agendaSearch');
-
             if (btns.notif && modals.notif) {
-                btns.notif.onclick = () => { 
-                    modals.notif.classList.remove('hidden'); 
-                    setTimeout(() => modals.notif.classList.add('active'), 10); 
-                };
+                btns.notif.onclick = () => { modals.notif.classList.remove('hidden'); setTimeout(() => modals.notif.classList.add('active'), 10); };
             }
-
             if (btns.agenda && modals.agenda) {
-                btns.agenda.onclick = () => { 
-                    modals.agenda.classList.remove('hidden'); 
-                    setTimeout(() => { 
-                        modals.agenda.classList.add('active'); 
-                        fetchAgenda(); 
-                        if (searchInput) searchInput.focus();
-                    }, 10); 
-                };
+                btns.agenda.onclick = () => { modals.agenda.classList.remove('hidden'); setTimeout(() => { modals.agenda.classList.add('active'); fetchAgenda(); if (searchInput) searchInput.focus(); }, 10); };
             }
-
             if (btns.closeNotif && modals.notif) {
-                btns.closeNotif.onclick = () => { 
-                    modals.notif.classList.remove('active'); 
-                    setTimeout(() => modals.notif.classList.add('hidden'), 400); 
-                };
+                btns.closeNotif.onclick = () => { modals.notif.classList.remove('active'); setTimeout(() => modals.notif.classList.add('hidden'), 400); };
             }
-
             if (btns.closeAgenda && modals.agenda) {
-                btns.closeAgenda.onclick = () => { 
-                    modals.agenda.classList.remove('active'); 
-                    setTimeout(() => modals.agenda.classList.add('hidden'), 400); 
-                };
+                btns.closeAgenda.onclick = () => { modals.agenda.classList.remove('active'); setTimeout(() => modals.agenda.classList.add('hidden'), 400); };
             }
-
             if (btns.viewMore) {
                 btns.viewMore.onclick = () => { agendaVisibleLimit += 5; renderAgenda(); };
             }
-
             if (btns.markAll) {
                 btns.markAll.onclick = () => markAllNotificationsAsRead();
             }
-
             if (searchInput) {
-                searchInput.addEventListener('input', (e) => {
-                    searchQuery = e.target.value;
-                    renderAgenda();
-                });
+                searchInput.addEventListener('input', (e) => { searchQuery = e.target.value; renderAgenda(); });
             }
         };
-
         setupUIListeners();
         init();
     </script>
