@@ -30,12 +30,10 @@
             line-height: 1.2;
         }
         
-        /* Cabeçalho Prioritário acima do Blur */
         .glass-header {
             background: #2563eb; 
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 110; 
         }
 
         .item-card {
@@ -67,7 +65,6 @@
             background: linear-gradient(180deg, #2563eb 0%, #1e3a8a 100%);
             background-attachment: fixed;
             visibility: hidden;
-            z-index: 120;
         }
         .modal-view.active {
             transform: translateY(0%);
@@ -121,77 +118,12 @@
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
         }
-
-        /* TOOLTIP E TUTORIAL STYLE */
-        .tutorial-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 100; /* Abaixo do header e tooltip */
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        .tutorial-backdrop.active {
-            display: block;
-            opacity: 1;
-        }
-
-        .feature-tooltip {
-            position: fixed;
-            top: 76px; 
-            right: 16px;
-            width: 290px;
-            background: white;
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-            z-index: 130;
-            display: none;
-            flex-direction: column;
-            gap: 12px;
-            transform: translateY(10px);
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .feature-tooltip.active {
-            display: flex;
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .tooltip-arrow {
-            position: absolute;
-            top: -10px;
-            right: 60px; 
-            width: 20px;
-            height: 20px;
-            background: white;
-            transform: rotate(45deg);
-            border-top-left-radius: 4px;
-        }
-
-        .pulse-highlight {
-            background: rgba(255, 255, 255, 0.3) !important;
-            animation: pulse-ring 2s infinite;
-        }
-
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
     </style>
 </head>
 <body class="min-h-screen bg-white">
 
-    <!-- Backdrop de Desfoque -->
-    <div id="tutorialBackdrop" class="tutorial-backdrop"></div>
-
     <!-- Cabeçalho Fixo -->
-    <header class="fixed top-0 left-0 right-0 w-full glass-header h-16">
+    <header class="fixed top-0 left-0 right-0 w-full glass-header z-40 h-16">
         <div class="max-w-xl mx-auto px-5 h-full flex justify-between items-center">
             
             <a href="index.html" class="flex items-center gap-3 active:scale-95 transition-transform outline-none">
@@ -220,23 +152,7 @@
         </div>
     </header>
 
-    <!-- Tooltip de Novidade -->
-    <div id="tutorialTooltip" class="feature-tooltip">
-        <div class="tooltip-arrow"></div>
-        <div class="flex items-center gap-2">
-            <div class="w-2 h-2 bg-blue-600 rounded-full animate-ping"></div>
-            <span class="text-blue-600 text-[10px] font-black uppercase tracking-widest">Marketing</span>
-        </div>
-        <h3 class="brand-font text-xl text-slate-800 leading-tight">O seu agendamento está certo? ✨</h3>
-        <p class="text-slate-500 text-[13px] leading-relaxed">
-            Agora podes ver se a tua reserva foi confirmada corretamente em tempo real! Clique no ícone de calendário.
-        </p>
-        <button id="closeTutorial" class="w-full mt-2 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow-xl shadow-blue-200 transition-all active:scale-95 outline-none">
-            Entendido, OK!
-        </button>
-    </div>
-
-    <!-- Área Principal -->
+    <!-- Área Principal (Vazia para manter o foco no cabeçalho) -->
     <main class="min-h-screen"></main>
 
     <!-- MODAL DE NOTIFICAÇÕES -->
@@ -305,16 +221,11 @@
             markAllReadBtn: document.getElementById('markAllRead'),
             viewMoreAgenda: document.getElementById('viewMoreAgenda'),
             agendaPagination: document.getElementById('agendaPagination'),
-            agendaCount: document.getElementById('agendaCount'),
-            backdrop: document.getElementById('tutorialBackdrop'),
-            tooltip: document.getElementById('tutorialTooltip'),
-            closeTutorial: document.getElementById('closeTutorial')
+            agendaCount: document.getElementById('agendaCount')
         };
 
         const init = async () => {
             fetchNotifications();
-            checkTutorial(); // Inicia o Tutorial
-            
             if (fbConfigRaw) {
                 try {
                     const app = initializeApp(JSON.parse(fbConfigRaw));
@@ -326,26 +237,6 @@
                     });
                 } catch (e) { console.warn("Firebase Offline"); }
             }
-        };
-
-        // --- LÓGICA DE TUTORIAL ---
-        function checkTutorial() {
-            if (localStorage.getItem('encanto_tutorial_seen')) return;
-
-            setTimeout(() => {
-                els.backdrop.classList.add('active');
-                els.tooltip.classList.add('active');
-                els.agendaBtn.classList.add('pulse-highlight');
-                document.body.style.overflow = 'hidden';
-            }, 800);
-        }
-
-        els.closeTutorial.onclick = () => {
-            els.backdrop.classList.remove('active');
-            els.tooltip.classList.remove('active');
-            els.agendaBtn.classList.remove('pulse-highlight');
-            document.body.style.overflow = '';
-            localStorage.setItem('encanto_tutorial_seen', 'true');
         };
 
         const setupPersistenceListener = () => {
@@ -362,11 +253,10 @@
 
         function parseSheetDate(dateStr) {
             if (!dateStr) return new Date();
-            const d = dateStr.toString();
-            if (d.includes('-') && d.includes('T')) return new Date(d);
-            const parts = d.split('/');
+            if (dateStr.includes('-') && dateStr.includes('T')) return new Date(dateStr);
+            const parts = dateStr.split('/');
             if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
-            return new Date(d);
+            return new Date(dateStr);
         }
 
         async function fetchAgenda() {
@@ -384,11 +274,7 @@
                 agendaData = data.filter(item => {
                     const dateVal = item.EVENTO || item.dia || item.data;
                     return parseSheetDate(dateVal) >= today;
-                }).sort((a, b) => {
-                    const dA = parseSheetDate(a.EVENTO || a.dia);
-                    const dB = parseSheetDate(b.EVENTO || b.dia);
-                    return dA - dB;
-                });
+                }).sort((a, b) => parseSheetDate(a.EVENTO || a.dia) - parseSheetDate(b.EVENTO || b.dia));
 
                 els.agendaCount.innerText = `${agendaData.length} RESERVAS`;
                 renderAgenda();
@@ -413,16 +299,19 @@
 
             const today = new Date(); today.setHours(0,0,0,0);
             const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-            let lastMonthYear = "", html = "";
+            
+            let lastMonthYear = "";
+            let html = "";
 
-            visibleItems.forEach((item) => {
+            visibleItems.forEach((item, idx) => {
                 const date = parseSheetDate(item.EVENTO || item.dia || item.data);
                 const checkDate = new Date(date); checkDate.setHours(0,0,0,0);
-                const monthYearKey = `${date.getMonth()}-${date.getFullYear()}`;
                 
+                const monthYearKey = `${date.getMonth()}-${date.getFullYear()}`;
                 if (monthYearKey !== lastMonthYear) {
                     const monthName = date.toLocaleDateString('pt-PT', { month: 'long' });
                     const isThisMonth = date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+                    
                     html += `<div class="month-divider">${isThisMonth ? 'ESTE MÊS' : monthName}</div>`;
                     lastMonthYear = monthYearKey;
                 }
@@ -431,25 +320,38 @@
                 if (checkDate.getTime() === today.getTime()) {
                     dateBadgeHtml = `<span class="text-[11px] font-black text-white">HOJE</span>`;
                 } else if (checkDate.getTime() === tomorrow.getTime()) {
-                    dateBadgeHtml = `<span class="text-[10px] font-black text-white leading-none uppercase text-center">AMA<br>NHÃ</span>`;
+                    dateBadgeHtml = `
+                        <span class="text-[10px] font-black text-white leading-none uppercase">AMA</span>
+                        <span class="text-[10px] font-black text-white leading-none uppercase">NHÃ</span>
+                    `;
                 } else {
-                    dateBadgeHtml = `<span class="text-[10px] uppercase font-bold text-white/70 leading-none">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span><span class="text-xl font-bold brand-font text-white leading-none">${date.getDate()}</span>`;
+                    dateBadgeHtml = `
+                        <span class="text-[10px] uppercase font-bold opacity-70 leading-none text-white/70">${date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.','')}</span>
+                        <span class="text-xl font-bold brand-font leading-none text-white">${date.getDate()}</span>
+                    `;
                 }
 
                 const itensRaw = item["ITENS LOCADOS"] || 'Equipamentos Diversos';
-                const itensList = itensRaw.toString().split(',').map(i => i.trim()).join('<br>');
+                const itensList = itensRaw.split(',').map(i => i.trim()).join('<br>');
 
                 html += `
                     <div class="item-card p-4 rounded-[1.5rem] text-white shadow-lg flex flex-col gap-3">
                         <div class="flex items-center gap-4">
-                            <div class="date-badge flex flex-col items-center justify-center w-14 h-14 rounded-2xl shrink-0">${dateBadgeHtml}</div>
+                            <div class="date-badge flex flex-col items-center justify-center w-14 h-14 rounded-2xl shrink-0">
+                                ${dateBadgeHtml}
+                            </div>
                             <div class="flex-1 min-w-0">
-                                <h3 class="font-bold text-sm leading-tight mb-0.5 truncate">${item.NOME || 'Cliente'}</h3>
+                                <h3 class="font-bold text-sm leading-tight mb-0.5 truncate">${item.NOME || 'Cliente Encanto'}</h3>
                                 <p class="text-[12px] text-blue-100/70 font-medium">${formatPhone(item.WHATSAPP || item.telefone)}</p>
                             </div>
                         </div>
-                        <div class="pt-2 border-t border-white/5"><p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">${itensList}</p></div>
-                    </div>`;
+                        <div class="pt-2 border-t border-white/5">
+                            <p class="text-[11px] text-yellow-400 font-bold italic leading-relaxed uppercase tracking-tight">
+                                ${itensList}
+                            </p>
+                        </div>
+                    </div>
+                `;
             });
 
             els.agendaContainer.innerHTML = html;
@@ -492,13 +394,15 @@
                             <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">${n.mensagem}</p>
                             <button class="mark-btn text-[10px] font-bold text-blue-300 hover:text-white uppercase transition-colors pointer-events-auto">Marcar lido</button>
                         </div>
-                    </div>`;
+                    </div>
+                `;
                 card.onclick = (e) => {
                     if (e.target.classList.contains('mark-btn')) {
                         e.stopPropagation(); card.classList.add('dismissing'); setTimeout(() => persistReadId(n.id), 450); return;
                     }
                     const msgPara = card.querySelector('.line-clamp-msg');
-                    if (msgPara.scrollHeight > msgPara.clientHeight && !card.classList.contains('expanded')) { card.classList.add('expanded'); }
+                    const isTruncated = msgPara.scrollHeight > msgPara.clientHeight;
+                    if (isTruncated && !card.classList.contains('expanded')) { card.classList.add('expanded'); }
                     else if (n.link) window.location.href = n.link;
                 };
                 els.notifContainer.appendChild(card);
