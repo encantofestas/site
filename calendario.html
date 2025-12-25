@@ -125,7 +125,7 @@
     </header>
 
     <main class="pt-24 px-5 max-w-xl mx-auto">
-        <div class="bg-blue-50 border border-blue-100 rounded-3xl p-6 text-center">
+        <div class="bg-blue-50 border border-blue-100 rounded-3xl p-6 text-center shadow-sm">
             <h2 class="brand-font text-2xl text-blue-900 mb-2">Painel Encanto Festas ✨</h2>
             <p class="text-blue-700 text-sm">Gira as tuas reservas e notificações num clique.</p>
         </div>
@@ -316,22 +316,43 @@
             els.notifContainer.innerHTML = '';
             list.forEach(n => {
                 const card = document.createElement('div');
-                card.className = "item-card p-4 rounded-[1.5rem] text-white shadow-lg";
+                card.className = "item-card p-4 rounded-[1.5rem] text-white shadow-lg cursor-pointer";
                 card.innerHTML = `
                     <div class="flex gap-3">
                         <div class="w-10 h-10 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner pointer-events-none">${n.tipo === 'alerta' ? '⚡' : '✨'}</div>
                         <div class="flex-1 min-w-0 pointer-events-none">
                             <h3 class="font-bold text-sm leading-tight mb-1 text-white">${n.titulo}</h3>
                             <p class="text-[13px] text-blue-50/80 mb-2 leading-relaxed line-clamp-msg">${n.mensagem}</p>
-                            <button class="mark-btn text-[10px] font-bold text-blue-300 uppercase pointer-events-auto">Marcar lido</button>
+                            <button class="mark-btn text-[10px] font-bold text-blue-300 hover:text-white uppercase transition-colors pointer-events-auto">Marcar lido</button>
                         </div>
                     </div>
                 `;
+
+                // LOGICA DE CLIQUE ATUALIZADA
                 card.onclick = (e) => {
-                    if (e.target.classList.contains('mark-btn')) { persistReadId(n.id); return; }
-                    if (!card.classList.contains('expanded')) { card.classList.add('expanded'); persistReadId(n.id); }
-                    else if (n.link) window.location.href = n.link;
+                    // Se clicar no botão "Marcar lido", removemos da lista
+                    if (e.target.classList.contains('mark-btn')) {
+                        e.stopPropagation();
+                        card.classList.add('dismissing');
+                        setTimeout(() => persistReadId(n.id), 450);
+                        return;
+                    }
+
+                    // Se clicar no card, verificamos se precisa expandir ou abrir link
+                    const msgPara = card.querySelector('.line-clamp-msg');
+                    const isTruncated = msgPara.scrollHeight > msgPara.clientHeight;
+                    const isExpanded = card.classList.contains('expanded');
+
+                    if (isTruncated && !isExpanded) {
+                        // Se for grande e não estiver expandido, abre a mensagem
+                        card.classList.add('expanded');
+                        // NOTA: Não chamamos persistReadId aqui para a notificação NÃO fechar
+                    } else {
+                        // Se já estiver aberta ou for pequena, abre o link fictício/real
+                        if (n.link) window.location.href = n.link;
+                    }
                 };
+
                 els.notifContainer.appendChild(card);
             });
         }
@@ -344,8 +365,9 @@
             }
             updateNotifUI();
             if (user && db) {
-                try { await updateDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state'), { readIds: arrayUnion(nid) }); }
-                catch (e) { await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state'), { readIds }); }
+                const stateRef = doc(db, 'artifacts', appId, 'users', user.uid, 'notification_data', 'state');
+                try { await updateDoc(stateRef, { readIds: arrayUnion(nid) }); }
+                catch (e) { await setDoc(stateRef, { readIds }); }
             }
         }
 
