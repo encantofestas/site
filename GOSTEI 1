@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Encanto Festas - Locação de Brinquedos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --secondary-blue: #0056b3;
+            --success-green: #28a745;
+            --warning-orange: #fd7e14;
+            --danger-red: #dc3545;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fff;
+            color: #333;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .rounded-card { border-radius: 24px; }
+        
+        /* Calendário Customizado */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .day-cell {
+            aspect-ratio: 1/1.1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            position: relative;
+            transition: transform 0.2s, background-color 0.3s;
+            border: 1px solid #eee;
+        }
+
+        .day-cell.active:active { transform: scale(0.9); }
+        
+        .price-indicator {
+            font-size: 0.6rem;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        /* Bottom Sheet - Mobile First */
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            z-index: 50;
+            border-radius: 30px 30px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+        }
+
+        .bottom-sheet.open { transform: translateY(0); }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 40;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Indicador de Disponibilidade */
+        .availability-bar {
+            height: 12px;
+            background: linear-gradient(to right, #28a745, #ffc107, #dc3545);
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .bar-pointer {
+            position: absolute;
+            top: -15px;
+            transition: left 0.3s;
+        }
+
+        /* Itens de Brinquedos */
+        .toy-card {
+            border: 1px solid #f0f0f0;
+            border-radius: 18px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+
+        .age-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Botão Fixo Bottom */
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px;
+            border-top: 1px solid #eee;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Animações */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+
+        .free-badge {
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-5px);}
+            60% {transform: translateY(-3px);}
+        }
+
+        input:invalid { border: 2px solid #dc3545; }
+        
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            position: relative;
+            transition: 0.3s;
+        }
+        .toggle-switch.on { background: #28a745; }
+        .toggle-knob {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+        }
+        .toggle-switch.on .toggle-knob { left: 22px; }
+    </style>
+</head>
+<body class="pb-32">
+
+    <!-- Espaço Cabeçalho -->
+    <div class="h-12"></div>
+
+    <main class="px-4">
+        <h1 class="text-2xl font-bold text-center text-blue-600 mb-2">Selecione a data</h1>
+        
+        <!-- Navegação Mês -->
+        <div class="flex justify-between items-center mb-4">
+            <button onclick="changeMonth(-1)" class="p-2 text-blue-600"><i class="fas fa-chevron-left"></i></button>
+            <h2 id="currentMonthLabel" class="font-semibold text-lg">Janeiro 2024</h2>
+            <button onclick="changeMonth(1)" class="p-2 text-blue-600"><i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <!-- Calendário -->
+        <div class="calendar-grid mb-6" id="calendarGrid">
+            <!-- Dias injetados via JS -->
+        </div>
+
+        <!-- Indicador de Disponibilidade -->
+        <div class="mb-8 p-4 bg-gray-50 rounded-card">
+            <div class="flex justify-between text-xs mb-2">
+                <span class="text-green-600 font-bold uppercase">Disponível</span>
+                <span class="text-red-600 font-bold uppercase">Esgotado</span>
+            </div>
+            <div class="availability-bar" id="availBar">
+                <div class="bar-pointer" id="barPointer" style="left: 0%;">
+                    <i class="fas fa-caret-down text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Overlay & Bottom Sheet para Brinquedos -->
+    <div class="overlay" id="overlay"></div>
+    <div class="bottom-sheet" id="toySheet">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold" id="toySheetTitle">Brinquedos disponíveis</h3>
+                <button onclick="closeSheet()" class="text-gray-400"><i class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <p id="priceLevelLabel" class="text-sm font-semibold mb-4"></p>
+
+            <!-- Filtros -->
+            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                <select id="sortFilter" onchange="renderToys()" class="p-2 bg-gray-100 rounded-lg text-sm outline-none">
+                    <option value="relevance">Relevância</option>
+                    <option value="az">A-Z</option>
+                </select>
+                <select id="ageFilter" onchange="renderToys()" class="p-2 bg-gray-100 rounded-lg text-sm outline-none">
+                    <option value="all">Todas Idades</option>
+                    <option value="L">Livre</option>
+                    <option value="-6">Até 6 anos</option>
+                    <option value="-14">Até 14 anos</option>
+                </select>
+            </div>
+
+            <div id="toyList" class="grid grid-cols-1 gap-4 mb-32">
+                <!-- Brinquedos injetados via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário Multi-Step -->
+    <div class="bottom-sheet" id="formSheet">
+        <div class="p-6 mb-32" id="formContent">
+            <!-- Conteúdo dinâmico do formulário -->
+        </div>
+    </div>
+
+    <!-- Resumo Fixo Inferior -->
+    <div class="fixed-footer fade-in" id="summaryFooter">
+        <div class="flex justify-between text-sm">
+            <span id="deliveryText" class="text-gray-500">FRETE GRÁTIS</span>
+            <span class="font-bold text-blue-600" id="totalValueText">Total: R$ 0,00</span>
+        </div>
+        <button id="mainBtn" onclick="nextStep()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform">
+            CONTINUAR
+        </button>
+    </div>
+
+    <!-- Popup Pix -->
+    <div id="pixPopup" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] hidden p-4">
+        <div class="bg-white p-8 rounded-[32px] text-center w-full max-w-sm">
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-2xl"></i>
+            </div>
+            <h4 class="text-xl font-bold mb-2">Reserva Garantida!</h4>
+            <p class="text-gray-500 text-sm mb-6">Para finalizar, realize o sinal de reserva de R$ 25,00 via PIX.</p>
+            <div class="bg-gray-100 p-4 rounded-xl mb-4 font-mono text-sm break-all" id="pixKey">
+                57.545.647/0001-16
+            </div>
+            <button onclick="copyPix()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold mb-3">COPIAR CÓDIGO PIX</button>
+            <button onclick="location.reload()" class="text-gray-400 text-sm">Voltar ao início</button>
+        </div>
+    </div>
+
+    <!-- Espaço Footer -->
+    <div class="h-12"></div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbz_4NqmCf3iwAzXdBTUC-o1C9d_029b6g-HP6QyD8oEaHKt5eNjSd3eWsB9EaRJo9Nj/exec";
+        const APP_ID = "site-encanto-001";
+        
+        let currentDate = new Date();
+        let selectedDate = null;
+        let sheetData = [];
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        let cart = [];
+        let currentStep = 'calendar'; // calendar, toys, id, address, party, details, summary
+        let insuranceEnabled = false;
+        let nfEnabled = false;
+        let selectedBairro = null;
+        let extraDays = 1;
+        let startTime = "09:00";
+        let endTime = "10:00";
+        let monitorsCount = 0;
+        let monitorHours = 2;
+        let rainInfo = "não molha nada";
+        let socketDistances = {};
+        let couponCode = "";
+        let couponDiscount = 0;
+
+        const TOYS_DB = [
+            { id: 1, name: "Pula Pula Médio", qty: 3, price: 190, category: "pula", age: "-14", size: "3.0m", power: false, relevance: 1 },
+            { id: 2, name: "Pula Pula Pequeno", qty: 1, price: 170, category: "pula", age: "-6", size: "2.4m", power: false, relevance: 2 },
+            { id: 3, name: "Piscina de Bolinhas", qty: 2, price: 160, category: "piscina", age: "-6", size: "2.0m", power: false, relevance: 3 },
+            { id: 4, name: "Tobogã Médio", qty: 1, price: 400, category: "toboga", age: "-14", size: "5.0m", power: true, relevance: 4 },
+            { id: 5, name: "Área Baby", qty: 1, price: 120, category: "baby", age: "-6", size: "3x3m", power: false, relevance: 5 },
+            { id: 6, name: "Mini Baby", qty: 1, price: 220, category: "baby", age: "-6", size: "2.5m", power: true, relevance: 6 },
+            { id: 7, name: "Castelinho", qty: 1, price: 220, category: "baby", age: "-6", size: "3.0m", power: true, relevance: 7 },
+            { id: 8, name: "Futebol de Sabão", qty: 1, price: 600, category: "especial", age: "L", size: "10.0m", power: true, relevance: 8 },
+            { id: 9, name: "Escorrega com Bolinhas", qty: 1, price: 400, category: "especial", age: "-6", size: "4.0m", power: true, relevance: 9 },
+            { id: 10, name: "Airhockey", qty: 1, price: 200, category: "mesa_jogo", age: "L", size: "1.5m", power: true, relevance: 10 },
+            { id: 11, name: "Pebolim", qty: 1, price: 200, category: "mesa_jogo", age: "L", size: "1.4m", power: false, relevance: 11 },
+            { id: 12, name: "Pingpong", qty: 1, price: 200, category: "mesa_jogo", age: "L", size: "2.7m", power: false, relevance: 12 },
+            { id: 13, name: "Mesas", qty: 4, price: 15, category: "mesa_comer", age: "L", size: "0.8m", power: false, relevance: 13 }
+        ];
+
+        const BAIRROS = {
+            "Acaraí": 0, "Água Branca": 0, "Capri": 10, "Centro": 0, "Centro Histórico": 0,
+            "Enseada": 10, "Ervino": 25, "Iperoba": 0, "Itaguaçu": 10, "Laranjeiras": 10,
+            "Majorca": 10, "Miranda": 10, "Morro Grande": 0, "Paulas": 0, "Praia Grande": 10,
+            "Reta": 0, "Ribeira": 10, "Rocio Grande": 0, "Rocio Pequeno": 0, "Sandra Regina": 10,
+            "Tapera": 10, "Ubatuba": 10, "Vila da Glória": -1
+        };
+
+        const HOLIDAYS = ["01/01", "01/05", "07/09", "12/10", "02/11", "15/11", "25/12", "01/01"];
+        const SPECIAL_DATES = ["05/10", "12/10", "12/07", "31/08", "11/10", "29/06", "06/07", "20/07", "09/11", "07/06", "21/06", "28/06", "13/07", "02/08", "16/08", "17/08", "06/09", "13/09", "20/09", "28/09", "19/10", "26/10"];
+
+        // Initialization
+        window.onload = async () => {
+            renderCalendar();
+            fetchData();
+            document.getElementById('summaryFooter').style.display = 'none';
+        };
+
+        async function fetchData() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                sheetData = data;
+                renderCalendar();
+            } catch (e) { console.error("Erro ao buscar dados do Sheets"); }
+        }
+
+        function changeMonth(dir) {
+            let nextM = currentMonth + dir;
+            let nextY = currentYear;
+            if (nextM < 0) { nextM = 11; nextY--; }
+            if (nextM > 11) { nextM = 0; nextY++; }
+            
+            // Limite 12 meses
+            const diff = (nextY - currentDate.getFullYear()) * 12 + (nextM - currentDate.getMonth());
+            if (diff < 0 || diff > 12) return;
+
+            currentMonth = nextM;
+            currentYear = nextY;
+            renderCalendar();
+        }
+
+        function getPriceLevel(date) {
+            const dateStr = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth()+1).padStart(2, '0')}`;
+            const fullDateStr = `${dateStr}/${date.getFullYear()}`;
+            const isOctoberToDecember = date.getMonth() >= 9 && date.getMonth() <= 11;
+            const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+            if (HOLIDAYS.includes(dateStr) || ["11/10", "24/12", "31/12"].includes(dateStr)) return '$$$$';
+            if (SPECIAL_DATES.includes(dateStr)) return '$$$';
+            
+            if (isOctoberToDecember) {
+                return isWeekend ? '$$$' : '$$';
+            }
+            return isWeekend ? '$$' : '$';
+        }
+
+        function getDayColor(date) {
+            const dateStr = date.toLocaleDateString('pt-BR');
+            const bookingsOnDay = sheetData.filter(row => row['INICIO'] && row['INICIO'].includes(dateStr));
+            let locados = 0;
+            bookingsOnDay.forEach(b => locados += parseInt(b['ITENS LOCADOS'] || 0));
+            
+            const totalItems = 19;
+            const ratio = locados / totalItems;
+            if (ratio === 0) return 'bg-green-50';
+            if (ratio < 0.3) return 'bg-green-100';
+            if (ratio < 0.6) return 'bg-yellow-100';
+            if (ratio < 0.9) return 'bg-orange-100';
+            return 'bg-red-100';
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const label = document.getElementById('currentMonthLabel');
+            const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            label.innerText = `${months[currentMonth]} ${currentYear}`;
+            grid.innerHTML = '';
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div></div>';
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const date = new Date(currentYear, currentMonth, d);
+                const isPast = date < new Date().setHours(0,0,0,0);
+                const priceLevel = getPriceLevel(date);
+                const colorClass = isPast ? 'bg-gray-100 text-gray-400 opacity-50' : getDayColor(date);
+                
+                const cell = document.createElement('div');
+                cell.className = `day-cell active ${colorClass} ${isPast ? '' : 'cursor-pointer hover:shadow-md'}`;
+                cell.innerHTML = `
+                    <span class="font-bold">${d}</span>
+                    <span class="price-indicator ${priceLevel === '$' ? 'text-green-600' : priceLevel === '$$' ? 'text-gray-500' : priceLevel === '$$$' ? 'text-orange-400' : 'text-orange-700'}">${priceLevel}</span>
+                `;
+                
+                if (!isPast) {
+                    cell.onclick = () => selectDate(date);
+                    cell.onmouseenter = () => movePointer(date);
+                }
+                grid.appendChild(cell);
+            }
+        }
+
+        function movePointer(date) {
+            const dateStr = date.toLocaleDateString('pt-BR');
+            const bookingsOnDay = sheetData.filter(row => row['INICIO'] && row['INICIO'].includes(dateStr));
+            let locados = 0;
+            bookingsOnDay.forEach(b => locados += parseInt(b['ITENS LOCADOS'] || 0));
+            const perc = Math.min((locados / 19) * 100, 100);
+            document.getElementById('barPointer').style.left = `${perc}%`;
+        }
+
+        function selectDate(date) {
+            selectedDate = date;
+            currentStep = 'toys';
+            openSheet('toySheet');
+            document.getElementById('toySheetTitle').innerText = `Disponível em ${date.toLocaleDateString('pt-BR')}`;
+            const pl = getPriceLevel(date);
+            const plLabel = document.getElementById('priceLevelLabel');
+            if (pl === '$') { plLabel.innerText = "Valor promocional para este dia"; plLabel.className = "text-sm font-bold mb-4 text-green-600"; }
+            else if (pl === '$$') { plLabel.innerText = ""; }
+            else if (pl === '$$$') { plLabel.innerText = "Valor um pouco acima nesta data"; plLabel.className = "text-sm font-bold mb-4 text-orange-400"; }
+            else { plLabel.innerText = "Valor bem acima nesta data"; plLabel.className = "text-sm font-bold mb-4 text-orange-700"; }
+            
+            cart = [];
+            renderToys();
+            updateSummary();
+            document.getElementById('summaryFooter').style.display = 'flex';
+        }
+
+        function openSheet(id) {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById(id).classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSheet() {
+            document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('open'));
+            document.getElementById('overlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function renderToys() {
+            const list = document.getElementById('toyList');
+            const sort = document.getElementById('sortFilter').value;
+            const ageF = document.getElementById('ageFilter').value;
+
+            let toys = [...TOYS_DB];
+            if (ageF !== 'all') toys = toys.filter(t => t.age === ageF);
+            
+            if (sort === 'az') toys.sort((a,b) => a.name.localeCompare(b.name));
+            else toys.sort((a,b) => a.relevance - b.relevance);
+
+            list.innerHTML = '';
+            toys.forEach(toy => {
+                const inCart = cart.find(c => c.id === toy.id) || { qty: 0 };
+                const ageColor = toy.age === 'L' ? '#28a745' : toy.age === '-6' ? '#ffc107' : '#dc3545';
+                const pl = getPriceLevel(selectedDate);
+                let currentPrice = toy.price;
+                if (toy.category !== 'mesa_comer') {
+                    if (pl === '$') currentPrice *= 0.8;
+                    if (pl === '$$$') currentPrice *= 1.4;
+                    if (pl === '$$$$') currentPrice *= 1.6;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'toy-card flex p-4 relative bg-white';
+                card.innerHTML = `
+                    <div class="w-24 h-24 rounded-xl overflow-hidden mr-4 relative flex-shrink-0">
+                        <img src="https://github.com/encantofestas/site/blob/ecbbc9e62afe23ea83f4a33d57fa3ebfb6287765/areababy.webp?raw=true" class="w-full h-full object-cover">
+                        <div class="age-badge" style="background:${ageColor}">${toy.age}</div>
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="font-bold text-gray-800">${toy.name}</h4>
+                        <p class="text-xs text-gray-400">${toy.size}</p>
+                        <p class="text-blue-600 font-bold mt-1">R$ ${currentPrice.toFixed(2).replace('.',',')}</p>
+                        <div class="flex items-center mt-2 gap-3">
+                            <button onclick="changeQty(${toy.id}, -1)" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center">-</button>
+                            <span class="font-bold w-4 text-center">${inCart.qty}</span>
+                            <button onclick="changeQty(${toy.id}, 1)" class="w-8 h-8 rounded-full border border-blue-600 text-blue-600 flex items-center justify-center">+</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function changeQty(id, delta) {
+            const toy = TOYS_DB.find(t => t.id === id);
+            let item = cart.find(c => c.id === id);
+            
+            if (!item && delta > 0) {
+                item = { ...toy, qty: 1 };
+                cart.push(item);
+            } else if (item) {
+                item.qty = Math.max(0, Math.min(item.qty + delta, toy.qty));
+                if (item.qty === 0) cart = cart.filter(c => c.id !== id);
+            }
+            renderToys();
+            updateSummary();
+        }
+
+        function updateSummary() {
+            let total = 0;
+            let countToys = 0;
+            let countMesasComer = 0;
+            const pl = getPriceLevel(selectedDate);
+            const isWeekday = selectedDate.getDay() > 0 && selectedDate.getDay() < 6;
+
+            cart.forEach(item => {
+                let price = item.price;
+                if (item.category !== 'mesa_comer') {
+                    if (pl === '$') price *= 0.8;
+                    if (pl === '$$$') price *= 1.4;
+                    if (pl === '$$$$') price *= 1.6;
+                    countToys += item.qty;
+                } else {
+                    countMesasComer += item.qty;
+                }
+                total += price * item.qty;
+            });
+
+            // Descontos
+            let discountText = "";
+            if (countToys >= 2) {
+                total *= 0.9; // 10%
+                discountText = "(-10% 2+ itens)";
+            } else if (isWeekday) {
+                total *= 0.95; // 5%
+                discountText = "(-5% dia útil)";
+            }
+
+            // Frete
+            let frete = 0;
+            if (selectedBairro) {
+                frete = BAIRROS[selectedBairro];
+                if (frete === -1) {
+                    document.getElementById('deliveryText').innerText = "VILA DA GLÓRIA (Indisponível)";
+                    document.getElementById('deliveryText').className = "text-red-500 font-bold";
+                    frete = 0;
+                } else {
+                    document.getElementById('deliveryText').innerText = frete === 0 ? "FRETE GRÁTIS" : `TAXA ENTREGA: R$ ${frete},00`;
+                    document.getElementById('deliveryText').className = frete === 0 ? "text-green-600 font-bold" : "text-gray-500 font-bold";
+                }
+            }
+            total += frete;
+
+            // Extra Days
+            if (extraDays > 1) {
+                let baseDay = total - frete;
+                for (let i = 2; i <= extraDays; i++) {
+                    if (i === 2 && !isWeekday) { total += 0; } // Segundo grátis regras
+                    else if (i === 3) total += baseDay * 0.7;
+                    else if (i === 4) total += baseDay * 0.6;
+                    else if (i === 5) total += baseDay * 0.5;
+                }
+            }
+
+            // Monitores
+            total += (monitorsCount * monitorHours * 30);
+
+            // Seguro
+            if (insuranceEnabled) total += 14.90;
+
+            document.getElementById('totalValueText').innerText = `Total: R$ ${total.toFixed(2).replace('.',',')}`;
+            const mainBtn = document.getElementById('mainBtn');
+            mainBtn.disabled = cart.length === 0;
+            mainBtn.style.opacity = cart.length === 0 ? "0.5" : "1";
+        }
+
+        function nextStep() {
+            if (currentStep === 'toys') currentStep = 'id';
+            else if (currentStep === 'id') {
+                const n = document.getElementById('userName').value.trim();
+                if (n.split(' ').length > 3 || n.length > 18 || n === "") {
+                    document.getElementById('userName').style.borderColor = 'red';
+                    return;
+                }
+                currentStep = 'address';
+            }
+            else if (currentStep === 'address') currentStep = 'party';
+            else if (currentStep === 'party') currentStep = 'details';
+            else if (currentStep === 'details') currentStep = 'summary';
+            else if (currentStep === 'summary') {
+                document.getElementById('pixPopup').classList.remove('hidden');
+                return;
+            }
+            
+            closeSheet();
+            setTimeout(() => {
+                openSheet('formSheet');
+                renderForm();
+            }, 400);
+        }
+
+        function renderForm() {
+            const container = document.getElementById('formContent');
+            const summaryBtn = document.getElementById('mainBtn');
+
+            if (currentStep === 'id') {
+                container.innerHTML = `
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fab fa-whatsapp text-green-500"></i> Identificação</h3>
+                    <div class="space-y-4">
+                        <input type="text" id="userName" placeholder="NOME COMPLETO" class="w-full p-4 bg-gray-50 rounded-xl outline-none border-2 border-transparent focus:border-blue-600 uppercase" maxlength="18" oninput="this.value = this.value.toUpperCase()">
+                        <input type="tel" id="userZap" placeholder="(XX) XXXXX-XXXX" class="w-full p-4 bg-gray-50 rounded-xl outline-none border-2 border-transparent focus:border-blue-600" oninput="maskZap(this)">
+                    </div>
+                `;
+            } else if (currentStep === 'address') {
+                container.innerHTML = `
+                    <h3 class="text-xl font-bold mb-4">Endereço de Entrega</h3>
+                    <div class="space-y-4">
+                        <select id="userBairro" onchange="selectedBairro=this.value;updateSummary()" class="w-full p-4 bg-gray-50 rounded-xl outline-none">
+                            <option value="">Selecione o Bairro</option>
+                            ${Object.keys(BAIRROS).map(b => `<option value="${b}">${b}</option>`).join('')}
+                        </select>
+                        <input type="text" id="userRua" placeholder="RUA" class="w-full p-4 bg-gray-50 rounded-xl outline-none border-2 border-transparent focus:border-blue-600" maxlength="35">
+                        <div class="flex gap-2 items-center">
+                            <input type="text" id="userNum" placeholder="N°" class="w-1/3 p-4 bg-gray-50 rounded-xl outline-none border-2 border-transparent focus:border-blue-600" maxlength="4">
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <span>Sem número?</span>
+                                <div class="toggle-switch" id="noNumToggle" onclick="toggleNoNum()">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" id="userRef" placeholder="Detalhes da casa (Ex: muro azul)" class="w-full p-4 bg-gray-50 rounded-xl outline-none">
+                        <textarea id="userObs" placeholder="Mais detalhes (Opcional)" class="w-full p-4 bg-gray-50 rounded-xl outline-none h-24"></textarea>
+                    </div>
+                `;
+            } else if (currentStep === 'party') {
+                container.innerHTML = `
+                    <h3 class="text-xl font-bold mb-4">Detalhes da Festa</h3>
+                    <p class="text-sm text-gray-400 mb-2">Quantas diárias?</p>
+                    <div class="flex justify-between mb-6">
+                        ${[1,2,3,4,5].map(d => `
+                            <div onclick="setExtraDays(${d})" class="relative w-12 h-12 rounded-xl flex items-center justify-center border-2 ${extraDays === d ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-200'}">
+                                ${d}
+                                ${d === 2 ? '<span class="free-badge">Grátis!</span>' : ''}
+                                ${d > 2 ? `<span class="absolute -top-3 text-[10px] text-green-600 font-bold">-${(10*d)}%</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="text-xs text-gray-400">Início</label>
+                            <select onchange="startTime=this.value" class="w-full p-3 bg-gray-50 rounded-xl">
+                                ${Array.from({length:13}, (_,i) => i+9).map(h => `<option value="${h}:00">${h}:00</option>`)}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-400">Término</label>
+                            <select onchange="endTime=this.value" class="w-full p-3 bg-gray-50 rounded-xl">
+                                ${Array.from({length:13}, (_,i) => i+10).map(h => `<option value="${h}:00">${h}:00</option>`)}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <span class="text-sm">Levar 1 dia antes?</span>
+                        <div class="toggle-switch" onclick="this.classList.toggle('on')">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                `;
+            } else if (currentStep === 'details') {
+                container.innerHTML = `
+                    <h3 class="text-xl font-bold mb-4">Configuração</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <p class="text-sm font-bold mb-2">Contratar monitores?</p>
+                            <div class="flex gap-2">
+                                <button onclick="monitorsCount=0;updateSummary();renderForm()" class="flex-1 py-2 rounded-lg border ${monitorsCount===0?'bg-blue-600 text-white':'bg-white'}">NÃO</button>
+                                <button onclick="monitorsCount=1;updateSummary();renderForm()" class="flex-1 py-2 rounded-lg border ${monitorsCount===1?'bg-blue-600 text-white':'bg-white'}">1 MONIT.</button>
+                                <button onclick="monitorsCount=2;updateSummary();renderForm()" class="flex-1 py-2 rounded-lg border ${monitorsCount===2?'bg-blue-600 text-white':'bg-white'}">2 MONIT.</button>
+                            </div>
+                        </div>
+                        ${cart.find(c => c.category==='piscina') ? `
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <p class="text-sm font-bold mb-2">Piscina de bolinhas em caso de chuva:</p>
+                            <select onchange="rainInfo=this.value" class="w-full p-2 bg-white rounded-lg outline-none">
+                                <option>Não molha nada</option>
+                                <option>Molha um pouco</option>
+                                <option>Molha muito</option>
+                            </select>
+                        </div>` : ''}
+                        ${cart.filter(c => c.power).map(toy => `
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <p class="text-sm font-bold mb-1">${toy.name}</p>
+                            <p class="text-xs text-gray-400 mb-2">Distância da tomada:</p>
+                            <div class="flex gap-2 overflow-x-auto">
+                                ${[5,10,15,20].map(m => `
+                                    <button onclick="socketDistances['${toy.id}']=${m};this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('bg-blue-600','text-white'));this.classList.add('bg-blue-600','text-white')" class="px-4 py-2 rounded-lg border bg-white whitespace-nowrap">${m}m</button>
+                                `).join('')}
+                            </div>
+                        </div>`).join('')}
+                    </div>
+                `;
+            } else if (currentStep === 'summary') {
+                container.innerHTML = `
+                    <h3 class="text-xl font-bold mb-4">Resumo do Pedido</h3>
+                    <div class="space-y-2 mb-6">
+                        ${cart.map(i => `<div class="flex justify-between text-sm"><span>${i.qty}x ${i.name}</span> <span class="text-gray-400">R$ ${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-2xl">
+                            <div class="flex-grow">
+                                <p class="text-sm font-bold text-green-800">Seguro Adicional + R$ 14,90</p>
+                                <p class="text-[10px] text-green-600">Evite prejuízos de até R$ 300,00 em danos.</p>
+                            </div>
+                            <div class="toggle-switch ${insuranceEnabled?'on':''}" onclick="toggleInsurance(this)">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                            <div class="flex-grow">
+                                <p class="text-sm font-bold">Emitir Nota Fiscal?</p>
+                                ${nfEnabled ? `<input type="text" id="cnpj" placeholder="CNPJ 00.000..." class="w-full mt-2 p-2 bg-white rounded-lg border outline-none">` : ''}
+                            </div>
+                            <div class="toggle-switch ${nfEnabled?'on':''}" onclick="toggleNF(this)">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 rounded-2xl">
+                            <input type="text" id="coupon" placeholder="CUPOM DE DESCONTO" class="w-full p-2 bg-white rounded-lg border outline-none text-center font-bold">
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function maskZap(i) {
+            let v = i.value.replace(/\D/g, "");
+            if (v.length > 11) v = v.slice(0, 11);
+            if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`;
+            if (v.length > 9) v = `${v.slice(0, 10)}-${v.slice(10)}`;
+            i.value = v;
+        }
+
+        function toggleNoNum() {
+            const toggle = document.getElementById('noNumToggle');
+            const input = document.getElementById('userNum');
+            toggle.classList.toggle('on');
+            if (toggle.classList.contains('on')) {
+                input.value = "";
+                input.placeholder = "S/N";
+                input.disabled = true;
+            } else {
+                input.placeholder = "N°";
+                input.disabled = false;
+            }
+        }
+
+        function setExtraDays(d) {
+            extraDays = d;
+            updateSummary();
+            renderForm();
+        }
+
+        function toggleInsurance(el) {
+            el.classList.toggle('on');
+            insuranceEnabled = el.classList.contains('on');
+            updateSummary();
+        }
+
+        function toggleNF(el) {
+            el.classList.toggle('on');
+            nfEnabled = el.classList.contains('on');
+            renderForm();
+        }
+
+        function copyPix() {
+            const key = "57545647000116";
+            const el = document.createElement('textarea');
+            el.value = key;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert("Código Pix copiado!");
+        }
+
+    </script>
+</body>
+</html>
